@@ -5,16 +5,24 @@ import { sortTasks } from '../utils';
 import TaskCard from './TaskCard';
 import TaskForm from './TaskForm';
 import { PlusCircle, Menu } from 'lucide-react';
+import { Button } from './ui/button';
 
 const Dashboard: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
-  const { state, toggleSidebar } = useAppContext();
-  const { tasks, viewMode, showHiddenTasks, sidebarOpen } = state;
+  const { state, toggleSidebar, updateDateDisplayOptions } = useAppContext();
+  const { tasks, viewMode, showHiddenTasks, sidebarOpen, dateDisplayOptions } = state;
 
   const visibleTasks = tasks.filter(task => 
     !task.completed && (showHiddenTasks || !task.hidden)
   );
   const sortedTasks = sortTasks(visibleTasks, viewMode);
+
+  const toggleDateOption = (option: keyof typeof dateDisplayOptions) => {
+    updateDateDisplayOptions({
+      ...dateDisplayOptions,
+      [option]: !dateDisplayOptions[option]
+    });
+  };
 
   return (
     <div className={`transition-all duration-300 ${sidebarOpen ? 'ml-60' : 'ml-16'}`}>
@@ -30,13 +38,43 @@ const Dashboard: React.FC = () => {
             {viewMode === 'power' ? 'Modo Potência' : 'Modo Cronologia'}
           </h1>
         </div>
-        <button
-          onClick={() => setShowForm(true)}
-          className="p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-full flex items-center shadow-sm"
-          aria-label="Nova tarefa"
-        >
-          <PlusCircle size={20} />
-        </button>
+        
+        <div className="flex items-center gap-2">
+          <div className="flex gap-2 mr-2">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => toggleDateOption('hideDate')}
+              className={dateDisplayOptions.hideDate ? 'bg-gray-200' : ''}
+            >
+              Ocultar Data
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => toggleDateOption('hideYear')}
+              className={dateDisplayOptions.hideYear ? 'bg-gray-200' : ''}
+            >
+              Ocultar Ano
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => toggleDateOption('hideTime')}
+              className={dateDisplayOptions.hideTime ? 'bg-gray-200' : ''}
+            >
+              Ocultar Hora
+            </Button>
+          </div>
+          
+          <button
+            onClick={() => setShowForm(true)}
+            className="p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-full flex items-center shadow-sm"
+            aria-label="Nova tarefa"
+          >
+            <PlusCircle size={20} />
+          </button>
+        </div>
       </header>
 
       <main className="p-4 max-w-3xl mx-auto">

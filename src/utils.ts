@@ -1,15 +1,33 @@
 
 import { Task } from './types';
 
-export const formatDate = (date: Date | null): string => {
+export const formatDate = (date: Date | null, options?: {
+  hideYear?: boolean,
+  hideTime?: boolean,
+  hideDate?: boolean
+}): string => {
   if (!date) return '';
   
-  return new Intl.DateTimeFormat('pt-BR', {
-    day: '2-digit',
-    month: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit'
-  }).format(date);
+  const { hideYear = false, hideTime = false, hideDate = false } = options || {};
+  
+  if (hideDate) return '';
+  
+  const formatOptions: Intl.DateTimeFormatOptions = {};
+  
+  if (!hideDate) {
+    formatOptions.day = '2-digit';
+    formatOptions.month = '2-digit';
+    if (!hideYear) {
+      formatOptions.year = 'numeric';
+    }
+  }
+  
+  if (!hideTime) {
+    formatOptions.hour = '2-digit';
+    formatOptions.minute = '2-digit';
+  }
+  
+  return new Intl.DateTimeFormat('pt-BR', formatOptions).format(date);
 };
 
 export const getTaskPriorityClass = (score: number): string => {

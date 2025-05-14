@@ -22,10 +22,17 @@ export interface TaskFormData {
 
 export type ViewMode = 'power' | 'chronological';
 
+export interface DateDisplayOptions {
+  hideYear: boolean;
+  hideTime: boolean;
+  hideDate: boolean;
+}
+
 export interface AppState {
   tasks: Task[];
   viewMode: ViewMode;
   showHiddenTasks: boolean;
   darkMode: boolean;
   sidebarOpen: boolean;
+  dateDisplayOptions: DateDisplayOptions;
 }

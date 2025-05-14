@@ -12,10 +12,12 @@ import { X } from 'lucide-react';
 
 interface TaskFormProps {
   onClose: () => void;
+  initialData?: TaskFormData;
+  taskId?: string;
 }
 
-const TaskForm: React.FC<TaskFormProps> = ({ onClose }) => {
-  const [formData, setFormData] = useState<TaskFormData>({
+const TaskForm: React.FC<TaskFormProps> = ({ onClose, initialData, taskId }) => {
+  const [formData, setFormData] = useState<TaskFormData>(initialData || {
     title: '',
     consequenceScore: 3,
     prideScore: 3,
@@ -23,7 +25,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose }) => {
     idealDate: null
   });
   
-  const { addTask } = useAppContext();
+  const { addTask, updateTask } = useAppContext();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,7 +35,11 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose }) => {
       return;
     }
     
-    addTask(formData);
+    if (taskId) {
+      updateTask(taskId, formData);
+    } else {
+      addTask(formData);
+    }
     onClose();
   };
 
@@ -59,7 +65,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose }) => {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white dark:bg-gray-800 rounded-lg w-full max-w-md shadow-xl">
         <div className="flex justify-between items-center p-4 border-b">
-          <h2 className="text-lg font-semibold">Nova Tarefa</h2>
+          <h2 className="text-lg font-semibold">{taskId ? 'Editar Tarefa' : 'Nova Tarefa'}</h2>
           <button onClick={onClose} className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
             <X size={20} />
           </button>
@@ -90,6 +96,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose }) => {
               type="datetime-local"
               id="idealDate"
               name="idealDate"
+              value={formData.idealDate ? new Date(formData.idealDate.getTime() - (formData.idealDate.getTimezoneOffset() * 60000)).toISOString().slice(0, 16) : ''}
               onChange={handleDateChange}
               className="w-full p-2 border rounded-md"
             />
@@ -110,7 +117,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose }) => {
 
           <div>
             <h3 className="font-medium mb-2 flex justify-between">
-              <span>Orgulho Pós-Execução</span>
+              <span>Orgulho pós-execução</span>
               <span>{formData.prideScore}/5</span>
             </h3>
             <ScoreSlider
@@ -123,7 +130,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose }) => {
 
           <div>
             <h3 className="font-medium mb-2 flex justify-between">
-              <span>Força de Construção Pessoal</span>
+              <span>Força de construção pessoal</span>
               <span>{formData.constructionScore}/5</span>
             </h3>
             <ScoreSlider
