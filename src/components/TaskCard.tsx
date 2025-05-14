@@ -20,7 +20,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
   const titleInputRef = useRef<HTMLInputElement>(null);
 
   const handleTitleClick = () => {
-    if (!expanded) return;
+    // Removida a condição que exigia o card estar expandido
     setIsEditingTitle(true);
   };
 
@@ -60,7 +60,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
   return (
     <div
       className={`task-card ${priorityClass} ${task.completed ? 'opacity-50' : ''}`}
-      onClick={() => setExpanded(!expanded)}
+      onClick={() => !isEditingTitle && setExpanded(!expanded)}
     >
       <div className="flex justify-between items-start">
         <div className="flex-1">
@@ -79,7 +79,10 @@ const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
           ) : (
             <h3 
               className="text-base font-medium cursor-pointer"
-              onClick={handleTitleClick}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleTitleClick();
+              }}
             >
               {task.title}
             </h3>
