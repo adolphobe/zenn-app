@@ -96,14 +96,14 @@ const RatingSlider: React.FC<RatingSliderProps> = ({
         />
         
         {/* Custom step indicators for visual clarity */}
-        <div className="absolute top-0 left-0 w-full flex justify-between px-3 pointer-events-none">
+     <div className="absolute top-0 left-0 w-full flex justify-between px-3 pointer-events-none">
   {Array.from({ length: maxValue }, (_, i) => i + 1).map((step) => (
     <div
       key={step}
       className={cn(
-        "w-6 h-6 rounded-full border-2 transition-all duration-200", // Aumentei de w-5 h-5 para w-6 h-6
-        // Ajuste o posicionamento vertical para cima
-        "transform translate-y-0", // Ou você pode usar translate-y-[-4px] para mover 4px para cima
+        "w-6 h-6 rounded-full border-2 transition-all duration-200",
+        // Mover 4px mais para cima
+        "transform translate-y-[-4px]", // Isso vai mover as bolinhas 4px para cima
         step <= value
           ? cn("bg-white", styles.activeBorder)
           : cn("bg-white", styles.border)
