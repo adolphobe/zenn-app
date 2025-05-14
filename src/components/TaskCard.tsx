@@ -14,7 +14,8 @@ const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
   const [expanded, setExpanded] = useState(false);
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [titleValue, setTitleValue] = useState(task.title);
-  const { toggleTaskCompleted, toggleTaskHidden, deleteTask, updateTaskTitle } = useAppContext();
+  const { toggleTaskCompleted, toggleTaskHidden, deleteTask, updateTaskTitle, state } = useAppContext();
+  const { dateDisplayOptions } = state;
   const priorityClass = getTaskPriorityClass(task.totalScore);
   const titleInputRef = useRef<HTMLInputElement>(null);
 
@@ -88,7 +89,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
         <div className="flex items-center">
           {task.idealDate && (
             <div className="text-xs text-right ml-3">
-              {formatDate(task.idealDate)}
+              {formatDate(task.idealDate, dateDisplayOptions)}
             </div>
           )}
           <div className="flex items-center justify-center bg-white bg-opacity-40 rounded-full px-2 py-1 text-xs font-semibold ml-2">

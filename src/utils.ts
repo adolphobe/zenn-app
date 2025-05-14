@@ -1,11 +1,7 @@
 
-import { Task } from './types';
+import { Task, DateDisplayOptions } from './types';
 
-export const formatDate = (date: Date | null, options?: {
-  hideYear?: boolean,
-  hideTime?: boolean,
-  hideDate?: boolean
-}): string => {
+export const formatDate = (date: Date | null, options?: DateDisplayOptions): string => {
   if (!date) return '';
   
   const { hideYear = false, hideTime = false, hideDate = false } = options || {};

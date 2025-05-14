@@ -1,7 +1,7 @@
 
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { AppState, Task, TaskFormData, ViewMode } from '../types';
+import { AppState, Task, TaskFormData, ViewMode, DateDisplayOptions } from '../types';
 import { SAMPLE_TASKS } from '../constants';
 
 // Actions
@@ -11,10 +11,12 @@ type Action =
   | { type: 'TOGGLE_TASK_COMPLETED'; payload: string }
   | { type: 'TOGGLE_TASK_HIDDEN'; payload: string }
   | { type: 'UPDATE_TASK'; payload: { id: string; data: Partial<TaskFormData> } }
+  | { type: 'UPDATE_TASK_TITLE'; payload: { id: string; title: string } }
   | { type: 'SET_VIEW_MODE'; payload: ViewMode }
   | { type: 'TOGGLE_SHOW_HIDDEN_TASKS' }
   | { type: 'TOGGLE_DARK_MODE' }
-  | { type: 'TOGGLE_SIDEBAR' };
+  | { type: 'TOGGLE_SIDEBAR' }
+  | { type: 'UPDATE_DATE_DISPLAY_OPTIONS'; payload: DateDisplayOptions };
 
 // Context interface
 interface AppContextType {
@@ -25,10 +27,12 @@ interface AppContextType {
   toggleTaskCompleted: (id: string) => void;
   toggleTaskHidden: (id: string) => void;
   updateTask: (id: string, data: Partial<TaskFormData>) => void;
+  updateTaskTitle: (id: string, title: string) => void;
   setViewMode: (mode: ViewMode) => void;
   toggleShowHiddenTasks: () => void;
   toggleDarkMode: () => void;
   toggleSidebar: () => void;
+  updateDateDisplayOptions: (options: DateDisplayOptions) => void;
 }
 
 // Initial state
@@ -37,7 +41,12 @@ const initialState: AppState = {
   viewMode: 'power',
   showHiddenTasks: false,
   darkMode: false,
-  sidebarOpen: true
+  sidebarOpen: true,
+  dateDisplayOptions: {
+    hideYear: false,
+    hideTime: false,
+    hideDate: false
+  }
 };
 
 // Create context
@@ -114,6 +123,14 @@ const appReducer = (state: AppState, action: Action): AppState => {
       };
     }
 
+    case 'UPDATE_TASK_TITLE':
+      return {
+        ...state,
+        tasks: state.tasks.map(task =>
+          task.id === action.payload.id ? { ...task, title: action.payload.title } : task
+        )
+      };
+
     case 'SET_VIEW_MODE':
       return { ...state, viewMode: action.payload };
 
@@ -125,6 +142,9 @@ const appReducer = (state: AppState, action: Action): AppState => {
 
     case 'TOGGLE_SIDEBAR':
       return { ...state, sidebarOpen: !state.sidebarOpen };
+
+    case 'UPDATE_DATE_DISPLAY_OPTIONS':
+      return { ...state, dateDisplayOptions: action.payload };
 
     default:
       return state;
@@ -183,6 +203,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     dispatch({ type: 'UPDATE_TASK', payload: { id, data } });
   };
 
+  const updateTaskTitle = (id: string, title: string) => {
+    dispatch({ type: 'UPDATE_TASK_TITLE', payload: { id, title } });
+  };
+
   const setViewMode = (mode: ViewMode) => {
     dispatch({ type: 'SET_VIEW_MODE', payload: mode });
   };
@@ -199,6 +223,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     dispatch({ type: 'TOGGLE_SIDEBAR' });
   };
 
+  const updateDateDisplayOptions = (options: DateDisplayOptions) => {
+    dispatch({ type: 'UPDATE_DATE_DISPLAY_OPTIONS', payload: options });
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -209,10 +237,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         toggleTaskCompleted,
         toggleTaskHidden,
         updateTask,
+        updateTaskTitle,
         setViewMode,
         toggleShowHiddenTasks,
         toggleDarkMode,
-        toggleSidebar
+        toggleSidebar,
+        updateDateDisplayOptions
       }}
     >
       {children}
