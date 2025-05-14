@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { TaskFormData } from '../types';
@@ -62,22 +61,21 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, initialData, taskId }) => 
   const totalScore = formData.consequenceScore + formData.prideScore + formData.constructionScore;
 
   return (
-    <div className="fundo-modal aparecer-suave">
-      <div className="conteudo-modal">
-        <div className="cabecalho-modal">
-          <h2 className="subtitulo">{taskId ? 'Editar Tarefa' : 'Nova Tarefa'}</h2>
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
+      <div className="bg-white dark:bg-gray-800 rounded-xl w-full max-w-md shadow-lg overflow-hidden">
+        <div className="flex justify-between items-center p-5 border-b">
+          <h2 className="text-xl font-semibold">{taskId ? 'Editar Tarefa' : 'Nova Tarefa'}</h2>
           <button 
             onClick={onClose} 
-            className="botao botao-circular botao-circular-pequeno botao-secundario"
-            aria-label="Fechar"
+            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
           >
             <X size={20} />
           </button>
         </div>
         
-        <form onSubmit={handleSubmit} className="corpo-modal espaco-entre-itens-g flex-coluna">
-          <div className="campo-formulario">
-            <label htmlFor="title" className="rotulo-campo">
+        <form onSubmit={handleSubmit} className="p-5 space-y-6 max-h-[calc(100vh-12rem)] overflow-y-auto">
+          <div>
+            <label htmlFor="title" className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
               Título da Tarefa
             </label>
             <input
@@ -86,14 +84,14 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, initialData, taskId }) => 
               name="title"
               value={formData.title}
               onChange={handleChange}
-              className="entrada-texto"
+              className="w-full p-3 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
               placeholder="O que precisa ser feito?"
               required
             />
           </div>
 
-          <div className="campo-formulario">
-            <label htmlFor="idealDate" className="rotulo-campo">
+          <div>
+            <label htmlFor="idealDate" className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
               Data/Hora Ideal (opcional)
             </label>
             <input
@@ -102,14 +100,14 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, initialData, taskId }) => 
               name="idealDate"
               value={formData.idealDate ? new Date(formData.idealDate.getTime() - (formData.idealDate.getTimezoneOffset() * 60000)).toISOString().slice(0, 16) : ''}
               onChange={handleDateChange}
-              className="entrada-texto"
+              className="w-full p-3 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
             />
           </div>
 
           <RatingSlider
             value={formData.consequenceScore}
             onChange={(value) => setFormData(prev => ({ ...prev, consequenceScore: value }))}
-            color="azul"
+            color="blue"
             label="Consequência de Ignorar"
             description={CONSEQUENCE_PHRASES}
           />
@@ -117,7 +115,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, initialData, taskId }) => 
           <RatingSlider
             value={formData.prideScore}
             onChange={(value) => setFormData(prev => ({ ...prev, prideScore: value }))}
-            color="laranja"
+            color="orange"
             label="Orgulho pós-execução"
             description={PRIDE_PHRASES}
           />
@@ -125,17 +123,17 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, initialData, taskId }) => 
           <RatingSlider
             value={formData.constructionScore}
             onChange={(value) => setFormData(prev => ({ ...prev, constructionScore: value }))}
-            color="verde"
+            color="green"
             label="Força de construção pessoal"
             description={CONSTRUCTION_PHRASES}
           />
 
-          <div className="card margem-topo-m">
-            <div className="flex-entre">
-              <span className="texto-normal">Score Total:</span>
-              <span className="texto-normal subtitulo">{totalScore}/15</span>
+          <div className="mt-5 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg shadow-sm">
+            <div className="font-medium flex justify-between">
+              <span>Score Total:</span>
+              <span className="font-semibold">{totalScore}/15</span>
             </div>
-            <div className="texto-pequeno texto-secundario margem-topo-p">
+            <div className="text-xs text-gray-500 mt-1">
               {totalScore >= 14 ? "Tarefa Crítica" : 
                totalScore >= 11 ? "Tarefa Importante" : 
                totalScore >= 8 ? "Tarefa Moderada" : 
@@ -143,17 +141,17 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, initialData, taskId }) => 
             </div>
           </div>
 
-          <div className="flex espaco-entre-itens-m" style={{justifyContent: 'flex-end'}}>
+          <div className="mt-6 flex justify-end space-x-4">
             <button
               type="button"
               onClick={onClose}
-              className="botao botao-secundario"
+              className="px-5 py-2.5 text-sm font-medium border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors"
             >
               Cancelar
             </button>
             <button
               type="submit"
-              className="botao botao-primario"
+              className="px-5 py-2.5 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 transition-all"
             >
               Salvar
             </button>

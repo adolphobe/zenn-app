@@ -1,11 +1,13 @@
 
-import React, { useState } from 'react';
+import React from 'react';
+import { cn } from "@/lib/utils";
+import { Slider } from "@/components/ui/slider";
 
 interface RatingSliderProps {
   value: number;
   onChange: (value: number) => void;
   maxValue?: number;
-  color: 'azul' | 'laranja' | 'verde';
+  color: 'blue' | 'orange' | 'green';
   label: string;
   description: string[];
   className?: string;
@@ -20,135 +22,97 @@ const RatingSlider: React.FC<RatingSliderProps> = ({
   description,
   className
 }) => {
-  // Estado para controle de arrastar
-  const [isDragging, setIsDragging] = useState(false);
-  
-  // Função para determinar qual classe de cor usar
-  const getColorClasses = () => {
-    switch(color) {
-      case 'azul':
-        return {
-          container: 'container-slider container-slider-azul',
-          titulo: 'titulo-slider titulo-slider-azul',
-          ponto: 'ponto-slider ponto-slider-azul',
-          pontoAtivo: 'ponto-slider ponto-slider-azul ponto-ativo',
-          progresso: 'progresso-azul',
-          descricao: 'descricao-slider descricao-slider-azul'
-        };
-      case 'laranja':
-        return {
-          container: 'container-slider container-slider-laranja',
-          titulo: 'titulo-slider titulo-slider-laranja',
-          ponto: 'ponto-slider ponto-slider-laranja',
-          pontoAtivo: 'ponto-slider ponto-slider-laranja ponto-ativo',
-          progresso: 'progresso-laranja',
-          descricao: 'descricao-slider descricao-slider-laranja'
-        };
-      case 'verde':
-        return {
-          container: 'container-slider container-slider-verde',
-          titulo: 'titulo-slider titulo-slider-verde',
-          ponto: 'ponto-slider ponto-slider-verde',
-          pontoAtivo: 'ponto-slider ponto-slider-verde ponto-ativo',
-          progresso: 'progresso-verde',
-          descricao: 'descricao-slider descricao-slider-verde'
-        };
-      default:
-        return {
-          container: 'container-slider container-slider-azul',
-          titulo: 'titulo-slider titulo-slider-azul',
-          ponto: 'ponto-slider ponto-slider-azul',
-          pontoAtivo: 'ponto-slider ponto-slider-azul ponto-ativo',
-          progresso: 'progresso-azul',
-          descricao: 'descricao-slider descricao-slider-azul'
-        };
+  // Define styling based on color theme
+  const colorStyles = {
+    blue: {
+      bg: 'bg-blue-50',
+      track: 'bg-blue-200',
+      fill: 'bg-blue-500',
+      text: 'text-blue-700',
+      border: 'border-blue-200',
+      activeBorder: 'border-blue-500',
+      hover: 'hover:bg-blue-100',
+      gradient: 'from-blue-300 to-blue-500'
+    },
+    orange: {
+      bg: 'bg-orange-50',
+      track: 'bg-orange-200',
+      fill: 'bg-orange-500',
+      text: 'text-orange-700',
+      border: 'border-orange-200',
+      activeBorder: 'border-orange-500',
+      hover: 'hover:bg-orange-100',
+      gradient: 'from-orange-300 to-orange-500'
+    },
+    green: {
+      bg: 'bg-emerald-50',
+      track: 'bg-emerald-200',
+      fill: 'bg-emerald-500',
+      text: 'text-emerald-700',
+      border: 'border-emerald-200',
+      activeBorder: 'border-emerald-500',
+      hover: 'hover:bg-emerald-100',
+      gradient: 'from-emerald-300 to-emerald-500'
     }
   };
 
-  const colorClasses = getColorClasses();
+  const styles = colorStyles[color];
   
-  // Calcular largura da barra de progresso (0% quando value=1, 100% quando value=maxValue)
-  const progressWidth = value === 1 ? '0%' : `${((value - 1) / (maxValue - 1)) * 100}%`;
+  // Custom slider display logic
+  const displayValue = value === 0 ? 1 : value;
+  const progressWidth = value === 1 ? 0 : `${((value - 1) / (maxValue - 1)) * 100}%`;
   
-  // Manipulador de clique nos pontos
-  const handlePointClick = (newValue: number) => {
-    onChange(newValue);
+  // Handle slider change
+  const handleSliderChange = (values: number[]) => {
+    onChange(values[0]);
   };
-
-  // Manipuladores para arrastar
-  const handleMouseDown = () => {
-    setIsDragging(true);
-  };
-
-  const handleMouseUp = () => {
-    setIsDragging(false);
-  };
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!isDragging) return;
-    
-    const container = e.currentTarget;
-    const rect = container.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const width = rect.width;
-    
-    // Calcular posição relativa e converter para valor (1-5)
-    let newPosition = Math.max(0, Math.min(1, x / width));
-    let newValue = Math.ceil(newPosition * maxValue);
-    if (newValue === 0) newValue = 1;
-    
-    onChange(newValue);
-  };
-
-  // Garantir que os eventos de mouse são removidos quando o componente é desmontado
-  React.useEffect(() => {
-    const handleGlobalMouseUp = () => {
-      setIsDragging(false);
-    };
-    
-    window.addEventListener('mouseup', handleGlobalMouseUp);
-    return () => {
-      window.removeEventListener('mouseup', handleGlobalMouseUp);
-    };
-  }, []);
 
   return (
-    <div className={`${colorClasses.container} ${className || ''}`}>
-      <div className="cabecalho-slider">
-        <h3 className={colorClasses.titulo}>{label}</h3>
-        <span className={`valor-slider ${colorClasses.titulo}`}>{value}/{maxValue}</span>
+    <div className={cn("rounded-lg p-5 mb-6 transition-all", styles.bg, className)}>
+      <div className="flex justify-between items-center mb-3">
+        <h3 className={cn("font-medium text-sm", styles.text)}>{label}</h3>
+        <span className={cn("font-semibold text-sm", styles.text)}>
+          {displayValue}/{maxValue}
+        </span>
       </div>
       
-      {/* Container para os pontos e barra de progresso */}
-      <div 
-        className="container-slider-pontos cursor-arrastar"
-        onMouseDown={handleMouseDown}
-        onMouseUp={handleMouseUp}
-        onMouseMove={handleMouseMove}
-      >
-        {/* Barra de progresso de fundo */}
-        <div className="barra-progresso">
-          {/* Barra de progresso colorida - visível apenas quando o valor > 1 */}
-          {value > 1 && (
-            <div 
-              className={`barra-progresso ${colorClasses.progresso}`}
-              style={{ width: progressWidth }}
-            ></div>
-          )}
-        </div>
+      <div className="relative mb-4 px-3 py-1">
+        {/* Interactive slider */}
+        <Slider
+          value={[value]}
+          min={1}
+          max={maxValue}
+          step={1}
+          onValueChange={handleSliderChange}
+          classNames={{
+            track: cn(styles.track),
+            range: cn(
+              "bg-gradient-to-r", 
+              styles.gradient,
+              value === 1 ? "opacity-0" : "opacity-100"
+            ),
+            thumb: cn(styles.fill, styles.activeBorder)
+          }}
+        />
         
-        {/* Pontos */}
-        {Array.from({ length: maxValue }, (_, i) => i + 1).map((point) => (
-          <div
-            key={point}
-            className={point <= value ? colorClasses.pontoAtivo : colorClasses.ponto}
-            onClick={() => handlePointClick(point)}
-          />
-        ))}
+        {/* Custom step indicators for visual clarity */}
+        <div className="absolute top-0 left-0 w-full flex justify-between px-2.5 pointer-events-none">
+          {Array.from({ length: maxValue }, (_, i) => i + 1).map((step) => (
+            <div
+              key={step}
+              className={cn(
+                "w-5 h-5 rounded-full -mt-1.5 border-2 transition-all duration-200",
+                step <= value
+                  ? cn("bg-white", styles.activeBorder)
+                  : cn("bg-white", styles.border)
+              )}
+            />
+          ))}
+        </div>
       </div>
       
-      {/* Descrição que muda com o valor */}
-      <p className={colorClasses.descricao}>
+      {/* Description text that changes based on selected value */}
+      <p className={cn("text-sm mt-3", styles.text)}>
         {description[value - 1]}
       </p>
     </div>

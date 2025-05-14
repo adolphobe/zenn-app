@@ -22,74 +22,81 @@ const Sidebar: React.FC = () => {
   } = useAppContext();
 
   return (
-    <div className={`barra-lateral ${sidebarOpen ? 'barra-lateral-expandida' : 'barra-lateral-recolhida'}`}>
-      <div className="cabecalho-barra-lateral">
-        <h1 className={`subtitulo ${!sidebarOpen && 'escondido'}`} style={{color: 'var(--cor-primaria)'}}>ACTO</h1>
-        <button 
-          onClick={toggleSidebar} 
-          className="botao botao-circular botao-circular-pequeno botao-secundario"
-        >
-          {sidebarOpen ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
-        </button>
-      </div>
+    <>
+      <div 
+        className={`fixed top-0 left-0 h-full bg-white dark:bg-gray-900 border-r border-gray-100 dark:border-gray-800 
+                  transition-all duration-300 z-30 card-shadow ${sidebarOpen ? 'w-64' : 'w-20'}`}
+      >
+        <div className="p-5 flex items-center justify-between border-b border-gray-100 dark:border-gray-800">
+          <h1 className={`font-semibold text-xl text-blue-600 dark:text-blue-400 ${!sidebarOpen && 'sr-only'}`}>ACTO</h1>
+          <button 
+            onClick={toggleSidebar} 
+            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+          >
+            {sidebarOpen ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
+          </button>
+        </div>
 
-      <div className="conteudo-barra-lateral">
-        <div className="secao-barra-lateral">
-          <p className={`titulo-secao-barra-lateral ${!sidebarOpen && 'escondido'}`}>
-            Modos
-          </p>
+        <div className="p-3">
+          <div className="mb-6">
+            <p className={`text-xs text-gray-500 px-4 py-2 ${!sidebarOpen && 'sr-only'}`}>
+              Modos
+            </p>
+            
+            <button 
+              className={`sidebar-item ${viewMode === 'power' ? 'active' : ''} w-full`}
+              onClick={() => setViewMode('power')}
+            >
+              <LayoutDashboard size={20} />
+              {sidebarOpen && <span>Modo Potência</span>}
+            </button>
+            
+            <button 
+              className={`sidebar-item ${viewMode === 'chronological' ? 'active' : ''} w-full`}
+              onClick={() => setViewMode('chronological')}
+            >
+              <CalendarClock size={20} />
+              {sidebarOpen && <span>Modo Cronologia</span>}
+            </button>
+          </div>
           
-          <button 
-            className={`item-barra-lateral ${viewMode === 'power' ? 'item-barra-lateral-ativo' : ''}`}
-            onClick={() => setViewMode('power')}
-          >
-            <LayoutDashboard size={20} />
-            {sidebarOpen && <span>Modo Potência</span>}
-          </button>
+          <div className="mb-6">
+            <p className={`text-xs text-gray-500 px-4 py-2 ${!sidebarOpen && 'sr-only'}`}>
+              Filtros
+            </p>
+            
+            <button 
+              className={`sidebar-item ${showHiddenTasks ? 'active' : ''} w-full`}
+              onClick={toggleShowHiddenTasks}
+            >
+              <Eye size={20} />
+              {sidebarOpen && <span>Mostrar Tarefas Ocultas</span>}
+            </button>
+          </div>
           
-          <button 
-            className={`item-barra-lateral ${viewMode === 'chronological' ? 'item-barra-lateral-ativo' : ''}`}
-            onClick={() => setViewMode('chronological')}
-          >
-            <CalendarClock size={20} />
-            {sidebarOpen && <span>Modo Cronologia</span>}
-          </button>
-        </div>
-        
-        <div className="secao-barra-lateral">
-          <p className={`titulo-secao-barra-lateral ${!sidebarOpen && 'escondido'}`}>
-            Filtros
-          </p>
-          
-          <button 
-            className={`item-barra-lateral ${showHiddenTasks ? 'item-barra-lateral-ativo' : ''}`}
-            onClick={toggleShowHiddenTasks}
-          >
-            <Eye size={20} />
-            {sidebarOpen && <span>Mostrar Tarefas Ocultas</span>}
-          </button>
-        </div>
-        
-        <div className="secao-barra-lateral">
-          <p className={`titulo-secao-barra-lateral ${!sidebarOpen && 'escondido'}`}>
-            Configurações
-          </p>
-          
-          <button 
-            className="item-barra-lateral"
-            onClick={toggleDarkMode}
-          >
-            {darkMode ? <Sun size={20} /> : <Moon size={20} />}
-            {sidebarOpen && <span>{darkMode ? 'Modo Claro' : 'Modo Escuro'}</span>}
-          </button>
-          
-          <button className="item-barra-lateral">
-            <Settings size={20} />
-            {sidebarOpen && <span>Configurações</span>}
-          </button>
+          <div className="mb-6">
+            <p className={`text-xs text-gray-500 px-4 py-2 ${!sidebarOpen && 'sr-only'}`}>
+              Configurações
+            </p>
+            
+            <button 
+              className={`sidebar-item w-full`}
+              onClick={toggleDarkMode}
+            >
+              {darkMode ? <Sun size={20} /> : <Moon size={20} />}
+              {sidebarOpen && <span>{darkMode ? 'Modo Claro' : 'Modo Escuro'}</span>}
+            </button>
+            
+            <button 
+              className={`sidebar-item w-full`}
+            >
+              <Settings size={20} />
+              {sidebarOpen && <span>Configurações</span>}
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 
