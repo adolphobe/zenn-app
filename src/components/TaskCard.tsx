@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Task } from '../types';
 import { useAppContext } from '../context/AppContext';
 import { formatDate, getTaskPriorityClass } from '../utils';
-import { Check, Pencil, EyeOff, CheckCircle } from 'lucide-react';
+import { Check, Pencil, EyeOff, CheckCircle, Eye } from 'lucide-react';
 import { Button } from './ui/button';
 import PostCompletionFeedback from './PostCompletionFeedback';
 
@@ -17,12 +17,11 @@ const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
   const [titleValue, setTitleValue] = useState(task.title);
   const [feedbackModalOpen, setFeedbackModalOpen] = useState(false);
   const { toggleTaskCompleted, toggleTaskHidden, deleteTask, updateTaskTitle, state } = useAppContext();
-  const { dateDisplayOptions } = state;
+  const { dateDisplayOptions, showHiddenTasks } = state;
   const priorityClass = getTaskPriorityClass(task.totalScore);
   const titleInputRef = useRef<HTMLInputElement>(null);
 
   const handleTitleClick = () => {
-    // Removida a condição que exigia o card estar expandido
     setIsEditingTitle(true);
   };
 
@@ -78,9 +77,16 @@ const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
   return (
     <>
       <div
-        className={`task-card ${priorityClass} ${task.completed ? 'opacity-50' : ''}`}
+        className={`task-card ${priorityClass} ${task.completed ? 'opacity-50' : ''} relative`}
         onClick={() => !isEditingTitle && setExpanded(!expanded)}
       >
+        {/* Eye icon for hidden tasks that are only visible because of the filter */}
+        {task.hidden && showHiddenTasks && (
+          <div className="absolute bottom-2 right-2 bg-gray-800/70 dark:bg-gray-200/70 text-white dark:text-gray-800 rounded-full p-1 z-10">
+            <Eye size={16} />
+          </div>
+        )}
+        
         <div className="flex justify-between items-start">
           <div className="flex-1">
             {isEditingTitle ? (

@@ -7,11 +7,14 @@ import TaskForm from './TaskForm';
 import { PlusCircle, Menu, Filter } from 'lucide-react';
 import { Button } from './ui/button';
 import SortDropdown from './SortDropdown';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const Dashboard: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
   const { state, toggleSidebar, updateDateDisplayOptions } = useAppContext();
   const { tasks, viewMode, showHiddenTasks, sidebarOpen, dateDisplayOptions, sortOptions } = state;
+  const isMobile = useIsMobile();
 
   const visibleTasks = tasks.filter(task => 
     !task.completed && (showHiddenTasks || !task.hidden)
@@ -27,11 +30,11 @@ const Dashboard: React.FC = () => {
   };
 
   return (
-    <div className={`transition-all duration-300 ${sidebarOpen ? 'ml-64' : 'ml-20'}`}>
+    <div className={`transition-all duration-300 ${sidebarOpen && !isMobile ? 'ml-64' : isMobile ? 'ml-0' : 'ml-20'}`}>
       <header className="bg-white dark:bg-gray-900 p-6 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between sticky top-0 z-10 card-shadow">
         <div className="flex items-center">
           <button 
-            className="mr-4 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors lg:hidden"
+            className="mr-4 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
             onClick={toggleSidebar}
           >
             <Menu size={20} />
@@ -42,63 +45,67 @@ const Dashboard: React.FC = () => {
         </div>
         
         <div className="flex items-center gap-3">
-          <div className="relative group">
+          <div className="relative">
             <Button 
               variant="outline" 
               size="sm" 
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-900/20 dark:hover:text-blue-400"
+              onClick={() => setShowFilters(!showFilters)}
             >
               <Filter size={16} />
               <span className="hidden sm:inline">Filtros</span>
             </Button>
             
-            <div className="absolute right-0 mt-2 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-lg shadow-lg p-3 min-w-[200px] hidden group-hover:block">
-              <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Opções de data</p>
-              <div className="space-y-2">
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input 
-                    type="checkbox" 
-                    checked={dateDisplayOptions.hideDate} 
-                    onChange={() => toggleDateOption('hideDate')}
-                    className="h-4 w-4 rounded text-blue-600"
-                  />
-                  <span className="text-sm">Ocultar Data</span>
-                </label>
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input 
-                    type="checkbox" 
-                    checked={dateDisplayOptions.hideYear} 
-                    onChange={() => toggleDateOption('hideYear')}
-                    className="h-4 w-4 rounded text-blue-600"
-                  />
-                  <span className="text-sm">Ocultar Ano</span>
-                </label>
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input 
-                    type="checkbox" 
-                    checked={dateDisplayOptions.hideTime} 
-                    onChange={() => toggleDateOption('hideTime')}
-                    className="h-4 w-4 rounded text-blue-600"
-                  />
-                  <span className="text-sm">Ocultar Hora</span>
-                </label>
+            {showFilters && (
+              <div className="absolute right-0 mt-2 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-lg shadow-lg p-3 min-w-[200px] z-10">
+                <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Opções de data</p>
+                <div className="space-y-2">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input 
+                      type="checkbox" 
+                      checked={dateDisplayOptions.hideDate} 
+                      onChange={() => toggleDateOption('hideDate')}
+                      className="h-4 w-4 rounded text-blue-600"
+                    />
+                    <span className="text-sm">Ocultar Data</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input 
+                      type="checkbox" 
+                      checked={dateDisplayOptions.hideYear} 
+                      onChange={() => toggleDateOption('hideYear')}
+                      className="h-4 w-4 rounded text-blue-600"
+                    />
+                    <span className="text-sm">Ocultar Ano</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input 
+                      type="checkbox" 
+                      checked={dateDisplayOptions.hideTime} 
+                      onChange={() => toggleDateOption('hideTime')}
+                      className="h-4 w-4 rounded text-blue-600"
+                    />
+                    <span className="text-sm">Ocultar Hora</span>
+                  </label>
+                </div>
               </div>
-            </div>
+            )}
           </div>
           
           <SortDropdown />
           
-          <button
+          <Button
             onClick={() => setShowForm(true)}
-            className="p-3 bg-blue-600 hover:bg-blue-700 text-white rounded-full flex items-center shadow-sm transition-colors"
+            className="bg-blue-600 hover:bg-blue-700 text-white rounded-md flex items-center gap-2 shadow-sm transition-colors"
             aria-label="Nova tarefa"
           >
             <PlusCircle size={20} />
-          </button>
+            <span className="hidden sm:inline">Adicionar tarefa</span>
+          </Button>
         </div>
       </header>
 
-      <main className="p-6 max-w-4xl mx-auto">
+      <main className={`p-6 ${isMobile ? 'px-2 w-full max-w-none' : 'max-w-4xl mx-auto'}`}>
         <div className="mb-8">
           <h2 className="text-xl font-semibold mb-2 text-gray-800 dark:text-gray-100">Suas Tarefas</h2>
           <p className="text-sm text-gray-500">
