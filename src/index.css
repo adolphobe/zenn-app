@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -35,19 +36,12 @@
     --radius: 0.5rem;
 
     --sidebar-background: 0 0% 98%;
-
     --sidebar-foreground: 240 5.3% 26.1%;
-
     --sidebar-primary: 240 5.9% 10%;
-
     --sidebar-primary-foreground: 0 0% 98%;
-
     --sidebar-accent: 240 4.8% 95.9%;
-
     --sidebar-accent-foreground: 240 5.9% 10%;
-
     --sidebar-border: 220 13% 91%;
-
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
@@ -79,6 +73,7 @@
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
+    
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
@@ -96,6 +91,68 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
+  }
+}
+
+@layer components {
+  .task-card {
+    @apply relative p-4 rounded-lg shadow-sm transition-all duration-200 border border-border;
+  }
+
+  .task-critical {
+    @apply bg-acto-critical text-acto-critical-text;
+  }
+
+  .task-important {
+    @apply bg-acto-important text-acto-important-text;
+  }
+
+  .task-moderate {
+    @apply bg-acto-moderate text-acto-moderate-text;
+  }
+
+  .task-light {
+    @apply bg-acto-light text-acto-light-text;
+  }
+
+  .score-slider {
+    @apply flex items-center justify-between space-x-2 my-3;
+  }
+
+  .score-dot {
+    @apply w-4 h-4 rounded-full cursor-pointer transition-all duration-200;
+  }
+
+  .score-dot-consequence {
+    @apply bg-gray-200 border border-gray-300 hover:bg-acto-consequence;
+  }
+
+  .score-dot-consequence.active {
+    @apply bg-acto-consequence border-acto-consequence;
+  }
+
+  .score-dot-pride {
+    @apply bg-gray-200 border border-gray-300 hover:bg-acto-pride;
+  }
+
+  .score-dot-pride.active {
+    @apply bg-acto-pride border-acto-pride;
+  }
+
+  .score-dot-construction {
+    @apply bg-gray-200 border border-gray-300 hover:bg-acto-construction;
+  }
+
+  .score-dot-construction.active {
+    @apply bg-acto-construction border-acto-construction;
+  }
+
+  .sidebar-item {
+    @apply flex items-center gap-3 px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md transition-all duration-200;
+  }
+
+  .sidebar-item.active {
+    @apply bg-gray-100 font-medium text-gray-900;
   }
 }
