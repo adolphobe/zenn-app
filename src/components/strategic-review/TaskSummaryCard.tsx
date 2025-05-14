@@ -1,59 +1,18 @@
 
-import React, { useMemo } from 'react';
+import React from 'react';
 import { Task } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartContainer, ChartTooltipContent } from '@/components/ui/chart';
 import { Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell, ResponsiveContainer } from 'recharts';
-
-// Colors for the charts
-const COLORS = {
-  zone: {
-    critical: '#ffcdd2',
-    important: '#ffe0b2',
-    moderate: '#bbdefb',
-    hidden: '#e0e0e0'
-  }
-};
+import { useZoneAnalysis } from './hooks/useZoneAnalysis';
 
 interface TaskSummaryCardProps {
   tasks: Task[];
 }
 
 const TaskSummaryCard: React.FC<TaskSummaryCardProps> = ({ tasks }) => {
-  // Calculate zone distributions
-  const zoneData = useMemo(() => {
-    const zones = {
-      critical: 0,
-      important: 0,
-      moderate: 0,
-      hidden: 0
-    };
-    
-    tasks.forEach(task => {
-      if (task.totalScore >= 14) zones.critical++;
-      else if (task.totalScore >= 11) zones.important++;
-      else if (task.totalScore >= 8) zones.moderate++;
-      else zones.hidden++;
-    });
-    
-    return [
-      { name: 'Zona de Ação Imediata', value: zones.critical, color: COLORS.zone.critical },
-      { name: 'Zona de Mobilização', value: zones.important, color: COLORS.zone.important },
-      { name: 'Zona Moderada', value: zones.moderate, color: COLORS.zone.moderate },
-      { name: 'Zona Oculta', value: zones.hidden, color: COLORS.zone.hidden }
-    ];
-  }, [tasks]);
-  
-  // Calculate averages and insights
-  const taskStats = useMemo(() => {
-    if (tasks.length === 0) return { avgTotal: 0, highConsequence: 0, highPride: 0 };
-    
-    const avgTotal = tasks.reduce((sum, task) => sum + task.totalScore, 0) / tasks.length;
-    const highConsequence = tasks.filter(task => task.consequenceScore >= 4).length;
-    const highPride = tasks.filter(task => task.prideScore === 5).length;
-    
-    return { avgTotal, highConsequence, highPride };
-  }, [tasks]);
+  // Use the custom hook for zone analysis
+  const { zoneData, taskStats, colors } = useZoneAnalysis(tasks);
   
   return (
     <Card className="overflow-hidden border-none shadow-md">
@@ -81,10 +40,10 @@ const TaskSummaryCard: React.FC<TaskSummaryCardProps> = ({ tasks }) => {
           <div className="mt-6 h-56">
             <ChartContainer 
               config={{
-                critical: { color: COLORS.zone.critical },
-                important: { color: COLORS.zone.important },
-                moderate: { color: COLORS.zone.moderate },
-                hidden: { color: COLORS.zone.hidden }
+                critical: { color: colors.critical },
+                important: { color: colors.important },
+                moderate: { color: colors.moderate },
+                hidden: { color: colors.hidden }
               }}
             >
               <ResponsiveContainer width="100%" height="100%">
