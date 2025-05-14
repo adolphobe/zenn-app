@@ -60,17 +60,17 @@ const ScoreSlider: React.FC<ScoreSliderProps> = ({ value, type, onChange, phrase
     <div className="mb-4">
       <div className="relative">
         {/* Step indicators - positioned absolutely on top of the slider track */}
-        <div className="absolute top-[9px] z-10 w-full flex justify-between pointer-events-none">
-  {[1, 2, 3, 4, 5].map((step) => (
-    <div
-      key={step}
-      className={`w-[21px] h-[21px] rounded-full ${
-        step <= value ? dotActiveColor : dotInactiveColor
-      } ${step === 1 ? 'ml-0' : ''} ${step === 5 ? 'mr-0' : ''}`}
-      aria-label={`Step ${step}`}
-    />
-  ))}
-</div>
+        <div className="absolute top-[9px] z-10 w-full flex justify-between px-[20px] pointer-events-none">
+          {[1, 2, 3, 4, 5].map((step) => (
+            <div
+              key={step}
+              className={`w-[21px] h-[21px] rounded-full ${
+                step <= value ? dotActiveColor : dotInactiveColor
+              }`}
+              aria-label={`Step ${step}`}
+            />
+          ))}
+        </div>
         
         {/* Custom Slider component using shadcn/ui slider */}
         <Slider
@@ -79,7 +79,7 @@ const ScoreSlider: React.FC<ScoreSliderProps> = ({ value, type, onChange, phrase
           max={5}
           step={1}
           onValueChange={handleValueChange}
-          className={cn("py-4", bgColor)}
+          className={cn("py-4 px-[10px]", bgColor)}
           // Use the custom styling directly in the component
           classNames={{
             track: "h-1.5 rounded-full",
