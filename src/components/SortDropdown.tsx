@@ -19,13 +19,21 @@ const SortDropdown: React.FC = () => {
   const { viewMode, sortOptions } = state;
   
   const currentSortOptions = sortOptions[viewMode];
-  const { sortDirection, noDateAtEnd } = currentSortOptions;
+  const sortDirection = currentSortOptions.sortDirection;
+  // Using optional chaining for noDateAtEnd to avoid TypeScript errors
+  const noDateAtEnd = viewMode === 'chronological' 
+    ? (currentSortOptions as { sortDirection: SortDirection; noDateAtEnd: boolean }).noDateAtEnd 
+    : false;
   
   const handleSortDirectionChange = (direction: SortDirection) => {
-    setSortOptions({ 
-      sortDirection: direction,
-      noDateAtEnd: currentSortOptions.noDateAtEnd 
-    });
+    if (viewMode === 'chronological') {
+      setSortOptions({ 
+        sortDirection: direction,
+        noDateAtEnd: noDateAtEnd
+      });
+    } else {
+      setSortOptions({ sortDirection: direction });
+    }
   };
   
   const handleNoDateToggle = () => {
