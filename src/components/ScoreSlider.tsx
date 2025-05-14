@@ -60,11 +60,11 @@ const ScoreSlider: React.FC<ScoreSliderProps> = ({ value, type, onChange, phrase
     <div className="mb-4">
       <div className="relative">
         {/* Step indicators - positioned absolutely on top of the slider track */}
-        <div className="absolute top-[8px] z-10 w-full flex justify-between px-[2px] pointer-events-none">
+        <div className="absolute top-[9px] z-10 w-full flex justify-between pl-0 pr-[4px] pointer-events-none">
           {[1, 2, 3, 4, 5].map((step) => (
             <div
               key={step}
-              className={`w-[19px] h-[19px] rounded-full ${
+              className={`w-[21px] h-[21px] rounded-full ${
                 step <= value ? dotActiveColor : dotInactiveColor
               }`}
               aria-label={`Step ${step}`}
