@@ -10,6 +10,7 @@ export interface Task {
   hidden: boolean;
   completed: boolean;
   createdAt: Date;
+  feedback?: 'transformed' | 'relief' | 'obligation' | null;
 }
 
 export interface TaskFormData {
@@ -20,7 +21,7 @@ export interface TaskFormData {
   idealDate?: Date | null;
 }
 
-export type ViewMode = 'power' | 'chronological';
+export type ViewMode = 'power' | 'chronological' | 'strategic';
 export type SortDirection = 'asc' | 'desc';
 export type SortOption = {
   sortDirection: SortDirection;

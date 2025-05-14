@@ -17,7 +17,8 @@ export const appReducer = (state: AppState, action: Action): AppState => {
         idealDate: action.payload.idealDate || null,
         hidden: (action.payload.consequenceScore + action.payload.prideScore + action.payload.constructionScore) < 8,
         completed: false,
-        createdAt: new Date()
+        createdAt: new Date(),
+        feedback: null
       };
       return { ...state, tasks: [...state.tasks, newTask] };
     }
@@ -111,6 +112,15 @@ export const appReducer = (state: AppState, action: Action): AppState => {
             ...(viewMode === 'chronological' && noDateAtEnd !== undefined ? { noDateAtEnd } : {})
           }
         }
+      };
+    }
+    
+    case 'SET_TASK_FEEDBACK': {
+      return {
+        ...state,
+        tasks: state.tasks.map(task =>
+          task.id === action.payload.id ? { ...task, feedback: action.payload.feedback } : task
+        )
       };
     }
 

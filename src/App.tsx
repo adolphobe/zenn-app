@@ -7,6 +7,7 @@ import { AppProvider } from "./context/AppContext";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ActoApp from "./pages/ActoApp";
 import NotFound from "./pages/NotFound";
+import StrategicReview from "./pages/StrategicReview";
 
 const queryClient = new QueryClient();
 
@@ -19,6 +20,7 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<ActoApp />} />
+            <Route path="/strategic-review" element={<ActoApp />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

@@ -12,11 +12,13 @@ import {
   Sun,
   LogOut,
   User,
+  BarChart
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const Sidebar: React.FC = () => {
   const { 
@@ -28,6 +30,11 @@ const Sidebar: React.FC = () => {
   } = useAppContext();
   
   const isMobile = useIsMobile();
+  const location = useLocation();
+  const navigate = useNavigate();
+  
+  // Check if user is on the strategic review page
+  const isStrategicReview = location.pathname === '/strategic-review';
   
   // Auto-close sidebar on mobile when it's initially loaded
   useEffect(() => {
@@ -58,6 +65,23 @@ const Sidebar: React.FC = () => {
     }
   }, [isMobile, sidebarOpen, toggleSidebar]);
 
+  // Navigate to main page with power view mode
+  const handlePowerModeClick = () => {
+    setViewMode('power');
+    navigate('/');
+  };
+
+  // Navigate to main page with chronological view mode
+  const handleChronologicalModeClick = () => {
+    setViewMode('chronological');
+    navigate('/');
+  };
+
+  // Navigate to strategic review page
+  const handleStrategicReviewClick = () => {
+    navigate('/strategic-review');
+  };
+
   if (!sidebarOpen && isMobile) {
     return null; // Don't render sidebar at all on mobile when closed
   }
@@ -86,19 +110,27 @@ const Sidebar: React.FC = () => {
           </p>
           
           <button 
-            className={`sidebar-item ${viewMode === 'power' ? 'active' : ''} w-full`}
-            onClick={() => setViewMode('power')}
+            className={`sidebar-item ${viewMode === 'power' && !isStrategicReview ? 'active' : ''} w-full`}
+            onClick={handlePowerModeClick}
           >
             <LayoutDashboard size={20} />
             {sidebarOpen && <span>Modo Potência</span>}
           </button>
           
           <button 
-            className={`sidebar-item ${viewMode === 'chronological' ? 'active' : ''} w-full`}
-            onClick={() => setViewMode('chronological')}
+            className={`sidebar-item ${viewMode === 'chronological' && !isStrategicReview ? 'active' : ''} w-full`}
+            onClick={handleChronologicalModeClick}
           >
             <CalendarClock size={20} />
             {sidebarOpen && <span>Modo Cronologia</span>}
+          </button>
+          
+          <button 
+            className={`sidebar-item ${isStrategicReview ? 'active' : ''} w-full`}
+            onClick={handleStrategicReviewClick}
+          >
+            <BarChart size={20} />
+            {sidebarOpen && <span>Revisão Estratégica</span>}
           </button>
         </div>
         

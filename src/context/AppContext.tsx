@@ -95,6 +95,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const setSortOptions = (options: { sortDirection: SortDirection; noDateAtEnd?: boolean }) => {
     dispatch({ type: 'SET_SORT_OPTIONS', payload: options });
   };
+  
+  const setTaskFeedback = (id: string, feedback: 'transformed' | 'relief' | 'obligation') => {
+    dispatch({ type: 'SET_TASK_FEEDBACK', payload: { id, feedback } });
+  };
 
   return (
     <AppContext.Provider
@@ -112,7 +116,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         toggleDarkMode,
         toggleSidebar,
         updateDateDisplayOptions,
-        setSortOptions
+        setSortOptions,
+        setTaskFeedback
       }}
     >
       {children}

@@ -1,159 +1,74 @@
 
-import React, { useState } from 'react';
-import { useAppContext } from '../context/AppContext';
-import { sortTasks } from '../utils';
-import TaskCard from './TaskCard';
-import TaskForm from './TaskForm';
-import { PlusCircle, Menu, Filter } from 'lucide-react';
-import { Button } from './ui/button';
-import SortDropdown from './SortDropdown';
+import React from 'react';
+import { useAppContext } from '@/context/AppContext';
 import { useIsMobile } from '@/hooks/use-mobile';
+import TaskForm from './TaskForm';
+import TaskCard from './TaskCard';
+import SortDropdown from './SortDropdown';
+import StrategicReview from '../pages/StrategicReview';
+import { useLocation } from 'react-router-dom';
+import { sortTasks } from '@/utils';
 
 const Dashboard: React.FC = () => {
-  const [showForm, setShowForm] = useState(false);
-  const [showFilters, setShowFilters] = useState(false);
-  const { state, toggleSidebar, updateDateDisplayOptions } = useAppContext();
-  const { tasks, viewMode, showHiddenTasks, sidebarOpen, dateDisplayOptions, sortOptions } = state;
+  const { state } = useAppContext();
+  const { tasks, viewMode, showHiddenTasks, sidebarOpen, sortOptions } = state;
   const isMobile = useIsMobile();
+  const location = useLocation();
 
-  const visibleTasks = tasks.filter(task => 
-    !task.completed && (showHiddenTasks || !task.hidden)
+  // Check if we're on strategic review route
+  const isStrategicReview = location.pathname === '/strategic-review';
+  
+  // If on strategic review route, render that component
+  if (isStrategicReview) {
+    return (
+      <main className={`transition-all duration-300 min-h-screen bg-background
+        ${sidebarOpen ? (isMobile ? 'ml-0' : 'ml-64') : 'ml-0 md:ml-20'}`}>
+        <StrategicReview />
+      </main>
+    );
+  }
+
+  // Sort and filter tasks
+  const filteredTasks = sortTasks(
+    tasks.filter(task => !task.completed && (showHiddenTasks || !task.hidden)),
+    viewMode,
+    sortOptions[viewMode]
   );
-  const sortedTasks = sortTasks(visibleTasks, viewMode, sortOptions[viewMode]);
-  const completedTasks = tasks.filter(task => task.completed);
-
-  const toggleDateOption = (option: keyof typeof dateDisplayOptions) => {
-    updateDateDisplayOptions({
-      ...dateDisplayOptions,
-      [option]: !dateDisplayOptions[option]
-    });
-  };
 
   return (
-    <div className={`transition-all duration-300 ${sidebarOpen && !isMobile ? 'ml-64' : isMobile ? 'ml-0' : 'ml-20'}`}>
-      <header className="bg-white dark:bg-gray-900 p-6 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between sticky top-0 z-10 card-shadow">
-        <div className="flex items-center">
-          <button 
-            className="mr-4 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-            onClick={toggleSidebar}
-          >
-            <Menu size={20} />
-          </button>
-          <h1 className="text-2xl font-semibold text-gray-800 dark:text-gray-100">
-            {viewMode === 'power' ? 'Modo Potência' : 'Modo Cronologia'}
+    <main className={`transition-all duration-300 min-h-screen bg-background
+      ${sidebarOpen ? (isMobile ? 'ml-0' : 'ml-64') : 'ml-0 md:ml-20'}`}>
+      <div className="p-4 md:p-6 lg:p-8">
+        <div className="mb-6 flex justify-between items-center">
+          <h1 className="text-2xl font-bold tracking-tight">
+            {viewMode === 'power' ? 'Modo Potência' : 'Modo Cronológico'}
           </h1>
-        </div>
-        
-        <div className="flex items-center gap-3">
-          <div className="relative">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="flex items-center gap-2 hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-900/20 dark:hover:text-blue-400"
-              onClick={() => setShowFilters(!showFilters)}
-            >
-              <Filter size={16} />
-              <span className="hidden sm:inline">Filtros</span>
-            </Button>
-            
-            {showFilters && (
-              <div className="absolute right-0 mt-2 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-lg shadow-lg p-3 min-w-[200px] z-10">
-                <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Opções de data</p>
-                <div className="space-y-2">
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input 
-                      type="checkbox" 
-                      checked={dateDisplayOptions.hideDate} 
-                      onChange={() => toggleDateOption('hideDate')}
-                      className="h-4 w-4 rounded text-blue-600"
-                    />
-                    <span className="text-sm">Ocultar Data</span>
-                  </label>
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input 
-                      type="checkbox" 
-                      checked={dateDisplayOptions.hideYear} 
-                      onChange={() => toggleDateOption('hideYear')}
-                      className="h-4 w-4 rounded text-blue-600"
-                    />
-                    <span className="text-sm">Ocultar Ano</span>
-                  </label>
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input 
-                      type="checkbox" 
-                      checked={dateDisplayOptions.hideTime} 
-                      onChange={() => toggleDateOption('hideTime')}
-                      className="h-4 w-4 rounded text-blue-600"
-                    />
-                    <span className="text-sm">Ocultar Hora</span>
-                  </label>
-                </div>
-              </div>
-            )}
-          </div>
-          
-          <SortDropdown />
-          
-          <Button
-            onClick={() => setShowForm(true)}
-            className="bg-blue-600 hover:bg-blue-700 text-white rounded-md flex items-center gap-2 shadow-sm transition-colors"
-            aria-label="Nova tarefa"
-          >
-            <PlusCircle size={20} />
-            <span className="hidden sm:inline">Adicionar tarefa</span>
-          </Button>
-        </div>
-      </header>
-
-      <main className={`p-6 ${isMobile ? 'px-4 w-full max-w-none' : 'max-w-4xl mx-auto'}`}>
-        <div className="mb-8">
-          <h2 className="text-xl font-semibold mb-2 text-gray-800 dark:text-gray-100">Suas Tarefas</h2>
-          <p className="text-sm text-gray-500">
-            {viewMode === 'power' 
-              ? `Ordenadas por potência (${sortOptions.power.sortDirection === 'desc' ? 'maior → menor' : 'menor → maior'})` 
-              : `Ordenadas por data ${sortOptions.chronological.sortDirection === 'asc' ? 'próximas primeiro' : 'distantes primeiro'}`
-            }
-          </p>
+          <TaskForm />
         </div>
 
-        <div className="space-y-4">
-          {sortedTasks.length > 0 ? (
-            sortedTasks.map(task => (
-              <TaskCard key={task.id} task={task} />
-            ))
-          ) : (
-            <div className="p-10 text-center bg-gray-50 dark:bg-gray-800 rounded-xl">
-              <p className="text-gray-500">
-                Nenhuma tarefa encontrada.
-                {!showHiddenTasks && (
-                  <button 
-                    className="text-blue-600 hover:underline ml-1"
-                    onClick={() => {
-                      useAppContext().toggleShowHiddenTasks();
-                    }}
-                  >
-                    Mostrar tarefas ocultas?
-                  </button>
-                )}
+        <div className="grid grid-cols-1 gap-4 md:gap-6">
+          {filteredTasks.map(task => (
+            <TaskCard key={task.id} task={task} />
+          ))}
+          
+          {filteredTasks.length === 0 && (
+            <div className="text-center py-12 border border-dashed rounded-lg bg-muted/30 border-border">
+              <p className="text-muted-foreground">
+                {showHiddenTasks 
+                  ? 'Nenhuma tarefa encontrada. Adicione sua primeira tarefa!' 
+                  : 'Nenhuma tarefa visível. Você pode habilitar tarefas ocultas nas configurações.'}
               </p>
             </div>
           )}
         </div>
-
-        {completedTasks.length > 0 && (
-          <div className="mt-12">
-            <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-100">Tarefas Concluídas</h2>
-            <div className="space-y-4">
-              {completedTasks.map(task => (
-                <TaskCard key={task.id} task={task} />
-              ))}
-            </div>
+        
+        {filteredTasks.length > 0 && (
+          <div className="mt-6 flex flex-wrap gap-2 justify-end">
+            <SortDropdown />
           </div>
         )}
-      </main>
-
-      {showForm && <TaskForm onClose={() => setShowForm(false)} />}
-    </div>
+      </div>
+    </main>
   );
 };
 
