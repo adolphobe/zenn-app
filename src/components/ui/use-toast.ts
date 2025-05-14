@@ -1,9 +1,10 @@
 
 import * as React from "react"
 import { createContext, useContext, useState } from "react"
+import { v4 as uuidv4 } from "uuid"
 
 type ToastProps = {
-  id: string
+  id?: string
   title?: React.ReactNode
   description?: React.ReactNode
   action?: React.ReactNode
@@ -12,7 +13,12 @@ type ToastProps = {
 
 type ToastActionElement = React.ReactElement
 
-type ToasterToast = ToastProps & {
+type ToasterToast = {
+  id: string
+  title?: React.ReactNode
+  description?: React.ReactNode
+  action?: React.ReactNode
+  variant?: "default" | "destructive"
   open: boolean
   promise: boolean
 }
@@ -57,7 +63,11 @@ function useToast() {
 
 function toast(props: ToastProps) {
   const { addToast } = useToast()
-  addToast(props)
+  // Ensure there is an ID by generating one if not provided
+  addToast({
+    ...props,
+    id: props.id || uuidv4()
+  })
 }
 
 export {

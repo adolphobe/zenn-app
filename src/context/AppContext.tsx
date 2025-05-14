@@ -5,7 +5,8 @@ import { TaskFormData, ViewMode, DateDisplayOptions, SortDirection } from '../ty
 import { AppContextType, AppState, Action } from './types';
 import { appReducer } from './appReducer';
 import { initialState } from './initialState';
-import { toast } from '../components/ui/use-toast';
+import { toast } from '../hooks/use-toast';
+import { v4 as uuidv4 } from 'uuid';
 
 // Create context
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -45,6 +46,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const addTask = (task: TaskFormData) => {
     dispatch({ type: 'ADD_TASK', payload: task });
     toast({
+      id: uuidv4(), // Add the ID here
       title: "Tarefa adicionada",
       description: `"${task.title}" foi adicionada com sucesso.`
     });
