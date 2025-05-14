@@ -10,6 +10,25 @@ const COLORS = {
   construction: '#10B981' // Verde
 };
 
+// Messages for each pillar based on classification
+const PILLAR_MESSAGES = {
+  consequence: {
+    prioridade_alta: "Você está priorizando tarefas com alta Consequência de Ignorar. Está agindo com foco no que realmente não pode ser deixado de lado.",
+    equilibrado: "Sua relação com a Consequência de Ignorar está equilibrada. Você sabe o que é importante, sem entrar em modo alerta constante.",
+    negligenciado: "Você está negligenciando tarefas com Consequência de Ignorar. Pode estar empurrando coisas que vão te cobrar lá na frente."
+  },
+  pride: {
+    prioridade_alta: "Você está priorizando tarefas com alto Orgulho Pós-Execução. Está fazendo o que representa quem você quer ser.",
+    equilibrado: "Seu nível de Orgulho Pós-Execução está saudável. O que você faz tem valor e está conectado com sua identidade.",
+    negligenciado: "Você está deixando o Orgulho Pós-Execução de lado. Está executando sem se sentir realizado com o que entrega."
+  },
+  construction: {
+    prioridade_alta: "Você está priorizando tarefas com alta Força de Construção Pessoal. Está focado em se fortalecer e evoluir.",
+    equilibrado: "Sua Força de Construção Pessoal está estável. Você está equilibrando bem ação presente e evolução pessoal.",
+    negligenciado: "Você está negligenciando sua Força de Construção Pessoal. Está fazendo, mas sem se fortalecer com o que faz."
+  }
+};
+
 export const useInsightsAnalysis = (tasks: Task[]): PillarDataType => {
   return useMemo(() => {
     // Return default empty values if no tasks
@@ -41,128 +60,60 @@ export const useInsightsAnalysis = (tasks: Task[]): PillarDataType => {
     const HIGH_THRESHOLD = 4.0; // >= 4.0 is high priority (priorizado)
     const LOW_THRESHOLD = 2.5;  // <= 2.5 is low priority (negligenciado)
     
-    // Find highest and lowest pillars
-    const sortedPillars = [...pillars].sort((a, b) => b.value - a.value);
-    
-    // Select highest and lowest based on defined thresholds
-    const prioritized = sortedPillars.filter(p => p.value >= HIGH_THRESHOLD);
-    const neglected = [...sortedPillars].reverse().filter(p => p.value <= LOW_THRESHOLD);
-    
-    const highest = prioritized.length > 0 ? prioritized[0] : null;
-    const lowest = neglected.length > 0 ? neglected[0] : null;
-    
     // Generate insights based on classifications
     const insights = [];
     
-    // Always add insights for each pillar based on their scores
-    pillars.forEach(pillar => {
-      if (pillar.value >= HIGH_THRESHOLD) {
-        // High priority pillar
-        if (pillar.name === 'Consequência') {
-          insights.push({
-            title: '🟢 Consequência - Priorizado',
-            messages: [
-              'Você está se guiando por impacto real. Evitando arrependimentos antes que eles aconteçam.',
-              'Suas ações mostram clareza sobre o que não pode ser ignorado.',
-              'Você está agindo com base no que ameaça seu progresso, não no que só parece urgente.'
-            ]
-          });
-        } else if (pillar.name === 'Orgulho') {
-          insights.push({
-            title: '🟢 Orgulho - Priorizado',
-            messages: [
-              'Você está executando com identidade. O que faz, representa quem você é.',
-              'Suas ações fortalecem sua autoimagem e te validam internamente.',
-              'Você não está apenas riscando tarefas. Está se orgulhando de cada entrega.'
-            ]
-          });
-        } else if (pillar.name === 'Construção') {
-          insights.push({
-            title: '🟢 Construção - Priorizado',
-            messages: [
-              'Você está entregando o que te fortalece. Cada tarefa te deixa mais preparado, mais sólido.',
-              'Está saindo do automático e moldando a versão que quer se tornar.',
-              'Suas ações estão em alinhamento com evolução real, não só manutenção.'
-            ]
-          });
-        }
-      } else if (pillar.value <= LOW_THRESHOLD) {
-        // Low priority pillar
-        if (pillar.name === 'Consequência') {
-          insights.push({
-            title: '🔴 Consequência - Negligenciado',
-            messages: [
-              'Suas tarefas podem estar organizadas, mas não estão resolvendo o que realmente importa.',
-              'Está se mantendo produtivo, mas evitando o que tem mais risco se for adiado.',
-              'Pode estar ignorando os alertas estratégicos que te exigem responsabilidade.'
-            ]
-          });
-        } else if (pillar.name === 'Orgulho') {
-          insights.push({
-            title: '🔴 Orgulho - Negligenciado',
-            messages: [
-              'Está cumprindo tarefas, mas sem se sentir satisfeito com o que entrega.',
-              'Falta conexão entre o que você faz e quem você quer ser.',
-              'Está fazendo por obrigação, não por construção de respeito próprio.'
-            ]
-          });
-        } else if (pillar.name === 'Construção') {
-          insights.push({
-            title: '🔴 Construção - Negligenciado',
-            messages: [
-              'Você está operando no presente, mas não está construindo seu futuro.',
-              'As tarefas podem parecer úteis, mas não estão te transformando.',
-              'Está sendo eficiente, mas não está se expandindo.'
-            ]
-          });
-        }
-      } else {
-        // Medium priority pillar - add a neutral message
-        if (pillar.name === 'Consequência') {
-          insights.push({
-            title: '🔵 Consequência - Equilibrado',
-            messages: [
-              'Você está mantendo um bom equilíbrio com suas responsabilidades e consequências.',
-              'Está atento ao que é importante sem se deixar paralisar pelas preocupações.',
-              'Continue desenvolvendo essa consciência sobre o que realmente importa.'
-            ]
-          });
-        } else if (pillar.name === 'Orgulho') {
-          insights.push({
-            title: '🔵 Orgulho - Equilibrado',
-            messages: [
-              'Você mantém uma boa conexão entre suas tarefas e sua identidade.',
-              'Existe um senso equilibrado de satisfação com o que você entrega.',
-              'Continue fortalecendo a relação entre o que faz e quem você é.'
-            ]
-          });
-        } else if (pillar.name === 'Construção') {
-          insights.push({
-            title: '🔵 Construção - Equilibrado',
-            messages: [
-              'Você está balanceando ações presentes com construção de futuro.',
-              'Há um equilíbrio entre manutenção e evolução em suas tarefas.',
-              'Continue investindo em tarefas que expandem suas capacidades.'
-            ]
-          });
-        }
-      }
+    // Add insights for each pillar based on their scores
+    const consequenceClassification = getClassification(avgConsequence, HIGH_THRESHOLD, LOW_THRESHOLD);
+    insights.push({
+      title: getClassificationTitle('Consequência', consequenceClassification),
+      messages: [PILLAR_MESSAGES.consequence[consequenceClassification]]
     });
     
-    // If no insights were generated (which shouldn't happen with our new logic), add a default
-    if (insights.length === 0) {
-      insights.push({
-        title: 'Análise de Pilares',
-        messages: [
-          'Complete mais tarefas para obter insights específicos sobre seus pilares estratégicos.',
-          'Seus padrões de execução revelarão qual é seu pilar dominante.'
-        ]
-      });
-    }
+    const prideClassification = getClassification(avgPride, HIGH_THRESHOLD, LOW_THRESHOLD);
+    insights.push({
+      title: getClassificationTitle('Orgulho', prideClassification),
+      messages: [PILLAR_MESSAGES.pride[prideClassification]]
+    });
+    
+    const constructionClassification = getClassification(avgConstruction, HIGH_THRESHOLD, LOW_THRESHOLD);
+    insights.push({
+      title: getClassificationTitle('Construção', constructionClassification),
+      messages: [PILLAR_MESSAGES.construction[constructionClassification]]
+    });
+    
+    // Find highest and lowest pillars
+    const sortedPillars = [...pillars].sort((a, b) => b.value - a.value);
+    const highest = sortedPillars.length > 0 ? sortedPillars[0] : null;
+    const lowest = sortedPillars.length > 0 ? sortedPillars[sortedPillars.length - 1] : null;
     
     return { averages: pillars, highest, lowest, insights };
   }, [tasks]);
 };
+
+// Helper function to determine classification based on score
+function getClassification(value: number, highThreshold: number, lowThreshold: number): 'prioridade_alta' | 'equilibrado' | 'negligenciado' {
+  if (value >= highThreshold) return 'prioridade_alta';
+  if (value <= lowThreshold) return 'negligenciado';
+  return 'equilibrado';
+}
+
+// Helper function to get title with appropriate emoji
+function getClassificationTitle(pillarName: string, classification: 'prioridade_alta' | 'equilibrado' | 'negligenciado'): string {
+  const emoji = classification === 'prioridade_alta' 
+    ? '🟢' 
+    : classification === 'negligenciado' 
+      ? '🔴' 
+      : '🔵';
+  
+  const status = classification === 'prioridade_alta' 
+    ? 'Priorizado' 
+    : classification === 'negligenciado' 
+      ? 'Negligenciado' 
+      : 'Equilibrado';
+  
+  return `${emoji} ${pillarName} - ${status}`;
+}
 
 // Export COLORS for other components
 export const PILLAR_COLORS = COLORS;

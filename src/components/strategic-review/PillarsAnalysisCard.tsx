@@ -69,38 +69,37 @@ const PillarsAnalysisCard: React.FC<PillarsAnalysisCardProps> = ({ tasks }) => {
           )}
         </div>
         
-        {/* Insights Section - Improved with animations and better styling */}
+        {/* Insights Section with new styling */}
         {pillarData.insights.length > 0 && (
-          <div className="space-y-4 mt-6 animate-fade-in">
+          <div className="space-y-4 mt-6">
             <h3 className="font-medium text-lg">Insights</h3>
             <div className="grid gap-4 md:grid-cols-1">
-              {pillarData.insights.map((insight, index) => (
-                <div 
-                  key={index} 
-                  className="border rounded-lg p-4"
-                  style={{ 
-                    animationDelay: `${index * 150}ms`,
-                    animationDuration: '0.5s',
-                    animationFillMode: 'both',
-                    animationName: 'fadeIn',
-                    background: insight.title.includes('🟢') 
-                      ? 'linear-gradient(to right, rgba(240, 253, 244, 0.5), rgba(187, 247, 208, 0.3))' 
-                      : insight.title.includes('🔴')
-                      ? 'linear-gradient(to right, rgba(254, 242, 242, 0.5), rgba(254, 226, 226, 0.3))'
-                      : 'linear-gradient(to right, rgba(240, 249, 255, 0.5), rgba(186, 230, 253, 0.3))'
-                  }}
-                >
-                  <h4 className="font-medium mb-3 text-base">{insight.title}</h4>
-                  <ul className="space-y-2">
+              {pillarData.insights.map((insight, index) => {
+                // Determine background color based on insight title
+                const bgGradient = insight.title.includes('🟢') 
+                  ? 'linear-gradient(to right, rgba(240, 253, 244, 0.5), rgba(187, 247, 208, 0.3))' 
+                  : insight.title.includes('🔴')
+                    ? 'linear-gradient(to right, rgba(254, 242, 242, 0.5), rgba(254, 226, 226, 0.3))'
+                    : 'linear-gradient(to right, rgba(240, 249, 255, 0.5), rgba(186, 230, 253, 0.3))';
+                
+                return (
+                  <div 
+                    key={index} 
+                    className="border rounded-lg p-4 animate-fade-in"
+                    style={{ 
+                      animationDelay: `${index * 150}ms`,
+                      animationDuration: '0.5s',
+                      animationFillMode: 'both',
+                      background: bgGradient
+                    }}
+                  >
+                    <h4 className="font-medium mb-3 text-base">{insight.title}</h4>
                     {insight.messages.map((message, msgIndex) => (
-                      <li key={msgIndex} className="text-sm text-muted-foreground flex items-start gap-2">
-                        <span className="text-lg mt-0.5">•</span>
-                        <span>{message}</span>
-                      </li>
+                      <p key={msgIndex} className="text-sm text-muted-foreground">{message}</p>
                     ))}
-                  </ul>
-                </div>
-              ))}
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}
