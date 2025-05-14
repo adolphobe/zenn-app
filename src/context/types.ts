@@ -1,4 +1,3 @@
-
 import { Task, TaskFormData, ViewMode, DateDisplayOptions, SortDirection } from '../types';
 
 // Actions
@@ -15,7 +14,9 @@ export type Action =
   | { type: 'TOGGLE_SIDEBAR' }
   | { type: 'UPDATE_DATE_DISPLAY_OPTIONS'; payload: DateDisplayOptions }
   | { type: 'SET_SORT_OPTIONS'; payload: { sortDirection: SortDirection; noDateAtEnd?: boolean } }
-  | { type: 'SET_TASK_FEEDBACK'; payload: { id: string; feedback: 'transformed' | 'relief' | 'obligation' } };
+  | { type: 'SET_TASK_FEEDBACK'; payload: { id: string; feedback: 'transformed' | 'relief' | 'obligation' } }
+  | { type: 'COMPLETE_TASK_BY_TITLE'; payload: string }
+  | { type: 'SET_TASK_FEEDBACK_BY_TITLE'; payload: { title: string; feedback: 'transformed' | 'relief' | 'obligation' } };
 
 // Context interface
 export interface AppContextType {

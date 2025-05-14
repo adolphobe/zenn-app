@@ -1,4 +1,3 @@
-
 import { v4 as uuidv4 } from 'uuid';
 import { Task } from '../types';
 import { AppState, Action } from './types';
@@ -124,6 +123,30 @@ export const appReducer = (state: AppState, action: Action): AppState => {
       };
     }
 
+    case 'COMPLETE_TASK_BY_TITLE':
+      return {
+        ...state,
+        tasks: state.tasks.map(task => 
+          task.title === action.payload 
+            ? { 
+                ...task, 
+                completed: true,
+                completedAt: new Date().toISOString(),
+              } 
+            : task
+        )
+      };
+      
+    case 'SET_TASK_FEEDBACK_BY_TITLE':
+      return {
+        ...state,
+        tasks: state.tasks.map(task => 
+          task.title === action.payload.title
+            ? { ...task, feedback: action.payload.feedback }
+            : task
+        )
+      };
+      
     default:
       return state;
   }

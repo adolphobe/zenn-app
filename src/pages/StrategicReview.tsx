@@ -1,5 +1,5 @@
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useAppContext } from '@/context/AppContext';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { format, isSameDay } from 'date-fns';
@@ -8,11 +8,20 @@ import { getDateRangeByPeriod, filterTasksByDateRange } from '@/components/strat
 import TaskSummaryCard from '@/components/strategic-review/TaskSummaryCard';
 import PillarsAnalysisCard from '@/components/strategic-review/PillarsAnalysisCard';
 import FeedbackAnalysisCard from '@/components/strategic-review/FeedbackAnalysisCard';
+import { toast } from '@/hooks/use-toast';
 
 // Main Strategic Review Page Component
 const StrategicReview: React.FC = () => {
   const { state } = useAppContext();
   const [period, setPeriod] = useState<PeriodType>('week');
+  
+  useEffect(() => {
+    // Show a toast to indicate the page is loaded
+    toast({
+      title: "Revisão Estratégica",
+      description: "Mostrando análise das tarefas concluídas."
+    });
+  }, []);
   
   // Calculate date range based on selected period
   const dateRange = useMemo(() => getDateRangeByPeriod(period), [period]);
@@ -53,10 +62,12 @@ const StrategicReview: React.FC = () => {
         </TabsList>
         
         {/* Single TabsContent that updates based on the filter */}
-        <TabsContent value={period} className="space-y-0">
+        <TabsContent value={period} className="space-y-6">
           <div className="grid gap-6 lg:grid-cols-2">
             <TaskSummaryCard tasks={filteredTasks} />
             <PillarsAnalysisCard tasks={filteredTasks} />
+          </div>
+          <div className="grid gap-6">
             <FeedbackAnalysisCard tasks={filteredTasks} />
           </div>
         </TabsContent>
