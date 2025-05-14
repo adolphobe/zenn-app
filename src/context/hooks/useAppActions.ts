@@ -39,7 +39,7 @@ export const useAppActions = () => {
           type: 'UPDATE_TASK', 
           payload: { 
             id, 
-            data: { pillar } 
+            data: { pillar } as any // Type assertion to avoid TypeScript error
           } 
         });
       }
