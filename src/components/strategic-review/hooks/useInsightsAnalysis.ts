@@ -54,68 +54,110 @@ export const useInsightsAnalysis = (tasks: Task[]): PillarDataType => {
     // Generate insights based on classifications
     const insights = [];
     
-    // Add insights for prioritized pillars
-    if (highest) {
-      if (highest.name === 'Consequência') {
-        insights.push({
-          title: '🟢 Consequência - Priorizado',
-          messages: [
-            'Você está se guiando por impacto real. Evitando arrependimentos antes que eles aconteçam.',
-            'Suas ações mostram clareza sobre o que não pode ser ignorado.',
-            'Você está agindo com base no que ameaça seu progresso, não no que só parece urgente.'
-          ]
-        });
-      } else if (highest.name === 'Orgulho') {
-        insights.push({
-          title: '🟢 Orgulho - Priorizado',
-          messages: [
-            'Você está executando com identidade. O que faz, representa quem você é.',
-            'Suas ações fortalecem sua autoimagem e te validam internamente.',
-            'Você não está apenas riscando tarefas. Está se orgulhando de cada entrega.'
-          ]
-        });
-      } else if (highest.name === 'Construção') {
-        insights.push({
-          title: '🟢 Construção - Priorizado',
-          messages: [
-            'Você está entregando o que te fortalece. Cada tarefa te deixa mais preparado, mais sólido.',
-            'Está saindo do automático e moldando a versão que quer se tornar.',
-            'Suas ações estão em alinhamento com evolução real, não só manutenção.'
-          ]
-        });
+    // Always add insights for each pillar based on their scores
+    pillars.forEach(pillar => {
+      if (pillar.value >= HIGH_THRESHOLD) {
+        // High priority pillar
+        if (pillar.name === 'Consequência') {
+          insights.push({
+            title: '🟢 Consequência - Priorizado',
+            messages: [
+              'Você está se guiando por impacto real. Evitando arrependimentos antes que eles aconteçam.',
+              'Suas ações mostram clareza sobre o que não pode ser ignorado.',
+              'Você está agindo com base no que ameaça seu progresso, não no que só parece urgente.'
+            ]
+          });
+        } else if (pillar.name === 'Orgulho') {
+          insights.push({
+            title: '🟢 Orgulho - Priorizado',
+            messages: [
+              'Você está executando com identidade. O que faz, representa quem você é.',
+              'Suas ações fortalecem sua autoimagem e te validam internamente.',
+              'Você não está apenas riscando tarefas. Está se orgulhando de cada entrega.'
+            ]
+          });
+        } else if (pillar.name === 'Construção') {
+          insights.push({
+            title: '🟢 Construção - Priorizado',
+            messages: [
+              'Você está entregando o que te fortalece. Cada tarefa te deixa mais preparado, mais sólido.',
+              'Está saindo do automático e moldando a versão que quer se tornar.',
+              'Suas ações estão em alinhamento com evolução real, não só manutenção.'
+            ]
+          });
+        }
+      } else if (pillar.value <= LOW_THRESHOLD) {
+        // Low priority pillar
+        if (pillar.name === 'Consequência') {
+          insights.push({
+            title: '🔴 Consequência - Negligenciado',
+            messages: [
+              'Suas tarefas podem estar organizadas, mas não estão resolvendo o que realmente importa.',
+              'Está se mantendo produtivo, mas evitando o que tem mais risco se for adiado.',
+              'Pode estar ignorando os alertas estratégicos que te exigem responsabilidade.'
+            ]
+          });
+        } else if (pillar.name === 'Orgulho') {
+          insights.push({
+            title: '🔴 Orgulho - Negligenciado',
+            messages: [
+              'Está cumprindo tarefas, mas sem se sentir satisfeito com o que entrega.',
+              'Falta conexão entre o que você faz e quem você quer ser.',
+              'Está fazendo por obrigação, não por construção de respeito próprio.'
+            ]
+          });
+        } else if (pillar.name === 'Construção') {
+          insights.push({
+            title: '🔴 Construção - Negligenciado',
+            messages: [
+              'Você está operando no presente, mas não está construindo seu futuro.',
+              'As tarefas podem parecer úteis, mas não estão te transformando.',
+              'Está sendo eficiente, mas não está se expandindo.'
+            ]
+          });
+        }
+      } else {
+        // Medium priority pillar - add a neutral message
+        if (pillar.name === 'Consequência') {
+          insights.push({
+            title: '🔵 Consequência - Equilibrado',
+            messages: [
+              'Você está mantendo um bom equilíbrio com suas responsabilidades e consequências.',
+              'Está atento ao que é importante sem se deixar paralisar pelas preocupações.',
+              'Continue desenvolvendo essa consciência sobre o que realmente importa.'
+            ]
+          });
+        } else if (pillar.name === 'Orgulho') {
+          insights.push({
+            title: '🔵 Orgulho - Equilibrado',
+            messages: [
+              'Você mantém uma boa conexão entre suas tarefas e sua identidade.',
+              'Existe um senso equilibrado de satisfação com o que você entrega.',
+              'Continue fortalecendo a relação entre o que faz e quem você é.'
+            ]
+          });
+        } else if (pillar.name === 'Construção') {
+          insights.push({
+            title: '🔵 Construção - Equilibrado',
+            messages: [
+              'Você está balanceando ações presentes com construção de futuro.',
+              'Há um equilíbrio entre manutenção e evolução em suas tarefas.',
+              'Continue investindo em tarefas que expandem suas capacidades.'
+            ]
+          });
+        }
       }
-    }
+    });
     
-    // Add insights for neglected pillars
-    if (lowest) {
-      if (lowest.name === 'Consequência') {
-        insights.push({
-          title: '🔴 Consequência - Negligenciado',
-          messages: [
-            'Suas tarefas podem estar organizadas, mas não estão resolvendo o que realmente importa.',
-            'Está se mantendo produtivo, mas evitando o que tem mais risco se for adiado.',
-            'Pode estar ignorando os alertas estratégicos que te exigem responsabilidade.'
-          ]
-        });
-      } else if (lowest.name === 'Orgulho') {
-        insights.push({
-          title: '🔴 Orgulho - Negligenciado',
-          messages: [
-            'Está cumprindo tarefas, mas sem se sentir satisfeito com o que entrega.',
-            'Falta conexão entre o que você faz e quem você quer ser.',
-            'Está fazendo por obrigação, não por construção de respeito próprio.'
-          ]
-        });
-      } else if (lowest.name === 'Construção') {
-        insights.push({
-          title: '🔴 Construção - Negligenciado',
-          messages: [
-            'Você está operando no presente, mas não está construindo seu futuro.',
-            'As tarefas podem parecer úteis, mas não estão te transformando.',
-            'Está sendo eficiente, mas não está se expandindo.'
-          ]
-        });
-      }
+    // If no insights were generated (which shouldn't happen with our new logic), add a default
+    if (insights.length === 0) {
+      insights.push({
+        title: 'Análise de Pilares',
+        messages: [
+          'Complete mais tarefas para obter insights específicos sobre seus pilares estratégicos.',
+          'Seus padrões de execução revelarão qual é seu pilar dominante.'
+        ]
+      });
     }
     
     return { averages: pillars, highest, lowest, insights };

@@ -20,7 +20,7 @@ const StrategicReview: React.FC = () => {
   const { assignMissingPillars } = useTaskPillars();
   
   useEffect(() => {
-    // Ensure all tasks have pillars assigned
+    // Ensure all tasks have pillars assigned - explicitly call this
     assignMissingPillars();
     
     // Show a toast to indicate the page is loaded
@@ -35,7 +35,9 @@ const StrategicReview: React.FC = () => {
   
   // Filter tasks based on date range
   const filteredTasks = useMemo(() => {
-    return filterTasksByDateRange(state.tasks, dateRange);
+    const filtered = filterTasksByDateRange(state.tasks, dateRange);
+    console.log(`Filtered ${filtered.length} completed tasks for analysis`);
+    return filtered;
   }, [state.tasks, dateRange]);
   
   // Format date range for display

@@ -31,12 +31,20 @@ export const filterTasksByDateRange = (tasks: Task[], dateRange: [Date, Date]): 
     // Only include completed tasks
     if (!task.completed) return false;
     
-    // If task doesn't have idealDate, include it for analysis
-    if (!task.idealDate) return true;
+    // If task has completedAt date, check if it's within range
+    if (task.completedAt) {
+      const completedDate = new Date(task.completedAt);
+      return isWithinInterval(completedDate, { start: startDate, end: endDate });
+    }
     
-    // If task has idealDate, check if it's within range
-    const taskDate = new Date(task.idealDate);
-    return isWithinInterval(taskDate, { start: startDate, end: endDate });
+    // If task has idealDate but no completedAt, use idealDate
+    if (task.idealDate) {
+      const taskDate = new Date(task.idealDate);
+      return isWithinInterval(taskDate, { start: startDate, end: endDate });
+    }
+    
+    // Include completed tasks without dates in current period
+    return true;
   });
 };
 
