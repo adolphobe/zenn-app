@@ -1,6 +1,7 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Slider } from './ui/slider';
+import { cn } from "@/lib/utils";
 
 interface ScoreSliderProps {
   value: number;
@@ -10,82 +11,83 @@ interface ScoreSliderProps {
 }
 
 const ScoreSlider: React.FC<ScoreSliderProps> = ({ value, type, onChange, phrases }) => {
-  // Definir cores baseadas no tipo
+  // Define colors based on type
   const getColors = () => {
     switch(type) {
       case 'consequence':
         return {
           bgColor: 'bg-blue-100',
-          activeColor: 'bg-gradient-to-r from-blue-300 to-blue-500',
-          hoverColor: 'hover:bg-blue-300',
-          thumbColor: 'border-blue-500 bg-white',
-          trackColor: 'bg-blue-300'
+          trackColor: 'bg-gradient-to-r from-blue-200 to-blue-500',
+          dotActiveColor: 'bg-blue-500',
+          dotInactiveColor: 'bg-blue-100 border border-blue-200',
+          thumbRingColor: 'ring-blue-200'
         };
       case 'pride':
         return {
           bgColor: 'bg-orange-100',
-          activeColor: 'bg-gradient-to-r from-orange-300 to-orange-500',
-          hoverColor: 'hover:bg-orange-300',
-          thumbColor: 'border-orange-500 bg-white',
-          trackColor: 'bg-orange-300'
+          trackColor: 'bg-gradient-to-r from-orange-200 to-orange-500',
+          dotActiveColor: 'bg-orange-500',
+          dotInactiveColor: 'bg-orange-100 border border-orange-200',
+          thumbRingColor: 'ring-orange-200'
         };
       case 'construction':
         return {
           bgColor: 'bg-emerald-100',
-          activeColor: 'bg-gradient-to-r from-emerald-300 to-emerald-500',
-          hoverColor: 'hover:bg-emerald-300',
-          thumbColor: 'border-emerald-500 bg-white',
-          trackColor: 'bg-emerald-300'
+          trackColor: 'bg-gradient-to-r from-emerald-200 to-emerald-500',
+          dotActiveColor: 'bg-emerald-500',
+          dotInactiveColor: 'bg-emerald-100 border border-emerald-200',
+          thumbRingColor: 'ring-emerald-200'
         };
       default:
         return {
           bgColor: 'bg-gray-100',
-          activeColor: 'bg-gradient-to-r from-gray-300 to-gray-500',
-          hoverColor: 'hover:bg-gray-300',
-          thumbColor: 'border-gray-500 bg-white',
-          trackColor: 'bg-gray-300'
+          trackColor: 'bg-gradient-to-r from-gray-200 to-gray-500',
+          dotActiveColor: 'bg-gray-500',
+          dotInactiveColor: 'bg-gray-100 border border-gray-200',
+          thumbRingColor: 'ring-gray-200'
         };
     }
   };
 
-  const { bgColor, activeColor, hoverColor, thumbColor, trackColor } = getColors();
+  const { bgColor, trackColor, dotActiveColor, dotInactiveColor, thumbRingColor } = getColors();
 
   // Handle slider value change
   const handleValueChange = (newValue: number[]) => {
     onChange(newValue[0]);
   };
 
-  // Create a custom rendering for the slider that shows our score dots
   return (
     <div className="mb-4">
       <div className="relative">
-        {/* Slider using shadcn/ui slider with custom styling */}
+        {/* Custom Slider component using shadcn/ui slider */}
         <Slider
           value={[value]}
           min={1}
           max={5}
           step={1}
           onValueChange={handleValueChange}
-          className="py-4"
-          // Override default Slider styles
-          classNameInner={{
-            track: `h-1 ${bgColor}`,
-            range: `h-1 ${trackColor}`,
-            thumb: `h-6 w-6 border-2 ${thumbColor} rounded-full shadow-md hover:scale-110 transition-transform cursor-grab active:cursor-grabbing`
+          className={cn("py-4", bgColor)}
+          // Use the custom styling directly in the component
+          classNames={{
+            track: "h-1.5 rounded-full",
+            range: cn("h-1.5 rounded-full", trackColor),
+            thumb: cn("block h-4 w-4 rounded-full border-2 border-white bg-white ring-2", thumbRingColor, 
+              "transition-all hover:scale-110 focus:outline-none focus:ring focus-visible:outline-none",
+              "cursor-grab active:cursor-grabbing shadow-md")
           }}
         />
         
         {/* Custom score dots */}
-        <div className="absolute top-4 -translate-y-1/2 w-full flex justify-between pointer-events-none">
+        <div className="absolute top-4 -translate-y-1/2 w-full flex justify-between px-2 pointer-events-none">
           {[1, 2, 3, 4, 5].map((score) => (
             <div
               key={score}
-              className={`w-6 h-6 rounded-full transition-all duration-200 transform ${
+              className={`w-3.5 h-3.5 rounded-full transition-all duration-200 transform ${
                 score <= value
-                  ? activeColor + ' shadow-md'
-                  : bgColor + ' ' + hoverColor
+                  ? dotActiveColor
+                  : dotInactiveColor
               } ${
-                score === value ? 'scale-110' : ''
+                score === value ? 'scale-110 shadow-sm' : ''
               }`}
               aria-label={`Score ${score}`}
             />
@@ -93,7 +95,7 @@ const ScoreSlider: React.FC<ScoreSliderProps> = ({ value, type, onChange, phrase
         </div>
       </div>
       
-      <div className="text-sm text-gray-600 mt-3">
+      <div className="text-sm text-gray-600 mt-2">
         {phrases[value - 1]}
       </div>
     </div>
