@@ -10,10 +10,15 @@ import {
   ToastTitle,
   ToastViewport,
 } from "@/components/ui/toast"
-import { useToast as useToastOriginal } from "@/components/ui/use-toast"
+import {
+  useToast as useToastOriginal,
+  type ToastProps,
+  type ToastActionElement,
+  toast,
+} from "@/components/ui/use-toast"
 
 export function Toaster() {
-  const { toasts } = useToast()
+  const { toasts } = useToastOriginal()
 
   return (
     <ToastProvider>
@@ -42,4 +47,4 @@ export {
   type ToastProps,
   type ToastActionElement,
   toast,
-} from "@/components/ui/use-toast"
+}
