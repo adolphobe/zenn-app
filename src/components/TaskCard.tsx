@@ -167,7 +167,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
               <Button 
                 variant="outline"
                 size="sm"
-                className="flex items-center gap-1"
+                className="flex items-center gap-1 text-gray-700 dark:text-gray-300 hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-900/20 dark:hover:text-blue-400"
                 onClick={(e) => {
                   e.stopPropagation();
                   toggleTaskHidden(task.id);
@@ -179,7 +179,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
               <Button 
                 variant="outline"
                 size="sm"
-                className="flex items-center gap-1"
+                className="flex items-center gap-1 text-gray-700 dark:text-gray-300 hover:bg-green-50 hover:text-green-600 dark:hover:bg-green-900/20 dark:hover:text-green-400"
                 onClick={handleCompleteTask}
               >
                 <CheckCircle size={14} />

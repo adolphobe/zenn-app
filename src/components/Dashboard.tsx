@@ -105,7 +105,7 @@ const Dashboard: React.FC = () => {
         </div>
       </header>
 
-      <main className={`p-6 ${isMobile ? 'px-2 w-full max-w-none' : 'max-w-4xl mx-auto'}`}>
+      <main className={`p-6 ${isMobile ? 'px-4 w-full max-w-none' : 'max-w-4xl mx-auto'}`}>
         <div className="mb-8">
           <h2 className="text-xl font-semibold mb-2 text-gray-800 dark:text-gray-100">Suas Tarefas</h2>
           <p className="text-sm text-gray-500">
