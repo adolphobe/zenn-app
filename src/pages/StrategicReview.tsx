@@ -5,9 +5,8 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatDate } from '@/utils';
 import { Task } from '@/types';
-import { BarChart, LineChart, PieChart } from 'recharts';
-import { ChartContainer, ChartTooltipContent, ChartLegend, ChartTooltip } from '@/components/ui/chart';
-import { Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Line, ResponsiveContainer, Pie, Cell } from 'recharts';
+import { ChartContainer, ChartTooltipContent } from '@/components/ui/chart';
+import { Bar, XAxis, YAxis, CartesianGrid, Tooltip, Pie, Cell, ResponsiveContainer } from 'recharts';
 import { subDays, startOfWeek, startOfMonth, endOfWeek, endOfMonth, isSameDay, isWithinInterval, format } from 'date-fns';
 
 // Period type definition
@@ -15,22 +14,10 @@ type PeriodType = 'today' | 'week' | 'month' | 'custom';
 
 // Colors for the charts
 const COLORS = {
-  consequence: {
-    main: '#ea384c',
-    light: '#ffebee'
-  },
-  pride: {
-    main: '#F97316',
-    light: '#fff8f0'
-  },
-  construction: {
-    main: '#0EA5E9',
-    light: '#f0f9ff'
-  },
-  total: {
-    main: '#6b46c1',
-    light: '#f5f3ff'
-  },
+  consequence: '#ea384c',
+  pride: '#F97316',
+  construction: '#0EA5E9',
+  total: '#9b87f5',
   zone: {
     critical: '#ffcdd2',
     important: '#ffe0b2',
@@ -115,25 +102,29 @@ const TaskSummaryCard = ({ tasks }: { tasks: Task[] }) => {
   }, [tasks]);
   
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Resumo de Tarefas</CardTitle>
+    <Card className="overflow-hidden border-none shadow-md">
+      <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 pb-2">
+        <CardTitle className="text-xl">Resumo de Tarefas</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="space-y-4">
-          <div className="flex flex-col gap-1">
-            <div className="flex justify-between">
-              <span className="text-sm text-muted-foreground">Total de tarefas concluídas:</span>
-              <span className="font-semibold">{tasks.length}</span>
+        <div className="space-y-6 pt-4">
+          <div className="grid grid-cols-3 gap-4">
+            <div className="rounded-lg bg-primary/5 p-4 text-center">
+              <div className="text-4xl font-bold text-primary">{tasks.length}</div>
+              <div className="mt-1 text-sm text-muted-foreground">Tarefas Concluídas</div>
             </div>
-            <div className="flex justify-between">
-              <span className="text-sm text-muted-foreground">Média do score total:</span>
-              <span className="font-semibold">{taskStats.avgTotal.toFixed(1)}</span>
+            <div className="rounded-lg bg-primary/5 p-4 text-center">
+              <div className="text-4xl font-bold text-primary">{taskStats.avgTotal.toFixed(1)}</div>
+              <div className="mt-1 text-sm text-muted-foreground">Média de Score</div>
+            </div>
+            <div className="rounded-lg bg-primary/5 p-4 text-center">
+              <div className="text-4xl font-bold text-primary">{taskStats.highConsequence}</div>
+              <div className="mt-1 text-sm text-muted-foreground">Alta Consequência</div>
             </div>
           </div>
           
           {/* Zone Distribution Chart */}
-          <div className="h-52 mt-6">
+          <div className="mt-6 h-56">
             <ChartContainer 
               config={{
                 critical: { color: COLORS.zone.critical },
@@ -142,34 +133,25 @@ const TaskSummaryCard = ({ tasks }: { tasks: Task[] }) => {
                 hidden: { color: COLORS.zone.hidden }
               }}
             >
-              <BarChart
-                layout="vertical"
-                data={zoneData}
-                margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" horizontal={false} />
-                <XAxis type="number" />
-                <YAxis dataKey="name" type="category" width={150} />
-                <Tooltip content={<ChartTooltipContent />} />
-                <Bar dataKey="value" barSize={20}>
-                  {zoneData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
+              <ResponsiveContainer width="100%" height="100%">
+                <Bar
+                  data={zoneData}
+                  layout="vertical"
+                  margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" horizontal={false} />
+                  <XAxis type="number" />
+                  <YAxis dataKey="name" type="category" width={150} />
+                  <Tooltip content={<ChartTooltipContent />} />
+                  <Bar dataKey="value" barSize={20}>
+                    {zoneData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Bar>
                 </Bar>
-              </BarChart>
+              </ResponsiveContainer>
             </ChartContainer>
           </div>
-          
-          {/* Auto-generated insight */}
-          {tasks.length > 0 && (
-            <div className="mt-4 p-3 bg-primary/5 rounded-md text-sm">
-              <p>
-                {`Este período você entregou ${tasks.length} ${tasks.length === 1 ? 'tarefa' : 'tarefas'}, 
-                sendo ${taskStats.highConsequence} com alta consequência (4-5)
-                ${taskStats.highPride > 0 ? `, sendo ${taskStats.highPride} com orgulho máximo (5)` : ''}.`}
-              </p>
-            </div>
-          )}
         </div>
       </CardContent>
     </Card>
@@ -183,9 +165,9 @@ const PillarsAnalysisCard = ({ tasks }: { tasks: Task[] }) => {
     if (tasks.length === 0) {
       return {
         averages: [
-          { name: 'Consequência', value: 0, color: COLORS.consequence.main },
-          { name: 'Orgulho', value: 0, color: COLORS.pride.main },
-          { name: 'Construção', value: 0, color: COLORS.construction.main }
+          { name: 'Consequência', value: 0, color: COLORS.consequence },
+          { name: 'Orgulho', value: 0, color: COLORS.pride },
+          { name: 'Construção', value: 0, color: COLORS.construction }
         ],
         highest: null,
         lowest: null,
@@ -198,9 +180,9 @@ const PillarsAnalysisCard = ({ tasks }: { tasks: Task[] }) => {
     const avgConstruction = tasks.reduce((sum, task) => sum + task.constructionScore, 0) / tasks.length;
     
     const pillars = [
-      { name: 'Consequência', value: avgConsequence, color: COLORS.consequence.main },
-      { name: 'Orgulho', value: avgPride, color: COLORS.pride.main },
-      { name: 'Construção', value: avgConstruction, color: COLORS.construction.main }
+      { name: 'Consequência', value: avgConsequence, color: COLORS.consequence },
+      { name: 'Orgulho', value: avgPride, color: COLORS.pride },
+      { name: 'Construção', value: avgConstruction, color: COLORS.construction }
     ];
     
     // Find highest and lowest pillars
@@ -294,45 +276,46 @@ const PillarsAnalysisCard = ({ tasks }: { tasks: Task[] }) => {
   }, [tasks]);
   
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Análise de Pilares</CardTitle>
+    <Card className="overflow-hidden border-none shadow-md">
+      <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 pb-2">
+        <CardTitle className="text-xl">Análise de Pilares</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="space-y-6">
+        <div className="space-y-6 pt-4">
           {/* Pillar Chart */}
-          <div className="h-40">
+          <div className="h-64">
             <ChartContainer 
               config={{
-                consequence: { color: COLORS.consequence.main },
-                pride: { color: COLORS.pride.main },
-                construction: { color: COLORS.construction.main }
+                consequence: { color: COLORS.consequence },
+                pride: { color: COLORS.pride },
+                construction: { color: COLORS.construction }
               }}
             >
-              <BarChart
-                layout="vertical"
-                data={pillarData.averages}
-                margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" horizontal={false} />
-                <XAxis type="number" domain={[0, 5]} />
-                <YAxis dataKey="name" type="category" width={100} />
-                <Tooltip content={<ChartTooltipContent />} />
-                <Bar dataKey="value" barSize={20}>
-                  {pillarData.averages.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
+              <ResponsiveContainer width="100%" height="100%">
+                <Bar
+                  data={pillarData.averages}
+                  margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis domain={[0, 5]} />
+                  <Tooltip content={<ChartTooltipContent />} />
+                  <Bar dataKey="value" barSize={60} radius={[4, 4, 0, 0]}>
+                    {pillarData.averages.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Bar>
                 </Bar>
-              </BarChart>
+              </ResponsiveContainer>
             </ChartContainer>
           </div>
           
           {/* Insights */}
           {pillarData.insights.length > 0 ? (
-            <div className="space-y-4 mt-6">
+            <div className="mt-6 space-y-4">
               {pillarData.insights.map((insight, i) => (
-                <div key={i} className="p-4 rounded-md bg-primary/5">
-                  <h4 className="font-medium mb-2">{insight.title}</h4>
+                <div key={i} className="rounded-md bg-primary/5 p-4">
+                  <h4 className="mb-2 font-medium">{insight.title}</h4>
                   <ul className="space-y-2">
                     {insight.messages.map((message, j) => (
                       <li key={j} className="text-sm">{message}</li>
@@ -343,14 +326,14 @@ const PillarsAnalysisCard = ({ tasks }: { tasks: Task[] }) => {
             </div>
           ) : (
             tasks.length > 0 && (
-              <div className="p-4 rounded-md bg-primary/5">
+              <div className="rounded-md bg-primary/5 p-4">
                 <p className="text-sm">Equilíbrio entre os pilares. Continue mantendo essa distribuição balanceada.</p>
               </div>
             )
           )}
           
           {tasks.length === 0 && (
-            <div className="p-4 rounded-md bg-muted/30">
+            <div className="rounded-md bg-muted/30 p-4">
               <p className="text-sm text-muted-foreground">Sem tarefas concluídas no período para análise.</p>
             </div>
           )}
@@ -363,8 +346,6 @@ const PillarsAnalysisCard = ({ tasks }: { tasks: Task[] }) => {
 // Component for feedback analysis
 const FeedbackAnalysisCard = ({ tasks }: { tasks: Task[] }) => {
   // Calculate feedback distribution
-  // Note: This requires an additional property in tasks for feedback
-  // For now we'll simulate with random data
   const feedbackData = useMemo(() => {
     if (tasks.length === 0) {
       return {
@@ -377,25 +358,36 @@ const FeedbackAnalysisCard = ({ tasks }: { tasks: Task[] }) => {
       };
     }
     
-    // Simulating feedback data (in a real app, this would come from task data)
-    const total = tasks.length;
-    const transformed = Math.floor(total * (Math.random() * 0.4 + 0.2)); // 20-60%
-    const relief = Math.floor(total * (Math.random() * 0.4 + 0.1)); // 10-50% 
-    const obligation = total - transformed - relief;
+    // Count actual feedback from tasks
+    let transformed = 0;
+    let relief = 0;
+    let obligation = 0;
     
-    const transformedPercent = Math.round((transformed / total) * 100);
-    const reliefPercent = Math.round((relief / total) * 100);
-    const obligationPercent = Math.round((obligation / total) * 100);
+    tasks.forEach(task => {
+      if (task.feedback === 'transformed') transformed++;
+      else if (task.feedback === 'relief') relief++;
+      else if (task.feedback === 'obligation') obligation++;
+    });
+    
+    const total = transformed + relief + obligation;
+    const withFeedback = total > 0;
+    
+    // Calculate percentages if we have feedback data
+    const transformedPercent = withFeedback ? Math.round((transformed / total) * 100) : 0;
+    const reliefPercent = withFeedback ? Math.round((relief / total) * 100) : 0;
+    const obligationPercent = withFeedback ? Math.round((obligation / total) * 100) : 0;
     
     // Determine insight based on highest percentage
     let insight = '';
     
-    if (obligationPercent >= reliefPercent && obligationPercent >= transformedPercent) {
-      insight = `${obligationPercent}% das suas tarefas foram classificadas como 'só obrigação'. Você pode estar executando sem identidade.`;
-    } else if (transformedPercent >= reliefPercent && transformedPercent >= obligationPercent) {
-      insight = `${transformedPercent}% das suas tarefas te 'transformaram'. Você está focando no que realmente te fortalece.`;
-    } else if (reliefPercent >= transformedPercent && reliefPercent >= obligationPercent) {
-      insight = `${reliefPercent}% das suas tarefas te deram 'alívio'. Você está buscando reduzir peso mais do que construir potência.`;
+    if (withFeedback) {
+      if (obligationPercent >= reliefPercent && obligationPercent >= transformedPercent) {
+        insight = `${obligationPercent}% das suas tarefas foram classificadas como 'só obrigação'. Você pode estar executando sem identidade.`;
+      } else if (transformedPercent >= reliefPercent && transformedPercent >= obligationPercent) {
+        insight = `${transformedPercent}% das suas tarefas te 'transformaram'. Você está focando no que realmente te fortalece.`;
+      } else if (reliefPercent >= transformedPercent && reliefPercent >= obligationPercent) {
+        insight = `${reliefPercent}% das suas tarefas te deram 'alívio'. Você está buscando reduzir peso mais do que construir potência.`;
+      }
     }
     
     return {
@@ -404,7 +396,8 @@ const FeedbackAnalysisCard = ({ tasks }: { tasks: Task[] }) => {
         { name: 'Deu alívio', value: relief, percent: reliefPercent, color: COLORS.feedback.relief },
         { name: 'Foi só obrigação', value: obligation, percent: obligationPercent, color: COLORS.feedback.obligation }
       ],
-      insight
+      insight,
+      withFeedback
     };
   }, [tasks]);
   
@@ -414,7 +407,7 @@ const FeedbackAnalysisCard = ({ tasks }: { tasks: Task[] }) => {
     const x = cx + radius * Math.cos(-midAngle * RADIAN);
     const y = cy + radius * Math.sin(-midAngle * RADIAN);
     
-    // Fix: Check if the distribution item has a percent property before accessing it
+    // Check if the distribution item has a percent property before accessing it
     const entry = feedbackData.distribution[index];
     const percentValue = entry && 'percent' in entry ? entry.percent : 0;
     
@@ -426,205 +419,70 @@ const FeedbackAnalysisCard = ({ tasks }: { tasks: Task[] }) => {
   };
   
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Análise de Feedback</CardTitle>
+    <Card className="overflow-hidden border-none shadow-md">
+      <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 pb-2">
+        <CardTitle className="text-xl">Análise de Feedback</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="space-y-6">
+        <div className="space-y-6 pt-4">
           {/* Feedback Chart */}
           {tasks.length > 0 ? (
             <>
-              <div className="h-56 flex justify-center items-center">
-                <ChartContainer 
-                  config={{
-                    transformed: { color: COLORS.feedback.transformed },
-                    relief: { color: COLORS.feedback.relief },
-                    obligation: { color: COLORS.feedback.obligation }
-                  }}
-                >
-                  <PieChart margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
-                    <Pie
-                      data={feedbackData.distribution}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      label={renderCustomizedLabel}
-                      outerRadius={80}
-                      fill="#8884d8"
-                      dataKey="value"
-                    >
-                      {feedbackData.distribution.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Tooltip content={<ChartTooltipContent />} />
-                    <Legend />
-                  </PieChart>
-                </ChartContainer>
-              </div>
+              {feedbackData.withFeedback ? (
+                <div className="flex h-56 items-center justify-center">
+                  <ChartContainer 
+                    config={{
+                      transformed: { color: COLORS.feedback.transformed },
+                      relief: { color: COLORS.feedback.relief },
+                      obligation: { color: COLORS.feedback.obligation }
+                    }}
+                  >
+                    <ResponsiveContainer width="100%" height="100%">
+                      <Pie
+                        data={feedbackData.distribution}
+                        cx="50%"
+                        cy="50%"
+                        labelLine={false}
+                        label={renderCustomizedLabel}
+                        outerRadius={80}
+                        fill="#8884d8"
+                        dataKey="value"
+                      >
+                        {feedbackData.distribution.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                    </ResponsiveContainer>
+                  </ChartContainer>
+                </div>
+              ) : (
+                <div className="my-8 rounded-md bg-muted/30 p-4 text-center">
+                  <p className="text-sm text-muted-foreground">Não há feedback registrado para as tarefas deste período.</p>
+                </div>
+              )}
+              
+              {/* Legend */}
+              {feedbackData.withFeedback && (
+                <div className="mt-4 flex justify-center gap-6">
+                  {feedbackData.distribution.map((entry, index) => (
+                    <div key={index} className="flex items-center">
+                      <div className="mr-2 h-3 w-3 rounded-full" style={{ backgroundColor: entry.color }} />
+                      <span className="text-sm">{entry.name}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
               
               {/* Insight */}
               {feedbackData.insight && (
-                <div className="p-4 rounded-md bg-primary/5">
+                <div className="mt-6 rounded-md bg-primary/5 p-4">
                   <p className="text-sm">{feedbackData.insight}</p>
                 </div>
               )}
             </>
           ) : (
-            <div className="p-4 rounded-md bg-muted/30">
+            <div className="rounded-md bg-muted/30 p-4">
               <p className="text-sm text-muted-foreground">Sem tarefas concluídas no período para análise de feedback.</p>
-            </div>
-          )}
-        </div>
-      </CardContent>
-    </Card>
-  );
-};
-
-// Component for time trend analysis
-const TimeTrendCard = ({ tasks }: { tasks: Task[] }) => {
-  const [timeMode, setTimeMode] = useState<'day' | 'week' | 'month'>('day');
-  
-  // Generate trend data based on tasks
-  const trendData = useMemo(() => {
-    if (tasks.length === 0) return [];
-    
-    // Get unique dates sorted chronologically
-    const uniqueDates = Array.from(new Set(
-      tasks
-        .filter(t => t.idealDate)
-        .map(t => {
-          const date = new Date(t.idealDate as Date);
-          // Format based on time mode
-          if (timeMode === 'day') return format(date, 'yyyy-MM-dd');
-          if (timeMode === 'week') return `W${format(date, 'w')}`;
-          return format(date, 'MMM yyyy');
-        })
-    )).sort();
-    
-    // Group tasks by date
-    const groupedByDate = uniqueDates.map(dateStr => {
-      const tasksInPeriod = tasks.filter(t => {
-        if (!t.idealDate) return false;
-        const date = new Date(t.idealDate);
-        
-        if (timeMode === 'day') {
-          return format(date, 'yyyy-MM-dd') === dateStr;
-        } else if (timeMode === 'week') {
-          return `W${format(date, 'w')}` === dateStr;
-        } else {
-          return format(date, 'MMM yyyy') === dateStr;
-        }
-      });
-      
-      // Calculate average scores
-      const avgConsequence = tasksInPeriod.length ? 
-        tasksInPeriod.reduce((sum, t) => sum + t.consequenceScore, 0) / tasksInPeriod.length : 0;
-        
-      const avgPride = tasksInPeriod.length ? 
-        tasksInPeriod.reduce((sum, t) => sum + t.prideScore, 0) / tasksInPeriod.length : 0;
-        
-      const avgConstruction = tasksInPeriod.length ? 
-        tasksInPeriod.reduce((sum, t) => sum + t.constructionScore, 0) / tasksInPeriod.length : 0;
-        
-      const avgTotal = tasksInPeriod.length ? 
-        tasksInPeriod.reduce((sum, t) => sum + t.totalScore, 0) / tasksInPeriod.length : 0;
-      
-      return {
-        date: dateStr,
-        consequenceScore: parseFloat(avgConsequence.toFixed(1)),
-        prideScore: parseFloat(avgPride.toFixed(1)),
-        constructionScore: parseFloat(avgConstruction.toFixed(1)),
-        totalScore: parseFloat(avgTotal.toFixed(1)),
-      };
-    });
-    
-    return groupedByDate;
-  }, [tasks, timeMode]);
-  
-  return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle>Tendência Temporal</CardTitle>
-        <div className="flex gap-1 text-xs">
-          <button 
-            className={`px-2 py-1 rounded-md ${timeMode === 'day' ? 'bg-primary/10 font-medium' : 'hover:bg-primary/5'}`}
-            onClick={() => setTimeMode('day')}
-          >
-            Dia
-          </button>
-          <button 
-            className={`px-2 py-1 rounded-md ${timeMode === 'week' ? 'bg-primary/10 font-medium' : 'hover:bg-primary/5'}`}
-            onClick={() => setTimeMode('week')}
-          >
-            Semana
-          </button>
-          <button 
-            className={`px-2 py-1 rounded-md ${timeMode === 'month' ? 'bg-primary/10 font-medium' : 'hover:bg-primary/5'}`}
-            onClick={() => setTimeMode('month')}
-          >
-            Mês
-          </button>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="h-64">
-          {tasks.length > 0 ? (
-            <ChartContainer 
-              config={{
-                consequence: { color: COLORS.consequence.main },
-                pride: { color: COLORS.pride.main },
-                construction: { color: COLORS.construction.main },
-                total: { color: COLORS.total.main }
-              }}
-            >
-              <LineChart
-                data={trendData}
-                margin={{ top: 10, right: 10, left: 0, bottom: 20 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                <XAxis dataKey="date" angle={-45} textAnchor="end" height={50} />
-                <YAxis domain={[0, 5]} />
-                <Tooltip content={<ChartTooltipContent />} />
-                <Legend />
-                <Line 
-                  type="monotone" 
-                  dataKey="consequenceScore" 
-                  name="Consequência"
-                  stroke={COLORS.consequence.main} 
-                  strokeWidth={2}
-                  dot={{ r: 4 }} 
-                />
-                <Line 
-                  type="monotone" 
-                  dataKey="prideScore" 
-                  name="Orgulho"
-                  stroke={COLORS.pride.main} 
-                  strokeWidth={2}
-                  dot={{ r: 4 }} 
-                />
-                <Line 
-                  type="monotone" 
-                  dataKey="constructionScore" 
-                  name="Construção"
-                  stroke={COLORS.construction.main} 
-                  strokeWidth={2}
-                  dot={{ r: 4 }} 
-                />
-                <Line 
-                  type="monotone" 
-                  dataKey="totalScore" 
-                  name="Total"
-                  stroke={COLORS.total.main} 
-                  strokeWidth={2}
-                  dot={{ r: 4 }} 
-                />
-              </LineChart>
-            </ChartContainer>
-          ) : (
-            <div className="h-full flex items-center justify-center">
-              <p className="text-sm text-muted-foreground">Sem dados suficientes para análise de tendência.</p>
             </div>
           )}
         </div>
@@ -662,53 +520,26 @@ const StrategicReview: React.FC = () => {
   }, [dateRange, period]);
   
   return (
-    <div className="p-4 md:p-6 lg:p-8 w-full">
+    <div className="w-full p-4 md:p-6 lg:p-8">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold tracking-tight">Revisão Estratégica</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Revisão Estratégica</h1>
         <p className="text-muted-foreground">Período: {dateRangeDisplay}</p>
       </div>
       
-      <Tabs defaultValue="week" value={period} onValueChange={(value) => setPeriod(value as PeriodType)}>
-        <TabsList className="mb-8">
+      <Tabs defaultValue="week" value={period} onValueChange={(value) => setPeriod(value as PeriodType)} className="space-y-6">
+        <TabsList>
           <TabsTrigger value="today">Hoje</TabsTrigger>
           <TabsTrigger value="week">Esta Semana</TabsTrigger>
           <TabsTrigger value="month">Este Mês</TabsTrigger>
-          <TabsTrigger value="custom">Personalizado</TabsTrigger>
+          <TabsTrigger value="custom">Últimos 30 dias</TabsTrigger>
         </TabsList>
         
-        <TabsContent value="today" className="space-y-0">
+        {/* Single TabsContent that updates based on the filter */}
+        <TabsContent value={period} className="space-y-0">
           <div className="grid gap-6 lg:grid-cols-2">
             <TaskSummaryCard tasks={filteredTasks} />
             <PillarsAnalysisCard tasks={filteredTasks} />
             <FeedbackAnalysisCard tasks={filteredTasks} />
-            <TimeTrendCard tasks={filteredTasks} />
-          </div>
-        </TabsContent>
-        
-        <TabsContent value="week" className="space-y-0">
-          <div className="grid gap-6 lg:grid-cols-2">
-            <TaskSummaryCard tasks={filteredTasks} />
-            <PillarsAnalysisCard tasks={filteredTasks} />
-            <FeedbackAnalysisCard tasks={filteredTasks} />
-            <TimeTrendCard tasks={filteredTasks} />
-          </div>
-        </TabsContent>
-        
-        <TabsContent value="month" className="space-y-0">
-          <div className="grid gap-6 lg:grid-cols-2">
-            <TaskSummaryCard tasks={filteredTasks} />
-            <PillarsAnalysisCard tasks={filteredTasks} />
-            <FeedbackAnalysisCard tasks={filteredTasks} />
-            <TimeTrendCard tasks={filteredTasks} />
-          </div>
-        </TabsContent>
-        
-        <TabsContent value="custom" className="space-y-0">
-          <div className="grid gap-6 lg:grid-cols-2">
-            <TaskSummaryCard tasks={filteredTasks} />
-            <PillarsAnalysisCard tasks={filteredTasks} />
-            <FeedbackAnalysisCard tasks={filteredTasks} />
-            <TimeTrendCard tasks={filteredTasks} />
           </div>
         </TabsContent>
       </Tabs>
