@@ -147,6 +147,61 @@
   .input-field {
     @apply px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all;
   }
+
+  /* Task Score Container Styling */
+  .task-score-container {
+    @apply flex flex-col gap-1;
+  }
+  
+  .task-score-header {
+    @apply flex justify-between items-center;
+  }
+  
+  .task-score-title {
+    @apply font-medium;
+  }
+  
+  .task-score-value {
+    @apply font-semibold transition-all duration-300;
+  }
+  
+  .task-score-label {
+    @apply text-xs text-gray-500 mt-1;
+  }
+  
+  /* Score value styling based on score */
+  .task-score-critical {
+    @apply text-red-600;
+  }
+  
+  .task-score-important {
+    @apply text-orange-500;
+  }
+  
+  .task-score-moderate {
+    @apply text-gray-600;
+  }
+  
+  .task-score-light {
+    @apply text-gray-400;
+  }
+  
+  /* Animations for the score */
+  .task-score-animate {
+    animation: pulse 1s ease-in-out;
+  }
+  
+  @keyframes pulse {
+    0%, 100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    50% {
+      transform: scale(1.1);
+      opacity: 0.8;
+      text-shadow: 0 0 15px currentColor;
+    }
+  }
 }
 
 @layer utilities {
@@ -165,4 +220,3 @@
     }
   }
 }
-

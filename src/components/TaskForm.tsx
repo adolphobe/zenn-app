@@ -1,7 +1,9 @@
+
 import React, { useState } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { TaskFormData } from '../types';
 import RatingSlider from './RatingSlider';
+import TaskScoreDisplay from './TaskScoreDisplay';
 import { 
   CONSEQUENCE_PHRASES, 
   PRIDE_PHRASES, 
@@ -129,16 +131,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, initialData, taskId }) => 
           />
 
           <div className="mt-5 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg shadow-sm">
-            <div className="font-medium flex justify-between">
-              <span>Score Total:</span>
-              <span className="font-semibold">{totalScore}/15</span>
-            </div>
-            <div className="text-xs text-gray-500 mt-1">
-              {totalScore >= 14 ? "Tarefa Crítica" : 
-               totalScore >= 11 ? "Tarefa Importante" : 
-               totalScore >= 8 ? "Tarefa Moderada" : 
-               "Tarefa Leve (ficará oculta por padrão)"}
-            </div>
+            <TaskScoreDisplay score={totalScore} />
           </div>
 
           <div className="mt-6 flex justify-end space-x-4">
