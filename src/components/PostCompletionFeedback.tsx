@@ -5,33 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Task } from '../types';
 import { useIsMobile } from '@/hooks/use-mobile';
 
-const feedbackOptions = [
-  {
-    type: 'satisfaction',
-    label: 'Satisfação plena',
-    description: 'Sinto que conquistei algo importante',
-    color: 'bg-green-100 border-green-300 dark:bg-green-900/30 dark:border-green-800',
-    textColor: 'text-green-800 dark:text-green-300',
-    emoji: '🏆'
-  },
-  {
-    type: 'relief',
-    label: 'Deu alívio',
-    description: 'Tirei um peso das costas',
-    color: 'bg-blue-100 border-blue-300 dark:bg-blue-900/30 dark:border-blue-800',
-    textColor: 'text-blue-800 dark:text-blue-300',
-    emoji: '😌'
-  },
-  {
-    type: 'neutral',
-    label: 'Neutro',
-    description: 'Apenas cumpri uma obrigação',
-    color: 'bg-gray-100 border-gray-300 dark:bg-gray-800/50 dark:border-gray-700',
-    textColor: 'text-gray-800 dark:text-gray-300',
-    emoji: '😐'
-  }
-];
-
 interface PostCompletionFeedbackProps {
   task: Task;
   isOpen: boolean;
@@ -51,62 +24,77 @@ const PostCompletionFeedback: React.FC<PostCompletionFeedbackProps> = ({ task, i
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className={isMobile ? "sm:max-w-md w-[400px]" : "sm:max-w-lg w-[600px]"}>
+      <DialogContent className="sm:max-w-md w-[450px]">
         <DialogHeader>
-          <DialogTitle className="text-xl">Missão cumprida! 🎯</DialogTitle>
-          <DialogDescription>
-            Como você se sente agora que concluiu "{task.title}"?
+          <DialogTitle className="text-xl text-center">Como você se sentiu ao concluir essa tarefa?</DialogTitle>
+          <DialogDescription className="text-center">
+            "{task.title}"
           </DialogDescription>
         </DialogHeader>
         
-        {isMobile ? (
-          <div className="grid gap-4 py-4">
-            {feedbackOptions.map(option => (
-              <button
-                key={option.type}
-                className={`p-4 border rounded-lg transition-all ${option.color} ${option.textColor} ${
-                  selectedFeedback === option.type 
-                    ? 'ring-2 ring-offset-2 ring-blue-500 dark:ring-blue-400' 
-                    : 'hover:bg-opacity-80'
-                }`}
-                onClick={() => setSelectedFeedback(option.type)}
-              >
-                <div className="font-medium text-lg mb-1">
-                  {option.emoji} {option.label}
-                </div>
-                <div className="text-sm opacity-90">{option.description}</div>
-              </button>
-            ))}
-          </div>
-        ) : (
-          <div className="flex justify-between gap-2 py-4">
-            {feedbackOptions.map(option => (
-              <button
-                key={option.type}
-                className={`flex-1 p-3 border rounded-lg transition-all text-center ${option.color} ${option.textColor} ${
-                  selectedFeedback === option.type 
-                    ? 'ring-2 ring-offset-2 ring-blue-500 dark:ring-blue-400' 
-                    : 'hover:bg-opacity-80'
-                }`}
-                onClick={() => setSelectedFeedback(option.type)}
-              >
-                <div className="font-medium text-base">
-                  {option.emoji} {option.label}
-                </div>
-              </button>
-            ))}
-          </div>
-        )}
+        <div className={`grid ${isMobile ? 'gap-4 py-4' : 'grid-cols-3 gap-3 py-4'}`}>
+          <button
+            className={`p-4 border rounded-lg transition-all ${
+              selectedFeedback === 'satisfaction' 
+                ? 'bg-green-100 border-green-300 dark:bg-green-900/30 dark:border-green-800' 
+                : 'bg-white border-gray-200 dark:bg-gray-800 dark:border-gray-700 hover:bg-green-50'
+            }`}
+            onClick={() => setSelectedFeedback('satisfaction')}
+          >
+            <div className="flex flex-col items-center">
+              <span className="text-2xl">😊</span>
+              <div className="font-medium text-center mt-2">Me transformou</div>
+              <p className="text-xs text-center mt-1 text-gray-600 dark:text-gray-300">
+                Esta tarefa me fortaleceu e expandiu
+              </p>
+            </div>
+          </button>
+
+          <button
+            className={`p-4 border rounded-lg transition-all ${
+              selectedFeedback === 'relief' 
+                ? 'bg-blue-100 border-blue-300 dark:bg-blue-900/30 dark:border-blue-800' 
+                : 'bg-white border-gray-200 dark:bg-gray-800 dark:border-gray-700 hover:bg-blue-50'
+            }`}
+            onClick={() => setSelectedFeedback('relief')}
+          >
+            <div className="flex flex-col items-center">
+              <span className="text-2xl">🔥</span>
+              <div className="font-medium text-center mt-2">Deu alívio</div>
+              <p className="text-xs text-center mt-1 text-gray-600 dark:text-gray-300">
+                Senti uma liberação de pressão
+              </p>
+            </div>
+          </button>
+
+          <button
+            className={`p-4 border rounded-lg transition-all ${
+              selectedFeedback === 'neutral' 
+                ? 'bg-gray-100 border-gray-300 dark:bg-gray-700 dark:border-gray-600' 
+                : 'bg-white border-gray-200 dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50'
+            }`}
+            onClick={() => setSelectedFeedback('neutral')}
+          >
+            <div className="flex flex-col items-center">
+              <span className="text-2xl">😐</span>
+              <div className="font-medium text-center mt-2">Foi só obrigação</div>
+              <p className="text-xs text-center mt-1 text-gray-600 dark:text-gray-300">
+                Apenas cumpri o que precisava ser feito
+              </p>
+            </div>
+          </button>
+        </div>
         
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>
+          <Button variant="outline" onClick={onClose} className="w-full sm:w-auto">
             Cancelar
           </Button>
           <Button 
-            onClick={handleConfirm} 
+            onClick={handleConfirm}
             disabled={!selectedFeedback}
+            className="w-full sm:w-auto"
           >
-            Confirmar
+            ✓ Confirmar
           </Button>
         </DialogFooter>
       </DialogContent>

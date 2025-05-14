@@ -80,9 +80,9 @@ const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
         className={`task-card ${priorityClass} ${task.completed ? 'opacity-50' : ''} relative`}
         onClick={() => !isEditingTitle && setExpanded(!expanded)}
       >
-        {/* Eye icon for hidden tasks that are only visible because of the filter */}
+        {/* Eye icon for hidden tasks that are only visible because of the filter - now with reduced opacity */}
         {task.hidden && showHiddenTasks && (
-          <div className="absolute bottom-2 right-2 bg-gray-800/70 dark:bg-gray-200/70 text-white dark:text-gray-800 rounded-full p-1 z-10">
+          <div className="absolute bottom-2 right-2 bg-gray-800/30 dark:bg-gray-200/30 text-white dark:text-gray-800 rounded-full p-1 z-10 opacity-40">
             <Eye size={16} />
           </div>
         )}

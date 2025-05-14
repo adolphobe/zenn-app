@@ -68,13 +68,13 @@ const SortDropdown: React.FC = () => {
           <>
             <DropdownMenuItem
               onClick={() => handleSortDirectionChange('desc')}
-              className={sortDirection === 'desc' ? 'bg-accent text-accent-foreground' : ''}
+              className={`hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-900/20 dark:hover:text-blue-400 ${sortDirection === 'desc' ? 'bg-accent text-accent-foreground' : ''}`}
             >
               Score: Maior → Menor
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => handleSortDirectionChange('asc')}
-              className={sortDirection === 'asc' ? 'bg-accent text-accent-foreground' : ''}
+              className={`hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-900/20 dark:hover:text-blue-400 ${sortDirection === 'asc' ? 'bg-accent text-accent-foreground' : ''}`}
             >
               Score: Menor → Maior
             </DropdownMenuItem>
@@ -83,13 +83,13 @@ const SortDropdown: React.FC = () => {
           <>
             <DropdownMenuItem
               onClick={() => handleSortDirectionChange('asc')}
-              className={sortDirection === 'asc' ? 'bg-accent text-accent-foreground' : ''}
+              className={`hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-900/20 dark:hover:text-blue-400 ${sortDirection === 'asc' ? 'bg-accent text-accent-foreground' : ''}`}
             >
               Data: Próximas primeiro
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => handleSortDirectionChange('desc')}
-              className={sortDirection === 'desc' ? 'bg-accent text-accent-foreground' : ''}
+              className={`hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-900/20 dark:hover:text-blue-400 ${sortDirection === 'desc' ? 'bg-accent text-accent-foreground' : ''}`}
             >
               Data: Distantes primeiro
             </DropdownMenuItem>
@@ -97,6 +97,7 @@ const SortDropdown: React.FC = () => {
             <DropdownMenuCheckboxItem
               checked={Boolean(noDateAtEnd)}
               onCheckedChange={handleNoDateToggle}
+              className="hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-900/20 dark:hover:text-blue-400"
             >
               Sem data no final
             </DropdownMenuCheckboxItem>
