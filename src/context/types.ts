@@ -18,6 +18,9 @@ export type Action =
   | { type: 'COMPLETE_TASK_BY_TITLE'; payload: string }
   | { type: 'SET_TASK_FEEDBACK_BY_TITLE'; payload: { title: string; feedback: 'transformed' | 'relief' | 'obligation' } };
 
+// Add AppDispatch type for action creators
+export type AppDispatch = React.Dispatch<Action>;
+
 // Context interface
 export interface AppContextType {
   state: AppState;
