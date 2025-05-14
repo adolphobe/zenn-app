@@ -49,7 +49,7 @@ const ScoreSlider: React.FC<ScoreSliderProps> = ({ value, type, onChange, phrase
     }
   };
 
-  const { bgColor, trackColor, thumbRingColor } = getColors();
+  const { bgColor, trackColor, dotActiveColor, dotInactiveColor, thumbRingColor } = getColors();
 
   // Handle slider value change
   const handleValueChange = (newValue: number[]) => {
@@ -77,7 +77,18 @@ const ScoreSlider: React.FC<ScoreSliderProps> = ({ value, type, onChange, phrase
           }}
         />
         
-        {/* Removed the custom score dots that were here previously */}
+        {/* Step indicators */}
+        <div className="absolute top-4 -translate-y-1/2 w-full flex justify-between px-2 pointer-events-none">
+          {[1, 2, 3, 4, 5].map((step) => (
+            <div
+              key={step}
+              className={`w-2 h-2 rounded-full ${
+                step <= value ? dotActiveColor : dotInactiveColor
+              }`}
+              aria-label={`Step ${step}`}
+            />
+          ))}
+        </div>
       </div>
       
       <div className="text-sm text-gray-600 mt-2">
