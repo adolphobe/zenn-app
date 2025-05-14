@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { TaskFormData } from '../types';
-import ScoreSlider from './ScoreSlider';
+import RatingSlider from './RatingSlider';
 import { 
   CONSEQUENCE_PHRASES, 
   PRIDE_PHRASES, 
@@ -62,18 +62,21 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, initialData, taskId }) => 
   const totalScore = formData.consequenceScore + formData.prideScore + formData.constructionScore;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-lg w-full max-w-md shadow-xl">
-        <div className="flex justify-between items-center p-4 border-b">
-          <h2 className="text-lg font-semibold">{taskId ? 'Editar Tarefa' : 'Nova Tarefa'}</h2>
-          <button onClick={onClose} className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
+      <div className="bg-white dark:bg-gray-800 rounded-xl w-full max-w-md shadow-lg overflow-hidden">
+        <div className="flex justify-between items-center p-5 border-b">
+          <h2 className="text-xl font-semibold">{taskId ? 'Editar Tarefa' : 'Nova Tarefa'}</h2>
+          <button 
+            onClick={onClose} 
+            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+          >
             <X size={20} />
           </button>
         </div>
         
-        <form onSubmit={handleSubmit} className="p-4 space-y-4">
+        <form onSubmit={handleSubmit} className="p-5 space-y-6 max-h-[calc(100vh-12rem)] overflow-y-auto">
           <div>
-            <label htmlFor="title" className="block text-sm font-medium mb-1">
+            <label htmlFor="title" className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
               Título da Tarefa
             </label>
             <input
@@ -82,14 +85,14 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, initialData, taskId }) => 
               name="title"
               value={formData.title}
               onChange={handleChange}
-              className="w-full p-2 border rounded-md"
+              className="w-full p-3 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
               placeholder="O que precisa ser feito?"
               required
             />
           </div>
 
           <div>
-            <label htmlFor="idealDate" className="block text-sm font-medium mb-1">
+            <label htmlFor="idealDate" className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
               Data/Hora Ideal (opcional)
             </label>
             <input
@@ -98,50 +101,35 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, initialData, taskId }) => 
               name="idealDate"
               value={formData.idealDate ? new Date(formData.idealDate.getTime() - (formData.idealDate.getTimezoneOffset() * 60000)).toISOString().slice(0, 16) : ''}
               onChange={handleDateChange}
-              className="w-full p-2 border rounded-md"
+              className="w-full p-3 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
             />
           </div>
 
-          <div>
-            <h3 className="font-medium mb-2 flex justify-between">
-              <span>Consequência de Ignorar</span>
-              <span>{formData.consequenceScore}/5</span>
-            </h3>
-            <ScoreSlider
-              value={formData.consequenceScore}
-              type="consequence"
-              onChange={(value) => setFormData(prev => ({ ...prev, consequenceScore: value }))}
-              phrases={CONSEQUENCE_PHRASES}
-            />
-          </div>
+          <RatingSlider
+            value={formData.consequenceScore}
+            onChange={(value) => setFormData(prev => ({ ...prev, consequenceScore: value }))}
+            color="blue"
+            label="Consequência de Ignorar"
+            description={CONSEQUENCE_PHRASES}
+          />
 
-          <div>
-            <h3 className="font-medium mb-2 flex justify-between">
-              <span>Orgulho pós-execução</span>
-              <span>{formData.prideScore}/5</span>
-            </h3>
-            <ScoreSlider
-              value={formData.prideScore}
-              type="pride"
-              onChange={(value) => setFormData(prev => ({ ...prev, prideScore: value }))}
-              phrases={PRIDE_PHRASES}
-            />
-          </div>
+          <RatingSlider
+            value={formData.prideScore}
+            onChange={(value) => setFormData(prev => ({ ...prev, prideScore: value }))}
+            color="orange"
+            label="Orgulho pós-execução"
+            description={PRIDE_PHRASES}
+          />
 
-          <div>
-            <h3 className="font-medium mb-2 flex justify-between">
-              <span>Força de construção pessoal</span>
-              <span>{formData.constructionScore}/5</span>
-            </h3>
-            <ScoreSlider
-              value={formData.constructionScore}
-              type="construction"
-              onChange={(value) => setFormData(prev => ({ ...prev, constructionScore: value }))}
-              phrases={CONSTRUCTION_PHRASES}
-            />
-          </div>
+          <RatingSlider
+            value={formData.constructionScore}
+            onChange={(value) => setFormData(prev => ({ ...prev, constructionScore: value }))}
+            color="green"
+            label="Força de construção pessoal"
+            description={CONSTRUCTION_PHRASES}
+          />
 
-          <div className="mt-4 p-3 bg-gray-50 dark:bg-gray-900 rounded-md">
+          <div className="mt-5 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg shadow-sm">
             <div className="font-medium flex justify-between">
               <span>Score Total:</span>
               <span className="font-semibold">{totalScore}/15</span>
@@ -154,17 +142,17 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, initialData, taskId }) => 
             </div>
           </div>
 
-          <div className="mt-5 flex justify-end">
+          <div className="mt-6 flex justify-end space-x-4">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 mr-2 text-sm border rounded-md"
+              className="px-5 py-2.5 text-sm font-medium border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors"
             >
               Cancelar
             </button>
             <button
               type="submit"
-              className="px-4 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700"
+              className="px-5 py-2.5 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 transition-all"
             >
               Salvar
             </button>

@@ -24,22 +24,22 @@ const Sidebar: React.FC = () => {
   return (
     <>
       <div 
-        className={`fixed top-0 left-0 h-full bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 
-                  transition-all duration-300 z-30 ${sidebarOpen ? 'w-60' : 'w-16'}`}
+        className={`fixed top-0 left-0 h-full bg-white dark:bg-gray-900 border-r border-gray-100 dark:border-gray-800 
+                  transition-all duration-300 z-30 card-shadow ${sidebarOpen ? 'w-64' : 'w-20'}`}
       >
-        <div className="p-4 flex items-center justify-between border-b border-gray-200 dark:border-gray-700">
-          <h1 className={`font-semibold text-xl ${!sidebarOpen && 'sr-only'}`}>ACTO</h1>
+        <div className="p-5 flex items-center justify-between border-b border-gray-100 dark:border-gray-800">
+          <h1 className={`font-semibold text-xl text-blue-600 dark:text-blue-400 ${!sidebarOpen && 'sr-only'}`}>ACTO</h1>
           <button 
             onClick={toggleSidebar} 
-            className="p-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800"
+            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
           >
-            {sidebarOpen ? <ChevronLeft size={18} /> : <ChevronRight size={18} />}
+            {sidebarOpen ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
           </button>
         </div>
 
-        <div className="p-2">
-          <div className="mb-4">
-            <p className={`text-xs text-gray-500 px-3 py-1 ${!sidebarOpen && 'sr-only'}`}>
+        <div className="p-3">
+          <div className="mb-6">
+            <p className={`text-xs text-gray-500 px-4 py-2 ${!sidebarOpen && 'sr-only'}`}>
               Modos
             </p>
             
@@ -47,7 +47,7 @@ const Sidebar: React.FC = () => {
               className={`sidebar-item ${viewMode === 'power' ? 'active' : ''} w-full`}
               onClick={() => setViewMode('power')}
             >
-              <LayoutDashboard size={18} />
+              <LayoutDashboard size={20} />
               {sidebarOpen && <span>Modo Potência</span>}
             </button>
             
@@ -55,13 +55,13 @@ const Sidebar: React.FC = () => {
               className={`sidebar-item ${viewMode === 'chronological' ? 'active' : ''} w-full`}
               onClick={() => setViewMode('chronological')}
             >
-              <CalendarClock size={18} />
+              <CalendarClock size={20} />
               {sidebarOpen && <span>Modo Cronologia</span>}
             </button>
           </div>
           
-          <div className="mb-4">
-            <p className={`text-xs text-gray-500 px-3 py-1 ${!sidebarOpen && 'sr-only'}`}>
+          <div className="mb-6">
+            <p className={`text-xs text-gray-500 px-4 py-2 ${!sidebarOpen && 'sr-only'}`}>
               Filtros
             </p>
             
@@ -69,13 +69,13 @@ const Sidebar: React.FC = () => {
               className={`sidebar-item ${showHiddenTasks ? 'active' : ''} w-full`}
               onClick={toggleShowHiddenTasks}
             >
-              <Eye size={18} />
+              <Eye size={20} />
               {sidebarOpen && <span>Mostrar Tarefas Ocultas</span>}
             </button>
           </div>
           
-          <div className="mb-4">
-            <p className={`text-xs text-gray-500 px-3 py-1 ${!sidebarOpen && 'sr-only'}`}>
+          <div className="mb-6">
+            <p className={`text-xs text-gray-500 px-4 py-2 ${!sidebarOpen && 'sr-only'}`}>
               Configurações
             </p>
             
@@ -83,14 +83,14 @@ const Sidebar: React.FC = () => {
               className={`sidebar-item w-full`}
               onClick={toggleDarkMode}
             >
-              {darkMode ? <Sun size={18} /> : <Moon size={18} />}
+              {darkMode ? <Sun size={20} /> : <Moon size={20} />}
               {sidebarOpen && <span>{darkMode ? 'Modo Claro' : 'Modo Escuro'}</span>}
             </button>
             
             <button 
               className={`sidebar-item w-full`}
             >
-              <Settings size={18} />
+              <Settings size={20} />
               {sidebarOpen && <span>Configurações</span>}
             </button>
           </div>
