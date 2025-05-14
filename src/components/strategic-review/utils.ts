@@ -1,4 +1,3 @@
-
 import { PeriodType } from './types';
 import { subDays, startOfWeek, startOfMonth, endOfWeek, endOfMonth } from 'date-fns';
 import { Task } from '@/types';
@@ -26,14 +25,21 @@ export const getDateRangeByPeriod = (period: PeriodType): [Date, Date] => {
 export const filterTasksByDateRange = (tasks: Task[], dateRange: [Date, Date]): Task[] => {
   const [startDate, endDate] = dateRange;
   
-  return tasks.filter(task => 
-    task.completed && 
-    task.idealDate && 
-    isWithinInterval(new Date(task.idealDate), { 
-      start: new Date(startDate),
-      end: new Date(endDate)
-    })
-  );
+  // Filter completed tasks within the date range
+  // If the task has an idealDate, check if it's within the range
+  // Otherwise, include all completed tasks
+  return tasks.filter(task => {
+    if (!task.completed) return false;
+    
+    // If task has idealDate, check if it's within range
+    if (task.idealDate) {
+      const taskDate = new Date(task.idealDate);
+      return isWithinInterval(taskDate, { start: startDate, end: endDate });
+    }
+    
+    // Include tasks without idealDate as they might still be relevant
+    return true;
+  });
 };
 
 // Helper function to check if a date is within an interval

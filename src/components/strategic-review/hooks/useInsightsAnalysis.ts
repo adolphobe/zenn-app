@@ -12,7 +12,8 @@ const COLORS = {
 
 export const useInsightsAnalysis = (tasks: Task[]): PillarDataType => {
   return useMemo(() => {
-    if (tasks.length === 0) {
+    // Return default empty values if no tasks
+    if (!tasks || tasks.length === 0) {
       return {
         averages: [
           { name: 'Consequência', value: 0, color: COLORS.consequence },
@@ -25,6 +26,7 @@ export const useInsightsAnalysis = (tasks: Task[]): PillarDataType => {
       };
     }
     
+    // Calculate averages of each pillar from the completed tasks
     const avgConsequence = tasks.reduce((sum, task) => sum + task.consequenceScore, 0) / tasks.length;
     const avgPride = tasks.reduce((sum, task) => sum + task.prideScore, 0) / tasks.length;
     const avgConstruction = tasks.reduce((sum, task) => sum + task.constructionScore, 0) / tasks.length;
@@ -35,31 +37,22 @@ export const useInsightsAnalysis = (tasks: Task[]): PillarDataType => {
       { name: 'Construção', value: avgConstruction, color: COLORS.construction }
     ];
     
+    // Define classification thresholds
+    const HIGH_THRESHOLD = 4.0; // >= 4.0 is high priority (priorizado)
+    const LOW_THRESHOLD = 2.5;  // <= 2.5 is low priority (negligenciado)
+    
     // Find highest and lowest pillars
-    let highest = pillars[0];
-    let lowest = pillars[0];
+    const prioritized = pillars.filter(p => p.value >= HIGH_THRESHOLD);
+    const neglected = pillars.filter(p => p.value <= LOW_THRESHOLD);
     
-    pillars.forEach(pillar => {
-      if (pillar.value > highest.value) highest = pillar;
-      if (pillar.value < lowest.value) lowest = pillar;
-    });
+    // Select highest and lowest based on defined thresholds
+    const highest = prioritized.length > 0 ? prioritized[0] : null;
+    const lowest = neglected.length > 0 ? neglected[0] : null;
     
-    // Don't highlight if difference is too small
-    if (highest.value - lowest.value < 0.5) {
-      highest = null;
-      lowest = null;
-    }
-    
-    // Always mark pillars below threshold as neglected
-    const neglected = pillars.filter(p => p.value < 3.0);
-    if (neglected.length > 0) {
-      lowest = neglected[0];
-      if (neglected.length > 1) highest = null; // Don't highlight highest if multiple are neglected
-    }
-    
-    // Generate insights
+    // Generate insights based on classifications
     const insights = [];
     
+    // Add insights for prioritized pillars
     if (highest) {
       if (highest.name === 'Consequência') {
         insights.push({
@@ -91,6 +84,7 @@ export const useInsightsAnalysis = (tasks: Task[]): PillarDataType => {
       }
     }
     
+    // Add insights for neglected pillars
     if (lowest) {
       if (lowest.name === 'Consequência') {
         insights.push({

@@ -19,7 +19,8 @@ export const useAppActions = () => {
     toggleDarkMode,
     toggleSidebar,
     updateDateDisplayOptions,
-    setSortOptions
+    setSortOptions,
+    dispatch
   } = useAppContext();
 
   return {
@@ -32,6 +33,16 @@ export const useAppActions = () => {
       update: updateTask,
       updateTitle: updateTaskTitle,
       setFeedback: setTaskFeedback,
+      // New action for setting task pillar
+      setPillar: (id: string, pillar: string) => {
+        dispatch({ 
+          type: 'UPDATE_TASK', 
+          payload: { 
+            id, 
+            data: { pillar } 
+          } 
+        });
+      }
     },
     
     // UI actions

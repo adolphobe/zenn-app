@@ -9,19 +9,26 @@ import TaskSummaryCard from '@/components/strategic-review/TaskSummaryCard';
 import PillarsAnalysisCard from '@/components/strategic-review/PillarsAnalysisCard';
 import FeedbackAnalysisCard from '@/components/strategic-review/FeedbackAnalysisCard';
 import { toast } from '@/hooks/use-toast';
+import { useTaskPillars } from '@/context/hooks';
 
 // Main Strategic Review Page Component
 const StrategicReview: React.FC = () => {
   const { state } = useAppContext();
   const [period, setPeriod] = useState<PeriodType>('week');
   
+  // Use the task pillars hook to ensure all tasks have pillars assigned
+  const { assignMissingPillars } = useTaskPillars();
+  
   useEffect(() => {
+    // Ensure all tasks have pillars assigned
+    assignMissingPillars();
+    
     // Show a toast to indicate the page is loaded
     toast({
       title: "Revisão Estratégica",
       description: "Mostrando análise das tarefas concluídas."
     });
-  }, []);
+  }, [assignMissingPillars]);
   
   // Calculate date range based on selected period
   const dateRange = useMemo(() => getDateRangeByPeriod(period), [period]);
