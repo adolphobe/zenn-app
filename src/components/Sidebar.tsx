@@ -110,7 +110,7 @@ const Sidebar: React.FC = () => {
             <div className={`flex ${sidebarOpen ? 'items-start gap-3' : 'justify-center'}`}>
               <div className="relative">
                 <Avatar className={`${sidebarOpen ? 'h-12 w-12' : 'h-10 w-10'} border-2 border-white shadow-sm`}>
-                  <AvatarImage src="https://i.ibb.co/YT49YYK/Whats-App-Image-2025-05-14-at-17-26-25.jpg" />
+                  <AvatarImage src="https://cdn.shopify.com/s/files/1/0629/1993/4061/files/WhatsApp_Image_2025-05-14_at_17.26.25.jpg?v=1747255394" />
                   <AvatarFallback className="bg-blue-100 text-blue-800">
                     <User size={sidebarOpen ? 24 : 18} />
                   </AvatarFallback>
