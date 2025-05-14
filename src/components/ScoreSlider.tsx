@@ -64,7 +64,7 @@ const ScoreSlider: React.FC<ScoreSliderProps> = ({ value, type, onChange, phrase
           {[1, 2, 3, 4, 5].map((step) => (
             <div
               key={step}
-              className={`w-[21px] h-[21px] rounded-full ${
+              className={`w-[25px] h-[25px] rounded-full ${
                 step <= value ? dotActiveColor : dotInactiveColor
               }`}
               aria-label={`Step ${step}`}
