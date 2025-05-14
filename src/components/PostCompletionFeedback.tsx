@@ -58,7 +58,7 @@ const PostCompletionFeedback: React.FC<PostCompletionFeedbackProps> = ({
       label: 'Deu alívio',
       description: 'Senti uma liberação de pressão',
       icon: <Droplets className="h-6 w-6" />,
-      colorClass: 'bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200 border-orange-200 dark:border-orange-800'
+      colorClass: 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 border-blue-200 dark:border-blue-800'
     },
     {
       id: 'obligation',
@@ -71,7 +71,7 @@ const PostCompletionFeedback: React.FC<PostCompletionFeedbackProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle className="text-center text-lg">
             Como você se sentiu ao concluir essa tarefa?
