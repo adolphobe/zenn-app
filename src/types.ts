@@ -1,4 +1,3 @@
-
 export interface Task {
   id: string;
   title: string;
@@ -11,6 +10,7 @@ export interface Task {
   completed: boolean;
   createdAt: Date;
   feedback?: 'transformed' | 'relief' | 'obligation' | null;
+  pillar?: string; // Added pillar property
 }
 
 export interface TaskFormData {

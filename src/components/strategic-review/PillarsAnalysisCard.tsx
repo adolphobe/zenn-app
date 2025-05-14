@@ -1,3 +1,4 @@
+
 import React, { useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Task } from '@/types';
@@ -38,16 +39,22 @@ const PillarsAnalysisCard: React.FC<PillarsAnalysisCardProps> = ({ tasks }) => {
         <CardDescription>Distribuição de tarefas por pilar estratégico.</CardDescription>
       </CardHeader>
       <CardContent className="h-80">
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={pillarDistribution}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" />
-            <YAxis domain={[0, 100] as any} />
-            <Tooltip />
-            <Legend />
-            <Bar dataKey="value" fill="#8884d8" />
-          </BarChart>
-        </ResponsiveContainer>
+        {pillarDistribution.length > 0 ? (
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={pillarDistribution}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="value" fill="#8884d8" />
+            </BarChart>
+          </ResponsiveContainer>
+        ) : (
+          <div className="flex h-full items-center justify-center">
+            <p className="text-muted-foreground">Nenhuma tarefa com pilar estratégico encontrada</p>
+          </div>
+        )}
         <p className="mt-4">Taxa de Conclusão: {completionRate}%</p>
       </CardContent>
     </Card>
