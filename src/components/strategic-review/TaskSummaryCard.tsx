@@ -21,7 +21,7 @@ const TaskSummaryCard: React.FC<TaskSummaryCardProps> = ({ tasks }) => {
       </CardHeader>
       <CardContent>
         <div className="space-y-6 pt-4">
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 gap-4">
             <div className="rounded-lg bg-primary/5 p-4 text-center">
               <div className="text-4xl font-bold text-primary">{tasks.length}</div>
               <div className="mt-1 text-sm text-muted-foreground">Tarefas Concluídas</div>
@@ -29,10 +29,6 @@ const TaskSummaryCard: React.FC<TaskSummaryCardProps> = ({ tasks }) => {
             <div className="rounded-lg bg-primary/5 p-4 text-center">
               <div className="text-4xl font-bold text-primary">{taskStats.avgTotal.toFixed(1)}</div>
               <div className="mt-1 text-sm text-muted-foreground">Média de Score</div>
-            </div>
-            <div className="rounded-lg bg-primary/5 p-4 text-center">
-              <div className="text-4xl font-bold text-primary">{taskStats.highConsequence}</div>
-              <div className="mt-1 text-sm text-muted-foreground">Alta Consequência</div>
             </div>
           </div>
           

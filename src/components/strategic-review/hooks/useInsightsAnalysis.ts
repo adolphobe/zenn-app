@@ -3,11 +3,11 @@ import { useMemo } from 'react';
 import { Task } from '@/types';
 import { PillarDataType } from '../types';
 
-// Colors for the charts
+// Colors for the pillars
 const COLORS = {
-  consequence: '#ea384c',
-  pride: '#F97316',
-  construction: '#0EA5E9'
+  consequence: '#3B82F6', // Azul
+  pride: '#F97316',       // Laranja
+  construction: '#10B981' // Verde
 };
 
 export const useInsightsAnalysis = (tasks: Task[]): PillarDataType => {
@@ -42,10 +42,12 @@ export const useInsightsAnalysis = (tasks: Task[]): PillarDataType => {
     const LOW_THRESHOLD = 2.5;  // <= 2.5 is low priority (negligenciado)
     
     // Find highest and lowest pillars
-    const prioritized = pillars.filter(p => p.value >= HIGH_THRESHOLD);
-    const neglected = pillars.filter(p => p.value <= LOW_THRESHOLD);
+    const sortedPillars = [...pillars].sort((a, b) => b.value - a.value);
     
     // Select highest and lowest based on defined thresholds
+    const prioritized = sortedPillars.filter(p => p.value >= HIGH_THRESHOLD);
+    const neglected = [...sortedPillars].reverse().filter(p => p.value <= LOW_THRESHOLD);
+    
     const highest = prioritized.length > 0 ? prioritized[0] : null;
     const lowest = neglected.length > 0 ? neglected[0] : null;
     

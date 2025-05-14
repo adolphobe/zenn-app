@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Task } from '@/types';
 import { useInsightsAnalysis } from './hooks/useInsightsAnalysis';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
-import { ResponsiveContainer, BarChart, Bar, XAxis, LabelList } from 'recharts';
+import { ResponsiveContainer, BarChart, Bar, XAxis, LabelList, Cell } from 'recharts';
 
 interface PillarsAnalysisCardProps {
   tasks: Task[];
@@ -26,9 +26,9 @@ const PillarsAnalysisCard: React.FC<PillarsAnalysisCardProps> = ({ tasks }) => {
             <ChartContainer 
               className="h-full w-full"
               config={{
-                consequence: { color: '#ea384c' },
-                pride: { color: '#F97316' },
-                construction: { color: '#0EA5E9' },
+                consequence: { color: '#3B82F6' }, // Azul
+                pride: { color: '#F97316' },       // Laranja
+                construction: { color: '#10B981' }, // Verde
               }}
             >
               <ResponsiveContainer width="100%" height="100%">
@@ -41,7 +41,6 @@ const PillarsAnalysisCard: React.FC<PillarsAnalysisCardProps> = ({ tasks }) => {
                   />
                   <Bar 
                     dataKey="value" 
-                    fill="var(--color-consequence)" 
                     radius={[4, 4, 0, 0]} 
                     maxBarSize={80}
                     fillOpacity={0.9}
@@ -56,6 +55,9 @@ const PillarsAnalysisCard: React.FC<PillarsAnalysisCardProps> = ({ tasks }) => {
                       formatter={(value: number) => value.toFixed(1)}
                       style={{ fontSize: '12px', fontWeight: 'bold' }}
                     />
+                    {pillarData.averages.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
                   </Bar>
                 </BarChart>
               </ResponsiveContainer>
