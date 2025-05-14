@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useAppContext } from '@/context/AppContext';
 import { useIsMobile } from '@/hooks/use-mobile';
 import TaskForm from './TaskForm';
@@ -14,6 +14,7 @@ const Dashboard: React.FC = () => {
   const { tasks, viewMode, showHiddenTasks, sidebarOpen, sortOptions } = state;
   const isMobile = useIsMobile();
   const location = useLocation();
+  const [isTaskFormOpen, setIsTaskFormOpen] = useState(false);
 
   // Check if we're on strategic review route
   const isStrategicReview = location.pathname === '/strategic-review';
@@ -43,7 +44,16 @@ const Dashboard: React.FC = () => {
           <h1 className="text-2xl font-bold tracking-tight">
             {viewMode === 'power' ? 'Modo Potência' : 'Modo Cronológico'}
           </h1>
-          <TaskForm />
+          {isTaskFormOpen ? (
+            <TaskForm onClose={() => setIsTaskFormOpen(false)} />
+          ) : (
+            <button
+              onClick={() => setIsTaskFormOpen(true)}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Nova Tarefa
+            </button>
+          )}
         </div>
 
         <div className="grid grid-cols-1 gap-4 md:gap-6">

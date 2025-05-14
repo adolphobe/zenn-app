@@ -414,9 +414,13 @@ const FeedbackAnalysisCard = ({ tasks }: { tasks: Task[] }) => {
     const x = cx + radius * Math.cos(-midAngle * RADIAN);
     const y = cy + radius * Math.sin(-midAngle * RADIAN);
     
+    // Fix: Check if the distribution item has a percent property before accessing it
+    const entry = feedbackData.distribution[index];
+    const percentValue = entry && 'percent' in entry ? entry.percent : 0;
+    
     return feedbackData.distribution[index].value > 0 ? (
       <text x={x} y={y} fill="white" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central">
-        {`${feedbackData.distribution[index].percent}%`}
+        {`${percentValue}%`}
       </text>
     ) : null;
   };
