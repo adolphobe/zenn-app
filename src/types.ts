@@ -21,6 +21,11 @@ export interface TaskFormData {
 }
 
 export type ViewMode = 'power' | 'chronological';
+export type SortDirection = 'asc' | 'desc';
+export type SortOption = {
+  sortDirection: SortDirection;
+  noDateAtEnd?: boolean;
+};
 
 export interface DateDisplayOptions {
   hideYear: boolean;
@@ -35,4 +40,8 @@ export interface AppState {
   darkMode: boolean;
   sidebarOpen: boolean;
   dateDisplayOptions: DateDisplayOptions;
+  sortOptions: {
+    power: SortOption;
+    chronological: SortOption;
+  };
 }

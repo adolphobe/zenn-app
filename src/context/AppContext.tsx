@@ -1,7 +1,6 @@
-
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { AppState, Task, TaskFormData, ViewMode, DateDisplayOptions } from '../types';
+import { AppState, Task, TaskFormData, ViewMode, DateDisplayOptions, SortDirection, SortOption } from '../types';
 import { SAMPLE_TASKS } from '../constants';
 
 // Actions
@@ -16,7 +15,8 @@ type Action =
   | { type: 'TOGGLE_SHOW_HIDDEN_TASKS' }
   | { type: 'TOGGLE_DARK_MODE' }
   | { type: 'TOGGLE_SIDEBAR' }
-  | { type: 'UPDATE_DATE_DISPLAY_OPTIONS'; payload: DateDisplayOptions };
+  | { type: 'UPDATE_DATE_DISPLAY_OPTIONS'; payload: DateDisplayOptions }
+  | { type: 'SET_SORT_OPTIONS'; payload: { sortDirection: SortDirection; noDateAtEnd?: boolean } };
 
 // Context interface
 interface AppContextType {
@@ -33,6 +33,7 @@ interface AppContextType {
   toggleDarkMode: () => void;
   toggleSidebar: () => void;
   updateDateDisplayOptions: (options: DateDisplayOptions) => void;
+  setSortOptions: (options: { sortDirection: SortDirection; noDateAtEnd?: boolean }) => void;
 }
 
 // Initial state
@@ -46,6 +47,15 @@ const initialState: AppState = {
     hideYear: false,
     hideTime: false,
     hideDate: false
+  },
+  sortOptions: {
+    power: {
+      sortDirection: 'desc',
+    },
+    chronological: {
+      sortDirection: 'asc',
+      noDateAtEnd: true
+    }
   }
 };
 
@@ -146,6 +156,23 @@ const appReducer = (state: AppState, action: Action): AppState => {
     case 'UPDATE_DATE_DISPLAY_OPTIONS':
       return { ...state, dateDisplayOptions: action.payload };
 
+    case 'SET_SORT_OPTIONS': {
+      const { sortDirection, noDateAtEnd } = action.payload;
+      const viewMode = state.viewMode;
+      
+      return {
+        ...state,
+        sortOptions: {
+          ...state.sortOptions,
+          [viewMode]: {
+            ...state.sortOptions[viewMode],
+            sortDirection,
+            ...(viewMode === 'chronological' && noDateAtEnd !== undefined ? { noDateAtEnd } : {})
+          }
+        }
+      };
+    }
+
     default:
       return state;
   }
@@ -227,6 +254,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     dispatch({ type: 'UPDATE_DATE_DISPLAY_OPTIONS', payload: options });
   };
 
+  const setSortOptions = (options: { sortDirection: SortDirection; noDateAtEnd?: boolean }) => {
+    dispatch({ type: 'SET_SORT_OPTIONS', payload: options });
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -242,7 +273,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         toggleShowHiddenTasks,
         toggleDarkMode,
         toggleSidebar,
-        updateDateDisplayOptions
+        updateDateDisplayOptions,
+        setSortOptions
       }}
     >
       {children}

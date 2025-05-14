@@ -6,16 +6,17 @@ import TaskCard from './TaskCard';
 import TaskForm from './TaskForm';
 import { PlusCircle, Menu, Filter } from 'lucide-react';
 import { Button } from './ui/button';
+import SortDropdown from './SortDropdown';
 
 const Dashboard: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
   const { state, toggleSidebar, updateDateDisplayOptions } = useAppContext();
-  const { tasks, viewMode, showHiddenTasks, sidebarOpen, dateDisplayOptions } = state;
+  const { tasks, viewMode, showHiddenTasks, sidebarOpen, dateDisplayOptions, sortOptions } = state;
 
   const visibleTasks = tasks.filter(task => 
     !task.completed && (showHiddenTasks || !task.hidden)
   );
-  const sortedTasks = sortTasks(visibleTasks, viewMode);
+  const sortedTasks = sortTasks(visibleTasks, viewMode, sortOptions[viewMode]);
   const completedTasks = tasks.filter(task => task.completed);
 
   const toggleDateOption = (option: keyof typeof dateDisplayOptions) => {
@@ -85,6 +86,8 @@ const Dashboard: React.FC = () => {
             </div>
           </div>
           
+          <SortDropdown />
+          
           <button
             onClick={() => setShowForm(true)}
             className="p-3 bg-blue-600 hover:bg-blue-700 text-white rounded-full flex items-center shadow-sm transition-colors"
@@ -100,8 +103,8 @@ const Dashboard: React.FC = () => {
           <h2 className="text-xl font-semibold mb-2 text-gray-800 dark:text-gray-100">Suas Tarefas</h2>
           <p className="text-sm text-gray-500">
             {viewMode === 'power' 
-              ? 'Ordenadas por potência (score total)' 
-              : 'Ordenadas por data ideal'
+              ? `Ordenadas por potência (${sortOptions.power.sortDirection === 'desc' ? 'maior → menor' : 'menor → maior'})` 
+              : `Ordenadas por data ${sortOptions.chronological.sortDirection === 'asc' ? 'próximas primeiro' : 'distantes primeiro'}`
             }
           </p>
         </div>
