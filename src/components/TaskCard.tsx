@@ -4,7 +4,6 @@ import { Task } from '../types';
 import { useAppContext } from '../context/AppContext';
 import { formatDate, getTaskPriorityClass } from '../utils';
 import { Check, Pencil, EyeOff, CheckCircle } from 'lucide-react';
-import { Button } from './ui/button';
 
 interface TaskCardProps {
   task: Task;
@@ -16,11 +15,18 @@ const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
   const [titleValue, setTitleValue] = useState(task.title);
   const { toggleTaskCompleted, toggleTaskHidden, deleteTask, updateTaskTitle, state } = useAppContext();
   const { dateDisplayOptions } = state;
-  const priorityClass = getTaskPriorityClass(task.totalScore);
   const titleInputRef = useRef<HTMLInputElement>(null);
 
+  // Determinar classe CSS baseada na prioridade da tarefa
+  const getPriorityClass = () => {
+    const total = task.totalScore;
+    if (total >= 14) return 'card-tarefa-critica';
+    if (total >= 11) return 'card-tarefa-importante';
+    if (total >= 8) return 'card-tarefa-moderada';
+    return 'card-tarefa-leve';
+  };
+
   const handleTitleClick = () => {
-    // Removida a condição que exigia o card estar expandido
     setIsEditingTitle(true);
   };
 
@@ -59,10 +65,11 @@ const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
 
   return (
     <div
-      className={`task-card ${priorityClass} ${task.completed ? 'opacity-50' : ''}`}
+      className={`card-tarefa ${getPriorityClass()} ${task.completed ? 'opacidade-50' : ''}`}
       onClick={() => !isEditingTitle && setExpanded(!expanded)}
+      style={{ opacity: task.completed ? 0.5 : 1, cursor: 'pointer' }}
     >
-      <div className="flex justify-between items-start">
+      <div className="flex-entre">
         <div className="flex-1">
           {isEditingTitle ? (
             <input
@@ -73,12 +80,20 @@ const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
               onBlur={handleTitleBlur}
               onKeyDown={handleTitleKeyDown}
               onClick={(e) => e.stopPropagation()}
-              className="w-full bg-transparent border-b border-gray-400 focus:outline-none py-1"
+              className="entrada-texto fundo-transparente borda-base"
+              style={{
+                backgroundColor: 'transparent',
+                borderWidth: '0 0 1px 0',
+                borderStyle: 'solid',
+                borderColor: 'var(--cor-borda-escura)',
+                width: '100%',
+                padding: '0.25rem 0'
+              }}
               autoFocus
             />
           ) : (
             <h3 
-              className="text-base font-medium cursor-pointer"
+              className="subtitulo cursor-pointer"
               onClick={(e) => {
                 e.stopPropagation();
                 handleTitleClick();
@@ -89,19 +104,29 @@ const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
           )}
         </div>
         
-        <div className="flex items-center">
+        <div className="flex-centro">
           {task.idealDate && (
-            <div className="text-xs text-right ml-3">
+            <div className="texto-pequeno texto-direita margem-esquerda-m" style={{ textAlign: 'right', marginLeft: '0.75rem' }}>
               {formatDate(task.idealDate, dateDisplayOptions)}
             </div>
           )}
-          <div className="flex items-center justify-center bg-white bg-opacity-40 rounded-full px-2 py-1 text-xs font-semibold ml-2">
+          <div className="badge-score" style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: 'rgba(255, 255, 255, 0.4)',
+            borderRadius: '9999px',
+            padding: '0.25rem 0.5rem',
+            fontSize: '0.75rem',
+            fontWeight: 600,
+            marginLeft: '0.5rem'
+          }}>
             {task.totalScore}/15
           </div>
         </div>
       </div>
       
-      <div className="mt-2 text-xs flex flex-wrap gap-2">
+      <div className="flex espaco-entre-itens-p flex-wrap margem-topo-p" style={{ flexWrap: 'wrap', marginTop: '0.5rem', fontSize: '0.75rem' }}>
         <span>Consequência: {task.consequenceScore}</span>
         <span>|</span>
         <span>Orgulho: {task.prideScore}</span>
@@ -110,10 +135,10 @@ const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
       </div>
 
       {expanded && (
-        <div className="mt-4 animate-fade-in">
-          <div className="space-y-2 text-sm">
+        <div className="margem-topo-m aparecer-suave">
+          <div className="espaco-entre-itens-p texto-pequeno">
             <p>
-              <span className="inline-flex items-center mr-1">🔥</span>
+              <span className="margem-direita-xs" style={{ marginRight: '0.25rem' }}>🔥</span>
               Consequência de Ignorar: {task.consequenceScore} – {task.consequenceScore === 5 ? "Vou me sentir bem mal comigo mesmo por não ter feito." : 
                             task.consequenceScore === 4 ? "Se eu ignorar, vou ficar incomodado." :
                             task.consequenceScore === 3 ? "Vai dar aquela sensação de \"tô enrolando\", mas ainda dá pra tolerar." :
@@ -121,7 +146,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
                             "Ignorar isso não muda nada na minha vida."}
             </p>
             <p>
-              <span className="inline-flex items-center mr-1">🏁</span>
+              <span className="margem-direita-xs" style={{ marginRight: '0.25rem' }}>🏁</span>
               Orgulho pós-execução: {task.prideScore} – {task.prideScore === 5 ? "Total senso de potência. Vou me sentir acima da média." : 
                       task.prideScore === 4 ? "Vou me olhar com respeito." :
                       task.prideScore === 3 ? "Boa sensação de ter mantido o ritmo." :
@@ -129,7 +154,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
                       "Nenhum orgulho. Só rotina ou tarefa obrigatória."}
             </p>
             <p>
-              <span className="inline-flex items-center mr-1">🧱</span>
+              <span className="margem-direita-xs" style={{ marginRight: '0.25rem' }}>🧱</span>
               Força de construção pessoal: {task.constructionScore} – {task.constructionScore === 5 ? "Essa tarefa solidifica quem eu quero me tornar." : 
                           task.constructionScore === 4 ? "Vai me posicionar num degrau acima da versão atual." :
                           task.constructionScore === 3 ? "Me move um pouco, mas não me desafia." :
@@ -138,11 +163,9 @@ const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
             </p>
           </div>
 
-          <div className="flex gap-2 mt-4 justify-start">
-            <Button 
-              variant="outline"
-              size="sm"
-              className="flex items-center gap-1"
+          <div className="flex espaco-entre-itens-p margem-topo-m">
+            <button 
+              className="botao botao-secundario"
               onClick={(e) => {
                 e.stopPropagation();
                 toggleTaskHidden(task.id);
@@ -150,11 +173,9 @@ const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
             >
               <EyeOff size={14} />
               {task.hidden ? 'Mostrar' : 'Ocultar'}
-            </Button>
-            <Button 
-              variant="outline"
-              size="sm"
-              className="flex items-center gap-1"
+            </button>
+            <button 
+              className="botao botao-secundario"
               onClick={(e) => {
                 e.stopPropagation();
                 toggleTaskCompleted(task.id);
@@ -162,7 +183,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
             >
               <CheckCircle size={14} />
               Concluir
-            </Button>
+            </button>
           </div>
         </div>
       )}
