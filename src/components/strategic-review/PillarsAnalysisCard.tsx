@@ -41,9 +41,10 @@ const PillarsAnalysisCard: React.FC<PillarsAnalysisCardProps> = ({ tasks }) => {
                   />
                   <Bar 
                     dataKey="value" 
-                    fill={(entry) => entry.color} 
+                    fill="var(--color-consequence)" 
                     radius={[4, 4, 0, 0]} 
                     maxBarSize={80}
+                    fillOpacity={0.9}
                     animationDuration={1000}
                     animationBegin={200}
                     animationEasing="ease-out"
