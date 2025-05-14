@@ -18,34 +18,30 @@ const ScoreSlider: React.FC<ScoreSliderProps> = ({ value, type, onChange, phrase
         return {
           bgColor: 'bg-blue-100',
           trackColor: 'bg-gradient-to-r from-blue-200 to-blue-500',
-          dotBorderColor: 'border-blue-200',
           thumbRingColor: 'ring-blue-200'
         };
       case 'pride':
         return {
           bgColor: 'bg-orange-100',
           trackColor: 'bg-gradient-to-r from-orange-200 to-orange-500',
-          dotBorderColor: 'border-orange-200',
           thumbRingColor: 'ring-orange-200'
         };
       case 'construction':
         return {
           bgColor: 'bg-emerald-100',
           trackColor: 'bg-gradient-to-r from-emerald-200 to-emerald-500',
-          dotBorderColor: 'border-emerald-200',
           thumbRingColor: 'ring-emerald-200'
         };
       default:
         return {
           bgColor: 'bg-gray-100',
           trackColor: 'bg-gradient-to-r from-gray-200 to-gray-500',
-          dotBorderColor: 'border-gray-200',
           thumbRingColor: 'ring-gray-200'
         };
     }
   };
 
-  const { bgColor, trackColor, dotBorderColor, thumbRingColor } = getColors();
+  const { bgColor, trackColor, thumbRingColor } = getColors();
 
   // Handle slider value change
   const handleValueChange = (newValue: number[]) => {
@@ -69,7 +65,7 @@ const ScoreSlider: React.FC<ScoreSliderProps> = ({ value, type, onChange, phrase
             range: cn("h-1.5 rounded-full", trackColor),
             thumb: cn("block h-4 w-4 rounded-full border-2 border-white bg-white ring-2", thumbRingColor, 
               "transition-all hover:scale-110 focus:outline-none focus:ring focus-visible:outline-none",
-              "cursor-grab active:cursor-grabbing shadow-md z-30")
+              "cursor-grab active:cursor-grabbing shadow-md")
           }}
         />
       </div>
