@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { cn } from "@/lib/utils";
+import { Slider } from "@/components/ui/slider";
 
 interface RatingSliderProps {
   value: number;
@@ -57,45 +58,54 @@ const RatingSlider: React.FC<RatingSliderProps> = ({
 
   const styles = colorStyles[color];
   
-  // Create array of possible values
-  const values = Array.from({ length: maxValue }, (_, i) => i + 1);
+  // Custom slider display logic
+  const displayValue = value === 0 ? 1 : value;
+  const progressWidth = value === 1 ? 0 : `${((value - 1) / (maxValue - 1)) * 100}%`;
+  
+  // Handle slider change
+  const handleSliderChange = (values: number[]) => {
+    onChange(values[0]);
+  };
 
   return (
     <div className={cn("rounded-lg p-5 mb-6 transition-all", styles.bg, className)}>
       <div className="flex justify-between items-center mb-3">
         <h3 className={cn("font-medium text-sm", styles.text)}>{label}</h3>
         <span className={cn("font-semibold text-sm", styles.text)}>
-          {value}/{maxValue}
+          {displayValue}/{maxValue}
         </span>
       </div>
       
-      <div className="relative mb-4">
-        {/* Track background */}
-        <div className={cn("h-2 w-full rounded-full", styles.track)} />
-        
-        {/* Filled portion with gradient */}
-        <div 
-          className={cn(
-            "absolute top-0 left-0 h-2 rounded-full bg-gradient-to-r",
-            styles.gradient
-          )}
-          style={{ width: `${(value / maxValue) * 100}%` }}
+      <div className="relative mb-4 px-3 py-1">
+        {/* Interactive slider */}
+        <Slider
+          value={[value]}
+          min={1}
+          max={maxValue}
+          step={1}
+          onValueChange={handleSliderChange}
+          classNames={{
+            track: cn(styles.track),
+            range: cn(
+              "bg-gradient-to-r", 
+              styles.gradient,
+              value === 1 ? "opacity-0" : "opacity-100"
+            ),
+            thumb: cn(styles.fill, styles.activeBorder)
+          }}
         />
         
-        {/* Step indicators */}
-        <div className="absolute top-0 left-0 w-full flex justify-between px-0">
-          {values.map((step) => (
-            <button
+        {/* Custom step indicators for visual clarity */}
+        <div className="absolute top-0 left-0 w-full flex justify-between px-2.5 pointer-events-none">
+          {Array.from({ length: maxValue }, (_, i) => i + 1).map((step) => (
+            <div
               key={step}
-              type="button"
-              onClick={() => onChange(step)}
               className={cn(
-                "w-5 h-5 rounded-full -mt-1.5 transition-all duration-200 border-2",
-                step <= value 
-                  ? cn("shadow-sm", styles.fill, styles.activeBorder) 
-                  : cn("bg-white", styles.border, styles.hover)
+                "w-5 h-5 rounded-full -mt-1.5 border-2 transition-all duration-200",
+                step <= value
+                  ? cn("bg-white", styles.activeBorder)
+                  : cn("bg-white", styles.border)
               )}
-              aria-label={`Set rating to ${step}`}
             />
           ))}
         </div>

@@ -17,7 +17,7 @@ const Slider = React.forwardRef<
   <SliderPrimitive.Root
     ref={ref}
     className={cn(
-      "relative flex w-full touch-none select-none items-center",
+      "relative flex w-full touch-none select-none items-center cursor-pointer",
       className
     )}
     {...props}
@@ -26,9 +26,10 @@ const Slider = React.forwardRef<
       <SliderPrimitive.Range className={cn("absolute h-full bg-primary", classNames?.range)} />
     </SliderPrimitive.Track>
     <SliderPrimitive.Thumb className={cn(
-      "block h-5 w-5 rounded-full border-2 border-primary bg-background ring-offset-background",
+      "block h-5 w-5 rounded-full border-2 border-primary bg-background ring-offset-background cursor-pointer",
       "transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
       "disabled:pointer-events-none disabled:opacity-50",
+      "hover:scale-110",
       classNames?.thumb
     )} />
   </SliderPrimitive.Root>
