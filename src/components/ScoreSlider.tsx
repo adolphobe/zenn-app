@@ -59,6 +59,19 @@ const ScoreSlider: React.FC<ScoreSliderProps> = ({ value, type, onChange, phrase
   return (
     <div className="mb-4">
       <div className="relative">
+        {/* Step indicators - positioned absolutely on top of the slider track */}
+        <div className="absolute top-4 z-10 w-full flex justify-between px-[2px] pointer-events-none">
+          {[1, 2, 3, 4, 5].map((step) => (
+            <div
+              key={step}
+              className={`w-3 h-3 rounded-full ${
+                step <= value ? dotActiveColor : dotInactiveColor
+              }`}
+              aria-label={`Step ${step}`}
+            />
+          ))}
+        </div>
+        
         {/* Custom Slider component using shadcn/ui slider */}
         <Slider
           value={[value]}
@@ -76,19 +89,6 @@ const ScoreSlider: React.FC<ScoreSliderProps> = ({ value, type, onChange, phrase
               "cursor-grab active:cursor-grabbing shadow-md")
           }}
         />
-        
-        {/* Step indicators */}
-        <div className="absolute top-4 -translate-y-1/2 w-full flex justify-between px-2 pointer-events-none">
-          {[1, 2, 3, 4, 5].map((step) => (
-            <div
-              key={step}
-              className={`w-2 h-2 rounded-full ${
-                step <= value ? dotActiveColor : dotInactiveColor
-              }`}
-              aria-label={`Step ${step}`}
-            />
-          ))}
-        </div>
       </div>
       
       <div className="text-sm text-gray-600 mt-2">
