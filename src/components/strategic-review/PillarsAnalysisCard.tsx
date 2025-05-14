@@ -38,7 +38,7 @@ const PillarsAnalysisCard: React.FC<PillarsAnalysisCardProps> = ({ tasks }) => {
                 >
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="name" />
-                  <YAxis domain={[0, 5]} />
+                  <YAxis domain={[0, 5] as [number, number]} />
                   <Tooltip content={<ChartTooltipContent />} />
                   {pillarData.averages.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.color} radius={[4, 4, 0, 0]} />
