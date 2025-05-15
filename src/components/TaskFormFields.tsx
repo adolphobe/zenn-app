@@ -120,8 +120,14 @@ const TaskFormFields: React.FC<TaskFormFieldsProps> = ({
           />
         </div>
         
-        {/* Right column with date and score */}
+        {/* Right column with score and date */}
         <div className="space-y-6">
+          {/* Score display now comes first */}
+          <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg shadow-sm">
+            <TaskScoreDisplay score={totalScore} />
+          </div>
+          
+          {/* Date input comes second */}
           <div>
             <label htmlFor="idealDate" className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
               A partir de quando você quer se ver envolvido com isso?
@@ -134,10 +140,6 @@ const TaskFormFields: React.FC<TaskFormFieldsProps> = ({
               onChange={handleDateChange}
               className="w-full p-3 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
             />
-          </div>
-          
-          <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg shadow-sm mt-4">
-            <TaskScoreDisplay score={totalScore} />
           </div>
         </div>
       </div>
