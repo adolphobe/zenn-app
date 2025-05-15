@@ -60,10 +60,10 @@ const Login: React.FC = () => {
   return (
     <div className="flex min-h-screen bg-background dark:bg-gray-950">
       {/* Left column: Login Form */}
-      <div className="w-full md:w-1/2 flex flex-col justify-center px-8 sm:px-16 md:px-24 lg:px-32 animate-fade-in">
+      <div className="w-full md:w-1/2.5 flex flex-col justify-center px-8 sm:px-16 md:px-24 lg:px-32 animate-fade-in">
         <div className="space-y-6 w-full max-w-md mx-auto">
           {/* Logo */}
-          <div className="text-left mb-[140px]">
+          <div className="text-left mb-[90px]">
             <img 
               src="https://cdn.shopify.com/s/files/1/0629/1993/4061/files/LOGO_ACTO.jpg?v=1747283022" 
               alt="Acto Logo" 
