@@ -55,7 +55,7 @@ export const CompletedTaskRow: React.FC<{ task: Task }> = ({ task }) => {
 
   return (
     <TableRow onClick={() => setShowRestore(!showRestore)} className="cursor-pointer">
-      <TableCell className="line-through opacity-70">{task.title}</TableCell>
+      <TableCell className="opacity-70">{task.title}</TableCell>
       <TableCell>{completedDate}</TableCell>
       <TableCell>{task.totalScore}/15</TableCell>
       <TableCell className="capitalize">{dominantPillar}</TableCell>
