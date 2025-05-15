@@ -9,7 +9,6 @@ import { useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { AspectRatio } from "@/components/ui/aspect-ratio";
 
 const loginSchema = z.object({
   email: z.string().email("Digite um e-mail válido"),
@@ -63,6 +62,15 @@ const Login: React.FC = () => {
       {/* Left column: Login Form */}
       <div className="w-full md:w-1/2 flex flex-col justify-center px-8 sm:px-16 md:px-24 lg:px-32 animate-fade-in">
         <div className="space-y-6 w-full max-w-md mx-auto">
+          {/* Logo */}
+          <div className="text-left">
+            <img 
+              src="https://cdn.shopify.com/s/files/1/0629/1993/4061/files/LOGO_ACTO.jpg?v=1747283022" 
+              alt="Acto Logo" 
+              className="h-16 mb-4"
+            />
+          </div>
+
           <div className="space-y-2 text-left">
             <h1 className="text-3xl font-bold tracking-tight">Bem-vindo de volta 👋</h1>
             <p className="text-muted-foreground">
