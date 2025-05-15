@@ -28,6 +28,12 @@ const TaskFormFields: React.FC<TaskFormFieldsProps> = ({
     <>
       {/* Removing the redundant title field since it's already in the form header */}
       
+      <div className="mb-2">
+        <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+          Avalie o peso da tarefa:
+        </label>
+      </div>
+      
       <RatingSlider
         value={formData.consequenceScore}
         onChange={(value) => setFormData(prev => ({ ...prev, consequenceScore: value }))}
