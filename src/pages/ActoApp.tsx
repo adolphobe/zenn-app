@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils';
 
 const ActoApp: React.FC = () => {
   const { state, toggleSidebar } = useAppContext();
-  const { sidebarOpen } = state;
+  const { sidebarOpen, viewMode } = state;
   const isMobile = useIsMobile();
   const location = useLocation();
   const navigate = useNavigate();
@@ -32,6 +32,9 @@ const ActoApp: React.FC = () => {
     }
   }, [isMobile, location.pathname]);
 
+  // Determine if we should use a narrower max-width for task cards (only in power and chronological mode)
+  const isTaskCardView = isDashboardRoute && (viewMode === 'power' || viewMode === 'chronological');
+  
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 flex">
       <Sidebar />
@@ -44,7 +47,10 @@ const ActoApp: React.FC = () => {
           "flex justify-center" // Add this to center the content horizontally
         )}
       >
-        <div className="w-full max-w-6xl"> {/* Add a container with max width to center content */}
+        <div className={cn(
+          "w-full", 
+          isTaskCardView ? "max-w-3xl" : "max-w-6xl"
+        )}> 
           {isDashboardRoute ? (
             <Dashboard />
           ) : (
