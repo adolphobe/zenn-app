@@ -14,7 +14,7 @@ const SidebarHeader: React.FC<SidebarHeaderProps> = ({ sidebarOpen, toggleSideba
           <img 
             src="https://cdn.shopify.com/s/files/1/0629/1993/4061/files/Sem_Titulo-8.jpg?v=1747284016" 
             alt="ACTO Logo" 
-            className="h-8 w-auto" 
+            className="h-6 max-w-[80px] object-contain" 
           />
         </div>
       ) : (
