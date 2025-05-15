@@ -78,7 +78,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
   return (
     <>
       <div
-        className={`task-card ${priorityClass} ${task.completed ? 'opacity-50' : ''} relative`}
+        className={`task-card ${priorityClass} ${task.completed ? 'opacity-50' : ''} relative cursor-pointer`}
         onClick={() => !isEditingTitle && onToggleExpand(task.id)}
       >
         <TaskCardHeader 
