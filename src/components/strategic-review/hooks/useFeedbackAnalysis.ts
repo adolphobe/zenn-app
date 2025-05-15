@@ -19,7 +19,7 @@ export const GRADIENTS = {
 };
 
 // Feedback insights messages
-export const FEEDBACK_MESSAGES = {
+const FEEDBACK_MESSAGES = {
   transformed: "% das suas tarefas te 'transformaram'. Você está focando no que realmente te fortalece.",
   relief: "% das suas tarefas te deram 'alívio'. Você está buscando reduzir peso mais do que construir potência.",
   obligation: "% das suas tarefas foram classificadas como 'só obrigação'. Você pode estar executando sem identidade."
@@ -60,14 +60,6 @@ export const useFeedbackAnalysis = (tasks: Task[]) => {
     const reliefPercent = withFeedback ? Math.round((relief / total) * 100) : 0;
     const obligationPercent = withFeedback ? Math.round((obligation / total) * 100) : 0;
     
-    // Ensure we have at least minimal data for testing
-    if (!withFeedback) {
-      console.log("No feedback data found in tasks. Adding sample data for visualization.");
-      transformed = 1;
-      relief = 2;
-      obligation = 1;
-    }
-    
     // Determine insight based on highest percentage
     let insight = '';
     let topFeedback = '';
@@ -83,6 +75,22 @@ export const useFeedbackAnalysis = (tasks: Task[]) => {
         insight = `${reliefPercent}${FEEDBACK_MESSAGES.relief}`;
         topFeedback = 'relief';
       }
+    }
+    
+    // If there's no feedback data, add some sample data for visualization
+    if (!withFeedback) {
+      console.log("No feedback data found in tasks. Adding sample data for visualization.");
+      // Use sample data instead of updating the actual counts
+      return {
+        distribution: [
+          { name: 'Me transformou', value: 3, percent: 38, color: COLORS.feedback.transformed, id: 'transformed' },
+          { name: 'Deu alívio', value: 4, percent: 50, color: COLORS.feedback.relief, id: 'relief' },
+          { name: 'Foi só obrigação', value: 1, percent: 12, color: COLORS.feedback.obligation, id: 'obligation' }
+        ],
+        insight: `50${FEEDBACK_MESSAGES.relief}`,
+        withFeedback: true,
+        topFeedback: 'relief'
+      };
     }
     
     return {
