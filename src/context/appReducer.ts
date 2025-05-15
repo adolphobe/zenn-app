@@ -1,3 +1,4 @@
+
 import { v4 as uuidv4 } from 'uuid';
 import { Task } from '../types';
 import { AppState, Action } from './types';
@@ -32,7 +33,11 @@ export const appReducer = (state: AppState, action: Action): AppState => {
       return {
         ...state,
         tasks: state.tasks.map(task =>
-          task.id === action.payload ? { ...task, completed: !task.completed } : task
+          task.id === action.payload ? { 
+            ...task, 
+            completed: !task.completed,
+            completedAt: !task.completed ? new Date().toISOString() : null
+          } : task
         )
       };
 

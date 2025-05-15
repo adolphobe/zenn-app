@@ -8,6 +8,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import ActoApp from "./pages/ActoApp";
 import NotFound from "./pages/NotFound";
 import StrategicReview from "./pages/StrategicReview";
+import TaskHistory from "./pages/TaskHistory";
 
 const queryClient = new QueryClient();
 
@@ -23,6 +24,7 @@ const App = () => (
               <Route index element={<Navigate to="/dashboard" replace />} />
               <Route path="dashboard" element={<></>} />
               <Route path="strategic-review" element={<StrategicReview />} />
+              <Route path="history" element={<TaskHistory />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>

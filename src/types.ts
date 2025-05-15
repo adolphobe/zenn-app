@@ -1,3 +1,4 @@
+
 export interface Task {
   id: string;
   title: string;
@@ -8,6 +9,7 @@ export interface Task {
   idealDate?: Date | null;
   hidden: boolean;
   completed: boolean;
+  completedAt?: string | null; // Added completedAt date string for completed tasks
   createdAt: Date;
   feedback?: 'transformed' | 'relief' | 'obligation' | null;
   pillar?: string; // Added pillar property
