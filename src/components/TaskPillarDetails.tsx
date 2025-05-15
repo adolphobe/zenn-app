@@ -8,7 +8,7 @@ interface TaskPillarDetailsProps {
 
 const TaskPillarDetails: React.FC<TaskPillarDetailsProps> = ({ task }) => {
   return (
-    <div className="space-y-3 text-sm">
+    <div className="space-y-0 text-sm">
 <div className="rounded-md bg-white px-[10px] py-[3px] text-blue-600 border border-blue-200 text-[13px]">
         <span className="font-medium">Consequência de Ignorar:</span> {task.consequenceScore} | {task.consequenceScore === 5 ? "Vou me sentir bem mal comigo mesmo por não ter feito." : 
                   task.consequenceScore === 4 ? "Se eu ignorar, vou ficar incomodado." :
