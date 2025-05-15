@@ -7,9 +7,8 @@ import SidebarNavItem from './SidebarNavItem';
 
 const SidebarFilterSection: React.FC<{ sidebarOpen: boolean }> = ({ sidebarOpen }) => {
   const { 
-    state: { showHiddenTasks, showPillars }, 
-    toggleShowHiddenTasks,
-    toggleShowPillars
+    state: { showHiddenTasks }, 
+    toggleShowHiddenTasks
   } = useAppContext();
   
   return (
@@ -20,13 +19,6 @@ const SidebarFilterSection: React.FC<{ sidebarOpen: boolean }> = ({ sidebarOpen 
         path="#"
         isActive={showHiddenTasks}
         onClick={toggleShowHiddenTasks}
-      />
-      <SidebarNavItem
-        icon={Eye}
-        label="Pilares no card"
-        path="#"
-        isActive={showPillars}
-        onClick={toggleShowPillars}
       />
     </SidebarSection>
   );

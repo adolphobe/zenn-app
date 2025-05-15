@@ -45,7 +45,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     // UI actions
     setViewMode: (mode) => uiActions.setViewMode(dispatch, mode),
     toggleShowHiddenTasks: () => uiActions.toggleShowHiddenTasks(dispatch),
-    toggleShowPillars: () => uiActions.toggleShowPillars(dispatch),
     toggleDarkMode: () => uiActions.toggleDarkMode(dispatch),
     toggleSidebar: () => uiActions.toggleSidebar(dispatch),
     updateDateDisplayOptions: (options) => uiActions.updateDateDisplayOptions(dispatch, options),

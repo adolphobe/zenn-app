@@ -1,11 +1,9 @@
 
-// src/components/TaskCardHeader.tsx
 import React from 'react';
 import { formatDate } from '@/utils';
 import { DateDisplayOptions } from '@/types';
 import TaskCardTitle from './TaskCardTitle';
 import { Eye } from 'lucide-react';
-import { useAppContext } from '@/context/AppContext';
 
 interface TaskCardHeaderProps {
   title: string;
@@ -36,8 +34,6 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
   onTitleBlur,
   onTitleKeyDown
 }) => {
-  const { state: { showPillars } } = useAppContext();
-  
   return (
     <>
       {/* Eye icon for hidden tasks that are only visible because of the filter - now with reduced opacity */}
@@ -66,22 +62,19 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
               {formatDate(idealDate, dateDisplayOptions)}
             </div>
           )}
-          <div className="flex items-center justify-center bg-white bg-opacity-40 rounded-full px-3 py-1.5 font-semibold ml-2">
-            <span className="text-[16px]">{totalScore}</span>
-            <span className="text-[10px] self-end mb-1 ml-0.5">/ 15</span>
+          <div className="flex items-center justify-center bg-white bg-opacity-40 rounded-full px-2 py-1 text-xs font-semibold ml-2">
+            {totalScore}/15
           </div>
         </div>
       </div>
       
-      {showPillars && (
-        <div className="mt-2 text-xs flex flex-wrap gap-2">
-          <span>Consequência: {totalScore ? Math.floor(totalScore / 3) : 0}</span>
-          <span>|</span>
-          <span>Orgulho: {totalScore ? Math.floor(totalScore / 3) : 0}</span>
-          <span>|</span>
-          <span>Construção: {totalScore ? Math.ceil(totalScore / 3) : 0}</span>
-        </div>
-      )}
+      <div className="mt-2 text-xs flex flex-wrap gap-2">
+        <span>Consequência: {totalScore ? Math.floor(totalScore / 3) : 0}</span>
+        <span>|</span>
+        <span>Orgulho: {totalScore ? Math.floor(totalScore / 3) : 0}</span>
+        <span>|</span>
+        <span>Construção: {totalScore ? Math.ceil(totalScore / 3) : 0}</span>
+      </div>
     </>
   );
 };

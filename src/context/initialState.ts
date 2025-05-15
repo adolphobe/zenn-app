@@ -1,12 +1,11 @@
 
 import { AppState } from './types';
 
-// Initial state for the application
+// Initial state
 export const initialState: AppState = {
   tasks: [],
   viewMode: 'power',
   showHiddenTasks: false,
-  showPillars: true, // Default to true - pillars will be visible by default
   darkMode: false,
   sidebarOpen: true,
   dateDisplayOptions: {
@@ -16,7 +15,7 @@ export const initialState: AppState = {
   },
   sortOptions: {
     power: {
-      sortDirection: 'desc'
+      sortDirection: 'desc',
     },
     chronological: {
       sortDirection: 'asc',

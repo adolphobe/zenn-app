@@ -6,10 +6,9 @@ import { toast } from '@/hooks/use-toast';
 
 interface CommentFormProps {
   taskId: string;
-  onCommentAdded?: () => void; // Nova prop para notificar quando um comentário é adicionado
 }
 
-const CommentForm: React.FC<CommentFormProps> = ({ taskId, onCommentAdded }) => {
+const CommentForm: React.FC<CommentFormProps> = ({ taskId }) => {
   const [commentText, setCommentText] = useState('');
   const { addComment } = useAppContext();
   
@@ -21,12 +20,6 @@ const CommentForm: React.FC<CommentFormProps> = ({ taskId, onCommentAdded }) => 
     if (commentText.trim() && addComment) {
       addComment(taskId, commentText);
       setCommentText('');
-      
-      // Notificar o componente pai que um comentário foi adicionado
-      if (onCommentAdded) {
-        onCommentAdded();
-      }
-      
       toast({
         title: "Comentário adicionado",
         description: "Seu comentário foi adicionado com sucesso."
@@ -52,12 +45,6 @@ const CommentForm: React.FC<CommentFormProps> = ({ taskId, onCommentAdded }) => 
       if (commentText.trim() && addComment) {
         addComment(taskId, commentText);
         setCommentText('');
-        
-        // Notificar o componente pai que um comentário foi adicionado
-        if (onCommentAdded) {
-          onCommentAdded();
-        }
-        
         toast({
           title: "Comentário adicionado",
           description: "Seu comentário foi adicionado com sucesso."
@@ -97,7 +84,7 @@ const CommentForm: React.FC<CommentFormProps> = ({ taskId, onCommentAdded }) => 
         <textarea
           value={commentText}
           onChange={handleTextChange}
-          onKeyDown={handleKeyDown} // Adicionar o evento de tecla
+          onKeyDown={handleKeyDown} // Adicionar o evento para tecla pressionada
           onClick={(e) => {
             e.stopPropagation();
             console.log('Comment textarea clicked');
