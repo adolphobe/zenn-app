@@ -4,12 +4,31 @@ import { LogOut, User } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { useNavigate } from 'react-router-dom';
+import { toast } from '@/hooks/use-toast';
 
 interface SidebarUserProfileProps {
   sidebarOpen: boolean;
 }
 
 const SidebarUserProfile: React.FC<SidebarUserProfileProps> = ({ sidebarOpen }) => {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    // Clear the login status from localStorage
+    localStorage.removeItem('acto_is_logged_in');
+    
+    // Show a success toast message
+    toast({
+      title: "Logout realizado",
+      description: "Você foi desconectado com sucesso.",
+      duration: 2000
+    });
+    
+    // Redirect to login page
+    navigate('/login');
+  };
+
   return (
     <div className="mt-auto">
       <Separator className="mb-4" />
@@ -40,6 +59,7 @@ const SidebarUserProfile: React.FC<SidebarUserProfileProps> = ({ sidebarOpen }) 
           variant="outline"
           size={sidebarOpen ? "default" : "icon"}
           className={`mt-2 w-full border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 dark:border-red-900 dark:text-red-400 dark:hover:bg-red-950/20 dark:hover:text-red-300`}
+          onClick={handleLogout}
         >
           <LogOut size={18} />
           {sidebarOpen && <span className="ml-2">Sair</span>}
