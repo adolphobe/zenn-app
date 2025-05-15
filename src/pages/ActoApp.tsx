@@ -45,7 +45,7 @@ const ActoApp: React.FC = () => {
       {isMobile && !sidebarOpen && (
         <button 
           onClick={openSidebar}
-          className="fixed top-4 left-4 z-40 p-2 rounded-md bg-gray-500/50 text-white shadow-md hover:bg-gray-600/70 transition-colors"
+          className="fixed top-4 left-4 z-40 p-2 rounded-md bg-gray-500/50 text-white shadow-md hover:bg-gray-600/70 transition-all duration-300 transform hover:scale-105 active:scale-95"
           aria-label="Open menu"
         >
           <Menu size={24} />

@@ -39,7 +39,8 @@ const Sidebar: React.FC = () => {
         className={`fixed top-0 left-0 h-full bg-white dark:bg-gray-900 border-r border-gray-100 dark:border-gray-800 
                   transition-all duration-300 z-30 card-shadow flex flex-col 
                   ${sidebarOpen ? 'w-64' : 'w-20'} 
-                  ${isMobile ? (sidebarOpen ? 'translate-x-0' : 'translate-x-full') : ''}`}
+                  ${isMobile ? (sidebarOpen ? 'translate-x-0 transition-transform ease-out duration-300' : '-translate-x-full') : ''}`}
+        style={isMobile && sidebarOpen ? { animation: 'slideInFromLeft 0.3s ease-out forwards' } : {}}
       >
         <SidebarHeader sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
 
@@ -57,6 +58,19 @@ const Sidebar: React.FC = () => {
         
         <SidebarUserProfile sidebarOpen={sidebarOpen} />
       </div>
+      
+      <style jsx>{`
+        @keyframes slideInFromLeft {
+          0% {
+            transform: translateX(-100%);
+            opacity: 0.5;
+          }
+          100% {
+            transform: translateX(0);
+            opacity: 1;
+          }
+        }
+      `}</style>
     </>
   );
 };
