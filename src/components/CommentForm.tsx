@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Button } from './ui/button';
 import { useAppContext } from '@/context/AppContext';
 import { MessageSquare } from 'lucide-react';
+import { toast } from '@/hooks/use-toast';
 
 interface CommentFormProps {
   taskId: string;
@@ -14,6 +15,7 @@ const CommentForm: React.FC<CommentFormProps> = ({ taskId }) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    e.stopPropagation(); // Stop event propagation to prevent any parent handlers from triggering
     
     if (commentText.trim() && addComment) {
       addComment(taskId, commentText);
@@ -40,6 +42,9 @@ const CommentForm: React.FC<CommentFormProps> = ({ taskId }) => {
             disabled={!commentText.trim()}
             size="sm"
             className="self-end flex items-center gap-1"
+            onClick={(e) => {
+              e.stopPropagation(); // Prevent the click from bubbling up
+            }}
           >
             <MessageSquare size={16} />
             Enviar

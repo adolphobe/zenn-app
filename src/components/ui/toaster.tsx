@@ -5,8 +5,10 @@ import { ToastContext } from "@/hooks/use-toast-context"
 
 export function Toaster() {
   return (
-    <ToastProvider>
-      <HookToaster />
-    </ToastProvider>
+    <>
+      <ToastProvider>
+        <HookToaster />
+      </ToastProvider>
+    </>
   )
 }
