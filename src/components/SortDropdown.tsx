@@ -46,13 +46,13 @@ const SortDropdown: React.FC = () => {
           <>
             <DropdownMenuItem
               onClick={() => handleSortDirectionChange('desc')}
-              className={`${dropdownStyles.item} ${sortDirection === 'desc' ? dropdownStyles.itemSelected : ''}`}
+              className={`${dropdownStyles.item} ${sortDirection === 'desc' ? dropdownStyles.itemSelected : ''} cursor-pointer`}
             >
               Score: Maior → Menor
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => handleSortDirectionChange('asc')}
-              className={`${dropdownStyles.item} ${sortDirection === 'asc' ? dropdownStyles.itemSelected : ''}`}
+              className={`${dropdownStyles.item} ${sortDirection === 'asc' ? dropdownStyles.itemSelected : ''} cursor-pointer`}
             >
               Score: Menor → Maior
             </DropdownMenuItem>
@@ -61,13 +61,13 @@ const SortDropdown: React.FC = () => {
           <>
             <DropdownMenuItem
               onClick={() => handleSortDirectionChange('asc')}
-              className={`${dropdownStyles.item} ${sortDirection === 'asc' ? dropdownStyles.itemSelected : ''}`}
+              className={`${dropdownStyles.item} ${sortDirection === 'asc' ? dropdownStyles.itemSelected : ''} cursor-pointer`}
             >
               Data: Próximas primeiro
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => handleSortDirectionChange('desc')}
-              className={`${dropdownStyles.item} ${sortDirection === 'desc' ? dropdownStyles.itemSelected : ''}`}
+              className={`${dropdownStyles.item} ${sortDirection === 'desc' ? dropdownStyles.itemSelected : ''} cursor-pointer`}
             >
               Data: Distantes primeiro
             </DropdownMenuItem>
