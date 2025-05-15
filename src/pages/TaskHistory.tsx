@@ -1,6 +1,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { useAppContext } from '@/context/AppContext';
+import { Task } from '@/types';
 
 // Import refactored components
 import { TaskHistoryStats } from '@/components/task-history/TaskHistoryStats';
@@ -22,9 +23,9 @@ const TaskHistory = () => {
   const [sortBy, setSortBy] = useState('recent');
   const [showFilters, setShowFilters] = useState(false);
 
-  // Filter for completed tasks only
+  // Filter for completed tasks only with completedAt
   const completedTasks = useMemo(() => {
-    return state.tasks.filter(task => task.completed && task.completedAt);
+    return state.tasks.filter(task => task.completed && task.completedAt) as Task[];
   }, [state.tasks]);
 
   // Apply filters and search
@@ -36,18 +37,21 @@ const TaskHistory = () => {
       
       // Period filter
       let matchesPeriod = true;
-      const now = new Date();
-      const completedDate = new Date(task.completedAt);
       
-      if (periodFilter === 'today') {
-        matchesPeriod = completedDate.toDateString() === now.toDateString();
-      } else if (periodFilter === 'week') {
-        const weekStart = new Date(now);
-        weekStart.setDate(now.getDate() - now.getDay());
-        matchesPeriod = completedDate >= weekStart;
-      } else if (periodFilter === 'month') {
-        matchesPeriod = completedDate.getMonth() === now.getMonth() && 
-                        completedDate.getFullYear() === now.getFullYear();
+      if (periodFilter !== 'all' && task.completedAt) {
+        const now = new Date();
+        const completedDate = new Date(task.completedAt);
+        
+        if (periodFilter === 'today') {
+          matchesPeriod = completedDate.toDateString() === now.toDateString();
+        } else if (periodFilter === 'week') {
+          const weekStart = new Date(now);
+          weekStart.setDate(now.getDate() - now.getDay());
+          matchesPeriod = completedDate >= weekStart;
+        } else if (periodFilter === 'month') {
+          matchesPeriod = completedDate.getMonth() === now.getMonth() && 
+                          completedDate.getFullYear() === now.getFullYear();
+        }
       }
       
       // Score filter
@@ -84,9 +88,9 @@ const TaskHistory = () => {
   const sortedTasks = useMemo(() => {
     return [...filteredTasks].sort((a, b) => {
       if (sortBy === 'recent') {
-        return new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime();
+        return new Date(b.completedAt || 0).getTime() - new Date(a.completedAt || 0).getTime();
       } else if (sortBy === 'oldest') {
-        return new Date(a.completedAt).getTime() - new Date(b.completedAt).getTime();
+        return new Date(a.completedAt || 0).getTime() - new Date(b.completedAt || 0).getTime();
       } else if (sortBy === 'highScore') {
         return b.totalScore - a.totalScore;
       } else if (sortBy === 'lowScore') {

@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { format } from 'date-fns';
+import { Task } from '@/types'; // Import Task type from main types file
 import { 
   Card,
   CardContent,
@@ -13,17 +14,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
-interface Task {
-  id: string;
-  title: string;
-  completedAt: string;
-  consequenceScore: number;
-  prideScore: number;
-  constructionScore: number;
-  totalScore: number;
-  feedback?: 'transformed' | 'relief' | 'obligation' | null;
-}
 
 // Table row component
 export const CompletedTaskRow: React.FC<{ task: Task }> = ({ task }) => {
@@ -47,10 +37,13 @@ export const CompletedTaskRow: React.FC<{ task: Task }> = ({ task }) => {
     obligation: 'Obrigação'
   };
 
+  // Make sure we have a completedAt value before trying to format it
+  const completedDate = task.completedAt ? format(new Date(task.completedAt), 'dd/MM/yyyy') : '-';
+
   return (
     <TableRow>
       <TableCell className="line-through opacity-70">{task.title}</TableCell>
-      <TableCell>{format(new Date(task.completedAt), 'dd/MM/yyyy')}</TableCell>
+      <TableCell>{completedDate}</TableCell>
       <TableCell>{task.totalScore}</TableCell>
       <TableCell className="capitalize">{dominantPillar}</TableCell>
       <TableCell>{task.feedback ? feedbackLabels[task.feedback] : '-'}</TableCell>

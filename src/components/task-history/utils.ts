@@ -1,8 +1,9 @@
 
+import { Task } from '@/types';
 import { format } from 'date-fns';
 
 // Timeline grouping function
-export const groupTasksByTimeline = (tasks) => {
+export const groupTasksByTimeline = (tasks: Task[]) => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   
@@ -23,6 +24,9 @@ export const groupTasksByTimeline = (tasks) => {
   };
   
   tasks.forEach(task => {
+    // Skip tasks without completedAt
+    if (!task.completedAt) return;
+    
     const completedDate = new Date(task.completedAt);
     completedDate.setHours(0, 0, 0, 0);
     

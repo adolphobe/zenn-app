@@ -1,20 +1,10 @@
 
 import React from 'react';
 import { format } from 'date-fns';
+import { Task } from '@/types'; // Import Task type from main types file
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-
-interface Task {
-  id: string;
-  title: string;
-  completedAt: string;
-  consequenceScore: number;
-  prideScore: number;
-  constructionScore: number;
-  totalScore: number;
-  feedback?: 'transformed' | 'relief' | 'obligation' | null;
-}
 
 interface TaskGroup {
   label: string;
@@ -49,6 +39,9 @@ export const CompletedTaskCard: React.FC<{ task: Task }> = ({ task }) => {
     obligation: 'bg-amber-100 text-amber-800 border-amber-200',
   };
 
+  // Make sure we have a completedAt value before trying to format it
+  const completedDate = task.completedAt ? format(new Date(task.completedAt), 'dd/MM/yyyy') : '-';
+
   return (
     <Card className="mb-3 border-l-4 border-l-gray-300">
       <CardContent className="pt-4">
@@ -56,7 +49,7 @@ export const CompletedTaskCard: React.FC<{ task: Task }> = ({ task }) => {
           <div>
             <h3 className="font-medium text-gray-900 dark:text-gray-100 line-through opacity-70">{task.title}</h3>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-              Concluída em {format(new Date(task.completedAt), 'dd/MM/yyyy')}
+              Concluída em {completedDate}
             </p>
           </div>
           <div className="flex gap-2">

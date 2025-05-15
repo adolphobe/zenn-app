@@ -1,11 +1,12 @@
 
 import React, { useMemo } from 'react';
 import { format } from 'date-fns';
+import { Task } from '@/types';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { BarChart, Bar, ResponsiveContainer, XAxis, Tooltip } from 'recharts';
 
 interface TaskHistoryStatsProps {
-  completedTasks: any[];
+  completedTasks: Task[];
 }
 
 export const TaskHistoryStats: React.FC<TaskHistoryStatsProps> = ({ completedTasks }) => {
@@ -31,6 +32,8 @@ export const TaskHistoryStats: React.FC<TaskHistoryStatsProps> = ({ completedTas
     
     // Count tasks completed on each day
     completedTasks.forEach(task => {
+      if (!task.completedAt) return;
+      
       const taskDate = new Date(task.completedAt);
       taskDate.setHours(0, 0, 0, 0);
       const dateStr = taskDate.toISOString().split('T')[0];
