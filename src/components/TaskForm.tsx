@@ -153,55 +153,33 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, initialData, taskId, task,
             className="p-5 space-y-6"
             onClick={(e) => e.stopPropagation()}
           >
-            {isEditing ? (
-              <>
-                <div onClick={(e) => e.stopPropagation()}>
-                  <label htmlFor="title" className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
-                    Título da Tarefa
-                  </label>
-                  <input
-                    type="text"
-                    id="title"
-                    name="title"
-                    value={formData.title}
-                    onChange={handleChange}
-                    onClick={(e) => e.stopPropagation()}
-                    className="w-full p-3 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-                    placeholder="O que precisa ser feito?"
-                    required
-                  />
-                </div>
-                
-                <TaskFormTabs 
-                  activeTab={activeTab}
-                  setActiveTab={setActiveTab}
-                  formData={formData}
-                  handleChange={handleChange}
-                  handleDateChange={handleDateChange}
-                  setFormData={setFormData}
-                  taskId={taskId}
-                  task={task}
-                />
-              </>
-            ) : (
-              // Simple form for new task
-              <div onClick={(e) => e.stopPropagation()}>
-                <label htmlFor="title" className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
-                  Título da Tarefa
-                </label>
-                <input
-                  type="text"
-                  id="title"
-                  name="title"
-                  value={formData.title}
-                  onChange={handleChange}
-                  onClick={(e) => e.stopPropagation()}
-                  className="w-full p-3 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-                  placeholder="O que precisa ser feito?"
-                  required
-                />
-              </div>
-            )}
+            <div onClick={(e) => e.stopPropagation()}>
+              <label htmlFor="title" className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+                Título da Tarefa
+              </label>
+              <input
+                type="text"
+                id="title"
+                name="title"
+                value={formData.title}
+                onChange={handleChange}
+                onClick={(e) => e.stopPropagation()}
+                className="w-full p-3 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                placeholder="O que precisa ser feito?"
+                required
+              />
+            </div>
+            
+            <TaskFormTabs 
+              activeTab={activeTab}
+              setActiveTab={setActiveTab}
+              formData={formData}
+              handleChange={handleChange}
+              handleDateChange={handleDateChange}
+              setFormData={setFormData}
+              taskId={taskId}
+              task={task}
+            />
 
             <TaskFormActions onClose={onClose} />
           </form>
