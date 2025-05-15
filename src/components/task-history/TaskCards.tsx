@@ -114,7 +114,7 @@ export const TaskGroupGrid: React.FC<{ groups: TaskGroup[] }> = ({ groups }) => 
         <div className="flex items-center gap-2 mb-2">
           <h3 className="text-lg font-medium">{group.label}</h3>
           <Badge variant="outline">{group.tasks.length}</Badge>
-          <Separator className="flex-grow" />
+          
         </div>
         <div className="grid grid-cols-1">
           {group.tasks.map(task => (
