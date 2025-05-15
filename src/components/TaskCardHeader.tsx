@@ -62,7 +62,7 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
               {formatDate(idealDate, dateDisplayOptions)}
             </div>
           )}
-          <div className="flex items-center justify-center bg-white bg-opacity-40 rounded-full px-2 py-1 text-xs font-semibold ml-2">
+          <div className="flex items-center justify-center bg-white bg-opacity-40 rounded-full px-2 py-1 text-sm font-semibold ml-2">
             {totalScore}/15
           </div>
         </div>
