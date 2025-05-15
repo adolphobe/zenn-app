@@ -31,7 +31,7 @@ const SortDropdown: React.FC = () => {
         <Button
           variant="outline"
           size="sm"
-        className="flex items-center gap-2 px-4 py-6 hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-900/20 dark:hover:text-blue-400"
+        className="flex items-center gap-2 px-4 py-4 hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-900/20 dark:hover:text-blue-400"
         >
           <ArrowUpDown size={16} />
           <span className="hidden sm:inline">Ordenação</span>
