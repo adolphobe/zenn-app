@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { format } from 'date-fns';
 import { Comment } from '@/types';
 import { useAppContext } from '@/context/AppContext';
@@ -24,6 +24,7 @@ interface TaskCommentsProps {
 const TaskComments: React.FC<TaskCommentsProps> = ({ taskId, comments }) => {
   const { deleteComment } = useAppContext();
   const [commentToDelete, setCommentToDelete] = useState<string | null>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   
   // Injetar CSS global para scrollbar
   useEffect(() => {
@@ -80,6 +81,14 @@ const TaskComments: React.FC<TaskCommentsProps> = ({ taskId, comments }) => {
     // Não é necessário limpar, pois queremos que o estilo permaneça.
   }, []);
   
+  // Efeito para rolar para o final sempre que os comentários mudarem
+  useEffect(() => {
+    if (scrollContainerRef.current && comments.length > 0) {
+      // Rolar para o final da div de comentários
+      scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight;
+    }
+  }, [comments]); // Executar quando os comentários mudarem
+  
   if (!comments || comments.length === 0) {
     return null;
   }
@@ -95,8 +104,11 @@ const TaskComments: React.FC<TaskCommentsProps> = ({ taskId, comments }) => {
     <div className="mt-4">
       <h4 className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">Comentários</h4>
       
-      {/* Div com scrollbar nativa e estilização */}
-      <div className="native-scrollbar h-60 overflow-auto rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+      {/* Div com scrollbar nativa e estilização, agora com ref */}
+      <div 
+        ref={scrollContainerRef}
+        className="native-scrollbar h-60 overflow-auto rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"
+      >
         <div className="space-y-3 p-4">
           {comments.map(comment => (
             <div 
