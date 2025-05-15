@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useAppContext } from '@/context/AppContext';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -10,7 +9,6 @@ import { useLocation } from 'react-router-dom';
 import { sortTasks } from '@/utils';
 import { Plus } from 'lucide-react';
 import { useExpandedTask } from '@/context/hooks';
-
 const Dashboard: React.FC = () => {
   const { state } = useAppContext();
   const { tasks, viewMode, showHiddenTasks, sortOptions } = state;
@@ -18,22 +16,19 @@ const Dashboard: React.FC = () => {
   const location = useLocation();
   const [isTaskFormOpen, setIsTaskFormOpen] = useState(false);
   const { isTaskExpanded, toggleTaskExpanded } = useExpandedTask();
-
   // Check if we're on strategic review route
   const isStrategicReview = location.pathname === '/strategic-review';
-  
+
   // If on strategic review route, render that component
   if (isStrategicReview) {
     return <StrategicReview />;
   }
-
   // Sort and filter tasks
   const filteredTasks = sortTasks(
     tasks.filter(task => !task.completed && (showHiddenTasks || !task.hidden)),
     viewMode,
     sortOptions[viewMode]
   );
-
   return (
     <>
       <div className="mb-6 flex justify-between items-center">
@@ -42,13 +37,13 @@ const Dashboard: React.FC = () => {
         </h1>
         <div className="flex items-center gap-2">
           <SortDropdown />
-          
+
           {isTaskFormOpen ? (
             <TaskForm onClose={() => setIsTaskFormOpen(false)} />
           ) : (
             <button
               onClick={() => setIsTaskFormOpen(true)}
-          className="flex items-center gap-2 px-3 py-[10px] text-sm font-medium rounded-md border border-[#1e52f1] bg-[#1e52f1] text-white hover:bg-[#1a47d9] hover:border-[#1a47d9] transition-colors"
+              className="flex rounded-[13px] items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
               <Plus size={18} />
               <span>Nova Tarefa</span>
@@ -56,7 +51,6 @@ const Dashboard: React.FC = () => {
           )}
         </div>
       </div>
-
       <div className="grid grid-cols-1 gap-4 md:gap-6">
         {filteredTasks.map(task => (
           <TaskCard 
@@ -66,7 +60,7 @@ const Dashboard: React.FC = () => {
             onToggleExpand={toggleTaskExpanded} 
           />
         ))}
-        
+
         {filteredTasks.length === 0 && (
           <div className="text-center py-12 border border-dashed rounded-lg bg-muted/30 border-border">
             <p className="text-muted-foreground">
@@ -80,5 +74,4 @@ const Dashboard: React.FC = () => {
     </>
   );
 };
-
 export default Dashboard;
