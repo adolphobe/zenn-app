@@ -28,7 +28,7 @@ const TaskComments: React.FC<TaskCommentsProps> = ({ taskId, comments }) => {
       <h4 className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">Comentários</h4>
       
       {/* Div com scrollbar nativa e estilização */}
-      <div className="native-scrollbar h-60 overflow-auto rounded-md border border-gray-200 dark:border-gray-700">
+    <div className="native-scrollbar h-60 overflow-auto rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
         <div className="space-y-3 p-4">
           {comments.map(comment => (
             <div 
