@@ -22,12 +22,20 @@ const Login: React.FC = () => {
   const { addToast } = useToast();
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [loaded, setLoaded] = useState(false);
 
   // Check if already logged in
   useEffect(() => {
     if (localStorage.getItem('acto_is_logged_in') === 'true') {
       navigate('/dashboard');
     }
+    
+    // Set loaded state for animations
+    const timer = setTimeout(() => {
+      setLoaded(true);
+    }, 100);
+    
+    return () => clearTimeout(timer);
   }, [navigate]);
 
   const form = useForm<LoginFormValues>({
@@ -57,22 +65,41 @@ const Login: React.FC = () => {
 
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
 
+  // Float animation items for the background
+  const floatingItems = Array(5).fill(null).map((_, i) => (
+    <div 
+      key={i}
+      className={`absolute rounded-full bg-primary/5 animate-float-${i+1}`}
+      style={{
+        width: `${Math.random() * 100 + 50}px`,
+        height: `${Math.random() * 100 + 50}px`,
+        left: `${Math.random() * 70}%`,
+        top: `${Math.random() * 100}%`,
+        animationDelay: `${Math.random() * 5}s`,
+        animationDuration: `${Math.random() * 15 + 20}s`,
+      }}
+    />
+  ));
+
   return (
-    <div className="flex min-h-screen bg-background dark:bg-gray-950">
+    <div className="flex min-h-screen bg-gradient-to-b from-white to-blue-50 dark:from-gray-950 dark:to-gray-900 overflow-hidden relative">
+      {/* Floating background elements */}
+      {floatingItems}
+      
       {/* Left column: Login Form */}
-      <div className="w-full md:w-1/2 flex flex-col justify-center px-8 sm:px-16 md:px-24 lg:px-32 animate-fade-in">
-        <div className="space-y-6 w-full max-w-md mx-auto">
+      <div className="w-full md:w-1/2 flex flex-col justify-center px-8 sm:px-16 md:px-24 lg:px-32 z-10">
+        <div className={`space-y-6 w-full max-w-md mx-auto transition-all duration-1000 ease-in-out ${loaded ? 'opacity-100' : 'opacity-0 translate-y-4'}`}>
           {/* Logo */}
-          <div className="text-left mb-[90px]">
+          <div className="text-left mb-12">
             <img 
               src="https://cdn.shopify.com/s/files/1/0629/1993/4061/files/LOGO_ACTO.jpg?v=1747283022" 
               alt="Acto Logo" 
-              className="hidden  w-[180px] mb-4"
+              className="h-16 mb-4"
             />
           </div>
 
           <div className="space-y-2 text-left">
-            <h1 className="text-3xl font-bold tracking-tight">Faça login abaixo:</h1>
+            <h1 className="text-3xl font-bold tracking-tight text-gray-800 dark:text-gray-100">Faça login abaixo:</h1>
             <p className="text-muted-foreground">
               Um novo dia chegou. É hora de continuar sua jornada.
             </p>
@@ -84,7 +111,7 @@ const Login: React.FC = () => {
                 control={form.control}
                 name="email"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="transition-all duration-300 ease-in-out hover:translate-x-1">
                     <div className="relative">
                       <Mail 
                         className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" 
@@ -93,7 +120,7 @@ const Login: React.FC = () => {
                       <FormControl>
                         <Input
                           placeholder="E-mail"
-                          className="pl-10 h-12"
+                          className="pl-10 h-12 bg-white/80 backdrop-blur-sm border-gray-200 shadow-sm transition-all duration-300"
                           {...field}
                         />
                       </FormControl>
@@ -107,7 +134,7 @@ const Login: React.FC = () => {
                 control={form.control}
                 name="password"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="transition-all duration-300 ease-in-out hover:translate-x-1">
                     <div className="relative">
                       <Lock
                         className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
@@ -117,7 +144,7 @@ const Login: React.FC = () => {
                         <Input
                           type={showPassword ? "text" : "password"}
                           placeholder="Senha"
-                          className="pl-10 pr-10 h-12"
+                          className="pl-10 pr-10 h-12 bg-white/80 backdrop-blur-sm border-gray-200 shadow-sm transition-all duration-300"
                           {...field}
                         />
                       </FormControl>
@@ -141,7 +168,7 @@ const Login: React.FC = () => {
               <div className="flex justify-end">
                 <button 
                   type="button"
-                  className="text-sm text-primary hover:underline focus:outline-none"
+                  className="text-sm text-primary hover:underline hover:text-primary/80 focus:outline-none transition-colors duration-300"
                 >
                   Esqueceu a senha?
                 </button>
@@ -149,7 +176,7 @@ const Login: React.FC = () => {
 
               <Button 
                 type="submit" 
-                className="w-full h-12 text-base transition-all duration-300 transform hover:scale-[1.02] bg-primary"
+                className="w-full h-12 text-base transition-all duration-300 transform hover:scale-[1.02] bg-primary hover:bg-primary/90 shadow-md hover:shadow-lg"
                 disabled={isSubmitting}
               >
                 {isSubmitting ? "Entrando..." : "Entrar"}
@@ -157,7 +184,7 @@ const Login: React.FC = () => {
 
               <div className="text-center text-sm">
                 <span className="text-muted-foreground">Não tem uma conta? </span>
-                <a href="#" className="text-primary hover:underline">
+                <a href="#" className="text-primary hover:underline hover:text-primary/80 transition-colors duration-300">
                   Criar conta
                 </a>
               </div>
@@ -165,23 +192,21 @@ const Login: React.FC = () => {
           </Form>
         </div>
 
-        <div className="mt-12 text-center text-xs text-muted-foreground">
+        <div className="mt-12 text-center text-xs text-muted-foreground opacity-70">
           © {new Date().getFullYear()} Acto. Todos os direitos reservados.
         </div>
       </div>
 
       {/* Right column: Image */}
-      <div className="hidden md:block md:w-1/2 bg-primary/5">
-        <div className="h-full w-full relative">
-          <div className="absolute inset-0 overflow-hidden">
-            <img
-              src="https://img.freepik.com/fotos-gratis/copo-de-agua-com-sombras_23-2150701849.jpg?t=st=1747283331~exp=1747286931~hmac=34c5470984073a35ee91759495d76cacc2596d43e03eb51d07b5beeae02a5a15&w=2000"
-              alt="Fundo de login"
-              className="object-cover w-full h-full object-center"
-              style={{ minWidth: '100%', minHeight: '100%' }}
-            />
-            <div className="absolute inset-0 bg-gradient-to-r from-primary/30 to-transparent mix-blend-multiply" />
-          </div>
+      <div className="hidden md:block md:w-1/2 relative">
+        <div className="absolute inset-0 overflow-hidden">
+          <img
+            src="https://images.pexels.com/photos/207237/pexels-photo-207237.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+            alt="Fundo de login"
+            className="object-cover w-full h-full object-center"
+            style={{ minWidth: '100%', minHeight: '100%' }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-500/30 to-primary/20 mix-blend-multiply" />
         </div>
       </div>
     </div>
