@@ -9,6 +9,7 @@ import StrategicReview from '../pages/StrategicReview';
 import { useLocation } from 'react-router-dom';
 import { sortTasks } from '@/utils';
 import { Plus } from 'lucide-react';
+import { useExpandedTask } from '@/context/hooks';
 
 const Dashboard: React.FC = () => {
   const { state } = useAppContext();
@@ -16,6 +17,7 @@ const Dashboard: React.FC = () => {
   const isMobile = useIsMobile();
   const location = useLocation();
   const [isTaskFormOpen, setIsTaskFormOpen] = useState(false);
+  const { isTaskExpanded, toggleTaskExpanded } = useExpandedTask();
 
   // Check if we're on strategic review route
   const isStrategicReview = location.pathname === '/strategic-review';
@@ -64,7 +66,12 @@ const Dashboard: React.FC = () => {
 
         <div className="grid grid-cols-1 gap-4 md:gap-6">
           {filteredTasks.map(task => (
-            <TaskCard key={task.id} task={task} />
+            <TaskCard 
+              key={task.id} 
+              task={task} 
+              isExpanded={isTaskExpanded(task.id)} 
+              onToggleExpand={toggleTaskExpanded} 
+            />
           ))}
           
           {filteredTasks.length === 0 && (
