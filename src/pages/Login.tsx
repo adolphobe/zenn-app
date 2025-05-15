@@ -123,7 +123,7 @@ const Login: React.FC = () => {
           {/* Logo */}
           <div className="text-left mb-12">
             <img 
-              src="https://cdn.shopify.com/s/files/1/0629/1993/4061/files/LOGO_ACTO.jpg?v=1747283022" 
+              src="https://cdn.shopify.com/s/files/1/0629/1993/4061/files/Sem_Titulo-8.jpg?v=1747284016" 
               alt="Acto Logo" 
               className="h-16 mb-4"
             />
