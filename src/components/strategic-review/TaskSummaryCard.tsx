@@ -20,7 +20,7 @@ const TaskSummaryCard: React.FC<TaskSummaryCardProps> = ({ tasks }) => {
     return (
       <Alert 
         variant="destructive" 
-        className="bg-red-50 border-red-100 text-red-800"
+        className="bg-red-50 border-red-100 text-red-100"
       >
         <AlertTitle className="text-lg font-medium">Nenhuma tarefa encontrada</AlertTitle>
         <AlertDescription>
