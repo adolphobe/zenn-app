@@ -12,6 +12,7 @@ export type Action =
   | { type: 'SET_VIEW_MODE'; payload: ViewMode }
   | { type: 'TOGGLE_SHOW_HIDDEN_TASKS' }
   | { type: 'TOGGLE_SHOW_PILLARS' }
+  | { type: 'TOGGLE_SHOW_DATES' }
   | { type: 'TOGGLE_DARK_MODE' }
   | { type: 'TOGGLE_SIDEBAR' }
   | { type: 'UPDATE_DATE_DISPLAY_OPTIONS'; payload: DateDisplayOptions }
@@ -39,6 +40,7 @@ export interface AppContextType {
   setViewMode: (mode: ViewMode) => void;
   toggleShowHiddenTasks: () => void;
   toggleShowPillars: () => void;
+  toggleShowDates: () => void;
   toggleDarkMode: () => void;
   toggleSidebar: () => void;
   updateDateDisplayOptions: (options: DateDisplayOptions) => void;
@@ -54,6 +56,7 @@ export interface AppState {
   viewMode: ViewMode;
   showHiddenTasks: boolean;
   showPillars: boolean;
+  showDates: boolean;
   darkMode: boolean;
   sidebarOpen: boolean;
   dateDisplayOptions: {

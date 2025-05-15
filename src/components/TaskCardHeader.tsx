@@ -36,7 +36,7 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
   onTitleBlur,
   onTitleKeyDown
 }) => {
-  const { state: { showPillars } } = useAppContext();
+  const { state: { showPillars, showDates } } = useAppContext();
   
   return (
     <>
@@ -61,7 +61,7 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
         </div>
         
         <div className="flex items-center">
-          {idealDate && (
+          {idealDate && showDates && (
             <div className="text-xs text-right ml-3">
               {formatDate(idealDate, dateDisplayOptions)}
             </div>
