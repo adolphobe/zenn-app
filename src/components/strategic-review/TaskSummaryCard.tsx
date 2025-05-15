@@ -54,8 +54,8 @@ const TaskSummaryCard: React.FC<TaskSummaryCardProps> = ({ tasks }) => {
             </div>
           </div>
           
-          {/* Zone Distribution Chart - with reduced height */}
-          <div className="h-36 mt-2">
+          {/* Zone Distribution Chart - reduced height further */}
+          <div className="h-28">
             <ChartContainer 
               config={{
                 critical: { color: colors.critical },
