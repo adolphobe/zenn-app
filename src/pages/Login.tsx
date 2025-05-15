@@ -111,8 +111,7 @@ const Login: React.FC = () => {
         }
         
         .animated-float {
-          animation: float-animate linear infinite;
-          transition: all 1s ease-in-out;
+            animation: float-animate ease-in-out infinite alternate;
         }
       `}
       </style>
