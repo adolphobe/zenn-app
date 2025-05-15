@@ -22,7 +22,7 @@ export const GRADIENTS = {
 const FEEDBACK_MESSAGES = {
   transformed: "% das suas tarefas te transformaram.\nVocê está priorizando entregas que impactam quem você é.\nIsso mostra foco em crescimento real e construção pessoal.",
   relief: "% das suas tarefas te deram alívio.\nVocê está escolhendo aliviar pressões, mas talvez sem investir tanto em evolução.\nIsso pode ser útil, mas não transforma.",
-  obligation: "% das suas tarefas foram classificadas como 'só obrigação'.\nVocê está executando o necessário, mas sem envolvimento pessoal.\nIsso indica esforço sem identidade e sem construção."
+  obligation: "% das suas tarefas foram classificadas como 'só obrigação'.\nVocê está executando o necessário, mas sem envolvimento pessoal.\nIsso indica esforço sem nenhuma identificação com as tarefas e sem nenhum foco na construção de sí mesmo."
 };
 
 export const useFeedbackAnalysis = (tasks: Task[]) => {
