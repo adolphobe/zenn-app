@@ -50,7 +50,7 @@ const TaskSummaryCard: React.FC<TaskSummaryCardProps> = ({ tasks }) => {
         </div>
         
         {/* Summary text with line breaks */}
-        <div className="border py-[35px] rounded-lg p-3 bg-gradient-to-r from-blue-50 to-blue-50/30">
+      <div className="border rounded-lg py-[10px] px-[12px] bg-gradient-to-r from-blue-50 to-blue-50/30">
           <h4 className="font-medium text-sm mb-1">📊 Distribuição por Zonas de Importância</h4>
           <p className="text-sm text-muted-foreground">
             Neste período, você completou {tasks.length} tarefas com uma média de score de {taskStats.avgTotal.toFixed(1)}.
