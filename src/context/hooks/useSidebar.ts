@@ -9,9 +9,16 @@ export const useSidebar = () => {
   } = useAppContext();
   const isMobile = useIsMobile();
 
+  const openSidebar = () => {
+    if (!sidebarOpen) {
+      toggleSidebar();
+    }
+  };
+
   return {
     isOpen: sidebarOpen,
     toggle: toggleSidebar,
+    open: openSidebar,
     isMobile
   };
 };

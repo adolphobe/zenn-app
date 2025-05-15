@@ -7,11 +7,13 @@ import { useAppContext } from '../context/AppContext';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
+import { Menu } from 'lucide-react';
+import { useSidebar } from '@/context/hooks';
 
 const ActoApp: React.FC = () => {
   const { state, toggleSidebar } = useAppContext();
-  const { sidebarOpen, viewMode } = state;
-  const isMobile = useIsMobile();
+  const { viewMode } = state;
+  const { isOpen: sidebarOpen, open: openSidebar, isMobile } = useSidebar();
   const location = useLocation();
   const navigate = useNavigate();
   const isDashboardRoute = location.pathname === '/' || location.pathname === '/dashboard';
@@ -38,6 +40,18 @@ const ActoApp: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 flex">
       <Sidebar />
+      
+      {/* Mobile Menu Toggle Button - Visible only when sidebar is closed on mobile */}
+      {isMobile && !sidebarOpen && (
+        <button 
+          onClick={openSidebar}
+          className="fixed top-4 left-4 z-40 p-2 rounded-md bg-blue-600 text-white shadow-lg hover:bg-blue-700"
+          aria-label="Open menu"
+        >
+          <Menu size={24} />
+        </button>
+      )}
+      
       <main 
         className={cn(
           "transition-all duration-300 p-4 md:p-6 lg:p-8 flex-grow",
