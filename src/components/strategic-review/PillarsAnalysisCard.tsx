@@ -59,7 +59,7 @@ const PillarsAnalysisCard: React.FC<PillarsAnalysisCardProps> = ({ tasks }) => {
     <Card>
       <CardHeader>
         <CardTitle>Foco das suas tarefas</CardTitle>
-        <CardDescription className="mt-[55px]">
+        <CardDescription className="!mt-[55px]">
           Este gráfico mostra onde seu foco tem sido: <br/>
           <span className="text-blue-600 font-medium">resolver o que não pode ser ignorado (risco)</span>, <br/>
           <span className="text-orange-600 font-medium">fazer o que te dá orgulho (orgulho)</span> ou <br/>
