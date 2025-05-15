@@ -47,7 +47,7 @@ const Login: React.FC = () => {
       localStorage.setItem('acto_is_logged_in', 'true');
       
       addToast({
-        title: "Faça o login abaixo:",
+        title: "Bem-vindo de volta!",
         description: "Login realizado com sucesso",
       });
       navigate('/dashboard');
@@ -72,7 +72,7 @@ const Login: React.FC = () => {
           </div>
 
           <div className="space-y-2 text-left">
-            <h1 className="text-3xl font-bold tracking-tight">Bem-vindo de volta 👋</h1>
+            <h1 className="text-3xl font-bold tracking-tight">Faça login abaixo:</h1>
             <p className="text-muted-foreground">
               Um novo dia chegou. É hora de continuar sua jornada.
             </p>
