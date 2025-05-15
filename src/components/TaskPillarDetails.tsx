@@ -25,7 +25,7 @@ const TaskPillarDetails: React.FC<TaskPillarDetailsProps> = ({ task }) => {
             "Nenhum orgulho. Só rotina ou tarefa obrigatória."}
       </div>
       
-<div className="rounded-md bg-white px-[10px] py-[3px] text-green-600 border border-green-200 text-[13px] mt-[6px]">
+<div className="rounded-md bg-white px-[10px] py-[3px] text-green-600 border border-green-200 text-[13px] !mt-[6px]">
         <span className="font-medium">Força de construção pessoal:</span> {task.constructionScore} – {task.constructionScore === 5 ? "Essa tarefa solidifica quem eu quero me tornar." : 
                 task.constructionScore === 4 ? "Vai me posicionar num degrau acima da versão atual." :
                 task.constructionScore === 3 ? "Me move um pouco, mas não me desafia." :
