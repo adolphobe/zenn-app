@@ -90,7 +90,7 @@ export const AdvancedFilters: React.FC<Omit<TaskFiltersProps, 'searchQuery' | 's
             <SelectItem value="all">Todas pontuações</SelectItem>
             <SelectItem value="high">Alta (≥ 12)</SelectItem>
             <SelectItem value="medium">Média (8-11)</SelectItem>
-            <SelectItem value="low">Baixa (< 8)</SelectItem>
+            <SelectItem value="low">Baixa (&lt; 8)</SelectItem>
           </SelectContent>
         </Select>
       </div>
