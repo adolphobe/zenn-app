@@ -22,20 +22,6 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
   const { dateDisplayOptions, showHiddenTasks } = state;
   const priorityClass = getTaskPriorityClass(task.totalScore);
   
-  // Determine the border color based on the priority class
-  const getBorderClass = () => {
-    switch (priorityClass) {
-      case 'task-critical': // Red
-        return 'border-red-300';
-      case 'task-important': // Yellow/Orange
-        return 'border-orange-300';
-      case 'task-moderate': // Blue
-        return 'border-blue-300';
-      default:
-        return 'border-border'; // Default border color for light tasks
-    }
-  };
-
   const handleTitleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     setIsEditingTitle(true);
@@ -92,7 +78,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
   return (
     <>
       <div
-        className={`task-card ${priorityClass} ${task.completed ? 'opacity-50' : ''} relative ${getBorderClass()}`}
+        className={`task-card ${priorityClass} ${task.completed ? 'opacity-50' : ''} relative`}
         onClick={() => !isEditingTitle && onToggleExpand(task.id)}
       >
         <TaskCardHeader 

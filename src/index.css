@@ -105,26 +105,27 @@
 
 @layer components {
   .task-card {
-    @apply relative p-6 rounded-xl shadow-sm transition-all duration-200 border border-border hover:shadow-md;
+    @apply relative p-6 rounded-xl shadow-sm transition-all duration-200 border hover:shadow-md;
   }
 
-  /* Updated softer colors for task priority classes */
+  /* Updated task priority classes with matching border colors */
   .task-critical {
-    @apply bg-[#FFEEEE] text-[#B84040];
+    @apply bg-[#FFEEEE] text-[#B84040] border-[#ffcccc];
   }
 
   .task-important {
-    @apply bg-[#FFFAEA] text-[#A07225];
+    @apply bg-[#FFFAEA] text-[#A07225] border-[#ffe8b3];
   }
 
   .task-moderate {
-    @apply bg-[#F0F7FF] text-[#4A7EB5];
+    @apply bg-[#F0F7FF] text-[#4A7EB5] border-[#d0e5ff];
   }
 
   .task-light {
-    @apply bg-acto-light text-acto-light-text;
+    @apply bg-acto-light text-acto-light-text border-border;
   }
 
+  /* Rest of the CSS remains the same */
   .sidebar-item {
     @apply flex items-center gap-2 px-3 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors;
   }
