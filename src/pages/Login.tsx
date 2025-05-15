@@ -167,8 +167,8 @@ const Login: React.FC = () => {
         <div className="h-full w-full relative">
           <AspectRatio ratio={16/9} className="h-full">
             <img
-              src="https://images.unsplash.com/photo-1545987796-200677ee1011?q=80&w=2670&auto=format&fit=crop"
-              alt="Folhagem verde"
+              src="https://images.pexels.com/photos/207237/pexels-photo-207237.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+              alt="Fundo de login"
               className="object-cover w-full h-full"
             />
             <div className="absolute inset-0 bg-gradient-to-r from-primary/30 to-transparent mix-blend-multiply" />
