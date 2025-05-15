@@ -13,6 +13,7 @@ import {
 } from './ui/dropdown-menu';
 import { Button } from './ui/button';
 import { SortDirection } from '../types';
+import { dropdownStyles } from '@/lib/utils';
 
 const SortDropdown: React.FC = () => {
   const { state, setSortOptions } = useAppContext();
@@ -59,22 +60,22 @@ const SortDropdown: React.FC = () => {
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align="end" className="w-56">
-        <DropdownMenuLabel>
+        <DropdownMenuLabel className={dropdownStyles.label}>
           {viewMode === 'power' ? 'Ordenar por Score' : 'Ordenar por Data'}
         </DropdownMenuLabel>
-        <DropdownMenuSeparator />
+        <DropdownMenuSeparator className={dropdownStyles.separator} />
         
         {viewMode === 'power' ? (
           <>
             <DropdownMenuItem
               onClick={() => handleSortDirectionChange('desc')}
-              className={`hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-900/20 dark:hover:text-blue-400 ${sortDirection === 'desc' ? 'bg-accent text-accent-foreground' : ''}`}
+              className={`${dropdownStyles.item} ${sortDirection === 'desc' ? 'bg-accent text-accent-foreground' : ''}`}
             >
               Score: Maior → Menor
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => handleSortDirectionChange('asc')}
-              className={`hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-900/20 dark:hover:text-blue-400 ${sortDirection === 'asc' ? 'bg-accent text-accent-foreground' : ''}`}
+              className={`${dropdownStyles.item} ${sortDirection === 'asc' ? 'bg-accent text-accent-foreground' : ''}`}
             >
               Score: Menor → Maior
             </DropdownMenuItem>
@@ -83,21 +84,21 @@ const SortDropdown: React.FC = () => {
           <>
             <DropdownMenuItem
               onClick={() => handleSortDirectionChange('asc')}
-              className={`hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-900/20 dark:hover:text-blue-400 ${sortDirection === 'asc' ? 'bg-accent text-accent-foreground' : ''}`}
+              className={`${dropdownStyles.item} ${sortDirection === 'asc' ? 'bg-accent text-accent-foreground' : ''}`}
             >
               Data: Próximas primeiro
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => handleSortDirectionChange('desc')}
-              className={`hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-900/20 dark:hover:text-blue-400 ${sortDirection === 'desc' ? 'bg-accent text-accent-foreground' : ''}`}
+              className={`${dropdownStyles.item} ${sortDirection === 'desc' ? 'bg-accent text-accent-foreground' : ''}`}
             >
               Data: Distantes primeiro
             </DropdownMenuItem>
-            <DropdownMenuSeparator />
+            <DropdownMenuSeparator className={dropdownStyles.separator} />
             <DropdownMenuCheckboxItem
               checked={Boolean(noDateAtEnd)}
               onCheckedChange={handleNoDateToggle}
-              className="hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-900/20 dark:hover:text-blue-400"
+              className={dropdownStyles.item}
             >
               Sem data no final
             </DropdownMenuCheckboxItem>

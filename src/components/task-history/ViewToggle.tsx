@@ -3,6 +3,7 @@ import React from 'react';
 import { LayoutGrid, LayoutList } from 'lucide-react';
 import { Toggle } from '@/components/ui/toggle';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { dropdownStyles } from '@/lib/utils';
 
 interface ViewToggleProps {
   viewMode: 'list' | 'grid';
@@ -22,12 +23,12 @@ export const ViewToggle: React.FC<ViewToggleProps> = ({
       <SelectTrigger className="w-auto">
         <SelectValue placeholder="Ordenar por" />
       </SelectTrigger>
-      <SelectContent>
-        <SelectItem value="recent">Mais recentes</SelectItem>
-        <SelectItem value="oldest">Mais antigas</SelectItem>
-        <SelectItem value="highScore">Maior pontuação</SelectItem>
-        <SelectItem value="lowScore">Menor pontuação</SelectItem>
-        <SelectItem value="alphabetical">Alfabética</SelectItem>
+      <SelectContent className="p-1.5">
+        <SelectItem value="recent" className={dropdownStyles.item}>Mais recentes</SelectItem>
+        <SelectItem value="oldest" className={dropdownStyles.item}>Mais antigas</SelectItem>
+        <SelectItem value="highScore" className={dropdownStyles.item}>Maior pontuação</SelectItem>
+        <SelectItem value="lowScore" className={dropdownStyles.item}>Menor pontuação</SelectItem>
+        <SelectItem value="alphabetical" className={dropdownStyles.item}>Alfabética</SelectItem>
       </SelectContent>
     </Select>
     
