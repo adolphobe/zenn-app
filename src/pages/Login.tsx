@@ -67,17 +67,17 @@ const Login: React.FC = () => {
 
   // Animated floating items for the background with random positions and continuous animations
   const floatingItems = Array(7).fill(null).map((_, i) => (
-  <div 
-    key={i}
-    className="absolute rounded-full bg-primary/15 animated-float"
+    <div 
+    className="absolute rounded-full animated-float"
     style={{
+      backgroundColor: 'rgba(142, 206, 234, 0.2)',
       width: `${Math.random() * 100 + 50}px`,
       height: `${Math.random() * 100 + 50}px`,
       left: `${Math.random() * 70}%`,
       top: `${Math.random() * 100}%`,
       animationDelay: `${Math.random() * 2}s`,
-      animationDuration: `${Math.random() * 6 + 6}s`, // ← mais rápido
-      opacity: Math.random() * 0.9 + 1.0,
+      animationDuration: `${Math.random() * 10 + 10}s`,
+      opacity: Math.random() * 0.4 + 0.3,
     }}
   />
 ));
