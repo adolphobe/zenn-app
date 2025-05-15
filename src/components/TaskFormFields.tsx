@@ -121,9 +121,9 @@ const TaskFormFields: React.FC<TaskFormFieldsProps> = ({
         </div>
         
         {/* Right column with score and date */}
-        <div className="space-y-6 mt-[35px]">
+        <div className="space-y-6 mt-[33px]">
           {/* Score display now comes first */}
-          <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg shadow-sm">
+          <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg shadow-sm p-[37px]">
             <TaskScoreDisplay score={totalScore} />
           </div>
           
