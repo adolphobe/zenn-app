@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { cn } from "@/lib/utils";
 import { Slider } from "@/components/ui/slider";
@@ -68,9 +67,6 @@ const RatingSlider: React.FC<RatingSliderProps> = ({
   };
 
   return (
-    <label htmlFor="title" className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
-      Avalie o peso da tarefa:
-      </label>
     <div className={cn("rounded-lg p-5 mb-6 transition-all", styles.bg, className)}>
       <div className="flex justify-between items-center mb-3">
         <h3 className={cn("font-medium text-sm", styles.text)}>{label}</h3>
