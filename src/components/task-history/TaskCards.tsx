@@ -34,6 +34,19 @@ export const CompletedTaskCard: React.FC<{ task: Task }> = ({ task }) => {
     return max.name;
   };
 
+  // Determine border color based on task score
+  const getBorderColor = () => {
+    if (task.totalScore >= 12) { // Critical
+      return 'border-l-red-300';
+    } else if (task.totalScore >= 9) { // Important
+      return 'border-l-orange-300';
+    } else if (task.totalScore >= 6) { // Moderate
+      return 'border-l-blue-300';
+    } else {
+      return 'border-l-gray-300'; // Default
+    }
+  };
+
   const dominantPillar = getDominantPillar();
   const pillarColors = {
     consequência: 'bg-orange-100 text-orange-800 border-orange-200',
@@ -65,7 +78,7 @@ export const CompletedTaskCard: React.FC<{ task: Task }> = ({ task }) => {
 
   return (
     <Card 
-      className="mb-3 border-l-4 border-l-gray-300" 
+      className={`mb-3 border-l-4 ${getBorderColor()}`}
       onClick={() => toggleTaskExpanded(task.id)}
     >
       <CardContent className="pt-4">
