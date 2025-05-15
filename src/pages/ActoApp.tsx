@@ -33,21 +33,24 @@ const ActoApp: React.FC = () => {
   }, [isMobile, location.pathname]);
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 flex">
       <Sidebar />
       <main 
         className={cn(
-          "transition-all duration-300 p-4 md:p-6 lg:p-8",
+          "transition-all duration-300 p-4 md:p-6 lg:p-8 flex-grow",
           sidebarOpen 
             ? isMobile ? "ml-0" : "md:ml-64" 
-            : isMobile ? "ml-0" : "md:ml-20"
+            : isMobile ? "ml-0" : "md:ml-20",
+          "flex justify-center" // Add this to center the content horizontally
         )}
       >
-        {isDashboardRoute ? (
-          <Dashboard />
-        ) : (
-          <Outlet />
-        )}
+        <div className="w-full max-w-6xl"> {/* Add a container with max width to center content */}
+          {isDashboardRoute ? (
+            <Dashboard />
+          ) : (
+            <Outlet />
+          )}
+        </div>
       </main>
     </div>
   );

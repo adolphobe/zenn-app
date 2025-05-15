@@ -13,7 +13,7 @@ import { useExpandedTask } from '@/context/hooks';
 
 const Dashboard: React.FC = () => {
   const { state } = useAppContext();
-  const { tasks, viewMode, showHiddenTasks, sidebarOpen, sortOptions } = state;
+  const { tasks, viewMode, showHiddenTasks, sortOptions } = state;
   const isMobile = useIsMobile();
   const location = useLocation();
   const [isTaskFormOpen, setIsTaskFormOpen] = useState(false);
@@ -24,12 +24,7 @@ const Dashboard: React.FC = () => {
   
   // If on strategic review route, render that component
   if (isStrategicReview) {
-    return (
-      <main className={`transition-all duration-300 min-h-screen bg-background
-        ${sidebarOpen ? (isMobile ? 'ml-0' : 'ml-64') : 'ml-0 md:ml-20'}`}>
-        <StrategicReview />
-      </main>
-    );
+    return <StrategicReview />;
   }
 
   // Sort and filter tasks
@@ -40,52 +35,49 @@ const Dashboard: React.FC = () => {
   );
 
   return (
-    <main className={`transition-all duration-300 min-h-screen bg-background
-      ${sidebarOpen ? (isMobile ? 'ml-0' : 'ml-64') : 'ml-0 md:ml-20'}`}>
-      <div className="p-4 md:p-6 lg:p-8">
-        <div className="mb-6 flex justify-between items-center">
-          <h1 className="text-2xl font-bold tracking-tight">
-            {viewMode === 'power' ? 'Modo Potência' : 'Modo Cronológico'}
-          </h1>
-          <div className="flex items-center gap-2">
-            <SortDropdown />
-            
-            {isTaskFormOpen ? (
-              <TaskForm onClose={() => setIsTaskFormOpen(false)} />
-            ) : (
-              <button
-                onClick={() => setIsTaskFormOpen(true)}
-                className="flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                <Plus size={18} />
-                <span>Nova Tarefa</span>
-              </button>
-            )}
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 gap-4 md:gap-6">
-          {filteredTasks.map(task => (
-            <TaskCard 
-              key={task.id} 
-              task={task} 
-              isExpanded={isTaskExpanded(task.id)} 
-              onToggleExpand={toggleTaskExpanded} 
-            />
-          ))}
+    <>
+      <div className="mb-6 flex justify-between items-center">
+        <h1 className="text-2xl font-bold tracking-tight">
+          {viewMode === 'power' ? 'Modo Potência' : 'Modo Cronológico'}
+        </h1>
+        <div className="flex items-center gap-2">
+          <SortDropdown />
           
-          {filteredTasks.length === 0 && (
-            <div className="text-center py-12 border border-dashed rounded-lg bg-muted/30 border-border">
-              <p className="text-muted-foreground">
-                {showHiddenTasks 
-                  ? 'Nenhuma tarefa encontrada. Adicione sua primeira tarefa!' 
-                  : 'Nenhuma tarefa visível. Você pode habilitar tarefas ocultas nas configurações.'}
-              </p>
-            </div>
+          {isTaskFormOpen ? (
+            <TaskForm onClose={() => setIsTaskFormOpen(false)} />
+          ) : (
+            <button
+              onClick={() => setIsTaskFormOpen(true)}
+              className="flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              <Plus size={18} />
+              <span>Nova Tarefa</span>
+            </button>
           )}
         </div>
       </div>
-    </main>
+
+      <div className="grid grid-cols-1 gap-4 md:gap-6">
+        {filteredTasks.map(task => (
+          <TaskCard 
+            key={task.id} 
+            task={task} 
+            isExpanded={isTaskExpanded(task.id)} 
+            onToggleExpand={toggleTaskExpanded} 
+          />
+        ))}
+        
+        {filteredTasks.length === 0 && (
+          <div className="text-center py-12 border border-dashed rounded-lg bg-muted/30 border-border">
+            <p className="text-muted-foreground">
+              {showHiddenTasks 
+                ? 'Nenhuma tarefa encontrada. Adicione sua primeira tarefa!' 
+                : 'Nenhuma tarefa visível. Você pode habilitar tarefas ocultas nas configurações.'}
+            </p>
+          </div>
+        )}
+      </div>
+    </>
   );
 };
 
