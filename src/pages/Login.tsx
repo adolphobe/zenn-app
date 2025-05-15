@@ -75,8 +75,8 @@ const Login: React.FC = () => {
         height: `${Math.random() * 100 + 50}px`,
         left: `${Math.random() * 70}%`,
         top: `${Math.random() * 100}%`,
-        animationDelay: `${Math.random() * 10}s`,
-        animationDuration: `${Math.random() * 20 + 30}s`,
+        animationDelay: `${Math.random() * 1}s`,
+        animationDuration: `${Math.random() * 10 + 20}s`,
         opacity: Math.random() * 0.4 + 0.3,
       }}
     />
