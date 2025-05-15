@@ -25,6 +25,30 @@ const Sidebar: React.FC = () => {
     }
   }, [isMobile]);
 
+  // Add animation styles to the document head
+  useEffect(() => {
+    // Create a style element for the animation
+    const styleElement = document.createElement('style');
+    styleElement.innerHTML = `
+      @keyframes slideInFromLeft {
+        0% {
+          transform: translateX(-100%);
+          opacity: 0.5;
+        }
+        100% {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+    `;
+    document.head.appendChild(styleElement);
+    
+    // Clean up when component unmounts
+    return () => {
+      document.head.removeChild(styleElement);
+    };
+  }, []);
+
   if (!sidebarOpen && isMobile) {
     return null; // Don't render sidebar at all on mobile when closed
   }
@@ -58,19 +82,6 @@ const Sidebar: React.FC = () => {
         
         <SidebarUserProfile sidebarOpen={sidebarOpen} />
       </div>
-      
-      <style jsx>{`
-        @keyframes slideInFromLeft {
-          0% {
-            transform: translateX(-100%);
-            opacity: 0.5;
-          }
-          100% {
-            transform: translateX(0);
-            opacity: 1;
-          }
-        }
-      `}</style>
     </>
   );
 };
