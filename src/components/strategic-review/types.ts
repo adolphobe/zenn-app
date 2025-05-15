@@ -4,6 +4,7 @@ export type PeriodType = 'today' | 'week' | 'month' | 'custom';
 export interface InsightMessage {
   id: string;
   title: string;
+  classification: 'prioridade_alta' | 'equilibrado' | 'negligenciado';
   messages: string[];
 }
 

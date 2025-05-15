@@ -67,21 +67,24 @@ export const useInsightsAnalysis = (tasks: Task[]): PillarDataType => {
     const consequenceClassification = getClassification(avgConsequence, HIGH_THRESHOLD, LOW_THRESHOLD);
     insights.push({
       id: 'consequence',
-      title: getClassificationTitle('Consequência', consequenceClassification),
+      title: 'Consequência de Ignorar',
+      classification: consequenceClassification,
       messages: [PILLAR_MESSAGES.consequence[consequenceClassification]]
     });
     
     const prideClassification = getClassification(avgPride, HIGH_THRESHOLD, LOW_THRESHOLD);
     insights.push({
       id: 'pride',
-      title: getClassificationTitle('Orgulho', prideClassification),
+      title: 'Orgulho pós execução',
+      classification: prideClassification, 
       messages: [PILLAR_MESSAGES.pride[prideClassification]]
     });
     
     const constructionClassification = getClassification(avgConstruction, HIGH_THRESHOLD, LOW_THRESHOLD);
     insights.push({
       id: 'construction',
-      title: getClassificationTitle('Construção', constructionClassification),
+      title: 'Força de Construção pessoal',
+      classification: constructionClassification,
       messages: [PILLAR_MESSAGES.construction[constructionClassification]]
     });
     
@@ -99,23 +102,6 @@ function getClassification(value: number, highThreshold: number, lowThreshold: n
   if (value >= highThreshold) return 'prioridade_alta';
   if (value <= lowThreshold) return 'negligenciado';
   return 'equilibrado';
-}
-
-// Helper function to get title with appropriate emoji
-function getClassificationTitle(pillarName: string, classification: 'prioridade_alta' | 'equilibrado' | 'negligenciado'): string {
-  const emoji = classification === 'prioridade_alta' 
-    ? '🟢' 
-    : classification === 'negligenciado' 
-      ? '🔴' 
-      : '🔵';
-  
-  const status = classification === 'prioridade_alta' 
-    ? 'Priorizado' 
-    : classification === 'negligenciado' 
-      ? 'Negligenciado' 
-      : 'Equilibrado';
-  
-  return `${emoji} ${pillarName} - ${status}`;
 }
 
 // Export COLORS for other components

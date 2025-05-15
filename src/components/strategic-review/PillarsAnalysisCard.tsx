@@ -18,15 +18,41 @@ const PillarsAnalysisCard: React.FC<PillarsAnalysisCardProps> = ({ tasks }) => {
   // Use the pillar hover hook to handle dynamic insights
   const { activeInsight, handlePillarHover } = usePillarHover(pillarData.insights, 'consequence');
   
-  // Function to determine background gradient based on insight title
-  const getBackgroundGradient = (title: string) => {
-    if (title.includes('🟢')) {
-      return 'linear-gradient(to right, rgba(240, 253, 244, 0.5), rgba(187, 247, 208, 0.3))';
-    } else if (title.includes('🔴')) {
-      return 'linear-gradient(to right, rgba(254, 242, 242, 0.5), rgba(254, 226, 226, 0.3))';
-    } else {
-      return 'linear-gradient(to right, rgba(240, 249, 255, 0.5), rgba(186, 230, 253, 0.3))';
+  // Function to determine background gradient based on insight id
+  const getBackgroundGradient = (id: string) => {
+    switch (id) {
+      case 'consequence':
+        return 'linear-gradient(to right, rgba(210, 230, 255, 0.5), rgba(180, 210, 250, 0.3))'; // Subtle blue
+      case 'pride':
+        return 'linear-gradient(to right, rgba(255, 230, 210, 0.5), rgba(255, 210, 180, 0.3))'; // Subtle orange
+      case 'construction':
+        return 'linear-gradient(to right, rgba(210, 255, 220, 0.5), rgba(180, 250, 210, 0.3))'; // Subtle green
+      default:
+        return 'linear-gradient(to right, rgba(240, 240, 240, 0.5), rgba(230, 230, 230, 0.3))';
     }
+  };
+  
+  // Function to get pillar title based on id
+  const getPillarTitle = (id: string, classification: string) => {
+    const titles = {
+      consequence: 'Consequência de Ignorar',
+      pride: 'Orgulho pós execução',
+      construction: 'Força de Construção pessoal'
+    };
+    
+    const emoji = classification === 'prioridade_alta' 
+      ? '🟢' 
+      : classification === 'negligenciado' 
+        ? '🔴' 
+        : '🔵';
+    
+    const status = classification === 'prioridade_alta' 
+      ? 'Priorizado' 
+      : classification === 'negligenciado' 
+        ? 'Negligenciado' 
+        : 'Equilibrado';
+    
+    return `${emoji} ${titles[id as keyof typeof titles]} - ${status}`;
   };
   
   return (
@@ -93,12 +119,14 @@ const PillarsAnalysisCard: React.FC<PillarsAnalysisCardProps> = ({ tasks }) => {
             <div 
               className="border rounded-lg p-4 animate-fade-in"
               style={{ 
-                background: getBackgroundGradient(activeInsight.title),
+                background: getBackgroundGradient(activeInsight.id),
                 animationDuration: '0.3s',
                 transition: 'background 0.3s ease'
               }}
             >
-              <h4 className="font-medium mb-3 text-base">{activeInsight.title}</h4>
+              <h4 className="font-medium mb-3 text-base">
+                {getPillarTitle(activeInsight.id, activeInsight.classification)}
+              </h4>
               {activeInsight.messages.map((message, msgIndex) => (
                 <p key={msgIndex} className="text-sm text-muted-foreground">{message}</p>
               ))}
