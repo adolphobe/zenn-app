@@ -27,15 +27,29 @@ const TaskFormTabs: React.FC<TaskFormTabsProps> = ({
   taskId,
   task
 }) => {
-  // Prevent the tab click from bubbling up to the modal's backdrop
+  // Prevenir a propagação de eventos para o modal
   const handleTabClick = (e: React.MouseEvent, value: string) => {
+    e.preventDefault();
     e.stopPropagation();
+    console.log('Tab clicked:', value);
     setActiveTab(value);
   };
 
+  // Prevenir a propagação de eventos para o conteúdo da tab
+  const handleTabContentClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    console.log('Tab content clicked');
+  };
+
   return (
-    <Tabs defaultValue="levels" className="w-full" value={activeTab} onValueChange={setActiveTab}>
-      <TabsList className="grid w-full grid-cols-2 mb-4">
+    <Tabs 
+      defaultValue="levels" 
+      className="w-full" 
+      value={activeTab} 
+      onValueChange={setActiveTab}
+      onClick={(e) => e.stopPropagation()}
+    >
+      <TabsList className="grid w-full grid-cols-2 mb-4" onClick={(e) => e.stopPropagation()}>
         <TabsTrigger 
           value="levels" 
           onClick={(e) => handleTabClick(e, "levels")}
@@ -50,7 +64,7 @@ const TaskFormTabs: React.FC<TaskFormTabsProps> = ({
         </TabsTrigger>
       </TabsList>
       
-      <TabsContent value="levels" className="space-y-6">
+      <TabsContent value="levels" className="space-y-6" onClick={handleTabContentClick}>
         <TaskFormFields 
           formData={formData} 
           handleChange={handleChange} 
@@ -59,11 +73,11 @@ const TaskFormTabs: React.FC<TaskFormTabsProps> = ({
         />
       </TabsContent>
       
-      <TabsContent value="comments">
+      <TabsContent value="comments" onClick={handleTabContentClick}>
         {taskId && (
-          <div className="space-y-4">
+          <div className="space-y-4" onClick={(e) => e.stopPropagation()}>
             {task && task.comments && task.comments.length > 0 && (
-              <div>
+              <div onClick={(e) => e.stopPropagation()}>
                 <TaskComments taskId={taskId} comments={task.comments} />
               </div>
             )}
