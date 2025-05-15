@@ -1,9 +1,11 @@
+
 // src/components/TaskCardHeader.tsx
 import React from 'react';
 import { formatDate } from '@/utils';
 import { DateDisplayOptions } from '@/types';
 import TaskCardTitle from './TaskCardTitle';
 import { Eye } from 'lucide-react';
+import { useAppContext } from '@/context/AppContext';
 
 interface TaskCardHeaderProps {
   title: string;
@@ -34,6 +36,8 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
   onTitleBlur,
   onTitleKeyDown
 }) => {
+  const { state: { showPillars } } = useAppContext();
+  
   return (
     <>
       {/* Eye icon for hidden tasks that are only visible because of the filter - now with reduced opacity */}
@@ -69,13 +73,15 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
         </div>
       </div>
       
-      <div className="mt-2 text-xs flex flex-wrap gap-2">
-        <span>Consequência: {totalScore ? Math.floor(totalScore / 3) : 0}</span>
-        <span>|</span>
-        <span>Orgulho: {totalScore ? Math.floor(totalScore / 3) : 0}</span>
-        <span>|</span>
-        <span>Construção: {totalScore ? Math.ceil(totalScore / 3) : 0}</span>
-      </div>
+      {showPillars && (
+        <div className="mt-2 text-xs flex flex-wrap gap-2">
+          <span>Consequência: {totalScore ? Math.floor(totalScore / 3) : 0}</span>
+          <span>|</span>
+          <span>Orgulho: {totalScore ? Math.floor(totalScore / 3) : 0}</span>
+          <span>|</span>
+          <span>Construção: {totalScore ? Math.ceil(totalScore / 3) : 0}</span>
+        </div>
+      )}
     </>
   );
 };

@@ -1,3 +1,4 @@
+
 import { Task, TaskFormData, ViewMode, DateDisplayOptions, SortDirection } from '../types';
 
 // Actions
@@ -10,6 +11,7 @@ export type Action =
   | { type: 'UPDATE_TASK_TITLE'; payload: { id: string; title: string } }
   | { type: 'SET_VIEW_MODE'; payload: ViewMode }
   | { type: 'TOGGLE_SHOW_HIDDEN_TASKS' }
+  | { type: 'TOGGLE_SHOW_PILLARS' }
   | { type: 'TOGGLE_DARK_MODE' }
   | { type: 'TOGGLE_SIDEBAR' }
   | { type: 'UPDATE_DATE_DISPLAY_OPTIONS'; payload: DateDisplayOptions }
@@ -36,6 +38,7 @@ export interface AppContextType {
   updateTaskTitle: (id: string, title: string) => void;
   setViewMode: (mode: ViewMode) => void;
   toggleShowHiddenTasks: () => void;
+  toggleShowPillars: () => void;
   toggleDarkMode: () => void;
   toggleSidebar: () => void;
   updateDateDisplayOptions: (options: DateDisplayOptions) => void;
@@ -50,6 +53,7 @@ export interface AppState {
   tasks: Task[];
   viewMode: ViewMode;
   showHiddenTasks: boolean;
+  showPillars: boolean;
   darkMode: boolean;
   sidebarOpen: boolean;
   dateDisplayOptions: {

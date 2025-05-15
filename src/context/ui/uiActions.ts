@@ -11,6 +11,10 @@ export const toggleShowHiddenTasks = (dispatch: AppDispatch) => {
   dispatch({ type: 'TOGGLE_SHOW_HIDDEN_TASKS' });
 };
 
+export const toggleShowPillars = (dispatch: AppDispatch) => {
+  dispatch({ type: 'TOGGLE_SHOW_PILLARS' });
+};
+
 export const toggleDarkMode = (dispatch: AppDispatch) => {
   dispatch({ type: 'TOGGLE_DARK_MODE' });
 };
