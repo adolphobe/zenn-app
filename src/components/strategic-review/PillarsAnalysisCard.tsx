@@ -62,8 +62,11 @@ const PillarsAnalysisCard: React.FC<PillarsAnalysisCardProps> = ({ tasks }) => {
         <CardDescription className="!mt-[25px]">
           As notas que você dá ao criar cada tarefa mostram o que importa pra você: <br/>
 
-           Este gráfico mostra onde você tem colocado sua atenção: <b  className="text-blue-600 font-medium">no que é urgente</b>, no que te trás <b className="text-orange-600 font-medium">satisfação pessoal</b>b> ou no que te <b className="text-green-600 font-medium">leva pro próximo nível</b>.
-.
+           Este gráfico mostra onde você tem colocado sua atenção:<br><br>
+          <b className="text-blue-600 font-medium">no que é urgente</b>, <br>
+          no que te trás <b className="text-orange-600 font-medium">satisfação pessoal</b><br>
+          ou no que te <b className="text-green-600 font-medium">leva pro próximo nível</b>.
+
         </CardDescription>
       </CardHeader>
       <CardContent>
