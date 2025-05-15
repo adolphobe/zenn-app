@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -107,16 +108,17 @@
     @apply relative p-6 rounded-xl shadow-sm transition-all duration-200 border border-border hover:shadow-md;
   }
 
+  /* Updated softer colors for task priority classes */
   .task-critical {
-    @apply bg-acto-critical text-acto-critical-text;
+    @apply bg-[#FFEEEE] text-[#B84040];
   }
 
   .task-important {
-    @apply bg-acto-important text-acto-important-text;
+    @apply bg-[#FFFAEA] text-[#A07225];
   }
 
   .task-moderate {
-    @apply bg-acto-moderate text-acto-moderate-text;
+    @apply bg-[#F0F7FF] text-[#4A7EB5];
   }
 
   .task-light {

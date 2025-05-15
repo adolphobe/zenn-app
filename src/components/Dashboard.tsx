@@ -8,6 +8,7 @@ import SortDropdown from './SortDropdown';
 import StrategicReview from '../pages/StrategicReview';
 import { useLocation } from 'react-router-dom';
 import { sortTasks } from '@/utils';
+import { Plus } from 'lucide-react';
 
 const Dashboard: React.FC = () => {
   const { state } = useAppContext();
@@ -44,16 +45,21 @@ const Dashboard: React.FC = () => {
           <h1 className="text-2xl font-bold tracking-tight">
             {viewMode === 'power' ? 'Modo Potência' : 'Modo Cronológico'}
           </h1>
-          {isTaskFormOpen ? (
-            <TaskForm onClose={() => setIsTaskFormOpen(false)} />
-          ) : (
-            <button
-              onClick={() => setIsTaskFormOpen(true)}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              Nova Tarefa
-            </button>
-          )}
+          <div className="flex items-center gap-2">
+            <SortDropdown />
+            
+            {isTaskFormOpen ? (
+              <TaskForm onClose={() => setIsTaskFormOpen(false)} />
+            ) : (
+              <button
+                onClick={() => setIsTaskFormOpen(true)}
+                className="flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                <Plus size={18} />
+                <span>Nova Tarefa</span>
+              </button>
+            )}
+          </div>
         </div>
 
         <div className="grid grid-cols-1 gap-4 md:gap-6">
@@ -71,12 +77,6 @@ const Dashboard: React.FC = () => {
             </div>
           )}
         </div>
-        
-        {filteredTasks.length > 0 && (
-          <div className="mt-6 flex flex-wrap gap-2 justify-end">
-            <SortDropdown />
-          </div>
-        )}
       </div>
     </main>
   );
