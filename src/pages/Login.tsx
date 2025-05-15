@@ -67,20 +67,20 @@ const Login: React.FC = () => {
 
   // Animated floating items for the background with random positions and continuous animations
   const floatingItems = Array(7).fill(null).map((_, i) => (
-    <div 
-      key={i}
-      className="absolute rounded-full bg-primary/5 animated-float"
-      style={{
-        width: `${Math.random() * 100 + 50}px`,
-        height: `${Math.random() * 100 + 50}px`,
-        left: `${Math.random() * 70}%`,
-        top: `${Math.random() * 100}%`,
-        animationDelay: `${Math.random() * 2}s`,
-        animationDuration: `${Math.random() * 20 + 30}s`,
-        opacity: Math.random() * 0.4 + 0.3,
-      }}
-    />
-  ));
+  <div 
+    key={i}
+    className="absolute rounded-full bg-primary/5 animated-float"
+    style={{
+      width: `${Math.random() * 100 + 50}px`,
+      height: `${Math.random() * 100 + 50}px`,
+      left: `${Math.random() * 70}%`,
+      top: `${Math.random() * 100}%`,
+      animationDelay: `${Math.random() * 2}s`,
+      animationDuration: `${Math.random() * 10 + 10}s`, // ← mais rápido
+      opacity: Math.random() * 0.4 + 0.3,
+    }}
+  />
+));
 
   return (
     <div className="flex min-h-screen bg-gradient-to-b from-white to-blue-50 dark:from-gray-950 dark:to-gray-900 overflow-hidden relative">
