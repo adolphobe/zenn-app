@@ -72,12 +72,17 @@ const StrategicReview: React.FC = () => {
         
         {/* Single TabsContent that updates based on the filter */}
         <TabsContent value={period} className="space-y-6">
-          <div className="grid gap-6 lg:grid-cols-2">
-            <TaskSummaryCard tasks={filteredTasks} />
-            <PillarsAnalysisCard tasks={filteredTasks} />
-          </div>
-          <div className="grid gap-6">
-            <FeedbackAnalysisCard tasks={filteredTasks} />
+          <div className="grid gap-6 md:grid-cols-2">
+            {/* Left column */}
+            <div className="space-y-6">
+              <TaskSummaryCard tasks={filteredTasks} />
+              <FeedbackAnalysisCard tasks={filteredTasks} />
+            </div>
+            
+            {/* Right column */}
+            <div>
+              <PillarsAnalysisCard tasks={filteredTasks} />
+            </div>
           </div>
         </TabsContent>
       </Tabs>

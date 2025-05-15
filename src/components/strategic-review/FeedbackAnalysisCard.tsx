@@ -14,16 +14,6 @@ const FeedbackAnalysisCard: React.FC<FeedbackAnalysisCardProps> = ({ tasks }) =>
   // Use the feedback analysis hook
   const feedbackData = useFeedbackAnalysis(tasks);
   
-  // Get background gradient based on top feedback type
-  const getInsightBackground = (topFeedback: string) => {
-    switch (topFeedback) {
-      case 'transformed': return GRADIENTS.transformed;
-      case 'relief': return GRADIENTS.relief;
-      case 'obligation': return GRADIENTS.obligation;
-      default: return GRADIENTS.relief;
-    }
-  };
-  
   return (
     <Card className="overflow-hidden border-none shadow-md">
       <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 pb-2">
@@ -81,29 +71,22 @@ const FeedbackAnalysisCard: React.FC<FeedbackAnalysisCardProps> = ({ tasks }) =>
                 </div>
               )}
               
-              {/* Legend */}
+              {/* Legend Box */}
               {feedbackData.withFeedback && (
-                <div className="mt-4 flex justify-center gap-6">
-                  {feedbackData.distribution.map((entry, index) => (
-                    <div key={index} className="flex items-center">
-                      <div className="mr-2 h-3 w-3 rounded-full" style={{ backgroundColor: entry.color }} />
-                      <span className="text-sm">{entry.name}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-              
-              {/* Insight */}
-              {feedbackData.insight && (
-                <div 
-                  className="mt-6 rounded-md p-4 animate-fade-in"
-                  style={{ 
-                    background: getInsightBackground(feedbackData.topFeedback),
-                    animationDuration: '0.3s',
-                    transition: 'background 0.3s ease'
-                  }}
-                >
-                  <p className="text-sm">{feedbackData.insight}</p>
+                <div className="mt-4 p-3 bg-muted/20 rounded-md">
+                  <div className="flex justify-center gap-6 mb-3">
+                    {feedbackData.distribution.map((entry, index) => (
+                      <div key={index} className="flex items-center">
+                        <div className="mr-2 h-3 w-3 rounded-full" style={{ backgroundColor: entry.color }} />
+                        <span className="text-sm">{entry.name}</span>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  {/* Insight */}
+                  {feedbackData.insight && (
+                    <p className="text-sm text-center">{feedbackData.insight}</p>
+                  )}
                 </div>
               )}
             </>
