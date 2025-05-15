@@ -1,3 +1,4 @@
+
 import { Task, DateDisplayOptions, ViewMode, SortDirection, SortOption } from './types';
 
 export const formatDate = (date: Date | null, options?: DateDisplayOptions): string => {
@@ -7,34 +8,22 @@ export const formatDate = (date: Date | null, options?: DateDisplayOptions): str
   
   if (hideDate) return '';
   
-  // Formatação da data
-  let result = '';
+  const formatOptions: Intl.DateTimeFormatOptions = {};
   
   if (!hideDate) {
-    const day = date.getDate().toString().padStart(2, '0');
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    
-    result = `${day}/${month}`;
-    
+    formatOptions.day = '2-digit';
+    formatOptions.month = '2-digit';
     if (!hideYear) {
-      const year = date.getFullYear();
-      result += `/${year}`;
+      formatOptions.year = 'numeric';
     }
   }
   
-  // Adicionar horário sem vírgula
   if (!hideTime) {
-    const hours = date.getHours().toString().padStart(2, '0');
-    const minutes = date.getMinutes().toString().padStart(2, '0');
-    
-    if (result) {
-      result += ' '; // Espaço em vez de vírgula
-    }
-    
-    result += `${hours}:${minutes}`;
+    formatOptions.hour = '2-digit';
+    formatOptions.minute = '2-digit';
   }
   
-  return result;
+  return new Intl.DateTimeFormat('pt-BR', formatOptions).format(date);
 };
 
 export const getTaskPriorityClass = (score: number): string => {
