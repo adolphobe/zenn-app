@@ -9,7 +9,6 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
   DropdownMenuLabel,
-  DropdownMenuCheckboxItem
 } from './ui/dropdown-menu';
 import { Button } from './ui/button';
 import { SortDirection } from '../types';
@@ -21,29 +20,9 @@ const SortDropdown: React.FC = () => {
   
   const currentSortOptions = sortOptions[viewMode];
   const sortDirection = currentSortOptions.sortDirection;
-  // Using optional chaining for noDateAtEnd to avoid TypeScript errors
-  const noDateAtEnd = viewMode === 'chronological' 
-    ? (currentSortOptions as { sortDirection: SortDirection; noDateAtEnd: boolean }).noDateAtEnd 
-    : false;
   
   const handleSortDirectionChange = (direction: SortDirection) => {
-    if (viewMode === 'chronological') {
-      setSortOptions({ 
-        sortDirection: direction,
-        noDateAtEnd: noDateAtEnd
-      });
-    } else {
-      setSortOptions({ sortDirection: direction });
-    }
-  };
-  
-  const handleNoDateToggle = () => {
-    if (viewMode === 'chronological') {
-      setSortOptions({ 
-        sortDirection,
-        noDateAtEnd: !noDateAtEnd 
-      });
-    }
+    setSortOptions({ sortDirection: direction });
   };
 
   return (
@@ -94,14 +73,6 @@ const SortDropdown: React.FC = () => {
             >
               Data: Distantes primeiro
             </DropdownMenuItem>
-            <DropdownMenuSeparator className={dropdownStyles.separator} />
-            <DropdownMenuCheckboxItem
-              checked={Boolean(noDateAtEnd)}
-              onCheckedChange={handleNoDateToggle}
-              className={dropdownStyles.item}
-            >
-              Sem data no final
-            </DropdownMenuCheckboxItem>
           </>
         )}
       </DropdownMenuContent>

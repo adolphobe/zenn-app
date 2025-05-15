@@ -1,6 +1,6 @@
 
 import React, { useEffect } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import Dashboard from '../components/Dashboard';
 import { useAppContext } from '../context/AppContext';
@@ -13,7 +13,17 @@ const ActoApp: React.FC = () => {
   const { sidebarOpen } = state;
   const isMobile = useIsMobile();
   const location = useLocation();
+  const navigate = useNavigate();
   const isDashboardRoute = location.pathname === '/' || location.pathname === '/dashboard';
+
+  // Check if user is logged in (this is just a mock check)
+  const isLoggedIn = localStorage.getItem('acto_is_logged_in') === 'true';
+
+  useEffect(() => {
+    if (!isLoggedIn) {
+      navigate('/login');
+    }
+  }, [isLoggedIn, navigate]);
 
   // Close sidebar on route change if on mobile
   useEffect(() => {
