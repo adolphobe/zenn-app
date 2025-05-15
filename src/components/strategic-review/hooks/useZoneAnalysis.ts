@@ -39,13 +39,14 @@ export const useZoneAnalysis = (tasks: Task[]) => {
 
   // Calculate task statistics
   const taskStats = useMemo(() => {
-    if (tasks.length === 0) return { avgTotal: 0, highConsequence: 0, highPride: 0 };
+    if (tasks.length === 0) return { avgTotal: 0, highConsequence: 0, highPride: 0, criticalCount: 0 };
     
     const avgTotal = tasks.reduce((sum, task) => sum + task.totalScore, 0) / tasks.length;
     const highConsequence = tasks.filter(task => task.consequenceScore >= 4).length;
     const highPride = tasks.filter(task => task.prideScore === 5).length;
+    const criticalCount = tasks.filter(task => task.totalScore >= 14).length;
     
-    return { avgTotal, highConsequence, highPride };
+    return { avgTotal, highConsequence, highPride, criticalCount };
   }, [tasks]);
 
   return {
