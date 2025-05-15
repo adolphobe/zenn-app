@@ -8,6 +8,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { RefreshCw } from 'lucide-react';
 import { useAppContext } from '@/context/AppContext';
+import { useExpandedTask } from '@/context/hooks';
 
 interface TaskGroup {
   label: string;
@@ -16,8 +17,9 @@ interface TaskGroup {
 
 // Task card component
 export const CompletedTaskCard: React.FC<{ task: Task }> = ({ task }) => {
-  const [expanded, setExpanded] = useState(false);
   const { restoreTask } = useAppContext();
+  const { expandedTaskId, toggleTaskExpanded, isTaskExpanded } = useExpandedTask();
+  const expanded = isTaskExpanded(task.id);
 
   // Determine dominant pillar based on scores
   const getDominantPillar = () => {
@@ -62,7 +64,10 @@ export const CompletedTaskCard: React.FC<{ task: Task }> = ({ task }) => {
   };
 
   return (
-    <Card className="mb-3 border-l-4 border-l-gray-300" onClick={() => setExpanded(!expanded)}>
+    <Card 
+      className="mb-3 border-l-4 border-l-gray-300" 
+      onClick={() => toggleTaskExpanded(task.id)}
+    >
       <CardContent className="pt-4">
         <div className="flex justify-between items-start">
           <div>
@@ -78,11 +83,11 @@ export const CompletedTaskCard: React.FC<{ task: Task }> = ({ task }) => {
               </Badge>
             )}
             <Badge
-  className={`${pillarColors[dominantPillar] || 'bg-gray-100 text-gray-800'} hidden`}
-  variant="outline"
->
-  {dominantPillar}
-</Badge>
+              className={`${pillarColors[dominantPillar] || 'bg-gray-100 text-gray-800'} hidden`}
+              variant="outline"
+            >
+              {dominantPillar}
+            </Badge>
             <Badge variant="outline" className="bg-gray-100 text-gray-800">
               {task.totalScore}/15
             </Badge>
@@ -90,16 +95,44 @@ export const CompletedTaskCard: React.FC<{ task: Task }> = ({ task }) => {
         </div>
 
         {expanded && (
-          <div className="mt-4 flex justify-end">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="flex items-center gap-1"
-              onClick={handleRestore}
-            >
-              <RefreshCw size={16} />
-              Restaurar
-            </Button>
+          <div className="mt-4 animate-fade-in">
+            <div className="space-y-3 text-sm">
+              <div className="rounded-md bg-white px-3 py-2 text-blue-600 border border-blue-200">
+                <span className="font-medium">Consequência de Ignorar:</span> {task.consequenceScore} – {task.consequenceScore === 5 ? "Vou me sentir bem mal comigo mesmo por não ter feito." : 
+                          task.consequenceScore === 4 ? "Se eu ignorar, vou ficar incomodado." :
+                          task.consequenceScore === 3 ? "Vai dar aquela sensação de \"tô enrolando\", mas ainda dá pra tolerar." :
+                          task.consequenceScore === 2 ? "Sei que devia fazer, mas não vou me cobrar." :
+                          "Ignorar isso não muda nada na minha vida."}
+              </div>
+              
+              <div className="rounded-md bg-white px-3 py-2 text-orange-600 border border-orange-200">
+                <span className="font-medium">Orgulho pós-execução:</span> {task.prideScore} – {task.prideScore === 5 ? "Total senso de potência. Vou me sentir acima da média." : 
+                    task.prideScore === 4 ? "Vou me olhar com respeito." :
+                    task.prideScore === 3 ? "Boa sensação de ter mantido o ritmo." :
+                    task.prideScore === 2 ? "Leve alívio por ter feito." :
+                    "Nenhum orgulho. Só rotina ou tarefa obrigatória."}
+              </div>
+              
+              <div className="rounded-md bg-white px-3 py-2 text-green-600 border border-green-200">
+                <span className="font-medium">Força de construção pessoal:</span> {task.constructionScore} – {task.constructionScore === 5 ? "Essa tarefa solidifica quem eu quero me tornar." : 
+                        task.constructionScore === 4 ? "Vai me posicionar num degrau acima da versão atual." :
+                        task.constructionScore === 3 ? "Me move um pouco, mas não me desafia." :
+                        task.constructionScore === 2 ? "Útil, mas não muda nada em mim." :
+                        "Só me ocupa."}
+              </div>
+            </div>
+            
+            <div className="mt-4 flex justify-end">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="flex items-center gap-1"
+                onClick={handleRestore}
+              >
+                <RefreshCw size={16} />
+                Restaurar
+              </Button>
+            </div>
           </div>
         )}
       </CardContent>

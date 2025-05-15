@@ -9,10 +9,11 @@ import PostCompletionFeedback from './PostCompletionFeedback';
 
 interface TaskCardProps {
   task: Task;
+  isExpanded: boolean;
+  onToggleExpand: (taskId: string) => void;
 }
 
-const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
-  const [expanded, setExpanded] = useState(false);
+const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand }) => {
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [titleValue, setTitleValue] = useState(task.title);
   const [feedbackModalOpen, setFeedbackModalOpen] = useState(false);
@@ -78,7 +79,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
     <>
       <div
         className={`task-card ${priorityClass} ${task.completed ? 'opacity-50' : ''} relative`}
-        onClick={() => !isEditingTitle && setExpanded(!expanded)}
+        onClick={() => !isEditingTitle && onToggleExpand(task.id)}
       >
         {/* Eye icon for hidden tasks that are only visible because of the filter - now with reduced opacity */}
         {task.hidden && showHiddenTasks && (
@@ -134,52 +135,31 @@ const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
           <span>Construção: {task.constructionScore}</span>
         </div>
 
-        {expanded && (
+        {isExpanded && (
           <div className="mt-4 animate-fade-in">
             <div className="space-y-3 text-sm">
-              <div className="flex flex-col">
-                <span className="inline-block mb-1 font-medium">
-                  <span className="rounded-md bg-white px-2 py-1 text-blue-600 border border-blue-200 inline-block">
-                    Consequência de Ignorar
-                  </span>
-                </span>
-                <p className="pl-2">
-                  {task.consequenceScore} – {task.consequenceScore === 5 ? "Vou me sentir bem mal comigo mesmo por não ter feito." : 
-                              task.consequenceScore === 4 ? "Se eu ignorar, vou ficar incomodado." :
-                              task.consequenceScore === 3 ? "Vai dar aquela sensação de \"tô enrolando\", mas ainda dá pra tolerar." :
-                              task.consequenceScore === 2 ? "Sei que devia fazer, mas não vou me cobrar." :
-                              "Ignorar isso não muda nada na minha vida."}
-                </p>
+              <div className="rounded-md bg-white px-3 py-2 text-blue-600 border border-blue-200">
+                <span className="font-medium">Consequência de Ignorar:</span> {task.consequenceScore} – {task.consequenceScore === 5 ? "Vou me sentir bem mal comigo mesmo por não ter feito." : 
+                          task.consequenceScore === 4 ? "Se eu ignorar, vou ficar incomodado." :
+                          task.consequenceScore === 3 ? "Vai dar aquela sensação de \"tô enrolando\", mas ainda dá pra tolerar." :
+                          task.consequenceScore === 2 ? "Sei que devia fazer, mas não vou me cobrar." :
+                          "Ignorar isso não muda nada na minha vida."}
               </div>
               
-              <div className="flex flex-col">
-                <span className="inline-block mb-1 font-medium">
-                  <span className="rounded-md bg-white px-2 py-1 text-orange-600 border border-orange-200 inline-block">
-                    Orgulho pós-execução
-                  </span>
-                </span>
-                <p className="pl-2">
-                  {task.prideScore} – {task.prideScore === 5 ? "Total senso de potência. Vou me sentir acima da média." : 
-                        task.prideScore === 4 ? "Vou me olhar com respeito." :
-                        task.prideScore === 3 ? "Boa sensação de ter mantido o ritmo." :
-                        task.prideScore === 2 ? "Leve alívio por ter feito." :
-                        "Nenhum orgulho. Só rotina ou tarefa obrigatória."}
-                </p>
+              <div className="rounded-md bg-white px-3 py-2 text-orange-600 border border-orange-200">
+                <span className="font-medium">Orgulho pós-execução:</span> {task.prideScore} – {task.prideScore === 5 ? "Total senso de potência. Vou me sentir acima da média." : 
+                    task.prideScore === 4 ? "Vou me olhar com respeito." :
+                    task.prideScore === 3 ? "Boa sensação de ter mantido o ritmo." :
+                    task.prideScore === 2 ? "Leve alívio por ter feito." :
+                    "Nenhum orgulho. Só rotina ou tarefa obrigatória."}
               </div>
               
-              <div className="flex flex-col">
-                <span className="inline-block mb-1 font-medium">
-                  <span className="rounded-md bg-white px-2 py-1 text-green-600 border border-green-200 inline-block">
-                    Força de construção pessoal
-                  </span>
-                </span>
-                <p className="pl-2">
-                  {task.constructionScore} – {task.constructionScore === 5 ? "Essa tarefa solidifica quem eu quero me tornar." : 
-                            task.constructionScore === 4 ? "Vai me posicionar num degrau acima da versão atual." :
-                            task.constructionScore === 3 ? "Me move um pouco, mas não me desafia." :
-                            task.constructionScore === 2 ? "Útil, mas não muda nada em mim." :
-                            "Só me ocupa."}
-                </p>
+              <div className="rounded-md bg-white px-3 py-2 text-green-600 border border-green-200">
+                <span className="font-medium">Força de construção pessoal:</span> {task.constructionScore} – {task.constructionScore === 5 ? "Essa tarefa solidifica quem eu quero me tornar." : 
+                        task.constructionScore === 4 ? "Vai me posicionar num degrau acima da versão atual." :
+                        task.constructionScore === 3 ? "Me move um pouco, mas não me desafia." :
+                        task.constructionScore === 2 ? "Útil, mas não muda nada em mim." :
+                        "Só me ocupa."}
               </div>
             </div>
 
