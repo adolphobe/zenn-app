@@ -1,47 +1,75 @@
 
+import { format, isToday, isThisWeek, isThisMonth, isThisYear } from 'date-fns';
 import { Task } from '@/types';
-import { format } from 'date-fns';
 
-// Timeline grouping function
+// Group tasks by time period (today, this week, this month, this year, older)
 export const groupTasksByTimeline = (tasks: Task[]) => {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const groups: { title: string; tasks: Task[]; invisible?: boolean }[] = [];
   
-  const yesterday = new Date(today);
-  yesterday.setDate(yesterday.getDate() - 1);
+  // Today's tasks
+  const todayTasks = tasks.filter(task => task.completedAt && isToday(new Date(task.completedAt)));
+  if (todayTasks.length > 0) {
+    groups.push({ 
+      title: `Hoje (${todayTasks.length})`, 
+      tasks: todayTasks,
+      invisible: true // Add invisible property for today's tasks
+    });
+  }
   
-  const thisWeekStart = new Date(today);
-  thisWeekStart.setDate(today.getDate() - today.getDay());
+  // This week's tasks (excluding today)
+  const thisWeekTasks = tasks.filter(task => 
+    task.completedAt && 
+    isThisWeek(new Date(task.completedAt)) && 
+    !isToday(new Date(task.completedAt))
+  );
+  if (thisWeekTasks.length > 0) {
+    groups.push({ 
+      title: `Esta semana (${thisWeekTasks.length})`, 
+      tasks: thisWeekTasks,
+      invisible: true // Add invisible property for this week's tasks
+    });
+  }
   
-  const thisMonthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+  // This month's tasks (excluding this week)
+  const thisMonthTasks = tasks.filter(task => 
+    task.completedAt && 
+    isThisMonth(new Date(task.completedAt)) && 
+    !isThisWeek(new Date(task.completedAt))
+  );
+  if (thisMonthTasks.length > 0) {
+    groups.push({ 
+      title: `Este mês (${thisMonthTasks.length})`, 
+      tasks: thisMonthTasks,
+      invisible: true // Add invisible property for this month's tasks
+    });
+  }
   
-  const groups = {
-    today: { label: 'Hoje', tasks: [] },
-    yesterday: { label: 'Ontem', tasks: [] },
-    thisWeek: { label: 'Esta semana', tasks: [] },
-    thisMonth: { label: 'Este mês', tasks: [] },
-    older: { label: 'Anteriores', tasks: [] },
-  };
+  // This year's tasks (excluding this month)
+  const thisYearTasks = tasks.filter(task => 
+    task.completedAt && 
+    isThisYear(new Date(task.completedAt)) && 
+    !isThisMonth(new Date(task.completedAt))
+  );
+  if (thisYearTasks.length > 0) {
+    groups.push({ 
+      title: `Este ano (${thisYearTasks.length})`, 
+      tasks: thisYearTasks,
+      invisible: true // Add invisible property for this year's tasks
+    });
+  }
   
-  tasks.forEach(task => {
-    // Skip tasks without completedAt
-    if (!task.completedAt) return;
-    
-    const completedDate = new Date(task.completedAt);
-    completedDate.setHours(0, 0, 0, 0);
-    
-    if (completedDate.getTime() === today.getTime()) {
-      groups.today.tasks.push(task);
-    } else if (completedDate.getTime() === yesterday.getTime()) {
-      groups.yesterday.tasks.push(task);
-    } else if (completedDate >= thisWeekStart && completedDate < today) {
-      groups.thisWeek.tasks.push(task);
-    } else if (completedDate >= thisMonthStart && completedDate < thisWeekStart) {
-      groups.thisMonth.tasks.push(task);
-    } else {
-      groups.older.tasks.push(task);
-    }
-  });
+  // Older tasks
+  const olderTasks = tasks.filter(task => 
+    task.completedAt && 
+    !isThisYear(new Date(task.completedAt))
+  );
+  if (olderTasks.length > 0) {
+    groups.push({ 
+      title: `Mais antigos (${olderTasks.length})`, 
+      tasks: olderTasks,
+      invisible: true // Add invisible property for older tasks
+    });
+  }
   
-  return Object.values(groups).filter(group => group.tasks.length > 0);
+  return groups;
 };
