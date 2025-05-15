@@ -77,7 +77,7 @@ export const CompletedTaskCard: React.FC<{ task: Task }> = ({ task }) => {
                 {feedbackLabels[task.feedback] || '-'}
               </Badge>
             )}
-            <Badge className={pillarColors[dominantPillar] || 'bg-gray-100 text-gray-800'} variant="outline">
+            <Badge hidden className={pillarColors[dominantPillar] || 'bg-gray-100 text-gray-800'} variant="outline">
               {dominantPillar}
             </Badge>
             <Badge variant="outline" className="bg-gray-100 text-gray-800">
