@@ -12,6 +12,16 @@ export const toggleShowHiddenTasks = (state: AppState, action: Action): AppState
   return { ...state, showHiddenTasks: !state.showHiddenTasks };
 };
 
+export const toggleShowPillars = (state: AppState, action: Action): AppState => {
+  if (action.type !== 'TOGGLE_SHOW_PILLARS') return state;
+  return { ...state, showPillars: !state.showPillars };
+};
+
+export const toggleShowDates = (state: AppState, action: Action): AppState => {
+  if (action.type !== 'TOGGLE_SHOW_DATES') return state;
+  return { ...state, showDates: !state.showDates };
+};
+
 export const toggleDarkMode = (state: AppState, action: Action): AppState => {
   if (action.type !== 'TOGGLE_DARK_MODE') return state;
   return { ...state, darkMode: !state.darkMode };

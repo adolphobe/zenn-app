@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { LucideIcon } from 'lucide-react';
@@ -32,23 +31,25 @@ const SidebarNavItem: React.FC<SidebarNavItemProps> = ({
       navigate(path);
     }
   };
-
+  
   // Adjust icon size when sidebar is collapsed
   const iconSize = isOpen ? 20 : 24;
-
+  
   return (
-    <button 
-      className={cn(
-        "flex items-center w-full px-3 py-2 text-sm rounded-md transition-colors",
-        isActive 
-          ? "bg-primary/10 text-primary font-medium" 
-          : "hover:bg-muted/50 text-muted-foreground hover:text-foreground"
-      )}
-      onClick={handleClick}
-    >
-      <Icon size={iconSize} className={cn("flex-shrink-0", isOpen ? "mr-2" : "mx-auto")} />
-      {isOpen && <span className="truncate">{label}</span>}
-    </button>
+    <div className="mb-1"> {/* Adicionado div com margin-bottom */}
+      <button 
+        className={cn(
+          "flex items-center w-full px-3 py-2 text-sm rounded-md transition-colors",
+          isActive 
+            ? "bg-primary/10 text-primary font-medium" 
+            : "hover:bg-muted/50 text-muted-foreground hover:text-foreground"
+        )}
+        onClick={handleClick}
+      >
+        <Icon size={iconSize} className={cn("flex-shrink-0", isOpen ? "mr-2" : "mx-auto")} />
+        {isOpen && <span className="truncate">{label}</span>}
+      </button>
+    </div>
   );
 };
 

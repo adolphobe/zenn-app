@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Task, TaskFormData } from '../types';
 import TaskFormFields from './TaskFormFields';
 import TaskComments from './TaskComments';
@@ -27,11 +26,32 @@ const TaskFormTabs: React.FC<TaskFormTabsProps> = ({
   taskId,
   task
 }) => {
+  // Referência para o container de comentários no DOM
+  const commentsContainerRef = useRef<HTMLDivElement | null>(null);
+  
+  // Função para rolar para o final da lista de comentários
+  const scrollToBottom = () => {
+    if (commentsContainerRef.current) {
+      const scrollElement = commentsContainerRef.current.querySelector('.native-scrollbar');
+      if (scrollElement) {
+        scrollElement.scrollTop = scrollElement.scrollHeight;
+      }
+    }
+  };
+  
+  // Efeito para rolar para o final quando a aba de comentários é selecionada
+  useEffect(() => {
+    if (activeTab === 'comments' && task?.comments?.length) {
+      // Pequeno delay para garantir que o DOM foi atualizado
+      setTimeout(scrollToBottom, 100);
+    }
+  }, [activeTab, task?.comments?.length]);
+  
   const handleTabValueChange = (value: string) => {
     console.log('Tab value changed to:', value);
     setActiveTab(value);
   };
-
+  
   // This function is critical for preventing propagation
   const handleTabClick = (e: React.MouseEvent, value: string) => {
     console.log('Tab clicked:', value);
@@ -43,13 +63,13 @@ const TaskFormTabs: React.FC<TaskFormTabsProps> = ({
     // Set the active tab
     setActiveTab(value);
   };
-
+  
   // This ensures clicks within tab content don't bubble up
   const handleContentClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     console.log('Tab content clicked, preventing propagation');
   };
-
+  
   return (
     <Tabs 
       value={activeTab} 
@@ -114,6 +134,7 @@ const TaskFormTabs: React.FC<TaskFormTabsProps> = ({
       >
         {taskId ? (
           <div 
+            ref={commentsContainerRef}
             className="space-y-4"
             onClick={(e) => {
               e.stopPropagation();
@@ -123,7 +144,10 @@ const TaskFormTabs: React.FC<TaskFormTabsProps> = ({
             {task && task.comments && task.comments.length > 0 && (
               <TaskComments taskId={taskId} comments={task.comments} />
             )}
-            <CommentForm taskId={taskId} />
+            <CommentForm 
+              taskId={taskId}
+              onCommentAdded={scrollToBottom} // Adicionar callback para rolar após adicionar comentário
+            />
           </div>
         ) : (
           <div className="text-gray-500 italic">Salve a tarefa primeiro para adicionar comentários</div>
