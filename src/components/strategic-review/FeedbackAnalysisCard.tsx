@@ -3,7 +3,7 @@ import React from 'react';
 import { Task } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartContainer, ChartTooltipContent } from '@/components/ui/chart';
-import { BarChart, Bar, Cell, ResponsiveContainer, XAxis, LabelList } from 'recharts';
+import { BarChart, Bar, Cell, ResponsiveContainer, XAxis, LabelList, Tooltip } from 'recharts';
 import { useFeedbackAnalysis, GRADIENTS } from './hooks/useFeedbackAnalysis';
 
 interface FeedbackAnalysisCardProps {
@@ -35,7 +35,7 @@ const FeedbackAnalysisCard: React.FC<FeedbackAnalysisCardProps> = ({ tasks }) =>
           {tasks.length > 0 ? (
             <>
               {feedbackData.withFeedback ? (
-                <div className="flex h-56 items-center justify-center">
+                <div className="h-56 w-full">
                   <ChartContainer 
                     config={{
                       transformed: { color: feedbackData.distribution[0].color },
@@ -50,6 +50,7 @@ const FeedbackAnalysisCard: React.FC<FeedbackAnalysisCardProps> = ({ tasks }) =>
                         margin={{ top: 10, right: 10, left: 10, bottom: 10 }}
                       >
                         <XAxis dataKey="name" axisLine={false} tickLine={false} />
+                        <Tooltip content={<ChartTooltipContent />} />
                         <Bar 
                           dataKey="value" 
                           radius={[4, 4, 0, 0]} 
