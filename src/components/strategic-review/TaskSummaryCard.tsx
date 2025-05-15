@@ -30,6 +30,10 @@ const TaskSummaryCard: React.FC<TaskSummaryCardProps> = ({ tasks }) => {
     );
   }
   
+  // Prepare summary text with line breaks
+  const mainSummary = `Neste período, você completou ${tasks.length} tarefas com uma média de score de ${taskStats.avgTotal.toFixed(1)}.`;
+  const criticalSummary = taskStats.criticalCount > 0 ? `${taskStats.criticalCount} tarefas eram críticas.` : '';
+  
   return (
     <Card className="overflow-hidden">
       <CardHeader className="pb-2">
@@ -37,7 +41,7 @@ const TaskSummaryCard: React.FC<TaskSummaryCardProps> = ({ tasks }) => {
         <CardDescription>Visão geral das tarefas concluídas no período.</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="space-y-3">
+        <div className="space-y-2">
           {/* Task Stats - Vertical Layout with reduced spacing */}
           <div className="grid grid-cols-1 gap-2">
             <div className="rounded-lg bg-blue-50 p-3 text-center">
@@ -51,7 +55,7 @@ const TaskSummaryCard: React.FC<TaskSummaryCardProps> = ({ tasks }) => {
           </div>
           
           {/* Zone Distribution Chart - with reduced height */}
-          <div className="h-40 mt-2">
+          <div className="h-36 mt-2">
             <ChartContainer 
               config={{
                 critical: { color: colors.critical },
@@ -79,8 +83,8 @@ const TaskSummaryCard: React.FC<TaskSummaryCardProps> = ({ tasks }) => {
             </ChartContainer>
           </div>
           
-          {/* Zone Summary - reducing spacing */}
-          <div className="mt-2">
+          {/* Zone Summary - with line breaks between sentences */}
+          <div>
             <div 
               className="border rounded-lg p-3 animate-fade-in"
               style={{ 
@@ -93,8 +97,8 @@ const TaskSummaryCard: React.FC<TaskSummaryCardProps> = ({ tasks }) => {
                 📊 Distribuição por Zonas de Importância
               </h4>
               <p className="text-sm text-muted-foreground">
-                Neste período, você completou {tasks.length} tarefas com uma média de score de {taskStats.avgTotal.toFixed(1)}.
-                {taskStats.criticalCount > 0 && ` ${taskStats.criticalCount} tarefas eram críticas.`}
+                {mainSummary}
+                {criticalSummary && <><br />{criticalSummary}</>}
               </p>
             </div>
           </div>
