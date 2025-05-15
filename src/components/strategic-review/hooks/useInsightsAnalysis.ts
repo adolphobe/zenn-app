@@ -13,27 +13,19 @@ const COLORS = {
 // Messages for each pillar based on classification - Updated with new messages
 const PILLAR_MESSAGES = {
   consequence: {
-    prioridade_alta: "Você tá priorizando tarefas que não podem ser ignoradas. Isso mostra foco em resolver o que importa antes que vire dor de cabeça. É uma forma madura de proteger o seu futuro agindo no presente.",
-    
-    equilibrado: "Você tá equilibrando bem o que tem peso real. Sabe quando precisa agir e quando pode esperar, sem deixar o importante virar urgente. Essa clareza evita acúmulo e te mantém em fluxo sem pressão constante.",
-    
-    negligenciado: "Você tá deixando de lado tarefas que já têm impacto real. Pode parecer leve agora, mas vai pesar na consciência quando perceber que perdeu tempo com o que não te levava pra lugar nenhum. O fardo não é só o que ficou por fazer — é saber que foi escolha sua."
+    prioridade_alta: "As tarefas que você tem feito mostram foco total em resolver o que não pode ser ignorado. Você tem lidado com o que realmente importa antes que vire dor de cabeça.",
+    equilibrado: "Você tem equilibrado bem tarefas urgentes com outras de impacto mais leve. Tá lidando com as prioridades sem se deixar sobrecarregar.",
+    negligenciado: "Você criou tarefas importantes, mas deixou de lado as que já tinham impacto real. Pode não parecer grave agora, mas esse tipo de adiamento pesa depois — principalmente na consciência."
   },
-  
   pride: {
-    prioridade_alta: "Você tá fazendo entregas que te dão orgulho real. Isso reforça sua identidade e te mantém respeitando suas próprias escolhas.",
-    
-    equilibrado: "Você tá se mantendo coerente com o que valoriza. Suas ações têm sua assinatura e não são só pra cumprir tabela.",
-    
-    negligenciado: "Você tá fazendo o que precisa, mas sem se ver no que entrega. Isso pode te deixar produtivo por fora, mas vazio por dentro."
+    prioridade_alta: "Você tem feito tarefas que te dão orgulho real. Isso mostra que você não tá só executando, mas entregando coisas que te representam de verdade.",
+    equilibrado: "Você tem mantido um bom nível de conexão pessoal com o que faz. Suas tarefas têm sido úteis e, em parte, alinhadas com seus valores.",
+    negligenciado: "As tarefas que você concluiu foram úteis, mas não te deixaram satisfeito. Pode estar operando no automático, sem sentir que tá construindo algo com a sua cara."
   },
-  
   construction: {
-    prioridade_alta: "Você tá escolhendo tarefas que te constroem. Cada entrega tá te deixando mais forte, mais preparado e mais próximo de quem você quer ser.",
-    
-    equilibrado: "Você tá conseguindo se mover e se desenvolver ao mesmo tempo. Tá cumprindo o presente sem perder o futuro de vista.",
-    
-    negligenciado: "Você tá ocupado, mas não evoluindo. Tá girando, mas não subindo. Isso pode te manter no mesmo lugar por tempo demais."
+    prioridade_alta: "Você tem escolhido tarefas que te fortalecem de verdade. Cada entrega mostra que você tá comprometido com a sua evolução pessoal.",
+    equilibrado: "Você tá conseguindo agir no presente sem perder de vista o seu crescimento. Suas tarefas te mantêm em movimento e em construção ao mesmo tempo.",
+    negligenciado: "As tarefas que você tem feito te mantêm ocupado, mas não te fazem crescer. Pode estar rodando bem por fora, mas sem avançar por dentro."
   }
 };
 
