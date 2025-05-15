@@ -69,7 +69,7 @@ const Login: React.FC = () => {
   const floatingItems = Array(7).fill(null).map((_, i) => (
   <div 
     key={i}
-    className="absolute rounded-full bg-primary/5 animated-float"
+    className="absolute rounded-full bg-primary/15 animated-float"
     style={{
       width: `${Math.random() * 100 + 50}px`,
       height: `${Math.random() * 100 + 50}px`,
