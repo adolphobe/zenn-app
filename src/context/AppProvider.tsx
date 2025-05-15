@@ -38,6 +38,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     updateTask: (id, data) => taskActions.updateTask(dispatch, id, data),
     updateTaskTitle: (id, title) => taskActions.updateTaskTitle(dispatch, id, title),
     setTaskFeedback: (id, feedback) => taskActions.setTaskFeedback(dispatch, id, feedback),
+    restoreTask: (id) => taskActions.restoreTask(dispatch, id),
     
     // UI actions
     setViewMode: (mode) => uiActions.setViewMode(dispatch, mode),

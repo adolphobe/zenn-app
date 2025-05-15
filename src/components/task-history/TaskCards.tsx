@@ -1,10 +1,13 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { format } from 'date-fns';
-import { Task } from '@/types'; // Import Task type from main types file
+import { Task } from '@/types'; 
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { RefreshCw } from 'lucide-react';
+import { useAppContext } from '@/context/AppContext';
 
 interface TaskGroup {
   label: string;
@@ -13,6 +16,9 @@ interface TaskGroup {
 
 // Task card component
 export const CompletedTaskCard: React.FC<{ task: Task }> = ({ task }) => {
+  const [expanded, setExpanded] = useState(false);
+  const { restoreTask } = useAppContext();
+
   // Determine dominant pillar based on scores
   const getDominantPillar = () => {
     const scores = [
@@ -42,8 +48,15 @@ export const CompletedTaskCard: React.FC<{ task: Task }> = ({ task }) => {
   // Make sure we have a completedAt value before trying to format it
   const completedDate = task.completedAt ? format(new Date(task.completedAt), 'dd/MM/yyyy') : '-';
 
+  const handleRestore = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (restoreTask) {
+      restoreTask(task.id);
+    }
+  };
+
   return (
-    <Card className="mb-3 border-l-4 border-l-gray-300">
+    <Card className="mb-3 border-l-4 border-l-gray-300" onClick={() => setExpanded(!expanded)}>
       <CardContent className="pt-4">
         <div className="flex justify-between items-start">
           <div>
@@ -63,10 +76,24 @@ export const CompletedTaskCard: React.FC<{ task: Task }> = ({ task }) => {
               {dominantPillar}
             </Badge>
             <Badge variant="outline" className="bg-gray-100 text-gray-800">
-              {task.totalScore} pts
+              {task.totalScore}/15
             </Badge>
           </div>
         </div>
+
+        {expanded && (
+          <div className="mt-4 flex justify-end">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="flex items-center gap-1"
+              onClick={handleRestore}
+            >
+              <RefreshCw size={16} />
+              Restaurar
+            </Button>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

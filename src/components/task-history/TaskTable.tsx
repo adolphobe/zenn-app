@@ -1,7 +1,7 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { format } from 'date-fns';
-import { Task } from '@/types'; // Import Task type from main types file
+import { Task } from '@/types'; 
 import { 
   Card,
   CardContent,
@@ -14,9 +14,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Button } from '@/components/ui/button';
+import { RefreshCw } from 'lucide-react';
+import { useAppContext } from '@/context/AppContext';
 
 // Table row component
 export const CompletedTaskRow: React.FC<{ task: Task }> = ({ task }) => {
+  const [showRestore, setShowRestore] = useState(false);
+  const { restoreTask } = useAppContext();
+
   // Determine dominant pillar based on scores
   const getDominantPillar = () => {
     const scores = [
@@ -40,13 +46,36 @@ export const CompletedTaskRow: React.FC<{ task: Task }> = ({ task }) => {
   // Make sure we have a completedAt value before trying to format it
   const completedDate = task.completedAt ? format(new Date(task.completedAt), 'dd/MM/yyyy') : '-';
 
+  const handleRestore = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (restoreTask) {
+      restoreTask(task.id);
+    }
+  };
+
   return (
-    <TableRow>
+    <TableRow 
+      onClick={() => setShowRestore(!showRestore)} 
+      className="cursor-pointer"
+    >
       <TableCell className="line-through opacity-70">{task.title}</TableCell>
       <TableCell>{completedDate}</TableCell>
-      <TableCell>{task.totalScore}</TableCell>
+      <TableCell>{task.totalScore}/15</TableCell>
       <TableCell className="capitalize">{dominantPillar}</TableCell>
       <TableCell>{task.feedback ? feedbackLabels[task.feedback] : '-'}</TableCell>
+      <TableCell>
+        {showRestore && (
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="flex items-center gap-1"
+            onClick={handleRestore}
+          >
+            <RefreshCw size={16} />
+            Restaurar
+          </Button>
+        )}
+      </TableCell>
     </TableRow>
   );
 };
@@ -62,6 +91,7 @@ export const TasksTable: React.FC<{ tasks: Task[] }> = ({ tasks }) => (
             <TableHead>Pontuação</TableHead>
             <TableHead>Pilar</TableHead>
             <TableHead>Feedback</TableHead>
+            <TableHead>Ações</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>

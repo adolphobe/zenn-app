@@ -1,3 +1,4 @@
+
 import { Task, TaskFormData, ViewMode, DateDisplayOptions, SortDirection } from '../types';
 
 // Actions
@@ -16,7 +17,8 @@ export type Action =
   | { type: 'SET_SORT_OPTIONS'; payload: { sortDirection: SortDirection; noDateAtEnd?: boolean } }
   | { type: 'SET_TASK_FEEDBACK'; payload: { id: string; feedback: 'transformed' | 'relief' | 'obligation' } }
   | { type: 'COMPLETE_TASK_BY_TITLE'; payload: string }
-  | { type: 'SET_TASK_FEEDBACK_BY_TITLE'; payload: { title: string; feedback: 'transformed' | 'relief' | 'obligation' } };
+  | { type: 'SET_TASK_FEEDBACK_BY_TITLE'; payload: { title: string; feedback: 'transformed' | 'relief' | 'obligation' } }
+  | { type: 'RESTORE_TASK'; payload: string };
 
 // Add AppDispatch type for action creators
 export type AppDispatch = React.Dispatch<Action>;
@@ -38,6 +40,7 @@ export interface AppContextType {
   updateDateDisplayOptions: (options: DateDisplayOptions) => void;
   setSortOptions: (options: { sortDirection: SortDirection; noDateAtEnd?: boolean }) => void;
   setTaskFeedback?: (id: string, feedback: 'transformed' | 'relief' | 'obligation') => void;
+  restoreTask?: (id: string) => void;
 }
 
 export interface AppState {

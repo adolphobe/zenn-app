@@ -14,6 +14,7 @@ export const useAppActions = () => {
     updateTask,
     updateTaskTitle,
     setTaskFeedback,
+    restoreTask,
     setViewMode,
     toggleShowHiddenTasks,
     toggleDarkMode,
@@ -33,6 +34,7 @@ export const useAppActions = () => {
       update: updateTask,
       updateTitle: updateTaskTitle,
       setFeedback: setTaskFeedback,
+      restore: restoreTask,
       // New action for setting task pillar
       setPillar: (id: string, pillar: string) => {
         dispatch({ 

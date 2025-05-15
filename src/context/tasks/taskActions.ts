@@ -41,3 +41,12 @@ export const setTaskFeedback = (
 ) => {
   dispatch({ type: 'SET_TASK_FEEDBACK', payload: { id, feedback } });
 };
+
+export const restoreTask = (dispatch: AppDispatch, taskId: string) => {
+  dispatch({ type: 'RESTORE_TASK', payload: taskId });
+  toast({
+    id: uuidv4(),
+    title: "Tarefa restaurada",
+    description: "A tarefa foi restaurada com sucesso."
+  });
+};
