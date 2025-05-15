@@ -61,23 +61,40 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, initialData, taskId, task,
     setFormData(prev => ({ ...prev, idealDate: date }));
   };
 
-  // Close only when clicking directly on the backdrop
-  const handleBackdropClick = useCallback((e: React.MouseEvent) => {
+  // Capture mousedown on backdrop to prevent the default click behavior
+  const handleBackdropMouseDown = useCallback((e: React.MouseEvent) => {
     // Only close if the click is directly on the backdrop element
     if (e.target === e.currentTarget) {
-      console.log('Backdrop clicked, closing modal');
-      onClose();
-    } else {
-      // This click was on some element inside the modal, don't close
-      console.log('Click inside modal, not closing');
-      e.stopPropagation();
+      console.log('Backdrop clicked directly, will close modal on mouseup');
+      
+      // Create a function to handle the mouseup event
+      const handleMouseUp = (upEvent: MouseEvent) => {
+        console.log('Mouse up detected, checking if still on backdrop');
+        
+        // Get the element under the mouse on mouseup
+        const elementUnderMouse = document.elementFromPoint(upEvent.clientX, upEvent.clientY);
+        
+        // Check if the mouseup is still on the backdrop
+        if (elementUnderMouse === e.currentTarget) {
+          console.log('Mouse up on backdrop, closing modal');
+          onClose();
+        } else {
+          console.log('Mouse up not on backdrop, modal stays open');
+        }
+        
+        // Remove the listener after handling
+        document.removeEventListener('mouseup', handleMouseUp);
+      };
+      
+      // Add a one-time mouseup listener to the document
+      document.addEventListener('mouseup', handleMouseUp);
     }
   }, [onClose]);
   
-  // Prevent clicks on the modal container from propagating to the backdrop
+  // Prevent all click events from the modal itself from bubbling up
   const handleModalClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
-    console.log('Modal container clicked, propagation stopped');
+    console.log('Modal container clicked, preventing propagation');
   }, []);
 
   useEffect(() => {
@@ -100,12 +117,16 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, initialData, taskId, task,
   return (
     <div 
       className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in" 
-      onClick={handleBackdropClick}
+      onMouseDown={handleBackdropMouseDown}
       data-testid="task-form-backdrop"
     >
       <div 
         className="bg-white dark:bg-gray-800 rounded-xl w-full max-w-md shadow-lg overflow-hidden"
         onClick={handleModalClick}
+        onMouseDown={(e) => {
+          e.stopPropagation();
+          console.log('Preventing mousedown propagation from modal container');
+        }}
         data-testid="task-form-modal"
       >
         <div className="flex justify-between items-center p-5 border-b">

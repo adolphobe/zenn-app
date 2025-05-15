@@ -34,25 +34,43 @@ const CommentForm: React.FC<CommentFormProps> = ({ taskId }) => {
     setCommentText(e.target.value);
   };
 
-  // Prevent clicks inside the comment form from closing the modal
+  // Prevent all events in the comment form from bubbling up
   const handleContainerClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     console.log('Comment form container clicked, propagation stopped');
   };
+  
+  // Prevent mousedown in the comment form from bubbling up
+  const handleContainerMouseDown = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    console.log('Comment form container mousedown, propagation stopped');
+  };
 
   return (
-    <div className="mt-4" onClick={handleContainerClick}>
+    <div 
+      className="mt-4" 
+      onClick={handleContainerClick}
+      onMouseDown={handleContainerMouseDown}
+    >
       <h4 className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">
         Adicionar comentário
       </h4>
-      <div className="flex flex-col space-y-2">
+      <div 
+        className="flex flex-col space-y-2"
+        onClick={handleContainerClick}
+        onMouseDown={handleContainerMouseDown}
+      >
         <textarea
           value={commentText}
           onChange={handleTextChange}
           onClick={(e) => {
             e.stopPropagation();
             console.log('Comment textarea clicked');
+          }}
+          onMouseDown={(e) => {
+            e.stopPropagation();
+            console.log('Comment textarea mousedown');
           }}
           className="w-full p-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all resize-none"
           placeholder="Escreva seu comentário..."
@@ -64,6 +82,10 @@ const CommentForm: React.FC<CommentFormProps> = ({ taskId }) => {
           size="sm"
           className="self-end flex items-center gap-1"
           onClick={handleSubmit}
+          onMouseDown={(e) => {
+            e.stopPropagation();
+            console.log('Comment submit button mousedown');
+          }}
         >
           <MessageSquare size={16} />
           Enviar
