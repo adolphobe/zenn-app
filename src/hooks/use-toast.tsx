@@ -14,7 +14,6 @@ import {
 } from "@/components/ui/toast"
 
 import {
-  useToast as useToastOriginal,
   type ToastProps,
   type ToastActionElement,
 } from "@/components/ui/use-toast"
@@ -24,6 +23,14 @@ type ToasterToastProps = ToastProps & {
   open: boolean
   promise: boolean
 }
+
+// Create the context
+const ToastContext = React.createContext<{
+  toasts: ToasterToastProps[];
+  addToast: (props: ToastProps) => void;
+  removeToast: (id: string) => void;
+  updateToast: (id: string, data: Partial<ToastProps>) => void;
+} | null>(null);
 
 export function Toaster() {
   const [toasts, setToasts] = useState<ToasterToastProps[]>([])
@@ -88,42 +95,33 @@ export function Toaster() {
   )
 }
 
-// Custom hook that provides our toast functionality
+// Provide the context through this hook
 export function useToast() {
-  const addToast = (props: ToastProps) => {
-    // In a real implementation, this would use context to add the toast
-    // But for simplicity in this stub, we'll just ensure an ID
-    const toastProps = {
-      ...props,
-      id: props.id || uuidv4()
-    }
-    
-    // Render the toast through any available toast library
-    // This is just a stub that would be expanded in a real implementation
+  const context = React.useContext(ToastContext);
+  
+  // Fallback if used outside provider
+  if (!context) {
+    return {
+      toasts: [],
+      addToast: (props: ToastProps) => {
+        const id = props.id || uuidv4();
+        console.log(`Toast created: ${id}`, props);
+      },
+      removeToast: (id: string) => {},
+      updateToast: (id: string, props: Partial<ToastProps>) => {},
+    };
   }
-
-  // Return a simplified interface
-  return {
-    toasts: [],
-    addToast,
-    removeToast: (id: string) => {},
-    updateToast: (id: string, props: Partial<ToastProps>) => {},
-  }
+  
+  return context;
 }
 
+// Helper function for creating toasts
 export const toast = (props: ToastProps) => {
-  // Ensure there's an ID
-  const id = props.id || uuidv4()
-  
-  // In a real implementation, this would use context or a global state
-  // to access the addToast function
-  
-  // But for now, we'll just create a simple toast implementation
-  console.log(`Toast created: ${id}`, props)
-  
-  // Return the ID for potential reference
-  return id
-}
+  // We have to create a dummy implementation for the toast function
+  // that can be imported directly. In actual usage, components should
+  // use the useToast hook instead
+  console.log('Toast created via toast function:', props);
+};
 
 export {
   type ToastProps,

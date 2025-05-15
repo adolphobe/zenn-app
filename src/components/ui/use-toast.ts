@@ -1,6 +1,6 @@
 
 import * as React from "react"
-import { createContext, useContext, useState } from "react"
+import { ToastContext } from "@/hooks/use-toast-context"
 import { v4 as uuidv4 } from "uuid"
 
 type ToastProps = {
@@ -13,61 +13,43 @@ type ToastProps = {
 
 type ToastActionElement = React.ReactElement
 
-type ToasterToast = {
-  id: string
-  title?: React.ReactNode
-  description?: React.ReactNode
-  action?: React.ReactNode
-  variant?: "default" | "destructive"
-  open: boolean
-  promise: boolean
-}
-
-type ToastContextType = {
-  toasts: ToasterToast[]
-  addToast: (toast: ToastProps) => void
-  removeToast: (id: string) => void
-  updateToast: (id: string, toast: Partial<ToastProps>) => void
-}
-
-const ToastContext = createContext<ToastContextType | null>(null)
-
 function useToast() {
-  const context = useContext(ToastContext)
+  const context = React.useContext(ToastContext);
 
   if (!context) {
-    const toasts: ToasterToast[] = []
+    const toasts: any[] = [];
     
     const addToast = (toast: ToastProps) => {
       // This is just a stub to prevent errors when useToast is imported directly
-    }
+      console.log('Toast created in stub:', toast);
+    };
     
     const removeToast = (id: string) => {
-      // This is just a stub to prevent errors when useToast is imported directly
-    }
+      // This is just a stub
+    };
     
     const updateToast = (id: string, toast: Partial<ToastProps>) => {
-      // This is just a stub to prevent errors when useToast is imported directly
-    }
+      // This is just a stub
+    };
     
     return {
       toasts,
       addToast,
       removeToast,
       updateToast,
-    }
+    };
   }
 
-  return context
+  return context;
 }
 
 function toast(props: ToastProps) {
-  const { addToast } = useToast()
+  const { addToast } = useToast();
   // Ensure there is an ID by generating one if not provided
   addToast({
     ...props,
     id: props.id || uuidv4()
-  })
+  });
 }
 
 export {
