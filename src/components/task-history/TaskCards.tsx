@@ -1,0 +1,99 @@
+
+import React from 'react';
+import { format } from 'date-fns';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+
+interface Task {
+  id: string;
+  title: string;
+  completedAt: string;
+  consequenceScore: number;
+  prideScore: number;
+  constructionScore: number;
+  totalScore: number;
+  feedback?: 'transformed' | 'relief' | 'obligation' | null;
+}
+
+interface TaskGroup {
+  label: string;
+  tasks: Task[];
+}
+
+// Task card component
+export const CompletedTaskCard: React.FC<{ task: Task }> = ({ task }) => {
+  // Determine dominant pillar based on scores
+  const getDominantPillar = () => {
+    const scores = [
+      { name: 'consequência', value: task.consequenceScore },
+      { name: 'orgulho', value: task.prideScore },
+      { name: 'construção', value: task.constructionScore },
+    ];
+    const max = scores.reduce((prev, current) => 
+      (prev.value > current.value) ? prev : current
+    );
+    return max.name;
+  };
+
+  const dominantPillar = getDominantPillar();
+  const pillarColors = {
+    consequência: 'bg-orange-100 text-orange-800 border-orange-200',
+    orgulho: 'bg-purple-100 text-purple-800 border-purple-200',
+    construção: 'bg-blue-100 text-blue-800 border-blue-200',
+  };
+
+  const feedbackColors = {
+    transformed: 'bg-emerald-100 text-emerald-800 border-emerald-200',
+    relief: 'bg-blue-100 text-blue-800 border-blue-200',
+    obligation: 'bg-amber-100 text-amber-800 border-amber-200',
+  };
+
+  return (
+    <Card className="mb-3 border-l-4 border-l-gray-300">
+      <CardContent className="pt-4">
+        <div className="flex justify-between items-start">
+          <div>
+            <h3 className="font-medium text-gray-900 dark:text-gray-100 line-through opacity-70">{task.title}</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+              Concluída em {format(new Date(task.completedAt), 'dd/MM/yyyy')}
+            </p>
+          </div>
+          <div className="flex gap-2">
+            {task.feedback && (
+              <Badge className={feedbackColors[task.feedback] || 'bg-gray-100 text-gray-800'} variant="outline">
+                {task.feedback === 'transformed' ? 'Transformadora' : 
+                 task.feedback === 'relief' ? 'Alívio' : 'Obrigação'}
+              </Badge>
+            )}
+            <Badge className={pillarColors[dominantPillar] || 'bg-gray-100 text-gray-800'} variant="outline">
+              {dominantPillar}
+            </Badge>
+            <Badge variant="outline" className="bg-gray-100 text-gray-800">
+              {task.totalScore} pts
+            </Badge>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
+export const TaskGroupGrid: React.FC<{ groups: TaskGroup[] }> = ({ groups }) => (
+  <div className="space-y-6">
+    {groups.map((group, index) => (
+      <div key={index}>
+        <div className="flex items-center gap-2 mb-2">
+          <h3 className="text-lg font-medium">{group.label}</h3>
+          <Badge variant="outline">{group.tasks.length}</Badge>
+          <Separator className="flex-grow" />
+        </div>
+        <div className="grid grid-cols-1">
+          {group.tasks.map(task => (
+            <CompletedTaskCard key={task.id} task={task} />
+          ))}
+        </div>
+      </div>
+    ))}
+  </div>
+);
