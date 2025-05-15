@@ -21,8 +21,8 @@ const SidebarUserProfile: React.FC<SidebarUserProfileProps> = ({ sidebarOpen }) 
     // Show a success toast message
     toast({
       title: "Logout realizado",
-      description: "Você foi desconectado com sucesso.",
-      duration: 2000
+      description: "Você foi desconectado com sucesso."
+      // Removed the duration property as it's not part of ToastProps
     });
     
     // Redirect to login page
