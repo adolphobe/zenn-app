@@ -40,7 +40,7 @@ const TaskFormFields: React.FC<TaskFormFieldsProps> = ({
         color="blue"
         label="Risco"
         description={CONSEQUENCE_PHRASES}
-        className="!mt-[5px]" // O "!" força a prioridade em Tailwind
+        className="!mt-[12px]" // O "!" força a prioridade em Tailwind
       />
 
       <RatingSlider
