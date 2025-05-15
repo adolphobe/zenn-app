@@ -110,15 +110,15 @@
 
   /* Updated task priority classes with matching border colors */
   .task-critical {
-    @apply bg-[#FFEEEE] text-[#B84040] border-[#ffcccc];
+    @apply bg-[#FFEEEE] text-[#B84040] border-[#f9d1d1];
   }
 
   .task-important {
-    @apply bg-[#FFFAEA] text-[#A07225] border-[#ffe8b3];
+    @apply bg-[#FFFAEA] text-[#A07225] border-[#ffdfbf];
   }
 
   .task-moderate {
-    @apply bg-[#F0F7FF] text-[#4A7EB5] border-[#d0e5ff];
+    @apply bg-[#F0F7FF] text-[#4A7EB5] border-[#d2e7ff];
   }
 
   .task-light {
