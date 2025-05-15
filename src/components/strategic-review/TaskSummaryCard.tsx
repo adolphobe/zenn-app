@@ -37,9 +37,9 @@ const TaskSummaryCard: React.FC<TaskSummaryCardProps> = ({ tasks }) => {
         <CardDescription>Visão geral das tarefas concluídas no período.</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="space-y-4">
+        <div className="space-y-3">
           {/* Task Stats - Vertical Layout with reduced spacing */}
-          <div className="grid grid-cols-1 gap-3">
+          <div className="grid grid-cols-1 gap-2">
             <div className="rounded-lg bg-blue-50 p-3 text-center">
               <div className="text-4xl font-bold text-blue-500">{tasks.length}</div>
               <div className="text-sm text-gray-600">Tarefas Concluídas</div>
@@ -51,7 +51,7 @@ const TaskSummaryCard: React.FC<TaskSummaryCardProps> = ({ tasks }) => {
           </div>
           
           {/* Zone Distribution Chart - with reduced height */}
-          <div className="h-48 mt-3">
+          <div className="h-40 mt-2">
             <ChartContainer 
               config={{
                 critical: { color: colors.critical },
@@ -79,8 +79,8 @@ const TaskSummaryCard: React.FC<TaskSummaryCardProps> = ({ tasks }) => {
             </ChartContainer>
           </div>
           
-          {/* Zone Summary */}
-          <div className="mt-3">
+          {/* Zone Summary - reducing spacing */}
+          <div className="mt-2">
             <div 
               className="border rounded-lg p-3 animate-fade-in"
               style={{ 
@@ -89,7 +89,7 @@ const TaskSummaryCard: React.FC<TaskSummaryCardProps> = ({ tasks }) => {
                 transition: 'background 0.3s ease'
               }}
             >
-              <h4 className="font-medium mb-2 text-base">
+              <h4 className="font-medium mb-1 text-base">
                 📊 Distribuição por Zonas de Importância
               </h4>
               <p className="text-sm text-muted-foreground">

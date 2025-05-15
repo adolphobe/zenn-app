@@ -54,6 +54,8 @@ const StrategicReview: React.FC = () => {
     
     return `${format(start, 'dd/MM/yyyy')} - ${format(end, 'dd/MM/yyyy')}`;
   }, [dateRange, period]);
+
+  const hasCompletedTasks = filteredTasks.length > 0;
   
   return (
     <div className="w-full">
@@ -72,18 +74,22 @@ const StrategicReview: React.FC = () => {
         
         {/* Single TabsContent that updates based on the filter */}
         <TabsContent value={period} className="space-y-6">
-          <div className="grid gap-6 md:grid-cols-2">
-            {/* Left column */}
-            <div className="space-y-6">
-              <TaskSummaryCard tasks={filteredTasks} />
-              <FeedbackAnalysisCard tasks={filteredTasks} />
+          <TaskSummaryCard tasks={filteredTasks} />
+          
+          {/* Only show analysis cards if there are tasks */}
+          {hasCompletedTasks && (
+            <div className="grid gap-6 md:grid-cols-2">
+              {/* Left column */}
+              <div className="space-y-6">
+                <FeedbackAnalysisCard tasks={filteredTasks} />
+              </div>
+              
+              {/* Right column */}
+              <div>
+                <PillarsAnalysisCard tasks={filteredTasks} />
+              </div>
             </div>
-            
-            {/* Right column */}
-            <div>
-              <PillarsAnalysisCard tasks={filteredTasks} />
-            </div>
-          </div>
+          )}
         </TabsContent>
       </Tabs>
     </div>
