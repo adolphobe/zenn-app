@@ -46,7 +46,7 @@ const TaskCardTitle: React.FC<TaskCardTitleProps> = ({
 
   return (
     <h3 
-      className="text-base font-medium cursor-pointer"
+        className="text-base font-medium cursor-text"
       onClick={onTitleClick}
     >
       {title}
