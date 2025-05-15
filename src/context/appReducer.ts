@@ -42,8 +42,6 @@ export const appReducer = (state: AppState, action: Action): AppState => {
       return uiReducers.toggleShowHiddenTasks(state, action);
     case 'TOGGLE_SHOW_PILLARS':
       return uiReducers.toggleShowPillars(state, action);
-    case 'TOGGLE_SHOW_DATES':
-      return uiReducers.toggleShowDates(state, action);
     case 'TOGGLE_DARK_MODE':
       return uiReducers.toggleDarkMode(state, action);
     case 'TOGGLE_SIDEBAR':

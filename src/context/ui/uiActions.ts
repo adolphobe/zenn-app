@@ -15,10 +15,6 @@ export const toggleShowPillars = (dispatch: AppDispatch) => {
   dispatch({ type: 'TOGGLE_SHOW_PILLARS' });
 };
 
-export const toggleShowDates = (dispatch: AppDispatch) => {
-  dispatch({ type: 'TOGGLE_SHOW_DATES' });
-};
-
 export const toggleDarkMode = (dispatch: AppDispatch) => {
   dispatch({ type: 'TOGGLE_DARK_MODE' });
 };

@@ -7,7 +7,6 @@ export const initialState: AppState = {
   viewMode: 'power',
   showHiddenTasks: false,
   showPillars: true, // Default to true - pillars will be visible by default
-  showDates: true,   // Default to true - dates will be visible by default
   darkMode: false,
   sidebarOpen: true,
   dateDisplayOptions: {
