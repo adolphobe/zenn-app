@@ -39,11 +39,11 @@ const TaskSummaryCard: React.FC<TaskSummaryCardProps> = ({ tasks }) => {
       <CardContent className="space-y-4">
         {/* Task Stats - Side by side layout for better space usage */}
         <div className="grid grid-cols-2 gap-2">
-          <div className="rounded-lg bg-blue-50 p-2 text-center">
+          <div className="rounded-lg bg-blue-50 py-[15px] px-2 text-center">
             <div className="text-3xl font-bold text-blue-500">{tasks.length}</div>
             <div className="text-sm text-gray-600">Tarefas Concluídas</div>
           </div>
-          <div className="rounded-lg bg-blue-50 p-2 text-center">
+          <div className="rounded-lg bg-blue-50 py-[15px] px-2 text-center">
             <div className="text-3xl font-bold text-blue-500">{taskStats.avgTotal.toFixed(1)}</div>
             <div className="text-sm text-gray-600">Média de Score</div>
           </div>
