@@ -14,6 +14,7 @@ import {
 import { X } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { useTabNavigation } from '../context/hooks/useTabNavigation';
 
 interface TaskFormProps {
   onClose: () => void;
@@ -33,7 +34,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, initialData, taskId, task,
   });
   
   const { addTask, updateTask } = useAppContext();
-  const [activeTab, setActiveTab] = useState('levels');
+  const { activeTab, setActiveTab } = useTabNavigation('levels');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,6 +70,12 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, initialData, taskId, task,
 
   const totalScore = formData.consequenceScore + formData.prideScore + formData.constructionScore;
 
+  // Prevent the tab click from bubbling up to the modal's backdrop
+  const handleTabClick = (e: React.MouseEvent, value: string) => {
+    e.stopPropagation();
+    setActiveTab(value);
+  };
+
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in" 
          onClick={(e) => e.target === e.currentTarget && onClose()}>
@@ -103,10 +110,20 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, initialData, taskId, task,
             </div>
 
             {isEditing ? (
-              <Tabs defaultValue="levels" className="w-full" onValueChange={setActiveTab}>
+              <Tabs defaultValue="levels" className="w-full" value={activeTab} onValueChange={setActiveTab}>
                 <TabsList className="grid w-full grid-cols-2 mb-4">
-                  <TabsTrigger value="levels">Níveis</TabsTrigger>
-                  <TabsTrigger value="comments">Comentários</TabsTrigger>
+                  <TabsTrigger 
+                    value="levels" 
+                    onClick={(e) => handleTabClick(e, "levels")}
+                  >
+                    Níveis
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="comments" 
+                    onClick={(e) => handleTabClick(e, "comments")}
+                  >
+                    Comentários
+                  </TabsTrigger>
                 </TabsList>
                 
                 <TabsContent value="levels" className="space-y-6">
@@ -155,14 +172,16 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, initialData, taskId, task,
                 
                 <TabsContent value="comments">
                   {taskId && (
-                    <>
-                      <CommentForm taskId={taskId} />
+                    <div className="space-y-4">
                       {task && task.comments && task.comments.length > 0 && (
-                        <div className="mt-4">
+                        <div>
                           <TaskComments taskId={taskId} comments={task.comments} />
                         </div>
                       )}
-                    </>
+                      <div onClick={(e) => e.stopPropagation()}>
+                        <CommentForm taskId={taskId} />
+                      </div>
+                    </div>
                   )}
                 </TabsContent>
               </Tabs>
