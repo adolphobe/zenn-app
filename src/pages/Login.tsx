@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { AspectRatio } from '@/components/ui/aspect-ratio';
 
 const loginSchema = z.object({
   email: z.string().email("Digite um e-mail válido"),
@@ -68,19 +69,20 @@ const Login: React.FC = () => {
   // Animated floating items for the background with random positions and continuous animations
   const floatingItems = Array(7).fill(null).map((_, i) => (
     <div 
-    className="absolute rounded-full animated-float"
-    style={{
-      backgroundColor: 'rgba(142, 206, 234, 0.2)',
-      width: `${Math.random() * 100 + 50}px`,
-      height: `${Math.random() * 100 + 50}px`,
-      left: `${Math.random() * 70}%`,
-      top: `${Math.random() * 100}%`,
-      animationDelay: `${Math.random() * 2}s`,
-      animationDuration: `${Math.random() * 6 + 6}s`,
-      opacity: Math.random() * 0.4 + 0.3,
-    }}
-  />
-));
+      key={i}
+      className="absolute rounded-full animated-float"
+      style={{
+        backgroundColor: 'rgba(142, 206, 234, 0.2)',
+        width: `${Math.random() * 100 + 50}px`,
+        height: `${Math.random() * 100 + 50}px`,
+        left: `${Math.random() * 70}%`,
+        top: `${Math.random() * 100}%`,
+        animationDelay: `${Math.random() * 2}s`,
+        animationDuration: `${Math.random() * 6 + 6}s`,
+        opacity: Math.random() * 0.4 + 0.3,
+      }}
+    />
+  ));
 
   return (
     <div className="flex min-h-screen bg-gradient-to-b from-white to-blue-50 dark:from-gray-950 dark:to-gray-900 overflow-hidden relative">
@@ -112,6 +114,20 @@ const Login: React.FC = () => {
         
         .animated-float {
             animation: float-animate ease-in-out infinite alternate;
+        }
+        
+        @keyframes fog-move {
+          0% {
+            background-position: 0% 0%;
+          }
+          100% {
+            background-position: 100% 100%;
+          }
+        }
+        
+        .haze-overlay {
+          animation: fog-move 60s ease infinite alternate;
+          background-size: 200% 200%;
         }
       `}
       </style>
@@ -229,7 +245,7 @@ const Login: React.FC = () => {
         </div>
       </div>
 
-      {/* Right column: Image */}
+      {/* Right column: Image with Névoa/Haze Overlay */}
       <div className="hidden md:block md:w-1/2 relative">
         <div className="absolute inset-0 overflow-hidden">
           <img
@@ -238,6 +254,11 @@ const Login: React.FC = () => {
             className="object-cover w-full h-full object-center"
             style={{ minWidth: '100%', minHeight: '100%' }}
           />
+          
+          {/* Névoa / Haze Overlay */}
+          <div className="absolute inset-0 haze-overlay bg-gradient-to-br from-blue-500/10 via-white/20 to-primary/10 backdrop-blur-[2px] mix-blend-overlay" />
+          
+          {/* Additional ambient gradient */}
           <div className="absolute inset-0 bg-gradient-to-r from-blue-500/30 to-primary/20 mix-blend-multiply" />
         </div>
       </div>
