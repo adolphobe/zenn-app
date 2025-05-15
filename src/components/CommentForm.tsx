@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from './ui/button';
 import { useAppContext } from '@/context/AppContext';
 import { MessageSquare } from 'lucide-react';
@@ -6,9 +6,10 @@ import { toast } from '@/hooks/use-toast';
 
 interface CommentFormProps {
   taskId: string;
+  onCommentAdded?: () => void; // Nova prop para notificar quando um comentário é adicionado
 }
 
-const CommentForm: React.FC<CommentFormProps> = ({ taskId }) => {
+const CommentForm: React.FC<CommentFormProps> = ({ taskId, onCommentAdded }) => {
   const [commentText, setCommentText] = useState('');
   const { addComment } = useAppContext();
   
@@ -20,6 +21,12 @@ const CommentForm: React.FC<CommentFormProps> = ({ taskId }) => {
     if (commentText.trim() && addComment) {
       addComment(taskId, commentText);
       setCommentText('');
+      
+      // Notificar que um comentário foi adicionado
+      if (onCommentAdded) {
+        onCommentAdded();
+      }
+      
       toast({
         title: "Comentário adicionado",
         description: "Seu comentário foi adicionado com sucesso."
@@ -45,6 +52,12 @@ const CommentForm: React.FC<CommentFormProps> = ({ taskId }) => {
       if (commentText.trim() && addComment) {
         addComment(taskId, commentText);
         setCommentText('');
+        
+        // Notificar que um comentário foi adicionado
+        if (onCommentAdded) {
+          onCommentAdded();
+        }
+        
         toast({
           title: "Comentário adicionado",
           description: "Seu comentário foi adicionado com sucesso."
@@ -84,7 +97,7 @@ const CommentForm: React.FC<CommentFormProps> = ({ taskId }) => {
         <textarea
           value={commentText}
           onChange={handleTextChange}
-          onKeyDown={handleKeyDown} // Adicionar o evento para tecla pressionada
+          onKeyDown={handleKeyDown}
           onClick={(e) => {
             e.stopPropagation();
             console.log('Comment textarea clicked');
