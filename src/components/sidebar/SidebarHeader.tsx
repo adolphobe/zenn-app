@@ -20,7 +20,12 @@ const SidebarHeader: React.FC<SidebarHeaderProps> = ({ sidebarOpen, toggleSideba
       ) : (
         <div className="sr-only">ACTO</div>
       )}
-     
+      <button 
+  onClick={toggleSidebar} 
+  className="p-2 rounded-lg text-[#8eceea] hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+>
+  {sidebarOpen ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
+</button>
     </div>
   );
 };
