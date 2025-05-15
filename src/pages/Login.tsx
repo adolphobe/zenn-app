@@ -234,7 +234,7 @@ const Login: React.FC = () => {
       <div className="hidden md:block md:w-1/2 relative">
         <div className="absolute inset-0 overflow-hidden">
           <img
-            src="https://img.freepik.com/fotos-gratis/fundo-de-papel-de-parede-colorido-embacado-artistico_58702-8207.jpg?t=st=1747283730~exp=1747287330~hmac=dcb07fdf1ceb013985424ef8876689f16478a138c822a7417d4c43fe98f2fb27&w=2000"
+            src="https://images.unsplash.com/photo-1595131264179-84bb2f9e17b9?q=80&w=2787&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
             alt="Fundo de login"
             className="object-cover w-full h-full object-center"
             style={{ minWidth: '100%', minHeight: '100%' }}
