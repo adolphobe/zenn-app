@@ -48,13 +48,13 @@ const SortDropdown: React.FC = () => {
           <>
             <DropdownMenuItem
               onClick={() => handleSortDirectionChange('desc')}
-              className={`${dropdownStyles.item} ${sortDirection === 'desc' ? 'bg-accent text-accent-foreground' : ''}`}
+              className={`${dropdownStyles.item} ${sortDirection === 'desc' ? 'dropdownStyles.itemSelected' : ''}`}
             >
               Score: Maior → Menor
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => handleSortDirectionChange('asc')}
-              className={`${dropdownStyles.item} ${sortDirection === 'asc' ? 'bg-accent text-accent-foreground' : ''}`}
+              className={`${dropdownStyles.item} ${sortDirection === 'asc' ? 'dropdownStyles.itemSelected' : ''}`}
             >
               Score: Menor → Maior
             </DropdownMenuItem>
@@ -63,13 +63,13 @@ const SortDropdown: React.FC = () => {
           <>
             <DropdownMenuItem
               onClick={() => handleSortDirectionChange('asc')}
-              className={`${dropdownStyles.item} ${sortDirection === 'asc' ? 'bg-accent text-accent-foreground' : ''}`}
+              className={`${dropdownStyles.item} ${sortDirection === 'asc' ? 'dropdownStyles.itemSelected' : ''}`}
             >
               Data: Próximas primeiro
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => handleSortDirectionChange('desc')}
-              className={`${dropdownStyles.item} ${sortDirection === 'desc' ? 'bg-accent text-accent-foreground' : ''}`}
+              className={`${dropdownStyles.item} ${sortDirection === 'desc' ? 'dropdownStyles.itemSelected' : ''}`}
             >
               Data: Distantes primeiro
             </DropdownMenuItem>
