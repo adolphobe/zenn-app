@@ -75,7 +75,7 @@ const TaskFormFields: React.FC<TaskFormFieldsProps> = ({
           />
         </div>
 
-        <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg shadow-sm mt-[20px]">
+        <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg shadow-sm">
           <TaskScoreDisplay score={totalScore} />
         </div>
       </>
@@ -89,7 +89,7 @@ const TaskFormFields: React.FC<TaskFormFieldsProps> = ({
       <div className="grid grid-cols-2 gap-6">
         <div className="space-y-6">
           <div className="mb-2">
-            <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+            <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300 mt-[20px]">
               Avalie o peso da tarefa:
             </label>
           </div>
