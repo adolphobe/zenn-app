@@ -2,18 +2,11 @@
 import React, { useState } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { TaskFormData, Task } from '../types';
-import RatingSlider from './RatingSlider';
-import TaskScoreDisplay from './TaskScoreDisplay';
-import CommentForm from './CommentForm';
-import TaskComments from './TaskComments';
-import { 
-  CONSEQUENCE_PHRASES, 
-  PRIDE_PHRASES, 
-  CONSTRUCTION_PHRASES 
-} from '../constants';
+import TaskFormFields from './TaskFormFields';
+import TaskFormTabs from './TaskFormTabs';
+import TaskFormActions from './TaskFormActions';
 import { X } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { useTabNavigation } from '../context/hooks/useTabNavigation';
 
 interface TaskFormProps {
@@ -68,14 +61,6 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, initialData, taskId, task,
     setFormData(prev => ({ ...prev, idealDate: date }));
   };
 
-  const totalScore = formData.consequenceScore + formData.prideScore + formData.constructionScore;
-
-  // Prevent the tab click from bubbling up to the modal's backdrop
-  const handleTabClick = (e: React.MouseEvent, value: string) => {
-    e.stopPropagation();
-    setActiveTab(value);
-  };
-
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in" 
          onClick={(e) => e.target === e.currentTarget && onClose()}>
@@ -93,164 +78,45 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, initialData, taskId, task,
         
         <ScrollArea className="max-h-[calc(100vh-12rem)]">
           <form onSubmit={handleSubmit} className="p-5 space-y-6">
-            <div>
-              <label htmlFor="title" className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
-                Título da Tarefa
-              </label>
-              <input
-                type="text"
-                id="title"
-                name="title"
-                value={formData.title}
-                onChange={handleChange}
-                className="w-full p-3 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-                placeholder="O que precisa ser feito?"
-                required
-              />
-            </div>
-
             {isEditing ? (
-              <Tabs defaultValue="levels" className="w-full" value={activeTab} onValueChange={setActiveTab}>
-                <TabsList className="grid w-full grid-cols-2 mb-4">
-                  <TabsTrigger 
-                    value="levels" 
-                    onClick={(e) => handleTabClick(e, "levels")}
-                  >
-                    Níveis
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="comments" 
-                    onClick={(e) => handleTabClick(e, "comments")}
-                  >
-                    Comentários
-                  </TabsTrigger>
-                </TabsList>
-                
-                <TabsContent value="levels" className="space-y-6">
-                  <RatingSlider
-                    value={formData.consequenceScore}
-                    onChange={(value) => setFormData(prev => ({ ...prev, consequenceScore: value }))}
-                    color="blue"
-                    label="Consequência de Ignorar"
-                    description={CONSEQUENCE_PHRASES}
-                  />
-
-                  <RatingSlider
-                    value={formData.prideScore}
-                    onChange={(value) => setFormData(prev => ({ ...prev, prideScore: value }))}
-                    color="orange"
-                    label="Orgulho pós-execução"
-                    description={PRIDE_PHRASES}
-                  />
-
-                  <RatingSlider
-                    value={formData.constructionScore}
-                    onChange={(value) => setFormData(prev => ({ ...prev, constructionScore: value }))}
-                    color="green"
-                    label="Força de construção pessoal"
-                    description={CONSTRUCTION_PHRASES}
-                  />
-
-                  <div>
-                    <label htmlFor="idealDate" className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
-                      A partir de quando você quer se ver envolvido com isso?
-                    </label>
-                    <input
-                      type="datetime-local"
-                      id="idealDate"
-                      name="idealDate"
-                      value={formData.idealDate ? new Date(formData.idealDate.getTime() - (formData.idealDate.getTimezoneOffset() * 60000)).toISOString().slice(0, 16) : ''}
-                      onChange={handleDateChange}
-                      className="w-full p-3 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-                    />
-                  </div>
-
-                  <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg shadow-sm">
-                    <TaskScoreDisplay score={totalScore} />
-                  </div>
-                </TabsContent>
-                
-                <TabsContent value="comments">
-                  {taskId && (
-                    <div className="space-y-4">
-                      {task && task.comments && task.comments.length > 0 && (
-                        <div>
-                          <TaskComments taskId={taskId} comments={task.comments} />
-                        </div>
-                      )}
-                      <div onClick={(e) => e.stopPropagation()}>
-                        <CommentForm taskId={taskId} />
-                      </div>
-                    </div>
-                  )}
-                </TabsContent>
-              </Tabs>
-            ) : (
-              // Non-editing mode shows all fields without tabs
               <>
-                <RatingSlider
-                  value={formData.consequenceScore}
-                  onChange={(value) => setFormData(prev => ({ ...prev, consequenceScore: value }))}
-                  color="blue"
-                  label="Consequência de Ignorar"
-                  description={CONSEQUENCE_PHRASES}
-                />
-
-                <RatingSlider
-                  value={formData.prideScore}
-                  onChange={(value) => setFormData(prev => ({ ...prev, prideScore: value }))}
-                  color="orange"
-                  label="Orgulho pós-execução"
-                  description={PRIDE_PHRASES}
-                />
-
-                <RatingSlider
-                  value={formData.constructionScore}
-                  onChange={(value) => setFormData(prev => ({ ...prev, constructionScore: value }))}
-                  color="green"
-                  label="Força de construção pessoal"
-                  description={CONSTRUCTION_PHRASES}
-                />
-
                 <div>
-                  <label htmlFor="idealDate" className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
-                    A partir de quando você quer se ver envolvido com isso?
+                  <label htmlFor="title" className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+                    Título da Tarefa
                   </label>
                   <input
-                    type="datetime-local"
-                    id="idealDate"
-                    name="idealDate"
-                    value={formData.idealDate ? new Date(formData.idealDate.getTime() - (formData.idealDate.getTimezoneOffset() * 60000)).toISOString().slice(0, 16) : ''}
-                    onChange={handleDateChange}
+                    type="text"
+                    id="title"
+                    name="title"
+                    value={formData.title}
+                    onChange={handleChange}
                     className="w-full p-3 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                    placeholder="O que precisa ser feito?"
+                    required
                   />
                 </div>
-
-                <div className="mt-5 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg shadow-sm">
-                  <TaskScoreDisplay score={totalScore} />
-                </div>
+                
+                <TaskFormTabs 
+                  activeTab={activeTab}
+                  setActiveTab={setActiveTab}
+                  formData={formData}
+                  handleChange={handleChange}
+                  handleDateChange={handleDateChange}
+                  setFormData={setFormData}
+                  taskId={taskId}
+                  task={task}
+                />
               </>
+            ) : (
+              <TaskFormFields 
+                formData={formData} 
+                handleChange={handleChange} 
+                handleDateChange={handleDateChange} 
+                setFormData={setFormData} 
+              />
             )}
 
-            <div className="mt-6 flex justify-end space-x-4">
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  onClose();
-                }}
-                className="px-5 py-2.5 text-sm font-medium border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors"
-              >
-                Cancelar
-              </button>
-              <button
-                type="submit"
-                className="px-5 py-2.5 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 transition-all"
-              >
-                Salvar
-              </button>
-            </div>
+            <TaskFormActions onClose={onClose} />
           </form>
         </ScrollArea>
       </div>
