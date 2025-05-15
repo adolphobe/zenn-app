@@ -80,7 +80,7 @@ const CommentForm: React.FC<CommentFormProps> = ({ taskId }) => {
           type="button"
           disabled={!commentText.trim()}
           size="sm"
-          className="self-end flex items-center gap-1"
+          className="self-end flex items-center gap-1 bg-blue-50 hover:bg-blue-100 text-blue-600"
           onClick={handleSubmit}
           onMouseDown={(e) => {
             e.stopPropagation();
