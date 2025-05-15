@@ -1,11 +1,9 @@
-
 import React, { useEffect, useState } from 'react';
 import { format } from 'date-fns';
 import { Comment } from '@/types';
 import { useAppContext } from '@/context/AppContext';
 import { X } from 'lucide-react';
 import { cn } from "@/lib/utils";
-import { AlwaysVisibleScrollArea } from '@/components/ui/always-visible-scroll-area';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -97,8 +95,8 @@ const TaskComments: React.FC<TaskCommentsProps> = ({ taskId, comments }) => {
     <div className="mt-4">
       <h4 className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">Comentários</h4>
       
-      {/* Componente AlwaysVisibleScrollArea */}
-      <AlwaysVisibleScrollArea className="h-60 border border-gray-200 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800">
+      {/* Div com scrollbar nativa e estilização */}
+      <div className="native-scrollbar h-60 overflow-auto rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
         <div className="space-y-3 p-4">
           {comments.map(comment => (
             <div 
@@ -147,7 +145,7 @@ const TaskComments: React.FC<TaskCommentsProps> = ({ taskId, comments }) => {
             </div>
           ))}
         </div>
-      </AlwaysVisibleScrollArea>
+      </div>
     </div>
   );
 };
