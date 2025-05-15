@@ -65,8 +65,8 @@ const Login: React.FC = () => {
 
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
 
-  // Animated floating items for the background with random positions and animations
-  const floatingItems = Array(5).fill(null).map((_, i) => (
+  // Animated floating items for the background with random positions and continuous animations
+  const floatingItems = Array(7).fill(null).map((_, i) => (
     <div 
       key={i}
       className="absolute rounded-full bg-primary/5 animated-float"
@@ -77,7 +77,7 @@ const Login: React.FC = () => {
         top: `${Math.random() * 100}%`,
         animationDelay: `${Math.random() * 10}s`,
         animationDuration: `${Math.random() * 20 + 30}s`,
-        opacity: 0.7,
+        opacity: Math.random() * 0.4 + 0.3,
       }}
     />
   ));
@@ -93,14 +93,16 @@ const Login: React.FC = () => {
             opacity: 0.3;
           }
           25% {
-            opacity: 0.7;
-          }
-          50% {
-            transform: translate(30px, -30px) scale(1.05);
+            transform: translate(20px, -20px) scale(1.05);
             opacity: 0.5;
           }
-          75% {
+          50% {
+            transform: translate(40px, 10px) scale(1);
             opacity: 0.7;
+          }
+          75% {
+            transform: translate(20px, 30px) scale(0.95);
+            opacity: 0.5;
           }
           100% {
             transform: translate(0, 0) scale(1);
@@ -232,7 +234,7 @@ const Login: React.FC = () => {
       <div className="hidden md:block md:w-1/2 relative">
         <div className="absolute inset-0 overflow-hidden">
           <img
-            src="https://images.unsplash.com/photo-1595131264179-84bb2f9e17b9?q=80&w=2787&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+            src="https://img.freepik.com/fotos-gratis/fundo-de-papel-de-parede-colorido-embacado-artistico_58702-8207.jpg?t=st=1747283730~exp=1747287330~hmac=dcb07fdf1ceb013985424ef8876689f16478a138c822a7417d4c43fe98f2fb27&w=2000"
             alt="Fundo de login"
             className="object-cover w-full h-full object-center"
             style={{ minWidth: '100%', minHeight: '100%' }}
