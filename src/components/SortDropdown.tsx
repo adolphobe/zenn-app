@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { ArrowUpDown } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
@@ -24,20 +23,19 @@ const SortDropdown: React.FC = () => {
   const handleSortDirectionChange = (direction: SortDirection) => {
     setSortOptions({ sortDirection: direction });
   };
-
+  
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
           variant="outline"
           size="sm"
-        className="flex items-center gap-2 px-4 py-5 hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-900/20 dark:hover:text-blue-400"
+          className="flex items-center gap-2 px-4 py-5 hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-900/20 dark:hover:text-blue-400"
         >
           <ArrowUpDown size={16} />
           <span className="hidden sm:inline">Ordenação</span>
         </Button>
       </DropdownMenuTrigger>
-
       <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuLabel className={dropdownStyles.label}>
           {viewMode === 'power' ? 'Ordenar por Score' : 'Ordenar por Data'}
@@ -48,13 +46,13 @@ const SortDropdown: React.FC = () => {
           <>
             <DropdownMenuItem
               onClick={() => handleSortDirectionChange('desc')}
-              className={`${dropdownStyles.item} ${sortDirection === 'desc' ? 'dropdownStyles.itemSelected' : ''}`}
+              className={`${dropdownStyles.item} ${sortDirection === 'desc' ? dropdownStyles.itemSelected : ''}`}
             >
               Score: Maior → Menor
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => handleSortDirectionChange('asc')}
-              className={`${dropdownStyles.item} ${sortDirection === 'asc' ? 'dropdownStyles.itemSelected' : ''}`}
+              className={`${dropdownStyles.item} ${sortDirection === 'asc' ? dropdownStyles.itemSelected : ''}`}
             >
               Score: Menor → Maior
             </DropdownMenuItem>
@@ -63,13 +61,13 @@ const SortDropdown: React.FC = () => {
           <>
             <DropdownMenuItem
               onClick={() => handleSortDirectionChange('asc')}
-              className={`${dropdownStyles.item} ${sortDirection === 'asc' ? 'dropdownStyles.itemSelected' : ''}`}
+              className={`${dropdownStyles.item} ${sortDirection === 'asc' ? dropdownStyles.itemSelected : ''}`}
             >
               Data: Próximas primeiro
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => handleSortDirectionChange('desc')}
-              className={`${dropdownStyles.item} ${sortDirection === 'desc' ? 'dropdownStyles.itemSelected' : ''}`}
+              className={`${dropdownStyles.item} ${sortDirection === 'desc' ? dropdownStyles.itemSelected : ''}`}
             >
               Data: Distantes primeiro
             </DropdownMenuItem>
