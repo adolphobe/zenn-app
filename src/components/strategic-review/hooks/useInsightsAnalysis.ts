@@ -10,22 +10,22 @@ const COLORS = {
   construction: '#10B981' // Verde
 };
 
-// Messages for each pillar based on classification
+// Messages for each pillar based on classification - Updated with new messages
 const PILLAR_MESSAGES = {
   consequence: {
-    prioridade_alta: "Você está priorizando tarefas com alta Consequência de Ignorar. Está agindo com foco no que realmente não pode ser deixado de lado.",
-    equilibrado: "Sua relação com a Consequência de Ignorar está equilibrada. Você sabe o que é importante, sem entrar em modo alerta constante.",
-    negligenciado: "Você está negligenciando tarefas com Consequência de Ignorar. Pode estar empurrando coisas que vão te cobrar lá na frente."
+    prioridade_alta: "Você tá mandando bem em resolver o que não pode ser adiado. Isso é ótimo porque te livra de problemas futuros antes mesmo deles virarem dor de cabeça.",
+    equilibrado: "Você tá sabendo equilibrar as tarefas que cobram um preço se forem ignoradas. Isso mantém sua vida em dia sem entrar em modo incêndio.",
+    negligenciado: "Você tá deixando de lado tarefas que vão te cobrar depois. Cuidado pra não empurrar o que pode virar problema real lá na frente."
   },
   pride: {
-    prioridade_alta: "Você está priorizando tarefas com alto Orgulho Pós-Execução. Está fazendo o que representa quem você quer ser.",
-    equilibrado: "Seu nível de Orgulho Pós-Execução está saudável. O que você faz tem valor e está conectado com sua identidade.",
-    negligenciado: "Você está deixando o Orgulho Pós-Execução de lado. Está executando sem se sentir realizado com o que entrega."
+    prioridade_alta: "Você tá fazendo o que te dá orgulho de verdade. Isso reforça quem você é e te deixa mais confiante a cada entrega.",
+    equilibrado: "Você tá se mantendo alinhado com o que acredita. Tá fazendo coisas que não são só úteis, mas também têm a sua cara.",
+    negligenciado: "Você tá executando sem se orgulhar do que faz. Tá batendo meta, mas sem sentir que tá construindo algo que te representa."
   },
   construction: {
-    prioridade_alta: "Você está priorizando tarefas com alta Força de Construção Pessoal. Está focado em se fortalecer e evoluir.",
-    equilibrado: "Sua Força de Construção Pessoal está estável. Você está equilibrando bem ação presente e evolução pessoal.",
-    negligenciado: "Você está negligenciando sua Força de Construção Pessoal. Está fazendo, mas sem se fortalecer com o que faz."
+    prioridade_alta: "Você tá focado no que te fortalece. Cada tarefa tá te deixando mais perto do seu Eu ideal. Isso é evolução real.",
+    equilibrado: "Você tá numa boa média entre agir no presente e construir pro futuro. Tá andando e se desenvolvendo ao mesmo tempo.",
+    negligenciado: "Você tá se ocupando, mas sem crescer. Tá mantendo a rotina, mas não tá ficando mais forte com o que faz."
   }
 };
 
@@ -35,9 +35,9 @@ export const useInsightsAnalysis = (tasks: Task[]): PillarDataType => {
     if (!tasks || tasks.length === 0) {
       return {
         averages: [
-          { name: 'Consequência', value: 0, color: COLORS.consequence },
-          { name: 'Orgulho', value: 0, color: COLORS.pride },
-          { name: 'Construção', value: 0, color: COLORS.construction }
+          { name: 'Consequência', value: 0, color: COLORS.consequence, id: 'consequence' },
+          { name: 'Orgulho', value: 0, color: COLORS.pride, id: 'pride' },
+          { name: 'Construção', value: 0, color: COLORS.construction, id: 'construction' }
         ],
         highest: null,
         lowest: null,
@@ -51,9 +51,9 @@ export const useInsightsAnalysis = (tasks: Task[]): PillarDataType => {
     const avgConstruction = tasks.reduce((sum, task) => sum + task.constructionScore, 0) / tasks.length;
     
     const pillars = [
-      { name: 'Consequência', value: avgConsequence, color: COLORS.consequence },
-      { name: 'Orgulho', value: avgPride, color: COLORS.pride },
-      { name: 'Construção', value: avgConstruction, color: COLORS.construction }
+      { name: 'Consequência', value: avgConsequence, color: COLORS.consequence, id: 'consequence' },
+      { name: 'Orgulho', value: avgPride, color: COLORS.pride, id: 'pride' },
+      { name: 'Construção', value: avgConstruction, color: COLORS.construction, id: 'construction' }
     ];
     
     // Define classification thresholds
@@ -66,18 +66,21 @@ export const useInsightsAnalysis = (tasks: Task[]): PillarDataType => {
     // Add insights for each pillar based on their scores
     const consequenceClassification = getClassification(avgConsequence, HIGH_THRESHOLD, LOW_THRESHOLD);
     insights.push({
+      id: 'consequence',
       title: getClassificationTitle('Consequência', consequenceClassification),
       messages: [PILLAR_MESSAGES.consequence[consequenceClassification]]
     });
     
     const prideClassification = getClassification(avgPride, HIGH_THRESHOLD, LOW_THRESHOLD);
     insights.push({
+      id: 'pride',
       title: getClassificationTitle('Orgulho', prideClassification),
       messages: [PILLAR_MESSAGES.pride[prideClassification]]
     });
     
     const constructionClassification = getClassification(avgConstruction, HIGH_THRESHOLD, LOW_THRESHOLD);
     insights.push({
+      id: 'construction',
       title: getClassificationTitle('Construção', constructionClassification),
       messages: [PILLAR_MESSAGES.construction[constructionClassification]]
     });

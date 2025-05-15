@@ -5,6 +5,7 @@ import { Task } from '@/types';
 import { useInsightsAnalysis } from './hooks/useInsightsAnalysis';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { ResponsiveContainer, BarChart, Bar, XAxis, LabelList, Cell } from 'recharts';
+import { usePillarHover } from '@/context/hooks';
 
 interface PillarsAnalysisCardProps {
   tasks: Task[];
@@ -13,6 +14,20 @@ interface PillarsAnalysisCardProps {
 const PillarsAnalysisCard: React.FC<PillarsAnalysisCardProps> = ({ tasks }) => {
   // Use the insights analysis hook to get pillar data
   const pillarData = useInsightsAnalysis(tasks);
+  
+  // Use the pillar hover hook to handle dynamic insights
+  const { activeInsight, handlePillarHover } = usePillarHover(pillarData.insights, 'consequence');
+  
+  // Function to determine background gradient based on insight title
+  const getBackgroundGradient = (title: string) => {
+    if (title.includes('🟢')) {
+      return 'linear-gradient(to right, rgba(240, 253, 244, 0.5), rgba(187, 247, 208, 0.3))';
+    } else if (title.includes('🔴')) {
+      return 'linear-gradient(to right, rgba(254, 242, 242, 0.5), rgba(254, 226, 226, 0.3))';
+    } else {
+      return 'linear-gradient(to right, rgba(240, 249, 255, 0.5), rgba(186, 230, 253, 0.3))';
+    }
+  };
   
   return (
     <Card>
@@ -47,6 +62,9 @@ const PillarsAnalysisCard: React.FC<PillarsAnalysisCardProps> = ({ tasks }) => {
                     animationDuration={1000}
                     animationBegin={200}
                     animationEasing="ease-out"
+                    onMouseEnter={(data) => {
+                      handlePillarHover(data.id);
+                    }}
                   >
                     <LabelList 
                       dataKey="value" 
@@ -69,37 +87,21 @@ const PillarsAnalysisCard: React.FC<PillarsAnalysisCardProps> = ({ tasks }) => {
           )}
         </div>
         
-        {/* Insights Section with new styling */}
-        {pillarData.insights.length > 0 && (
+        {/* Dynamic Insight Box */}
+        {activeInsight && (
           <div className="space-y-4 mt-6">
-            <h3 className="font-medium text-lg">Insights</h3>
-            <div className="grid gap-4 md:grid-cols-1">
-              {pillarData.insights.map((insight, index) => {
-                // Determine background color based on insight title
-                const bgGradient = insight.title.includes('🟢') 
-                  ? 'linear-gradient(to right, rgba(240, 253, 244, 0.5), rgba(187, 247, 208, 0.3))' 
-                  : insight.title.includes('🔴')
-                    ? 'linear-gradient(to right, rgba(254, 242, 242, 0.5), rgba(254, 226, 226, 0.3))'
-                    : 'linear-gradient(to right, rgba(240, 249, 255, 0.5), rgba(186, 230, 253, 0.3))';
-                
-                return (
-                  <div 
-                    key={index} 
-                    className="border rounded-lg p-4 animate-fade-in"
-                    style={{ 
-                      animationDelay: `${index * 150}ms`,
-                      animationDuration: '0.5s',
-                      animationFillMode: 'both',
-                      background: bgGradient
-                    }}
-                  >
-                    <h4 className="font-medium mb-3 text-base">{insight.title}</h4>
-                    {insight.messages.map((message, msgIndex) => (
-                      <p key={msgIndex} className="text-sm text-muted-foreground">{message}</p>
-                    ))}
-                  </div>
-                );
-              })}
+            <div 
+              className="border rounded-lg p-4 animate-fade-in"
+              style={{ 
+                background: getBackgroundGradient(activeInsight.title),
+                animationDuration: '0.3s',
+                transition: 'background 0.3s ease'
+              }}
+            >
+              <h4 className="font-medium mb-3 text-base">{activeInsight.title}</h4>
+              {activeInsight.messages.map((message, msgIndex) => (
+                <p key={msgIndex} className="text-sm text-muted-foreground">{message}</p>
+              ))}
             </div>
           </div>
         )}

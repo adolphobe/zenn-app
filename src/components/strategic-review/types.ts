@@ -2,6 +2,7 @@
 export type PeriodType = 'today' | 'week' | 'month' | 'custom';
 
 export interface InsightMessage {
+  id: string;
   title: string;
   messages: string[];
 }
@@ -11,6 +12,7 @@ export interface PillarDataType {
     name: string;
     value: number;
     color: string;
+    id: string;
   }[];
   highest: {
     name: string;
