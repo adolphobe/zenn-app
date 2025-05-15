@@ -26,22 +26,8 @@ const TaskFormFields: React.FC<TaskFormFieldsProps> = ({
 
   return (
     <>
-      <div>
-        <label htmlFor="title" className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
-          Título da Tarefa
-        </label>
-        <input
-          type="text"
-          id="title"
-          name="title"
-          value={formData.title}
-          onChange={handleChange}
-          className="w-full p-3 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-          placeholder="O que precisa ser feito?"
-          required
-        />
-      </div>
-
+      {/* Removing the redundant title field since it's already in the form header */}
+      
       <RatingSlider
         value={formData.consequenceScore}
         onChange={(value) => setFormData(prev => ({ ...prev, consequenceScore: value }))}
