@@ -1,4 +1,3 @@
-
 import * as React from "react"
 import * as MenubarPrimitive from "@radix-ui/react-menubar"
 import { Check, ChevronRight, Circle } from "lucide-react"
@@ -127,16 +126,16 @@ MenubarItem.displayName = MenubarPrimitive.Item.displayName
 const MenubarCheckboxItem = React.forwardRef<
   React.ElementRef<typeof MenubarPrimitive.CheckboxItem>,
   React.ComponentPropsWithoutRef<typeof MenubarPrimitive.CheckboxItem>
->(({ className, children, checked, ...props }, ref) => (
+>(({ className, children, ...props }, ref) => (
   <MenubarPrimitive.CheckboxItem
     ref={ref}
     className={cn(
       dropdownStyles.item,
       "relative pr-3",
-      checked && dropdownStyles.itemSelected,
+      props.checked && dropdownStyles.itemSelected,
       className
     )}
-    checked={checked}
+    checked={props.checked}
     {...props}
   >
     {children}
@@ -156,6 +155,7 @@ const MenubarRadioItem = React.forwardRef<
       props.checked && dropdownStyles.itemSelected,
       className
     )}
+    checked={props.checked}
     {...props}
   >
     {children}
