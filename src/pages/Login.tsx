@@ -125,7 +125,7 @@ const Login: React.FC = () => {
             <img 
               src="https://cdn.shopify.com/s/files/1/0629/1993/4061/files/Sem_Titulo-8.jpg?v=1747284016" 
               alt="Acto Logo" 
-              className="h-16 mb-4"
+              className="w-[120px] mb-4"
             />
           </div>
 
