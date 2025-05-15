@@ -47,4 +47,5 @@ export interface AppState {
     power: SortOption;
     chronological: SortOption;
   };
+  autoMode: boolean; // Add autoMode property to AppState
 }

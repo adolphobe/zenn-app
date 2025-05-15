@@ -100,6 +100,9 @@ export const appReducer = (state: AppState, action: Action): AppState => {
         )
       };
 
+    case 'TOGGLE_AUTO_MODE':
+      return { ...state, autoMode: !state.autoMode };
+
     case 'SET_VIEW_MODE':
       return { ...state, viewMode: action.payload };
 

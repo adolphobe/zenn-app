@@ -19,6 +19,7 @@ export const useAppActions = () => {
     toggleShowHiddenTasks,
     toggleDarkMode,
     toggleSidebar,
+    toggleAutoMode, // Add toggleAutoMode
     updateDateDisplayOptions,
     setSortOptions,
     dispatch
@@ -53,6 +54,7 @@ export const useAppActions = () => {
       toggleShowHiddenTasks,
       toggleDarkMode,
       toggleSidebar,
+      toggleAutoMode, // Add toggleAutoMode
       updateDateDisplayOptions,
       setSortOptions,
     }

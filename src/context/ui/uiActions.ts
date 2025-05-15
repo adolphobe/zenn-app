@@ -19,6 +19,10 @@ export const toggleSidebar = (dispatch: AppDispatch) => {
   dispatch({ type: 'TOGGLE_SIDEBAR' });
 };
 
+export const toggleAutoMode = (dispatch: AppDispatch) => {
+  dispatch({ type: 'TOGGLE_AUTO_MODE' });
+};
+
 export const updateDateDisplayOptions = (dispatch: AppDispatch, options: DateDisplayOptions) => {
   dispatch({ type: 'UPDATE_DATE_DISPLAY_OPTIONS', payload: options });
 };
