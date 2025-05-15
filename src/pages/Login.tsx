@@ -47,7 +47,7 @@ const Login: React.FC = () => {
       localStorage.setItem('acto_is_logged_in', 'true');
       
       addToast({
-        title: "Bem-vindo de volta!",
+        title: "Faça o login abaixo:",
         description: "Login realizado com sucesso",
       });
       navigate('/dashboard');
