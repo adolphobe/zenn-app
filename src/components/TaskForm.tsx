@@ -7,6 +7,7 @@ import TaskFormActions from './TaskFormActions';
 import { X } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useTabNavigation } from '../context/hooks/useTabNavigation';
+import { useIsMobile } from '../hooks/use-mobile';
 
 interface TaskFormProps {
   onClose: () => void;
@@ -27,6 +28,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, initialData, taskId, task,
   
   const { addTask, updateTask } = useAppContext();
   const { activeTab, setActiveTab } = useTabNavigation('levels');
+  const isMobile = useIsMobile();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -121,7 +123,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, initialData, taskId, task,
       data-testid="task-form-backdrop"
     >
       <div 
-        className="bg-white dark:bg-gray-800 rounded-xl w-full max-w-md shadow-lg overflow-hidden"
+        className={`bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden ${isMobile ? 'w-full max-w-md' : 'w-full max-w-4xl'}`}
         onClick={handleModalClick}
         onMouseDown={(e) => {
           e.stopPropagation();
