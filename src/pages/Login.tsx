@@ -152,7 +152,7 @@ const Login: React.FC = () => {
                       <FormControl>
                         <Input
                           placeholder="E-mail"
-                          className="pl-10 h-12 bg-white/80 backdrop-blur-sm border-gray-200 shadow-sm transition-all duration-300 focus:outline-none focus:ring-0 focus:border-transparent"
+                          className="pl-10 h-12 bg-white/80 backdrop-blur-sm border-gray-200 shadow-sm transition-all duration-300 focus:border-none focus:shadow-none focus:ring-0 focus:outline-none"
                           {...field}
                         />
                       </FormControl>
@@ -176,7 +176,7 @@ const Login: React.FC = () => {
                         <Input
                           type={showPassword ? "text" : "password"}
                           placeholder="Senha"
-                          className="pl-10 pr-10 h-12 bg-white/80 backdrop-blur-sm border-gray-200 shadow-sm transition-all duration-300 focus:outline-none focus:ring-0 focus:border-transparent"
+                          className="pl-10 pr-10 h-12 bg-white/80 backdrop-blur-sm border-gray-200 shadow-sm transition-all duration-300 focus:border-none focus:shadow-none focus:ring-0 focus:outline-none"
                           {...field}
                         />
                       </FormControl>
