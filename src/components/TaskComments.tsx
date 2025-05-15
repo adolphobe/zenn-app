@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { format } from 'date-fns';
 import { Comment } from '@/types';
 import { useAppContext } from '@/context/AppContext';
@@ -6,27 +6,59 @@ import { X } from 'lucide-react';
 import * as ScrollAreaPrimitive from "@radix-ui/react-scroll-area";
 import { cn } from "@/lib/utils";
 
-// Solução radical usando div com overflow e scrollbar CSS custom
-const CustomScrollArea: React.FC<{ className?: string; children: React.ReactNode }> = ({ 
-  className, 
-  children 
-}) => {
-  return (
-    <div 
-      className={cn(
-        "h-60 rounded-md border border-gray-200 dark:border-gray-700 overflow-auto scrollbar-custom",
-        className
-      )}
-      style={{
-        // Força scrollbar visível no Firefox
-        scrollbarWidth: 'thin',
-        scrollbarColor: 'rgba(156, 163, 175, 0.7) transparent',
-      }}
-    >
+// Componente ScrollArea personalizado com scrollbar sempre visível
+const AlwaysVisibleScrollArea = React.forwardRef<
+  React.ElementRef<typeof ScrollAreaPrimitive.Root>,
+  React.ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.Root>
+>(({ className, children, ...props }, ref) => (
+  <ScrollAreaPrimitive.Root
+    ref={ref}
+    className={cn("relative overflow-hidden", className)}
+    {...props}
+  >
+    <ScrollAreaPrimitive.Viewport className="h-full w-full rounded-[inherit]">
       {children}
-    </div>
-  );
-};
+    </ScrollAreaPrimitive.Viewport>
+    <AlwaysVisibleScrollBar />
+    <ScrollAreaPrimitive.Corner />
+  </ScrollAreaPrimitive.Root>
+))
+
+AlwaysVisibleScrollArea.displayName = "AlwaysVisibleScrollArea";
+
+// Componente ScrollBar personalizado sempre visível
+const AlwaysVisibleScrollBar = React.forwardRef<
+  React.ElementRef<typeof ScrollAreaPrimitive.ScrollAreaScrollbar>,
+  React.ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.ScrollAreaScrollbar>
+>(({ className, orientation = "vertical", ...props }, ref) => (
+  <ScrollAreaPrimitive.ScrollAreaScrollbar
+    ref={ref}
+    orientation={orientation}
+    className={cn(
+      "flex touch-none select-none transition-none",
+      orientation === "vertical" &&
+        "h-full w-2.5 border-l border-l-transparent p-[1px]",
+      orientation === "horizontal" &&
+        "h-2.5 flex-col border-t border-t-transparent p-[1px]",
+      "!opacity-100", // Força a opacidade usando classe Tailwind
+      className
+    )}
+    style={{ 
+      visibility: "visible",
+      opacity: "1 !important",
+      transition: "none",
+    }}
+    data-always-visible="true"
+    data-state="visible"
+    {...props}
+  >
+    <ScrollAreaPrimitive.ScrollAreaThumb 
+      className="relative flex-1 rounded-full bg-gray-400 dark:bg-gray-600" 
+    />
+  </ScrollAreaPrimitive.ScrollAreaScrollbar>
+))
+
+AlwaysVisibleScrollBar.displayName = "AlwaysVisibleScrollBar";
 
 interface TaskCommentsProps {
   taskId: string;
@@ -35,52 +67,6 @@ interface TaskCommentsProps {
 
 const TaskComments: React.FC<TaskCommentsProps> = ({ taskId, comments }) => {
   const { deleteComment } = useAppContext();
-  
-  useEffect(() => {
-    // Injeta CSS diretamente no documento
-    const style = document.createElement('style');
-    style.innerHTML = `
-      /* Estilos para scrollbar no Chrome, Edge, e Safari */
-      .scrollbar-custom::-webkit-scrollbar {
-        width: 10px !important;
-        display: block !important;
-        background: transparent !important;
-      }
-      
-      .scrollbar-custom::-webkit-scrollbar-thumb {
-        background-color: rgba(156, 163, 175, 0.7) !important;
-        border-radius: 20px !important;
-        border: 3px solid transparent !important;
-      }
-      
-      .dark .scrollbar-custom::-webkit-scrollbar-thumb {
-        background-color: rgba(107, 114, 128, 0.7) !important;
-      }
-      
-      /* Forçar scrollbar para o Radix UI */
-      [data-radix-scroll-area-scrollbar],
-      [data-radix-scroll-area-scrollbar][data-orientation="vertical"],
-      [data-radix-scroll-area-scrollbar][data-state="visible"] {
-        opacity: 1 !important;
-        visibility: visible !important;
-        display: flex !important;
-        width: 14px !important;
-      }
-      
-      [data-radix-scroll-area-thumb] {
-        background-color: rgba(156, 163, 175, 0.7) !important;
-      }
-      
-      .dark [data-radix-scroll-area-thumb] {
-        background-color: rgba(107, 114, 128, 0.7) !important;
-      }
-    `;
-    document.head.appendChild(style);
-    
-    return () => {
-      document.head.removeChild(style);
-    };
-  }, []);
   
   if (!comments || comments.length === 0) {
     return null;
@@ -95,9 +81,7 @@ const TaskComments: React.FC<TaskCommentsProps> = ({ taskId, comments }) => {
   return (
     <div className="mt-4">
       <h4 className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">Comentários</h4>
-      
-      {/* Usando uma div com overflow nativa em vez do Radix ScrollArea */}
-      <CustomScrollArea>
+      <AlwaysVisibleScrollArea className="h-60 rounded-md border border-gray-200 dark:border-gray-700">
         <div className="space-y-3 p-4">
           {comments.map(comment => (
             <div 
@@ -120,7 +104,7 @@ const TaskComments: React.FC<TaskCommentsProps> = ({ taskId, comments }) => {
             </div>
           ))}
         </div>
-      </CustomScrollArea>
+      </AlwaysVisibleScrollArea>
     </div>
   );
 };
