@@ -45,7 +45,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     toggleShowHiddenTasks: () => uiActions.toggleShowHiddenTasks(dispatch),
     toggleDarkMode: () => uiActions.toggleDarkMode(dispatch),
     toggleSidebar: () => uiActions.toggleSidebar(dispatch),
-    toggleAutoMode: () => uiActions.toggleAutoMode(dispatch), // Add toggle auto mode function
     updateDateDisplayOptions: (options) => uiActions.updateDateDisplayOptions(dispatch, options),
     setSortOptions: (options) => uiActions.setSortOptions(dispatch, options)
   };

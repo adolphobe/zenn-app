@@ -1,5 +1,4 @@
 
-
 import React, { useEffect } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -45,8 +44,7 @@ const Sidebar: React.FC = () => {
         <SidebarHeader sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
 
         <div className="p-3 flex-1">
-          {/* Changed the section title from "Modos" to "Menu" by passing a custom title prop */}
-          <SidebarModeSection sidebarOpen={sidebarOpen} title="Menu" />
+          <SidebarModeSection sidebarOpen={sidebarOpen} />
           
           {/* Add History Nav Item */}
           <div className="my-3">

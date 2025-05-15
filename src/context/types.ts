@@ -13,7 +13,6 @@ export type Action =
   | { type: 'TOGGLE_SHOW_HIDDEN_TASKS' }
   | { type: 'TOGGLE_DARK_MODE' }
   | { type: 'TOGGLE_SIDEBAR' }
-  | { type: 'TOGGLE_AUTO_MODE' } // Add toggle auto mode action
   | { type: 'UPDATE_DATE_DISPLAY_OPTIONS'; payload: DateDisplayOptions }
   | { type: 'SET_SORT_OPTIONS'; payload: { sortDirection: SortDirection; noDateAtEnd?: boolean } }
   | { type: 'SET_TASK_FEEDBACK'; payload: { id: string; feedback: 'transformed' | 'relief' | 'obligation' } }
@@ -38,9 +37,30 @@ export interface AppContextType {
   toggleShowHiddenTasks: () => void;
   toggleDarkMode: () => void;
   toggleSidebar: () => void;
-  toggleAutoMode: () => void; // Add toggleAutoMode function
   updateDateDisplayOptions: (options: DateDisplayOptions) => void;
   setSortOptions: (options: { sortDirection: SortDirection; noDateAtEnd?: boolean }) => void;
   setTaskFeedback?: (id: string, feedback: 'transformed' | 'relief' | 'obligation') => void;
   restoreTask?: (id: string) => void;
+}
+
+export interface AppState {
+  tasks: Task[];
+  viewMode: ViewMode;
+  showHiddenTasks: boolean;
+  darkMode: boolean;
+  sidebarOpen: boolean;
+  dateDisplayOptions: {
+    hideYear: boolean;
+    hideTime: boolean;
+    hideDate: boolean
+  };
+  sortOptions: {
+    power: {
+      sortDirection: SortDirection;
+    };
+    chronological: {
+      sortDirection: SortDirection;
+      noDateAtEnd: boolean;
+    };
+  };
 }

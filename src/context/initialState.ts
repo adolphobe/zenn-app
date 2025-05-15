@@ -8,7 +8,6 @@ export const initialState: AppState = {
   showHiddenTasks: false,
   darkMode: false,
   sidebarOpen: true,
-  autoMode: false, // Add autoMode with default value false
   dateDisplayOptions: {
     hideYear: false,
     hideTime: false,
