@@ -15,7 +15,7 @@ const CommentForm: React.FC<CommentFormProps> = ({ taskId }) => {
 
   const handleSubmit = (e: React.MouseEvent<HTMLButtonElement> | React.FormEvent) => {
     e.preventDefault();
-    e.stopPropagation(); // Impedir propagação do evento
+    e.stopPropagation();
     console.log('Comment submit clicked');
     
     if (commentText.trim() && addComment) {
@@ -29,22 +29,34 @@ const CommentForm: React.FC<CommentFormProps> = ({ taskId }) => {
     }
   };
 
-  // Manipular a alteração do texto do comentário
   const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     e.stopPropagation();
     setCommentText(e.target.value);
   };
 
   return (
-    <div className="mt-4" onClick={(e) => e.stopPropagation()}>
+    <div 
+      className="mt-4" 
+      onClick={(e) => {
+        e.stopPropagation();
+        console.log('Comment form container clicked');
+      }}
+    >
       <h4 className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">
         Adicionar comentário
       </h4>
-      <div className="flex flex-col space-y-2" onClick={(e) => e.stopPropagation()}>
+      <div 
+        className="flex flex-col space-y-2" 
+        onClick={(e) => e.stopPropagation()}
+      >
         <textarea
           value={commentText}
           onChange={handleTextChange}
-          onClick={(e) => e.stopPropagation()}
+          onClick={(e) => {
+            e.stopPropagation();
+            console.log('Comment textarea clicked');
+          }}
+          onFocus={(e) => e.stopPropagation()}
           className="w-full p-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all resize-none"
           placeholder="Escreva seu comentário..."
           rows={3}

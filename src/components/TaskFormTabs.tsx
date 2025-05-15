@@ -27,44 +27,52 @@ const TaskFormTabs: React.FC<TaskFormTabsProps> = ({
   taskId,
   task
 }) => {
-  // Prevenir a propagação de eventos para o modal
-  const handleTabClick = (e: React.MouseEvent, value: string) => {
-    e.preventDefault();
-    e.stopPropagation();
-    console.log('Tab clicked:', value);
+  const handleTabValueChange = (value: string) => {
+    console.log('Tab value changed to:', value);
     setActiveTab(value);
-  };
-
-  // Prevenir a propagação de eventos para o conteúdo da tab
-  const handleTabContentClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    console.log('Tab content clicked');
   };
 
   return (
     <Tabs 
-      defaultValue="levels" 
-      className="w-full" 
       value={activeTab} 
-      onValueChange={setActiveTab}
-      onClick={(e) => e.stopPropagation()}
+      onValueChange={handleTabValueChange}
+      className="w-full" 
+      onClick={(e) => {
+        e.stopPropagation();
+        console.log('Tabs container clicked, propagation stopped');
+      }}
     >
-      <TabsList className="grid w-full grid-cols-2 mb-4" onClick={(e) => e.stopPropagation()}>
+      <TabsList className="grid w-full grid-cols-2 mb-4">
         <TabsTrigger 
-          value="levels" 
-          onClick={(e) => handleTabClick(e, "levels")}
+          value="levels"
+          data-testid="levels-tab"
+          onClick={(e) => {
+            e.stopPropagation();
+            console.log('Levels tab clicked');
+          }}
         >
           Níveis
         </TabsTrigger>
         <TabsTrigger 
-          value="comments" 
-          onClick={(e) => handleTabClick(e, "comments")}
+          value="comments"
+          data-testid="comments-tab"
+          onClick={(e) => {
+            e.stopPropagation();
+            console.log('Comments tab clicked');
+          }}
         >
           Comentários
         </TabsTrigger>
       </TabsList>
       
-      <TabsContent value="levels" className="space-y-6" onClick={handleTabContentClick}>
+      <TabsContent 
+        value="levels" 
+        className="space-y-6"
+        onClick={(e) => {
+          e.stopPropagation();
+          console.log('Levels content clicked');
+        }}
+      >
         <TaskFormFields 
           formData={formData} 
           handleChange={handleChange} 
@@ -73,18 +81,28 @@ const TaskFormTabs: React.FC<TaskFormTabsProps> = ({
         />
       </TabsContent>
       
-      <TabsContent value="comments" onClick={handleTabContentClick}>
-        {taskId && (
-          <div className="space-y-4" onClick={(e) => e.stopPropagation()}>
+      <TabsContent 
+        value="comments"
+        onClick={(e) => {
+          e.stopPropagation();
+          console.log('Comments content clicked');
+        }}
+      >
+        {taskId ? (
+          <div 
+            className="space-y-4"
+            onClick={(e) => {
+              e.stopPropagation();
+              console.log('Comments container clicked');
+            }}
+          >
             {task && task.comments && task.comments.length > 0 && (
-              <div onClick={(e) => e.stopPropagation()}>
-                <TaskComments taskId={taskId} comments={task.comments} />
-              </div>
+              <TaskComments taskId={taskId} comments={task.comments} />
             )}
-            <div onClick={(e) => e.stopPropagation()}>
-              <CommentForm taskId={taskId} />
-            </div>
+            <CommentForm taskId={taskId} />
           </div>
+        ) : (
+          <div className="text-gray-500 italic">Salve a tarefa primeiro para adicionar comentários</div>
         )}
       </TabsContent>
     </Tabs>
