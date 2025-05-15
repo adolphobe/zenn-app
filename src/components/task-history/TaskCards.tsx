@@ -45,6 +45,12 @@ export const CompletedTaskCard: React.FC<{ task: Task }> = ({ task }) => {
     obligation: 'bg-amber-100 text-amber-800 border-amber-200',
   };
 
+  const feedbackLabels = {
+    transformed: 'Foi transformador terminar',
+    relief: 'Tive alívio ao finalizar',
+    obligation: 'Terminei por obrigação'
+  };
+
   // Make sure we have a completedAt value before trying to format it
   const completedDate = task.completedAt ? format(new Date(task.completedAt), 'dd/MM/yyyy') : '-';
 
@@ -68,8 +74,7 @@ export const CompletedTaskCard: React.FC<{ task: Task }> = ({ task }) => {
           <div className="flex gap-2">
             {task.feedback && (
               <Badge className={feedbackColors[task.feedback] || 'bg-gray-100 text-gray-800'} variant="outline">
-                {task.feedback === 'transformed' ? 'Transformadora' : 
-                 task.feedback === 'relief' ? 'Alívio' : 'Obrigação'}
+                {feedbackLabels[task.feedback] || '-'}
               </Badge>
             )}
             <Badge className={pillarColors[dominantPillar] || 'bg-gray-100 text-gray-800'} variant="outline">

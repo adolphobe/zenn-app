@@ -103,9 +103,9 @@ export const AdvancedFilters: React.FC<Omit<TaskFiltersProps, 'searchQuery' | 's
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Todos feedbacks</SelectItem>
-            <SelectItem value="transformed">Transformadora</SelectItem>
-            <SelectItem value="relief">Alívio</SelectItem>
-            <SelectItem value="obligation">Obrigação</SelectItem>
+            <SelectItem value="transformed">Foi transformador</SelectItem>
+            <SelectItem value="relief">Foi um alívio</SelectItem>
+            <SelectItem value="obligation">Foi obrigação</SelectItem>
           </SelectContent>
         </Select>
       </div>

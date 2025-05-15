@@ -38,9 +38,9 @@ export const CompletedTaskRow: React.FC<{ task: Task }> = ({ task }) => {
 
   const dominantPillar = getDominantPillar();
   const feedbackLabels = {
-    transformed: 'Transformadora',
-    relief: 'Alívio',
-    obligation: 'Obrigação'
+    transformed: 'Foi transformador terminar',
+    relief: 'Tive alívio ao finalizar',
+    obligation: 'Terminei por obrigação'
   };
 
   // Make sure we have a completedAt value before trying to format it
@@ -54,27 +54,22 @@ export const CompletedTaskRow: React.FC<{ task: Task }> = ({ task }) => {
   };
 
   return (
-    <TableRow 
-      onClick={() => setShowRestore(!showRestore)} 
-      className="cursor-pointer"
-    >
+    <TableRow onClick={() => setShowRestore(!showRestore)} className="cursor-pointer">
       <TableCell className="line-through opacity-70">{task.title}</TableCell>
       <TableCell>{completedDate}</TableCell>
       <TableCell>{task.totalScore}/15</TableCell>
       <TableCell className="capitalize">{dominantPillar}</TableCell>
       <TableCell>{task.feedback ? feedbackLabels[task.feedback] : '-'}</TableCell>
       <TableCell>
-        {showRestore && (
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className="flex items-center gap-1"
-            onClick={handleRestore}
-          >
-            <RefreshCw size={16} />
-            Restaurar
-          </Button>
-        )}
+        <Button 
+          variant="outline" 
+          size="sm" 
+          className="flex items-center gap-1"
+          onClick={handleRestore}
+        >
+          <RefreshCw size={16} />
+          Restaurar
+        </Button>
       </TableCell>
     </TableRow>
   );
