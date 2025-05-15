@@ -40,6 +40,7 @@ const TaskFormFields: React.FC<TaskFormFieldsProps> = ({
         color="blue"
         label="Risco"
         description={CONSEQUENCE_PHRASES}
+        className="mt-0" // Esta classe sobrescreve qualquer margin-top
       />
 
       <RatingSlider
