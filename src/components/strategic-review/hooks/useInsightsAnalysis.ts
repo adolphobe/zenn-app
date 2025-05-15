@@ -13,21 +13,24 @@ const COLORS = {
 // Messages for each pillar based on classification - Updated with new messages
 const PILLAR_MESSAGES = {
   consequence: {
-    prioridade_alta: "Você tem priorizado o que não dá pra adiar. Gosta de resolver o que pesa logo, antes que vire problema. Isso mostra atenção ao que realmente importa.",
-    equilibrado: "Você tem mantido um bom equilíbrio entre tarefas urgentes e outras mais leves. Sabe quando precisa agir, mas também não vive correndo atrás do prejuízo.",
-    negligenciado: "Você tem deixado de lado algumas tarefas importantes. Parece que só percebe o peso delas quando já passou. Isso te faz perder energia corrigindo depois."
+    prioridade_alta: "A maioria das tarefas que você criou tinham risco alto de serem ignoradas. Você tem focado em resolver o que pesa, o que não pode esperar. Isso mostra que sua atenção está no que realmente importa.",
+    equilibrado: "Você tem equilibrado bem tarefas urgentes com outras mais leves. Sabe o que precisa ser feito agora e o que pode esperar. Isso te mantém no controle sem viver apagando incêndio.",
+    negligenciado: "Muitas das tarefas que você concluiu tinham risco baixo, enquanto outras com impacto real ficaram de lado. Isso pode parecer inofensivo agora, mas costuma pesar depois — principalmente na consciência."
   },
+
   pride: {
-    prioridade_alta: "Você tem feito coisas que te deixam satisfeito. Dá pra ver que gosta de cumprir o que tem valor pessoal e não faz só por fazer.",
-    equilibrado: "Você tem mantido uma boa média entre fazer o que precisa e o que te deixa orgulhoso. Nem sempre se vê nas tarefas, mas ainda sente que tá no caminho.",
-    negligenciado: "Você tem feito muita coisa, mas quase nada que te orgulha de verdade. Tá entregando, mas sem sentir que o que faz representa quem você é."
+    prioridade_alta: "Boa parte das tarefas que você tem feito te dão orgulho de verdade. Você não tá só executando: tá entregando coisas que importam pra você, que carregam o seu nome de verdade.",
+    equilibrado: "Você tem feito tarefas que te atendem, mesmo que nem todas tragam orgulho. Ainda assim, mostra que você se preocupa em manter algum alinhamento pessoal com o que entrega.",
+    negligenciado: "Você tem concluído tarefas que não te deixam satisfeito. Isso pode te deixar produtivo por fora, mas com uma sensação de vazio depois. Pode estar entregando muito — mas sem se sentir parte do que faz."
   },
+
   construction: {
-    prioridade_alta: "Você tem procurado crescer. Escolhe tarefas que te desafiam, que te puxam pra frente. Dá pra ver que quer ficar mais forte com o que faz.",
-    equilibrado: "Você tá fazendo o necessário, mas sem esquecer do seu desenvolvimento. Cresce aos poucos, com constância.",
-    negligenciado: "Você tá se mantendo ocupado, mas não tá evoluindo. Faz o que precisa, mas quase nada que realmente te transforme."
+    prioridade_alta: "A maior parte das suas tarefas contribui diretamente pro seu crescimento. Você tá escolhendo fazer coisas que te desafiam, que te puxam pra cima. Isso mostra foco em evolução real.",
+    equilibrado: "Você tá misturando bem tarefas que mantêm sua rotina com outras que te fazem crescer. Esse ritmo é bom pra seguir em movimento sem perder direção.",
+    negligenciado: "As tarefas que você tem feito mantêm as coisas funcionando, mas não estão te levando além. Seu tempo está ocupado, mas sua evolução pessoal tá parada."
   }
 };
+
 
 
 
