@@ -63,7 +63,7 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
         <div className="flex items-center">
           {idealDate && showDates && (
             <div className="text-xs text-right ml-3">
-              {formatDate(idealDate, dateDisplayOptions)}
+              {formatDate(idealDate dateDisplayOptions)}
             </div>
           )}
           <div className="flex items-center justify-center bg-white bg-opacity-40 rounded-full px-3 py-1.5 font-semibold ml-2">
