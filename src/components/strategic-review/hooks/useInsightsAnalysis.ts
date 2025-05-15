@@ -13,21 +13,31 @@ const COLORS = {
 // Messages for each pillar based on classification - Updated with new messages
 const PILLAR_MESSAGES = {
   consequence: {
-    prioridade_alta: "Você tá mandando bem em resolver o que não pode ser adiado. Isso é ótimo porque te livra de problemas futuros antes mesmo deles virarem dor de cabeça.",
-    equilibrado: "Você tá sabendo equilibrar as tarefas que cobram um preço se forem ignoradas. Isso mantém sua vida em dia sem entrar em modo incêndio.",
-    negligenciado: "Você tá deixando de lado tarefas que vão te cobrar depois. Cuidado pra não empurrar o que pode virar problema real lá na frente."
+    prioridade_alta: "Você tá priorizando tarefas que não podem ser ignoradas. Isso mostra foco em resolver o que importa antes que vire dor de cabeça. É uma forma madura de proteger o seu futuro agindo no presente.",
+    
+    equilibrado: "Você tá equilibrando bem o que tem peso real. Sabe quando precisa agir e quando pode esperar, sem deixar o importante virar urgente. Essa clareza evita acúmulo e te mantém em fluxo sem pressão constante.",
+    
+    negligenciado: "Você tá deixando de lado tarefas que já têm impacto real. Pode parecer leve agora, mas vai pesar na consciência quando perceber que perdeu tempo com o que não te levava pra lugar nenhum. O fardo não é só o que ficou por fazer — é saber que foi escolha sua."
   },
+  
   pride: {
-    prioridade_alta: "Você tá fazendo o que te dá orgulho de verdade. Isso reforça quem você é e te deixa mais confiante a cada entrega.",
-    equilibrado: "Você tá se mantendo alinhado com o que acredita. Tá fazendo coisas que não são só úteis, mas também têm a sua cara.",
-    negligenciado: "Você tá executando sem se orgulhar do que faz. Tá batendo meta, mas sem sentir que tá construindo algo que te representa."
+    prioridade_alta: "Você tá fazendo entregas que te dão orgulho real. Isso reforça sua identidade e te mantém respeitando suas próprias escolhas.",
+    
+    equilibrado: "Você tá se mantendo coerente com o que valoriza. Suas ações têm sua assinatura e não são só pra cumprir tabela.",
+    
+    negligenciado: "Você tá fazendo o que precisa, mas sem se ver no que entrega. Isso pode te deixar produtivo por fora, mas vazio por dentro."
   },
+  
   construction: {
-    prioridade_alta: "Você tá focado no que te fortalece. Cada tarefa tá te deixando mais perto do seu Eu ideal. Isso é evolução real.",
-    equilibrado: "Você tá numa boa média entre agir no presente e construir pro futuro. Tá andando e se desenvolvendo ao mesmo tempo.",
-    negligenciado: "Você tá se ocupando, mas sem crescer. Tá mantendo a rotina, mas não tá ficando mais forte com o que faz."
+    prioridade_alta: "Você tá escolhendo tarefas que te constroem. Cada entrega tá te deixando mais forte, mais preparado e mais próximo de quem você quer ser.",
+    
+    equilibrado: "Você tá conseguindo se mover e se desenvolver ao mesmo tempo. Tá cumprindo o presente sem perder o futuro de vista.",
+    
+    negligenciado: "Você tá ocupado, mas não evoluindo. Tá girando, mas não subindo. Isso pode te manter no mesmo lugar por tempo demais."
   }
 };
+
+
 
 export const useInsightsAnalysis = (tasks: Task[]): PillarDataType => {
   return useMemo(() => {
