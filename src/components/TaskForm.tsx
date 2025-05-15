@@ -179,6 +179,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, initialData, taskId, task,
               setFormData={setFormData}
               taskId={taskId}
               task={task}
+              isEditing={isEditing}
             />
 
             <TaskFormActions onClose={onClose} />

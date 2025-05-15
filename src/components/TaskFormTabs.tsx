@@ -14,6 +14,7 @@ interface TaskFormTabsProps {
   setFormData: React.Dispatch<React.SetStateAction<TaskFormData>>;
   taskId?: string;
   task?: Task;
+  isEditing?: boolean;
 }
 
 const TaskFormTabs: React.FC<TaskFormTabsProps> = ({
@@ -24,7 +25,8 @@ const TaskFormTabs: React.FC<TaskFormTabsProps> = ({
   handleDateChange,
   setFormData,
   taskId,
-  task
+  task,
+  isEditing = false
 }) => {
   // Referência para o container de comentários no DOM
   const commentsContainerRef = useRef<HTMLDivElement | null>(null);
@@ -70,6 +72,21 @@ const TaskFormTabs: React.FC<TaskFormTabsProps> = ({
     console.log('Tab content clicked, preventing propagation');
   };
   
+  // If we're creating a new task (not editing), only show the basic fields
+  if (!isEditing && !taskId) {
+    return (
+      <div className="space-y-6" onClick={handleContentClick}>
+        <TaskFormFields 
+          formData={formData} 
+          handleChange={handleChange} 
+          handleDateChange={handleDateChange} 
+          setFormData={setFormData} 
+        />
+      </div>
+    );
+  }
+  
+  // Otherwise, show the full tabs interface when editing
   return (
     <Tabs 
       value={activeTab} 
