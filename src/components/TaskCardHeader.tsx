@@ -63,8 +63,8 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
             </div>
           )}
           <div className="flex items-center justify-center bg-white bg-opacity-40 rounded-full px-3 py-1.5 font-semibold ml-2">
-            <span className="text-xl">{totalScore}</span>
-            <span className="text-[14px] ml-0.5">/ 15</span>
+            <span className="text-[22px]">{totalScore}</span>
+            <span className="text-[12px] self-end mb-1 ml-0.5">/ 15</span>
           </div>
         </div>
       </div>
