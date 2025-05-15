@@ -35,9 +35,9 @@ export const useInsightsAnalysis = (tasks: Task[]): PillarDataType => {
     if (!tasks || tasks.length === 0) {
       return {
         averages: [
-          { name: 'Consequência', value: 0, color: COLORS.consequence, id: 'consequence' },
+          { name: 'Risco', value: 0, color: COLORS.consequence, id: 'consequence' },
           { name: 'Orgulho', value: 0, color: COLORS.pride, id: 'pride' },
-          { name: 'Construção', value: 0, color: COLORS.construction, id: 'construction' }
+          { name: 'Crescimento', value: 0, color: COLORS.construction, id: 'construction' }
         ],
         highest: null,
         lowest: null,
@@ -51,9 +51,9 @@ export const useInsightsAnalysis = (tasks: Task[]): PillarDataType => {
     const avgConstruction = tasks.reduce((sum, task) => sum + task.constructionScore, 0) / tasks.length;
     
     const pillars = [
-      { name: 'Consequência', value: avgConsequence, color: COLORS.consequence, id: 'consequence' },
+      { name: 'Risco', value: avgConsequence, color: COLORS.consequence, id: 'consequence' },
       { name: 'Orgulho', value: avgPride, color: COLORS.pride, id: 'pride' },
-      { name: 'Construção', value: avgConstruction, color: COLORS.construction, id: 'construction' }
+      { name: 'Crescimento', value: avgConstruction, color: COLORS.construction, id: 'construction' }
     ];
     
     // Define classification thresholds
@@ -67,7 +67,7 @@ export const useInsightsAnalysis = (tasks: Task[]): PillarDataType => {
     const consequenceClassification = getClassification(avgConsequence, HIGH_THRESHOLD, LOW_THRESHOLD);
     insights.push({
       id: 'consequence',
-      title: 'Consequência de Ignorar',
+      title: 'Risco',
       classification: consequenceClassification,
       messages: [PILLAR_MESSAGES.consequence[consequenceClassification]]
     });
@@ -75,7 +75,7 @@ export const useInsightsAnalysis = (tasks: Task[]): PillarDataType => {
     const prideClassification = getClassification(avgPride, HIGH_THRESHOLD, LOW_THRESHOLD);
     insights.push({
       id: 'pride',
-      title: 'Orgulho pós execução',
+      title: 'Orgulho',
       classification: prideClassification, 
       messages: [PILLAR_MESSAGES.pride[prideClassification]]
     });
@@ -83,7 +83,7 @@ export const useInsightsAnalysis = (tasks: Task[]): PillarDataType => {
     const constructionClassification = getClassification(avgConstruction, HIGH_THRESHOLD, LOW_THRESHOLD);
     insights.push({
       id: 'construction',
-      title: 'Força de Construção pessoal',
+      title: 'Crescimento pessoal',
       classification: constructionClassification,
       messages: [PILLAR_MESSAGES.construction[constructionClassification]]
     });

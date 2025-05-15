@@ -35,9 +35,9 @@ const PillarsAnalysisCard: React.FC<PillarsAnalysisCardProps> = ({ tasks }) => {
   // Function to get pillar title based on id
   const getPillarTitle = (id: string, classification: string) => {
     const titles = {
-      consequence: 'Consequência de Ignorar',
-      pride: 'Orgulho pós execução',
-      construction: 'Força de Construção pessoal'
+      consequence: 'Risco',
+      pride: 'Orgulho',
+      construction: 'Crescimento pessoal'
     };
     
     const emoji = classification === 'prioridade_alta' 

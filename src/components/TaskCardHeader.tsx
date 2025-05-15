@@ -75,11 +75,11 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
       
       {showPillars && (
         <div className="mt-2 text-xs flex flex-wrap gap-2">
-          <span>Consequência: {totalScore ? Math.floor(totalScore / 3) : 0}</span>
+          <span>Risco: {totalScore ? Math.floor(totalScore / 3) : 0}</span>
           <span>|</span>
           <span>Orgulho: {totalScore ? Math.floor(totalScore / 3) : 0}</span>
           <span>|</span>
-          <span>Construção: {totalScore ? Math.ceil(totalScore / 3) : 0}</span>
+          <span>Crescimento: {totalScore ? Math.ceil(totalScore / 3) : 0}</span>
         </div>
       )}
     </>

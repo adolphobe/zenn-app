@@ -24,9 +24,9 @@ export const CompletedTaskCard: React.FC<{ task: Task }> = ({ task }) => {
   // Determine dominant pillar based on scores
   const getDominantPillar = () => {
     const scores = [
-      { name: 'consequência', value: task.consequenceScore },
+      { name: 'risco', value: task.consequenceScore },
       { name: 'orgulho', value: task.prideScore },
-      { name: 'construção', value: task.constructionScore },
+      { name: 'crescimento', value: task.constructionScore },
     ];
     const max = scores.reduce((prev, current) => 
       (prev.value > current.value) ? prev : current
@@ -49,9 +49,9 @@ export const CompletedTaskCard: React.FC<{ task: Task }> = ({ task }) => {
 
   const dominantPillar = getDominantPillar();
   const pillarColors = {
-    consequência: 'bg-orange-100 text-orange-800 border-orange-200',
+    risco: 'bg-orange-100 text-orange-800 border-orange-200',
     orgulho: 'bg-purple-100 text-purple-800 border-purple-200',
-    construção: 'bg-blue-100 text-blue-800 border-blue-200',
+    crescimento: 'bg-blue-100 text-blue-800 border-blue-200',
   };
 
   const feedbackColors = {

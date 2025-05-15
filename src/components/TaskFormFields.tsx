@@ -32,7 +32,7 @@ const TaskFormFields: React.FC<TaskFormFieldsProps> = ({
         value={formData.consequenceScore}
         onChange={(value) => setFormData(prev => ({ ...prev, consequenceScore: value }))}
         color="blue"
-        label="Consequência de Ignorar"
+        label="Risco"
         description={CONSEQUENCE_PHRASES}
       />
 
@@ -40,7 +40,7 @@ const TaskFormFields: React.FC<TaskFormFieldsProps> = ({
         value={formData.prideScore}
         onChange={(value) => setFormData(prev => ({ ...prev, prideScore: value }))}
         color="orange"
-        label="Orgulho pós-execução"
+        label="Orgulho"
         description={PRIDE_PHRASES}
       />
 
@@ -48,7 +48,7 @@ const TaskFormFields: React.FC<TaskFormFieldsProps> = ({
         value={formData.constructionScore}
         onChange={(value) => setFormData(prev => ({ ...prev, constructionScore: value }))}
         color="green"
-        label="Força de construção pessoal"
+        label="Crescimento pessoal"
         description={CONSTRUCTION_PHRASES}
       />
 

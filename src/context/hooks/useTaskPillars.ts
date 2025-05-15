@@ -28,9 +28,9 @@ export const useTaskPillars = () => {
     }
     
     // Return the pillar with the highest score
-    if (maxScore === consequenceScore) return "Consequência";
+    if (maxScore === consequenceScore) return "Risco";
     if (maxScore === prideScore) return "Orgulho";
-    if (maxScore === constructionScore) return "Construção";
+    if (maxScore === constructionScore) return "Crescimento";
     
     // Default fallback - should never reach here
     return "Balanceado";

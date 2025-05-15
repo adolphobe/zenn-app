@@ -10,27 +10,27 @@ const TaskPillarDetails: React.FC<TaskPillarDetailsProps> = ({ task }) => {
   return (
     <div className="space-y-0 text-sm">
 <div className="rounded-md bg-white px-[10px] pt-[3px] pb-[3px] text-blue-600 border border-blue-200 text-[13px] !mt-[15px]">
-        <span className="font-medium">Consequência de Ignorar:</span> {task.consequenceScore} | {task.consequenceScore === 5 ? "Vou me sentir bem mal comigo mesmo por não ter feito." : 
-                  task.consequenceScore === 4 ? "Se eu ignorar, vou ficar incomodado." :
-                  task.consequenceScore === 3 ? "Vai dar aquela sensação de \"tô enrolando\", mas ainda dá pra tolerar." :
-                  task.consequenceScore === 2 ? "Sei que devia fazer, mas não vou me cobrar." :
-                  "Ignorar isso não muda nada na minha vida."}
+        <span className="font-medium">Risco:</span> {task.consequenceScore} | {task.consequenceScore === 5 ? "Não fazer isso me deixará muito mal" : 
+                  task.consequenceScore === 4 ? "Deixar isso de lado vai me atrapalhar" :
+                  task.consequenceScore === 3 ? "Vai gerar um leve incômodo se não fizer" :
+                  task.consequenceScore === 2 ? "Ignorar não pesa agora, mas tem sua importância" :
+                  "Não tem problema algum ignorar"}
       </div>
       
 <div className="rounded-md bg-white px-[10px] pt-[3px] pb-[3px] text-orange-600 border border-orange-200 text-[13px] !mt-[6px]">
-        <span className="font-medium">Orgulho pós-execução:</span> {task.prideScore} | {task.prideScore === 5 ? "Total senso de potência. Vou me sentir acima da média." : 
-            task.prideScore === 4 ? "Vou me olhar com respeito." :
-            task.prideScore === 3 ? "Boa sensação de ter mantido o ritmo." :
-            task.prideScore === 2 ? "Leve alívio por ter feito." :
-            "Nenhum orgulho. Só rotina ou tarefa obrigatória."}
+        <span className="font-medium">Orgulho:</span> {task.prideScore} | {task.prideScore === 5 ? "Vou ficar muito orgulhoso de mim mesmo!" : 
+            task.prideScore === 4 ? "Vou sentir que cumpri algo importante pra mim" :
+            task.prideScore === 3 ? "Vou sentir que fiz algo que valeu a pena" :
+            task.prideScore === 2 ? "Vai evitar incômodo, mas não trará satisfação" :
+            "Isso não tem valor nenhum pra mim"}
       </div>
       
 <div className="rounded-md bg-white px-[10px] !pt-[3px] pb-[3px] text-green-600 border border-green-200 text-[13px] !mt-[6px]">
-        <span className="font-medium">Força de construção pessoal:</span> {task.constructionScore} | {task.constructionScore === 5 ? "Essa tarefa solidifica quem eu quero me tornar." : 
-                task.constructionScore === 4 ? "Vai me posicionar num degrau acima da versão atual." :
-                task.constructionScore === 3 ? "Me move um pouco, mas não me desafia." :
-                task.constructionScore === 2 ? "Útil, mas não muda nada em mim." :
-                "Só me ocupa."}
+        <span className="font-medium">Crescimento pessoal:</span> {task.constructionScore} | {task.constructionScore === 5 ? "Cada vez que faço algo assim, eu fico mais inabalável" : 
+                task.constructionScore === 4 ? "Me exige acima do meu normal. Me força a crescer enquanto faço" :
+                task.constructionScore === 3 ? "Começa a me puxar pra cima, mesmo que só um pouco" :
+                task.constructionScore === 2 ? "Pode ser útil, mas não muda nada em quem eu sou" :
+                "Isso não me move nem 1%"}
       </div>
     </div>
   );

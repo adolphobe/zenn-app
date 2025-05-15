@@ -26,9 +26,9 @@ export const CompletedTaskRow: React.FC<{ task: Task }> = ({ task }) => {
   // Determine dominant pillar based on scores
   const getDominantPillar = () => {
     const scores = [
-      { name: 'consequência', value: task.consequenceScore },
+      { name: 'risco', value: task.consequenceScore },
       { name: 'orgulho', value: task.prideScore },
-      { name: 'construção', value: task.constructionScore },
+      { name: 'crescimento', value: task.constructionScore },
     ];
     const max = scores.reduce((prev, current) => 
       (prev.value > current.value) ? prev : current

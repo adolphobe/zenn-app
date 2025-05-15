@@ -1,26 +1,26 @@
 
 export const CONSEQUENCE_PHRASES = [
-  "Ignorar isso não muda nada na minha vida.",
-  "Sei que devia fazer, mas não vou me cobrar.",
-  "Vai dar aquela sensação de \"tô enrolando\", mas ainda dá pra tolerar.",
-  "Se eu ignorar, vou ficar incomodado.",
-  "Vou me sentir bem mal comigo mesmo por não ter feito."
+  "Não tem problema algum ignorar",
+  "Ignorar não pesa agora, mas tem sua importância",
+  "Vai gerar um leve incômodo se não fizer",
+  "Deixar isso de lado vai me atrapalhar",
+  "Não fazer isso me deixará muito mal"
 ];
 
 export const PRIDE_PHRASES = [
-  "Nenhum orgulho. Só rotina ou tarefa obrigatória.",
-  "Leve alívio por ter feito.",
-  "Boa sensação de ter mantido o ritmo.",
-  "Vou me olhar com respeito.",
-  "Total senso de potência. Vou me sentir acima da média."
+  "Isso não tem valor nenhum pra mim",
+  "Vai evitar incômodo, mas não trará satisfação",
+  "Vou sentir que fiz algo que valeu a pena",
+  "Vou sentir que cumpri algo importante pra mim",
+  "Vou ficar muito orgulhoso de mim mesmo!"
 ];
 
 export const CONSTRUCTION_PHRASES = [
-  "Só me ocupa.",
-  "Útil, mas não muda nada em mim.",
-  "Me move um pouco, mas não me desafia.",
-  "Vai me posicionar num degrau acima da versão atual.",
-  "Essa tarefa solidifica quem eu quero me tornar."
+  "Isso não me move nem 1%",
+  "Pode ser útil, mas não muda nada em quem eu sou",
+  "Começa a me puxar pra cima, mesmo que só um pouco",
+  "Me exige acima do meu normal. Me força a crescer enquanto faço",
+  "Cada vez que faço algo assim, eu fico mais inabalável"
 ];
 
 export const SAMPLE_TASKS: Array<Omit<import('./types').Task, 'id' | 'createdAt'>> = [
