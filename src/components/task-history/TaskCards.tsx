@@ -66,7 +66,7 @@ export const CompletedTaskCard: React.FC<{ task: Task }> = ({ task }) => {
       <CardContent className="pt-4">
         <div className="flex justify-between items-start">
           <div>
-            <h3 className="font-medium text-gray-900 dark:text-gray-100 line-through opacity-70">{task.title}</h3>
+            <h3 className="font-medium text-gray-900 dark:text-gray-100 opacity-70">{task.title}</h3>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
               Concluída em {completedDate}
             </p>
