@@ -75,7 +75,7 @@ const TaskFormFields: React.FC<TaskFormFieldsProps> = ({
           />
         </div>
 
-        <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg shadow-sm">
+        <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg shadow-sm mt-[20px]">
           <TaskScoreDisplay score={totalScore} />
         </div>
       </>
