@@ -1,9 +1,22 @@
-import React, { useEffect } from 'react';
+
+import React, { useEffect, useState } from 'react';
 import { format } from 'date-fns';
 import { Comment } from '@/types';
 import { useAppContext } from '@/context/AppContext';
 import { X } from 'lucide-react';
 import { cn } from "@/lib/utils";
+import { AlwaysVisibleScrollArea } from '@/components/ui/always-visible-scroll-area';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface TaskCommentsProps {
   taskId: string;
@@ -12,6 +25,7 @@ interface TaskCommentsProps {
 
 const TaskComments: React.FC<TaskCommentsProps> = ({ taskId, comments }) => {
   const { deleteComment } = useAppContext();
+  const [commentToDelete, setCommentToDelete] = useState<string | null>(null);
   
   // Injetar CSS global para scrollbar
   useEffect(() => {
@@ -75,6 +89,7 @@ const TaskComments: React.FC<TaskCommentsProps> = ({ taskId, comments }) => {
   const handleDeleteComment = (commentId: string) => {
     if (deleteComment) {
       deleteComment(taskId, commentId);
+      setCommentToDelete(null);
     }
   };
   
@@ -82,8 +97,8 @@ const TaskComments: React.FC<TaskCommentsProps> = ({ taskId, comments }) => {
     <div className="mt-4">
       <h4 className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">Comentários</h4>
       
-      {/* Div com scrollbar nativa e estilização */}
-      <div className="native-scrollbar h-60 overflow-auto rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+      {/* Componente AlwaysVisibleScrollArea */}
+      <AlwaysVisibleScrollArea className="h-60 border border-gray-200 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800">
         <div className="space-y-3 p-4">
           {comments.map(comment => (
             <div 
@@ -95,18 +110,44 @@ const TaskComments: React.FC<TaskCommentsProps> = ({ taskId, comments }) => {
                 <p className="text-xs text-gray-400">
                   {format(new Date(comment.createdAt), 'dd/MM/yyyy HH:mm')}
                 </p>
-                <button
-                  onClick={() => handleDeleteComment(comment.id)}
-                  className="text-gray-400 hover:text-red-500 transition-colors"
-                  title="Remover comentário"
-                >
-                  <X size={14} />
-                </button>
+                
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <button
+                      className="text-gray-400 hover:text-red-500 transition-colors"
+                      title="Remover comentário"
+                    >
+                      <X size={14} />
+                    </button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+                    <AlertDialogHeader>
+                      <AlertDialogTitle className="text-gray-900 dark:text-gray-100">
+                        Confirmar exclusão
+                      </AlertDialogTitle>
+                      <AlertDialogDescription className="text-gray-600 dark:text-gray-400">
+                        Tem certeza que deseja excluir este comentário?
+                        Esta ação não pode ser desfeita.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel className="bg-gray-100 hover:bg-gray-200 text-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-200 border-gray-200 dark:border-gray-600">
+                        Cancelar
+                      </AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={() => handleDeleteComment(comment.id)}
+                        className="bg-red-50 hover:bg-red-100 text-red-600 border border-red-100 hover:border-red-200"
+                      >
+                        Excluir
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </div>
             </div>
           ))}
         </div>
-      </div>
+      </AlwaysVisibleScrollArea>
     </div>
   );
 };
