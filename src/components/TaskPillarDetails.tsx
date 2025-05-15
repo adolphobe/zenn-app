@@ -17,7 +17,7 @@ const TaskPillarDetails: React.FC<TaskPillarDetailsProps> = ({ task }) => {
                   "Ignorar isso não muda nada na minha vida."}
       </div>
       
-<div className="rounded-md bg-white px-[10px] !pt-[6px] pb-[3px] text-orange-600 border border-orange-200 text-[13px] mt-[6px]">
+<div className="rounded-md bg-white px-[10px] pt-[6px] pb-[3px] text-orange-600 border border-orange-200 text-[13px] !mt-[6px]">
         <span className="font-medium">Orgulho pós-execução:</span> {task.prideScore} | {task.prideScore === 5 ? "Total senso de potência. Vou me sentir acima da média." : 
             task.prideScore === 4 ? "Vou me olhar com respeito." :
             task.prideScore === 3 ? "Boa sensação de ter mantido o ritmo." :
