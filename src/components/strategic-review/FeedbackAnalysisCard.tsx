@@ -100,7 +100,9 @@ const FeedbackAnalysisCard: React.FC<FeedbackAnalysisCardProps> = ({ tasks }) =>
               <h4 className="font-medium mb-3 text-base">
                 {getFeedbackTitle(feedbackData.topFeedback)}
               </h4>
-              <p className="text-sm text-muted-foreground">{feedbackData.insight}</p>
+              <p className="text-sm text-muted-foreground whitespace-pre-line">
+                {feedbackData.insight}
+              </p>
             </div>
           </div>
         )}
