@@ -58,8 +58,8 @@ const PillarsAnalysisCard: React.FC<PillarsAnalysisCardProps> = ({ tasks }) => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Análise de Pilares</CardTitle>
-        <CardDescription>Distribuição e análise dos pilares estratégicos nas tarefas.</CardDescription>
+        <CardTitle>Foco das suas tarefas</CardTitle>
+        <CardDescription>Este gráfico mostra onde seu foco tem sido: resolver o que não pode ser ignorado (risco), fazer o que te dá orgulho (orgulho) ou construir o seu eu mais forte (Crescimento Pessoal).</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="h-64 mb-6">
