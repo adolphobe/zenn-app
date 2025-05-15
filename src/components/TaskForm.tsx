@@ -1,9 +1,11 @@
 
 import React, { useState } from 'react';
 import { useAppContext } from '../context/AppContext';
-import { TaskFormData } from '../types';
+import { TaskFormData, Task } from '../types';
 import RatingSlider from './RatingSlider';
 import TaskScoreDisplay from './TaskScoreDisplay';
+import CommentForm from './CommentForm';
+import TaskComments from './TaskComments';
 import { 
   CONSEQUENCE_PHRASES, 
   PRIDE_PHRASES, 
@@ -15,9 +17,11 @@ interface TaskFormProps {
   onClose: () => void;
   initialData?: TaskFormData;
   taskId?: string;
+  task?: Task;
+  isEditing?: boolean;
 }
 
-const TaskForm: React.FC<TaskFormProps> = ({ onClose, initialData, taskId }) => {
+const TaskForm: React.FC<TaskFormProps> = ({ onClose, initialData, taskId, task, isEditing = false }) => {
   const [formData, setFormData] = useState<TaskFormData>(initialData || {
     title: '',
     consequenceScore: 3,
@@ -66,7 +70,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, initialData, taskId }) => 
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
       <div className="bg-white dark:bg-gray-800 rounded-xl w-full max-w-md shadow-lg overflow-hidden">
         <div className="flex justify-between items-center p-5 border-b">
-          <h2 className="text-xl font-semibold">{taskId ? 'Editar Tarefa' : 'Nova Tarefa'}</h2>
+          <h2 className="text-xl font-semibold">{isEditing ? 'Editar Tarefa' : 'Nova Tarefa'}</h2>
           <button 
             onClick={onClose} 
             className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
@@ -133,6 +137,18 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, initialData, taskId }) => 
           <div className="mt-5 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg shadow-sm">
             <TaskScoreDisplay score={totalScore} />
           </div>
+
+          {/* Comment section - only for editing */}
+          {isEditing && taskId && task && (
+            <>
+              <div className="border-t pt-4">
+                <CommentForm taskId={taskId} />
+              </div>
+              {task.comments && task.comments.length > 0 && (
+                <TaskComments taskId={taskId} comments={task.comments || []} />
+              )}
+            </>
+          )}
 
           <div className="mt-6 flex justify-end space-x-4">
             <button

@@ -1,18 +1,20 @@
 
 import React from 'react';
 import { Button } from './ui/button';
-import { EyeOff, CheckCircle } from 'lucide-react';
+import { EyeOff, CheckCircle, Edit } from 'lucide-react';
 
 interface TaskCardActionsProps {
   isHidden: boolean;
   onToggleHidden: (e: React.MouseEvent) => void;
   onCompleteTask: (e: React.MouseEvent) => void;
+  onEditTask: (e: React.MouseEvent) => void;
 }
 
 const TaskCardActions: React.FC<TaskCardActionsProps> = ({ 
   isHidden, 
   onToggleHidden, 
-  onCompleteTask 
+  onCompleteTask,
+  onEditTask
 }) => {
   return (
     <div className="flex gap-2 mt-4 justify-start">
@@ -24,6 +26,15 @@ const TaskCardActions: React.FC<TaskCardActionsProps> = ({
       >
         <EyeOff size={14} />
         {isHidden ? 'Mostrar' : 'Ocultar'}
+      </Button>
+      <Button 
+        variant="outline"
+        size="sm"
+        className="flex items-center gap-1 text-gray-700 dark:text-gray-300 hover:bg-purple-50 hover:text-purple-600 dark:hover:bg-purple-900/20 dark:hover:text-purple-400"
+        onClick={onEditTask}
+      >
+        <Edit size={14} />
+        Editar
       </Button>
       <Button 
         variant="outline"

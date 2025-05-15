@@ -7,6 +7,8 @@ import TaskPillarDetails from './TaskPillarDetails';
 import TaskCardHeader from './TaskCardHeader';
 import TaskCardActions from './TaskCardActions';
 import PostCompletionFeedback from './PostCompletionFeedback';
+import TaskForm from './TaskForm';
+import TaskComments from './TaskComments';
 
 interface TaskCardProps {
   task: Task;
@@ -18,6 +20,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [titleValue, setTitleValue] = useState(task.title);
   const [feedbackModalOpen, setFeedbackModalOpen] = useState(false);
+  const [editTaskModalOpen, setEditTaskModalOpen] = useState(false);
   const { toggleTaskCompleted, toggleTaskHidden, updateTaskTitle, state } = useAppContext();
   const { dateDisplayOptions, showHiddenTasks } = state;
   const priorityClass = getTaskPriorityClass(task.totalScore);
@@ -60,6 +63,11 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
     toggleTaskHidden(task.id);
   };
 
+  const handleEditTask = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setEditTaskModalOpen(true);
+  };
+
   const handleFeedbackConfirm = (feedbackType: string) => {
     // In a future implementation, we would store the feedback
     // For now, just complete the task
@@ -99,9 +107,18 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
         {isExpanded && (
           <div className="mt-4 animate-fade-in">
             <TaskPillarDetails task={task} />
+            
+            {/* Display comments if they exist */}
+            {task.comments && task.comments.length > 0 && (
+              <div className="mt-4">
+                <TaskComments taskId={task.id} comments={task.comments} />
+              </div>
+            )}
+            
             <TaskCardActions 
               isHidden={task.hidden}
               onToggleHidden={handleToggleHidden}
+              onEditTask={handleEditTask}
               onCompleteTask={handleCompleteTask}
             />
           </div>
@@ -114,6 +131,22 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
         onClose={handleFeedbackCancel}
         onConfirm={handleFeedbackConfirm}
       />
+      
+      {editTaskModalOpen && (
+        <TaskForm
+          onClose={() => setEditTaskModalOpen(false)}
+          initialData={{
+            title: task.title,
+            consequenceScore: task.consequenceScore,
+            prideScore: task.prideScore,
+            constructionScore: task.constructionScore,
+            idealDate: task.idealDate
+          }}
+          taskId={task.id}
+          task={task}
+          isEditing={true}
+        />
+      )}
     </>
   );
 };

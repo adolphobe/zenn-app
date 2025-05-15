@@ -50,3 +50,21 @@ export const restoreTask = (dispatch: AppDispatch, taskId: string) => {
     description: "A tarefa foi restaurada com sucesso."
   });
 };
+
+export const addComment = (dispatch: AppDispatch, taskId: string, text: string) => {
+  dispatch({ type: 'ADD_COMMENT', payload: { taskId, text } });
+  toast({
+    id: uuidv4(),
+    title: "Comentário adicionado",
+    description: "Seu comentário foi adicionado com sucesso."
+  });
+};
+
+export const deleteComment = (dispatch: AppDispatch, taskId: string, commentId: string) => {
+  dispatch({ type: 'DELETE_COMMENT', payload: { taskId, commentId } });
+  toast({
+    id: uuidv4(),
+    title: "Comentário removido",
+    description: "O comentário foi removido com sucesso."
+  });
+};

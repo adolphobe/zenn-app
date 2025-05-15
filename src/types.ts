@@ -9,10 +9,17 @@ export interface Task {
   idealDate?: Date | null;
   hidden: boolean;
   completed: boolean;
-  completedAt?: string | null; // Added completedAt date string for completed tasks
+  completedAt?: string | null;
   createdAt: Date;
   feedback?: 'transformed' | 'relief' | 'obligation' | null;
-  pillar?: string; // Added pillar property
+  pillar?: string;
+  comments?: Comment[];
+}
+
+export interface Comment {
+  id: string;
+  text: string;
+  createdAt: string;
 }
 
 export interface TaskFormData {

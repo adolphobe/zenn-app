@@ -17,9 +17,43 @@ export const appReducer = (state: AppState, action: Action): AppState => {
         hidden: (action.payload.consequenceScore + action.payload.prideScore + action.payload.constructionScore) < 8,
         completed: false,
         createdAt: new Date(),
-        feedback: null
+        feedback: null,
+        comments: []
       };
       return { ...state, tasks: [...state.tasks, newTask] };
+    }
+
+    case 'ADD_COMMENT': {
+      return {
+        ...state,
+        tasks: state.tasks.map(task => {
+          if (task.id === action.payload.taskId) {
+            const newComment = {
+              id: uuidv4(),
+              text: action.payload.text,
+              createdAt: new Date().toISOString()
+            };
+            const comments = task.comments ? [...task.comments, newComment] : [newComment];
+            return { ...task, comments };
+          }
+          return task;
+        })
+      };
+    }
+
+    case 'DELETE_COMMENT': {
+      return {
+        ...state,
+        tasks: state.tasks.map(task => {
+          if (task.id === action.payload.taskId) {
+            const comments = task.comments ? 
+              task.comments.filter(comment => comment.id !== action.payload.commentId) : 
+              [];
+            return { ...task, comments };
+          }
+          return task;
+        })
+      };
     }
 
     case 'DELETE_TASK':

@@ -1,4 +1,3 @@
-
 import { Task, TaskFormData, ViewMode, DateDisplayOptions, SortDirection } from '../types';
 
 // Actions
@@ -18,7 +17,9 @@ export type Action =
   | { type: 'SET_TASK_FEEDBACK'; payload: { id: string; feedback: 'transformed' | 'relief' | 'obligation' } }
   | { type: 'COMPLETE_TASK_BY_TITLE'; payload: string }
   | { type: 'SET_TASK_FEEDBACK_BY_TITLE'; payload: { title: string; feedback: 'transformed' | 'relief' | 'obligation' } }
-  | { type: 'RESTORE_TASK'; payload: string };
+  | { type: 'RESTORE_TASK'; payload: string }
+  | { type: 'ADD_COMMENT'; payload: { taskId: string; text: string } }
+  | { type: 'DELETE_COMMENT'; payload: { taskId: string; commentId: string } };
 
 // Add AppDispatch type for action creators
 export type AppDispatch = React.Dispatch<Action>;
@@ -41,6 +42,8 @@ export interface AppContextType {
   setSortOptions: (options: { sortDirection: SortDirection; noDateAtEnd?: boolean }) => void;
   setTaskFeedback?: (id: string, feedback: 'transformed' | 'relief' | 'obligation') => void;
   restoreTask?: (id: string) => void;
+  addComment?: (taskId: string, text: string) => void;
+  deleteComment?: (taskId: string, commentId: string) => void;
 }
 
 export interface AppState {
