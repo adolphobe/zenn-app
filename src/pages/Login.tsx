@@ -67,7 +67,7 @@ const Login: React.FC = () => {
             <img 
               src="https://cdn.shopify.com/s/files/1/0629/1993/4061/files/LOGO_ACTO.jpg?v=1747283022" 
               alt="Acto Logo" 
-              className="w-[120px] mb-4"
+              className="w-[180px] mb-4"
             />
           </div>
 
