@@ -129,7 +129,7 @@ const TaskComments: React.FC<TaskCommentsProps> = ({ taskId, comments }) => {
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                      <AlertDialogCancel className="bg-gray-50 hover:bg-gray-200 text-gray-700 dark:bg-gray-600 dark:hover:bg-gray-700 dark:text-gray-200 border-gray-200 dark:border-gray-600">
+                      <AlertDialogCancel className="bg-gray-50 hover:bg-gray-200 text-gray-700 hover:text-gray-700 dark:bg-gray-600 dark:hover:bg-gray-700 dark:text-gray-200 dark:hover:text-gray-200 border-gray-200 dark:border-gray-600">
                         Cancelar
                       </AlertDialogCancel>
                       <AlertDialogAction
