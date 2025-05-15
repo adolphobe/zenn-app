@@ -10,7 +10,7 @@ const TaskPillarDetails: React.FC<TaskPillarDetailsProps> = ({ task }) => {
   return (
     <div className="space-y-3 text-sm">
 <div className="rounded-md bg-white px-3 py-2 text-blue-600 border border-blue-200 text-[13px]">
-        <span className="font-medium">Consequência de Ignorar:</span> {task.consequenceScore} – {task.consequenceScore === 5 ? "Vou me sentir bem mal comigo mesmo por não ter feito." : 
+        <span className="font-medium">Consequência de Ignorar:</span> ({task.consequenceScore}) {task.consequenceScore === 5 ? "Vou me sentir bem mal comigo mesmo por não ter feito." : 
                   task.consequenceScore === 4 ? "Se eu ignorar, vou ficar incomodado." :
                   task.consequenceScore === 3 ? "Vai dar aquela sensação de \"tô enrolando\", mas ainda dá pra tolerar." :
                   task.consequenceScore === 2 ? "Sei que devia fazer, mas não vou me cobrar." :
