@@ -118,17 +118,12 @@ const SelectItem = React.forwardRef<
     ref={ref}
     className={cn(
       dropdownStyles.item,
-      "relative px-3 py-2.5 pl-8",
+      "relative pl-3 pr-3",
+      props.selected && dropdownStyles.itemSelected,
       className
     )}
     {...props}
   >
-    <span className="absolute left-2.5 flex h-3.5 w-3.5 items-center justify-center">
-      <SelectPrimitive.ItemIndicator>
-        <Check className="h-4 w-4" />
-      </SelectPrimitive.ItemIndicator>
-    </span>
-
     <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
   </SelectPrimitive.Item>
 ))

@@ -5,7 +5,6 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { dropdownStyles } from '@/lib/utils';
 
 interface TaskFiltersProps {
   searchQuery: string;
@@ -73,10 +72,10 @@ export const AdvancedFilters: React.FC<Omit<TaskFiltersProps, 'searchQuery' | 's
             <SelectValue placeholder="Todos os períodos" />
           </SelectTrigger>
           <SelectContent className="bg-white p-1.5">
-            <SelectItem value="all" className={dropdownStyles.item}>Todos os períodos</SelectItem>
-            <SelectItem value="today" className={dropdownStyles.item}>Hoje</SelectItem>
-            <SelectItem value="week" className={dropdownStyles.item}>Esta semana</SelectItem>
-            <SelectItem value="month" className={dropdownStyles.item}>Este mês</SelectItem>
+            <SelectItem value="all">Todos os períodos</SelectItem>
+            <SelectItem value="today">Hoje</SelectItem>
+            <SelectItem value="week">Esta semana</SelectItem>
+            <SelectItem value="month">Este mês</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -88,10 +87,10 @@ export const AdvancedFilters: React.FC<Omit<TaskFiltersProps, 'searchQuery' | 's
             <SelectValue placeholder="Todas pontuações" />
           </SelectTrigger>
           <SelectContent className="bg-white p-1.5">
-            <SelectItem value="all" className={dropdownStyles.item}>Todas pontuações</SelectItem>
-            <SelectItem value="high" className={dropdownStyles.item}>Alta (≥ 12)</SelectItem>
-            <SelectItem value="medium" className={dropdownStyles.item}>Média (8-11)</SelectItem>
-            <SelectItem value="low" className={dropdownStyles.item}>Baixa (&lt; 8)</SelectItem>
+            <SelectItem value="all">Todas pontuações</SelectItem>
+            <SelectItem value="high">Alta (≥ 12)</SelectItem>
+            <SelectItem value="medium">Média (8-11)</SelectItem>
+            <SelectItem value="low">Baixa (&lt; 8)</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -103,10 +102,10 @@ export const AdvancedFilters: React.FC<Omit<TaskFiltersProps, 'searchQuery' | 's
             <SelectValue placeholder="Todos feedbacks" />
           </SelectTrigger>
           <SelectContent className="bg-white p-1.5">
-            <SelectItem value="all" className={dropdownStyles.item}>Todos feedbacks</SelectItem>
-            <SelectItem value="transformed" className={dropdownStyles.item}>Foi transformador</SelectItem>
-            <SelectItem value="relief" className={dropdownStyles.item}>Foi um alívio</SelectItem>
-            <SelectItem value="obligation" className={dropdownStyles.item}>Foi obrigação</SelectItem>
+            <SelectItem value="all">Todos feedbacks</SelectItem>
+            <SelectItem value="transformed">Foi transformador</SelectItem>
+            <SelectItem value="relief">Foi um alívio</SelectItem>
+            <SelectItem value="obligation">Foi obrigação</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -118,10 +117,10 @@ export const AdvancedFilters: React.FC<Omit<TaskFiltersProps, 'searchQuery' | 's
             <SelectValue placeholder="Todos pilares" />
           </SelectTrigger>
           <SelectContent className="bg-white p-1.5">
-            <SelectItem value="all" className={dropdownStyles.item}>Todos pilares</SelectItem>
-            <SelectItem value="consequence" className={dropdownStyles.item}>Consequência</SelectItem>
-            <SelectItem value="pride" className={dropdownStyles.item}>Orgulho</SelectItem>
-            <SelectItem value="construction" className={dropdownStyles.item}>Construção</SelectItem>
+            <SelectItem value="all">Todos pilares</SelectItem>
+            <SelectItem value="consequence">Consequência</SelectItem>
+            <SelectItem value="pride">Orgulho</SelectItem>
+            <SelectItem value="construction">Construção</SelectItem>
           </SelectContent>
         </Select>
       </div>
