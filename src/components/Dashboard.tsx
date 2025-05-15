@@ -48,7 +48,7 @@ const Dashboard: React.FC = () => {
           ) : (
             <button
               onClick={() => setIsTaskFormOpen(true)}
-          className="flex items-center gap-2 px-3 py-[10px] text-sm font-medium rounded-md border border-blue-700 bg-blue-700 text-white hover:bg-blue-800 hover:border-blue-800 transition-colors"
+          className="flex items-center gap-2 px-3 py-[10px] text-sm font-medium rounded-md border border-[#1e52f1] bg-[#1e52f1] text-white hover:bg-[#1a47d9] hover:border-[#1a47d9] transition-colors"
             >
               <Plus size={18} />
               <span>Nova Tarefa</span>
