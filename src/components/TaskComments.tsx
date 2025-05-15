@@ -27,7 +27,7 @@ const TaskComments: React.FC<TaskCommentsProps> = ({ taskId, comments }) => {
   return (
     <div className="mt-4">
       <h4 className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">Comentários</h4>
-      <ScrollArea className="h-60 rounded-md border">
+      <ScrollArea className="h-60 rounded-md border border-gray-200 dark:border-gray-700">
         <div className="space-y-3 p-4">
           {comments.map(comment => (
             <div 

@@ -37,10 +37,16 @@ const ScrollBar = React.forwardRef<
         "h-2.5 flex-col border-t border-t-transparent p-[1px]",
       className
     )}
-    style={{ visibility: "visible" }} // Make scrollbar always visible
+    style={{ 
+      visibility: "visible",
+      opacity: "1 !important", // Force opacity to be visible always
+    }}
+    data-always-visible="true" // Add a data attribute to target with CSS if needed
     {...props}
   >
-    <ScrollAreaPrimitive.ScrollAreaThumb className="relative flex-1 rounded-full bg-border" />
+    <ScrollAreaPrimitive.ScrollAreaThumb 
+      className="relative flex-1 rounded-full bg-border hover:bg-gray-400 dark:hover:bg-gray-600" // Enhanced contrast for better visibility
+    />
   </ScrollAreaPrimitive.ScrollAreaScrollbar>
 ))
 ScrollBar.displayName = ScrollAreaPrimitive.ScrollAreaScrollbar.displayName
