@@ -85,7 +85,8 @@ const Login: React.FC = () => {
   return (
     <div className="flex min-h-screen bg-gradient-to-b from-white to-blue-50 dark:from-gray-950 dark:to-gray-900 overflow-hidden relative">
       {/* Animated floating background elements */}
-      <style jsx>{`
+      <style>
+        {`
         @keyframes float-animate {
           0% {
             transform: translate(0, 0) scale(1);
@@ -111,7 +112,8 @@ const Login: React.FC = () => {
           animation: float-animate linear infinite;
           transition: all 3s ease-in-out;
         }
-      `}</style>
+      `}
+      </style>
       
       {floatingItems}
       
@@ -230,7 +232,7 @@ const Login: React.FC = () => {
       <div className="hidden md:block md:w-1/2 relative">
         <div className="absolute inset-0 overflow-hidden">
           <img
-            src="https://images.pexels.com/photos/207237/pexels-photo-207237.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+            src="https://img.freepik.com/fotos-gratis/fundo-de-papel-de-parede-colorido-embacado-artistico_58702-8207.jpg?t=st=1747283730~exp=1747287330~hmac=dcb07fdf1ceb013985424ef8876689f16478a138c822a7417d4c43fe98f2fb27&w=2000"
             alt="Fundo de login"
             className="object-cover w-full h-full object-center"
             style={{ minWidth: '100%', minHeight: '100%' }}
