@@ -3,6 +3,7 @@ import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useSidebar } from '@/context/hooks/useSidebar';
 
 interface SidebarNavItemProps {
   icon: LucideIcon;
@@ -21,15 +22,19 @@ const SidebarNavItem: React.FC<SidebarNavItemProps> = ({
 }) => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { isOpen } = useSidebar();
   const isActive = propIsActive !== undefined ? propIsActive : location.pathname === path;
   
   const handleClick = () => {
     if (onClick) {
       onClick();
-    } else {
+    } else if (path !== '#') {
       navigate(path);
     }
   };
+
+  // Adjust icon size when sidebar is collapsed
+  const iconSize = isOpen ? 20 : 24;
 
   return (
     <button 
@@ -41,8 +46,8 @@ const SidebarNavItem: React.FC<SidebarNavItemProps> = ({
       )}
       onClick={handleClick}
     >
-      <Icon size={20} className="mr-2 flex-shrink-0" />
-      <span className="truncate">{label}</span>
+      <Icon size={iconSize} className={cn("flex-shrink-0", isOpen ? "mr-2" : "mx-auto")} />
+      {isOpen && <span className="truncate">{label}</span>}
     </button>
   );
 };

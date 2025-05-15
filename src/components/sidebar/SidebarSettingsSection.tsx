@@ -3,6 +3,7 @@ import React from 'react';
 import { useAppContext } from '@/context/AppContext';
 import { Moon, Sun, Settings } from 'lucide-react';
 import SidebarSection from './SidebarSection';
+import SidebarNavItem from './SidebarNavItem';
 
 const SidebarSettingsSection: React.FC<{ sidebarOpen: boolean }> = ({ sidebarOpen }) => {
   const { 
@@ -12,18 +13,18 @@ const SidebarSettingsSection: React.FC<{ sidebarOpen: boolean }> = ({ sidebarOpe
   
   return (
     <SidebarSection title="Configurações" sidebarOpen={sidebarOpen}>
-      <button 
-        className="sidebar-item w-full"
+      <SidebarNavItem
+        icon={darkMode ? Sun : Moon}
+        label={darkMode ? 'Modo Claro' : 'Modo Escuro'}
+        path="#"
         onClick={toggleDarkMode}
-      >
-        {darkMode ? <Sun size={20} /> : <Moon size={20} />}
-        {sidebarOpen && <span>{darkMode ? 'Modo Claro' : 'Modo Escuro'}</span>}
-      </button>
+      />
       
-      <button className="sidebar-item w-full">
-        <Settings size={20} />
-        {sidebarOpen && <span>Configurações</span>}
-      </button>
+      <SidebarNavItem
+        icon={Settings}
+        label="Configurações"
+        path="#"
+      />
     </SidebarSection>
   );
 };

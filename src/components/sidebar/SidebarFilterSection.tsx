@@ -3,6 +3,7 @@ import React from 'react';
 import { useAppContext } from '@/context/AppContext';
 import { Eye } from 'lucide-react';
 import SidebarSection from './SidebarSection';
+import SidebarNavItem from './SidebarNavItem';
 
 const SidebarFilterSection: React.FC<{ sidebarOpen: boolean }> = ({ sidebarOpen }) => {
   const { 
@@ -12,13 +13,13 @@ const SidebarFilterSection: React.FC<{ sidebarOpen: boolean }> = ({ sidebarOpen 
   
   return (
     <SidebarSection title="Filtros" sidebarOpen={sidebarOpen}>
-      <button 
-        className={`sidebar-item text-start justify-start ${showHiddenTasks ? 'active justify-start' : ''} w-full`}
+      <SidebarNavItem
+        icon={Eye}
+        label="Tarefas ocultas"
+        path="#"
+        isActive={showHiddenTasks}
         onClick={toggleShowHiddenTasks}
-      >
-        <Eye size={20} />
-        {sidebarOpen && <span className="text-left">Tarefas ocultas</span>}
-      </button>
+      />
     </SidebarSection>
   );
 };
