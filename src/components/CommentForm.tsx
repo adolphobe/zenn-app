@@ -44,6 +44,7 @@ const CommentForm: React.FC<CommentFormProps> = ({ taskId }) => {
             className="self-end flex items-center gap-1"
             onClick={(e) => {
               e.stopPropagation(); // Prevent the click from bubbling up
+              handleSubmit(e);
             }}
           >
             <MessageSquare size={16} />

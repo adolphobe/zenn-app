@@ -13,6 +13,7 @@ import {
 } from '../constants';
 import { X } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 
 interface TaskFormProps {
   onClose: () => void;
@@ -32,6 +33,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, initialData, taskId, task,
   });
   
   const { addTask, updateTask } = useAppContext();
+  const [activeTab, setActiveTab] = useState('levels');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -100,56 +102,115 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, initialData, taskId, task,
               />
             </div>
 
-            <RatingSlider
-              value={formData.consequenceScore}
-              onChange={(value) => setFormData(prev => ({ ...prev, consequenceScore: value }))}
-              color="blue"
-              label="Consequência de Ignorar"
-              description={CONSEQUENCE_PHRASES}
-            />
+            {isEditing ? (
+              <Tabs defaultValue="levels" className="w-full" onValueChange={setActiveTab}>
+                <TabsList className="grid w-full grid-cols-2 mb-4">
+                  <TabsTrigger value="levels">Níveis</TabsTrigger>
+                  <TabsTrigger value="comments">Comentários</TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="levels" className="space-y-6">
+                  <RatingSlider
+                    value={formData.consequenceScore}
+                    onChange={(value) => setFormData(prev => ({ ...prev, consequenceScore: value }))}
+                    color="blue"
+                    label="Consequência de Ignorar"
+                    description={CONSEQUENCE_PHRASES}
+                  />
 
-            <RatingSlider
-              value={formData.prideScore}
-              onChange={(value) => setFormData(prev => ({ ...prev, prideScore: value }))}
-              color="orange"
-              label="Orgulho pós-execução"
-              description={PRIDE_PHRASES}
-            />
+                  <RatingSlider
+                    value={formData.prideScore}
+                    onChange={(value) => setFormData(prev => ({ ...prev, prideScore: value }))}
+                    color="orange"
+                    label="Orgulho pós-execução"
+                    description={PRIDE_PHRASES}
+                  />
 
-            <RatingSlider
-              value={formData.constructionScore}
-              onChange={(value) => setFormData(prev => ({ ...prev, constructionScore: value }))}
-              color="green"
-              label="Força de construção pessoal"
-              description={CONSTRUCTION_PHRASES}
-            />
+                  <RatingSlider
+                    value={formData.constructionScore}
+                    onChange={(value) => setFormData(prev => ({ ...prev, constructionScore: value }))}
+                    color="green"
+                    label="Força de construção pessoal"
+                    description={CONSTRUCTION_PHRASES}
+                  />
 
-            <div>
-              <label htmlFor="idealDate" className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
-                A partir de quando você quer se ver envolvido com isso?
-              </label>
-              <input
-                type="datetime-local"
-                id="idealDate"
-                name="idealDate"
-                value={formData.idealDate ? new Date(formData.idealDate.getTime() - (formData.idealDate.getTimezoneOffset() * 60000)).toISOString().slice(0, 16) : ''}
-                onChange={handleDateChange}
-                className="w-full p-3 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-              />
-            </div>
+                  <div>
+                    <label htmlFor="idealDate" className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+                      A partir de quando você quer se ver envolvido com isso?
+                    </label>
+                    <input
+                      type="datetime-local"
+                      id="idealDate"
+                      name="idealDate"
+                      value={formData.idealDate ? new Date(formData.idealDate.getTime() - (formData.idealDate.getTimezoneOffset() * 60000)).toISOString().slice(0, 16) : ''}
+                      onChange={handleDateChange}
+                      className="w-full p-3 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                    />
+                  </div>
 
-            <div className="mt-5 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg shadow-sm">
-              <TaskScoreDisplay score={totalScore} />
-            </div>
+                  <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg shadow-sm">
+                    <TaskScoreDisplay score={totalScore} />
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="comments">
+                  {taskId && (
+                    <>
+                      <CommentForm taskId={taskId} />
+                      {task && task.comments && task.comments.length > 0 && (
+                        <div className="mt-4">
+                          <TaskComments taskId={taskId} comments={task.comments} />
+                        </div>
+                      )}
+                    </>
+                  )}
+                </TabsContent>
+              </Tabs>
+            ) : (
+              // Non-editing mode shows all fields without tabs
+              <>
+                <RatingSlider
+                  value={formData.consequenceScore}
+                  onChange={(value) => setFormData(prev => ({ ...prev, consequenceScore: value }))}
+                  color="blue"
+                  label="Consequência de Ignorar"
+                  description={CONSEQUENCE_PHRASES}
+                />
 
-            {/* Comment section - only for editing */}
-            {isEditing && taskId && task && (
-              <div className="border-t pt-4">
-                <CommentForm taskId={taskId} />
-                {task.comments && task.comments.length > 0 && (
-                  <TaskComments taskId={taskId} comments={task.comments || []} />
-                )}
-              </div>
+                <RatingSlider
+                  value={formData.prideScore}
+                  onChange={(value) => setFormData(prev => ({ ...prev, prideScore: value }))}
+                  color="orange"
+                  label="Orgulho pós-execução"
+                  description={PRIDE_PHRASES}
+                />
+
+                <RatingSlider
+                  value={formData.constructionScore}
+                  onChange={(value) => setFormData(prev => ({ ...prev, constructionScore: value }))}
+                  color="green"
+                  label="Força de construção pessoal"
+                  description={CONSTRUCTION_PHRASES}
+                />
+
+                <div>
+                  <label htmlFor="idealDate" className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+                    A partir de quando você quer se ver envolvido com isso?
+                  </label>
+                  <input
+                    type="datetime-local"
+                    id="idealDate"
+                    name="idealDate"
+                    value={formData.idealDate ? new Date(formData.idealDate.getTime() - (formData.idealDate.getTimezoneOffset() * 60000)).toISOString().slice(0, 16) : ''}
+                    onChange={handleDateChange}
+                    className="w-full p-3 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                  />
+                </div>
+
+                <div className="mt-5 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg shadow-sm">
+                  <TaskScoreDisplay score={totalScore} />
+                </div>
+              </>
             )}
 
             <div className="mt-6 flex justify-end space-x-4">
