@@ -65,25 +65,54 @@ const Login: React.FC = () => {
 
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
 
-  // Float animation items for the background
+  // Animated floating items for the background with random positions and animations
   const floatingItems = Array(5).fill(null).map((_, i) => (
     <div 
       key={i}
-      className={`absolute rounded-full bg-primary/5 animate-float-${i+1}`}
+      className="absolute rounded-full bg-primary/5 animated-float"
       style={{
         width: `${Math.random() * 100 + 50}px`,
         height: `${Math.random() * 100 + 50}px`,
         left: `${Math.random() * 70}%`,
         top: `${Math.random() * 100}%`,
-        animationDelay: `${Math.random() * 5}s`,
-        animationDuration: `${Math.random() * 15 + 20}s`,
+        animationDelay: `${Math.random() * 10}s`,
+        animationDuration: `${Math.random() * 20 + 30}s`,
+        opacity: 0.7,
       }}
     />
   ));
 
   return (
     <div className="flex min-h-screen bg-gradient-to-b from-white to-blue-50 dark:from-gray-950 dark:to-gray-900 overflow-hidden relative">
-      {/* Floating background elements */}
+      {/* Animated floating background elements */}
+      <style jsx>{`
+        @keyframes float-animate {
+          0% {
+            transform: translate(0, 0) scale(1);
+            opacity: 0.3;
+          }
+          25% {
+            opacity: 0.7;
+          }
+          50% {
+            transform: translate(30px, -30px) scale(1.05);
+            opacity: 0.5;
+          }
+          75% {
+            opacity: 0.7;
+          }
+          100% {
+            transform: translate(0, 0) scale(1);
+            opacity: 0.3;
+          }
+        }
+        
+        .animated-float {
+          animation: float-animate linear infinite;
+          transition: all 3s ease-in-out;
+        }
+      `}</style>
+      
       {floatingItems}
       
       {/* Left column: Login Form */}
