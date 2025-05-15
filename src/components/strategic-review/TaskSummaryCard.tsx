@@ -30,78 +30,61 @@ const TaskSummaryCard: React.FC<TaskSummaryCardProps> = ({ tasks }) => {
     );
   }
   
-  // Prepare summary text with line breaks
-  const mainSummary = `Neste período, você completou ${tasks.length} tarefas com uma média de score de ${taskStats.avgTotal.toFixed(1)}.`;
-  const criticalSummary = taskStats.criticalCount > 0 ? `${taskStats.criticalCount} tarefas eram críticas.` : '';
-  
   return (
-    <Card className="overflow-hidden">
+    <Card>
       <CardHeader className="pb-2">
         <CardTitle>Resumo de Tarefas</CardTitle>
         <CardDescription>Visão geral das tarefas concluídas no período.</CardDescription>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-2">
-          {/* Task Stats - Vertical Layout with reduced spacing */}
-          <div className="grid grid-cols-1 gap-2">
-            <div className="rounded-lg bg-blue-50 p-3 text-center">
-              <div className="text-4xl font-bold text-blue-500">{tasks.length}</div>
-              <div className="text-sm text-gray-600">Tarefas Concluídas</div>
-            </div>
-            <div className="rounded-lg bg-blue-50 p-3 text-center">
-              <div className="text-4xl font-bold text-blue-500">{taskStats.avgTotal.toFixed(1)}</div>
-              <div className="text-sm text-gray-600">Média de Score</div>
-            </div>
+      <CardContent className="space-y-4">
+        {/* Task Stats - Side by side layout for better space usage */}
+        <div className="grid grid-cols-2 gap-2">
+          <div className="rounded-lg bg-blue-50 p-2 text-center">
+            <div className="text-3xl font-bold text-blue-500">{tasks.length}</div>
+            <div className="text-sm text-gray-600">Tarefas Concluídas</div>
           </div>
-          
-          {/* Zone Distribution Chart - reduced height further */}
-          <div className="h-28">
-            <ChartContainer 
-              config={{
-                critical: { color: colors.critical },
-                important: { color: colors.important },
-                moderate: { color: colors.moderate },
-                hidden: { color: colors.hidden }
-              }}
-            >
-              <ResponsiveContainer width="100%" height="100%">
-                <Bar
-                  data={zoneData}
-                  dataKey="value"
-                  layout="vertical"
-                  barSize={20}
-                >
-                  <CartesianGrid strokeDasharray="3 3" horizontal={false} />
-                  <XAxis type="number" />
-                  <YAxis dataKey="name" type="category" width={150} />
-                  <Tooltip content={<ChartTooltipContent />} />
-                  {zoneData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Bar>
-              </ResponsiveContainer>
-            </ChartContainer>
+          <div className="rounded-lg bg-blue-50 p-2 text-center">
+            <div className="text-3xl font-bold text-blue-500">{taskStats.avgTotal.toFixed(1)}</div>
+            <div className="text-sm text-gray-600">Média de Score</div>
           </div>
-          
-          {/* Zone Summary - with line breaks between sentences */}
-          <div>
-            <div 
-              className="border rounded-lg p-3 animate-fade-in"
-              style={{ 
-                background: 'linear-gradient(to right, rgba(210, 230, 255, 0.5), rgba(180, 210, 250, 0.3))',
-                animationDuration: '0.3s',
-                transition: 'background 0.3s ease'
-              }}
-            >
-              <h4 className="font-medium mb-1 text-base">
-                📊 Distribuição por Zonas de Importância
-              </h4>
-              <p className="text-sm text-muted-foreground">
-                {mainSummary}
-                {criticalSummary && <><br />{criticalSummary}</>}
-              </p>
-            </div>
-          </div>
+        </div>
+        
+        {/* Summary text with line breaks */}
+        <div className="border rounded-lg p-3 bg-gradient-to-r from-blue-50 to-blue-50/30">
+          <h4 className="font-medium text-sm mb-1">📊 Distribuição por Zonas de Importância</h4>
+          <p className="text-sm text-muted-foreground">
+            Neste período, você completou {tasks.length} tarefas com uma média de score de {taskStats.avgTotal.toFixed(1)}.
+            {taskStats.criticalCount > 0 && <><br />{taskStats.criticalCount} tarefas eram críticas.</>}
+          </p>
+        </div>
+        
+        {/* Zone Distribution Chart - minimal height */}
+        <div className="h-24">
+          <ChartContainer 
+            config={{
+              critical: { color: colors.critical },
+              important: { color: colors.important },
+              moderate: { color: colors.moderate },
+              hidden: { color: colors.hidden }
+            }}
+          >
+            <ResponsiveContainer width="100%" height="100%">
+              <Bar
+                data={zoneData}
+                dataKey="value"
+                layout="vertical"
+                barSize={18}
+              >
+                <CartesianGrid strokeDasharray="3 3" horizontal={false} />
+                <XAxis type="number" />
+                <YAxis dataKey="name" type="category" width={140} />
+                <Tooltip content={<ChartTooltipContent />} />
+                {zoneData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.color} />
+                ))}
+              </Bar>
+            </ResponsiveContainer>
+          </ChartContainer>
         </div>
       </CardContent>
     </Card>
