@@ -165,14 +165,15 @@ const Login: React.FC = () => {
       {/* Right column: Image */}
       <div className="hidden md:block md:w-1/2 bg-primary/5">
         <div className="h-full w-full relative">
-          <AspectRatio ratio={16/9} className="h-full">
+          <div className="absolute inset-0 overflow-hidden">
             <img
               src="https://images.pexels.com/photos/207237/pexels-photo-207237.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
               alt="Fundo de login"
-              className="object-cover w-full h-full"
+              className="object-cover w-full h-full object-center"
+              style={{ minWidth: '100%', minHeight: '100%' }}
             />
             <div className="absolute inset-0 bg-gradient-to-r from-primary/30 to-transparent mix-blend-multiply" />
-          </AspectRatio>
+          </div>
         </div>
       </div>
     </div>
