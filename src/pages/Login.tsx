@@ -63,7 +63,7 @@ const Login: React.FC = () => {
       <div className="w-full md:w-1/2 flex flex-col justify-center px-8 sm:px-16 md:px-24 lg:px-32 animate-fade-in">
         <div className="space-y-6 w-full max-w-md mx-auto">
           {/* Logo */}
-          <div className="text-left mb-[40px]">
+          <div className="text-left mb-[140px]">
             <img 
               src="https://cdn.shopify.com/s/files/1/0629/1993/4061/files/LOGO_ACTO.jpg?v=1747283022" 
               alt="Acto Logo" 
