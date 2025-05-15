@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Button } from './ui/button';
 import { useAppContext } from '@/context/AppContext';
 import { MessageSquare } from 'lucide-react';
@@ -22,7 +22,7 @@ const CommentForm: React.FC<CommentFormProps> = ({ taskId, onCommentAdded }) => 
       addComment(taskId, commentText);
       setCommentText('');
       
-      // Notificar que um comentário foi adicionado
+      // Notificar o componente pai que um comentário foi adicionado
       if (onCommentAdded) {
         onCommentAdded();
       }
@@ -53,7 +53,7 @@ const CommentForm: React.FC<CommentFormProps> = ({ taskId, onCommentAdded }) => 
         addComment(taskId, commentText);
         setCommentText('');
         
-        // Notificar que um comentário foi adicionado
+        // Notificar o componente pai que um comentário foi adicionado
         if (onCommentAdded) {
           onCommentAdded();
         }
@@ -97,7 +97,7 @@ const CommentForm: React.FC<CommentFormProps> = ({ taskId, onCommentAdded }) => 
         <textarea
           value={commentText}
           onChange={handleTextChange}
-          onKeyDown={handleKeyDown}
+          onKeyDown={handleKeyDown} // Adicionar o evento de tecla
           onClick={(e) => {
             e.stopPropagation();
             console.log('Comment textarea clicked');
