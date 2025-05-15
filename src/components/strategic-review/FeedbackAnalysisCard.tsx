@@ -1,18 +1,10 @@
 
-import React, { useMemo } from 'react';
+import React from 'react';
 import { Task } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartContainer, ChartTooltipContent } from '@/components/ui/chart';
-import { Pie, Cell, ResponsiveContainer } from 'recharts';
-
-// Colors for the charts
-const COLORS = {
-  feedback: {
-    transformed: '#4CAF50',
-    relief: '#2196F3',
-    obligation: '#9E9E9E'
-  }
-};
+import { Pie, Cell, ResponsiveContainer, PieChart } from 'recharts';
+import { useFeedbackAnalysis, GRADIENTS } from './hooks/useFeedbackAnalysis';
 
 interface FeedbackAnalysisCardProps {
   tasks: Task[];
@@ -30,61 +22,8 @@ interface CustomizedLabelProps {
 }
 
 const FeedbackAnalysisCard: React.FC<FeedbackAnalysisCardProps> = ({ tasks }) => {
-  // Calculate feedback distribution
-  const feedbackData = useMemo(() => {
-    if (tasks.length === 0) {
-      return {
-        distribution: [
-          { name: 'Me transformou', value: 0, color: COLORS.feedback.transformed },
-          { name: 'Deu alívio', value: 0, color: COLORS.feedback.relief },
-          { name: 'Foi só obrigação', value: 0, color: COLORS.feedback.obligation }
-        ],
-        insight: ''
-      };
-    }
-    
-    // Count actual feedback from tasks
-    let transformed = 0;
-    let relief = 0;
-    let obligation = 0;
-    
-    tasks.forEach(task => {
-      if (task.feedback === 'transformed') transformed++;
-      else if (task.feedback === 'relief') relief++;
-      else if (task.feedback === 'obligation') obligation++;
-    });
-    
-    const total = transformed + relief + obligation;
-    const withFeedback = total > 0;
-    
-    // Calculate percentages if we have feedback data
-    const transformedPercent = withFeedback ? Math.round((transformed / total) * 100) : 0;
-    const reliefPercent = withFeedback ? Math.round((relief / total) * 100) : 0;
-    const obligationPercent = withFeedback ? Math.round((obligation / total) * 100) : 0;
-    
-    // Determine insight based on highest percentage
-    let insight = '';
-    
-    if (withFeedback) {
-      if (obligationPercent >= reliefPercent && obligationPercent >= transformedPercent) {
-        insight = `${obligationPercent}% das suas tarefas foram classificadas como 'só obrigação'. Você pode estar executando sem identidade.`;
-      } else if (transformedPercent >= reliefPercent && transformedPercent >= obligationPercent) {
-        insight = `${transformedPercent}% das suas tarefas te 'transformaram'. Você está focando no que realmente te fortalece.`;
-      } else if (reliefPercent >= transformedPercent && reliefPercent >= obligationPercent) {
-        insight = `${reliefPercent}% das suas tarefas te deram 'alívio'. Você está buscando reduzir peso mais do que construir potência.`;
-      }
-    }
-    
-    return {
-      distribution: [
-        { name: 'Me transformou', value: transformed, percent: transformedPercent, color: COLORS.feedback.transformed },
-        { name: 'Deu alívio', value: relief, percent: reliefPercent, color: COLORS.feedback.relief },
-        { name: 'Foi só obrigação', value: obligation, percent: obligationPercent, color: COLORS.feedback.obligation }
-      ],
-      insight,
-      withFeedback
-    };
-  }, [tasks]);
+  // Use the feedback analysis hook
+  const feedbackData = useFeedbackAnalysis(tasks);
   
   const RADIAN = Math.PI / 180;
   const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, index }: CustomizedLabelProps) => {
@@ -92,15 +31,25 @@ const FeedbackAnalysisCard: React.FC<FeedbackAnalysisCardProps> = ({ tasks }) =>
     const x = cx + radius * Math.cos(-midAngle * RADIAN);
     const y = cy + radius * Math.sin(-midAngle * RADIAN);
     
-    // Check if the distribution item has a percent property before accessing it
+    // Check if the distribution item has a percent property
     const entry = feedbackData.distribution[index];
-    const percentValue = entry && 'percent' in entry ? entry.percent : 0;
+    const percentValue = entry?.percent || 0;
     
     return feedbackData.distribution[index].value > 0 ? (
-      <text x={x} y={y} fill="white" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central">
+      <text x={x} y={y} fill="white" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central" className="font-semibold text-xs">
         {`${percentValue}%`}
       </text>
     ) : null;
+  };
+  
+  // Get background gradient based on top feedback type
+  const getInsightBackground = (topFeedback: string) => {
+    switch (topFeedback) {
+      case 'transformed': return GRADIENTS.transformed;
+      case 'relief': return GRADIENTS.relief;
+      case 'obligation': return GRADIENTS.obligation;
+      default: return GRADIENTS.relief;
+    }
   };
   
   return (
@@ -117,26 +66,33 @@ const FeedbackAnalysisCard: React.FC<FeedbackAnalysisCardProps> = ({ tasks }) =>
                 <div className="flex h-56 items-center justify-center">
                   <ChartContainer 
                     config={{
-                      transformed: { color: COLORS.feedback.transformed },
-                      relief: { color: COLORS.feedback.relief },
-                      obligation: { color: COLORS.feedback.obligation }
+                      transformed: { color: feedbackData.distribution[0].color },
+                      relief: { color: feedbackData.distribution[1].color },
+                      obligation: { color: feedbackData.distribution[2].color }
                     }}
                   >
                     <ResponsiveContainer width="100%" height="100%">
-                      <Pie
-                        data={feedbackData.distribution}
-                        cx="50%"
-                        cy="50%"
-                        labelLine={false}
-                        label={renderCustomizedLabel}
-                        outerRadius={80}
-                        fill="#8884d8"
-                        dataKey="value"
-                      >
-                        {feedbackData.distribution.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.color} />
-                        ))}
-                      </Pie>
+                      <PieChart>
+                        <Pie
+                          data={feedbackData.distribution}
+                          cx="50%"
+                          cy="50%"
+                          labelLine={false}
+                          label={renderCustomizedLabel}
+                          outerRadius={80}
+                          innerRadius={30} // Add innerRadius to create a donut chart
+                          fill="#8884d8"
+                          dataKey="value"
+                          animationDuration={1000}
+                          animationBegin={200}
+                          animationEasing="ease-out"
+                          paddingAngle={2} // Add padding between sections
+                        >
+                          {feedbackData.distribution.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.color} stroke="white" strokeWidth={2} />
+                          ))}
+                        </Pie>
+                      </PieChart>
                     </ResponsiveContainer>
                   </ChartContainer>
                 </div>
@@ -160,7 +116,14 @@ const FeedbackAnalysisCard: React.FC<FeedbackAnalysisCardProps> = ({ tasks }) =>
               
               {/* Insight */}
               {feedbackData.insight && (
-                <div className="mt-6 rounded-md bg-primary/5 p-4">
+                <div 
+                  className="mt-6 rounded-md p-4 animate-fade-in"
+                  style={{ 
+                    background: getInsightBackground(feedbackData.topFeedback),
+                    animationDuration: '0.3s',
+                    transition: 'background 0.3s ease'
+                  }}
+                >
                   <p className="text-sm">{feedbackData.insight}</p>
                 </div>
               )}
