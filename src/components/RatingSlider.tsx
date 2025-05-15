@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { cn } from "@/lib/utils";
 import { Slider } from "@/components/ui/slider";
@@ -54,6 +55,7 @@ const RatingSlider: React.FC<RatingSliderProps> = ({
       gradient: 'from-emerald-300 to-emerald-500'
     }
   };
+
   const styles = colorStyles[color];
   
   // Custom slider display logic
@@ -66,63 +68,56 @@ const RatingSlider: React.FC<RatingSliderProps> = ({
   };
 
   return (
-    <>
-      {/* Adicionando o label antes do primeiro div */}
-      <label htmlFor="title" className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
-        Avalie o peso da tarefa:
-      </label>
-      
-      <div className={cn("rounded-lg p-5 mb-6 transition-all", styles.bg, className)}>
-        <div className="flex justify-between items-center mb-3">
-          <h3 className={cn("font-medium text-sm", styles.text)}>{label}</h3>
-          <span className={cn("font-semibold text-sm", styles.text)}>
-            {displayValue}/{maxValue}
-          </span>
-        </div>
-        
-        <div className="relative mb-4 px-3 py-1">
-          {/* Interactive slider */}
-          <Slider
-            value={[value]}
-            min={1}
-            max={maxValue}
-            step={1}
-            onValueChange={handleSliderChange}
-            classNames={{
-              track: cn(styles.track),
-              range: cn(
-                "bg-gradient-to-r", 
-                styles.gradient,
-                value === 1 ? "opacity-0" : "opacity-100"
-              ),
-              thumb: cn(styles.fill, styles.activeBorder)
-            }}
-          />
-          
-          {/* Custom step indicators for visual clarity */}
-          <div className="absolute top-0 left-0 w-full flex justify-between px-3 pointer-events-none">
-            {Array.from({ length: maxValue }, (_, i) => i + 1).map((step) => (
-              <div
-                key={step}
-                className={cn(
-                  "w-6 h-6 rounded-full border-2 transition-all duration-200",
-                  // Mover 4px mais para cima
-                  "transform translate-y-[-4px]", // Isso vai mover as bolinhas 4px para cima
-                  step <= value
-                    ? cn("bg-white", styles.activeBorder)
-                    : cn("bg-white", styles.border)
-                )}
-              />
-            ))}
-          </div>
-        </div>
-        
-        {/* Description text that changes based on selected value */}
-        <p className={cn("text-sm mt-3", styles.text)}>
-          {description[value - 1]}
-        </p>
+    <div className={cn("rounded-lg p-5 mb-6 transition-all", styles.bg, className)}>
+      <div className="flex justify-between items-center mb-3">
+        <h3 className={cn("font-medium text-sm", styles.text)}>{label}</h3>
+        <span className={cn("font-semibold text-sm", styles.text)}>
+          {displayValue}/{maxValue}
+        </span>
       </div>
-    </>
+      
+      <div className="relative mb-4 px-3 py-1">
+        {/* Interactive slider */}
+        <Slider
+          value={[value]}
+          min={1}
+          max={maxValue}
+          step={1}
+          onValueChange={handleSliderChange}
+          classNames={{
+            track: cn(styles.track),
+            range: cn(
+              "bg-gradient-to-r", 
+              styles.gradient,
+              value === 1 ? "opacity-0" : "opacity-100"
+            ),
+            thumb: cn(styles.fill, styles.activeBorder)
+          }}
+        />
+        
+        {/* Custom step indicators for visual clarity */}
+     <div className="absolute top-0 left-0 w-full flex justify-between px-3 pointer-events-none">
+  {Array.from({ length: maxValue }, (_, i) => i + 1).map((step) => (
+    <div
+      key={step}
+      className={cn(
+        "w-6 h-6 rounded-full border-2 transition-all duration-200",
+        // Mover 4px mais para cima
+        "transform translate-y-[-4px]", // Isso vai mover as bolinhas 4px para cima
+        step <= value
+          ? cn("bg-white", styles.activeBorder)
+          : cn("bg-white", styles.border)
+      )}
+    />
+  ))}
+</div>
+      </div>
+      
+      {/* Description text that changes based on selected value */}
+      <p className={cn("text-sm mt-3", styles.text)}>
+        {description[value - 1]}
+      </p>
+    </div>
   );
 };
 
