@@ -32,47 +32,40 @@ const TaskFormTabs: React.FC<TaskFormTabsProps> = ({
     setActiveTab(value);
   };
 
+  const handleTabClick = (e: React.MouseEvent, value: string) => {
+    // Prevent the click from propagating to the modal backdrop
+    e.preventDefault();
+    e.stopPropagation();
+    
+    // Set the active tab
+    setActiveTab(value);
+    console.log('Tab clicked:', value);
+  };
+
   return (
     <Tabs 
       value={activeTab} 
       onValueChange={handleTabValueChange}
-      className="w-full" 
-      onClick={(e) => {
-        e.stopPropagation();
-        console.log('Tabs container clicked, propagation stopped');
-      }}
+      className="w-full"
     >
       <TabsList className="grid w-full grid-cols-2 mb-4">
         <TabsTrigger 
           value="levels"
           data-testid="levels-tab"
-          onClick={(e) => {
-            e.stopPropagation();
-            console.log('Levels tab clicked');
-          }}
+          onClick={(e) => handleTabClick(e, "levels")}
         >
           Níveis
         </TabsTrigger>
         <TabsTrigger 
           value="comments"
           data-testid="comments-tab"
-          onClick={(e) => {
-            e.stopPropagation();
-            console.log('Comments tab clicked');
-          }}
+          onClick={(e) => handleTabClick(e, "comments")}
         >
           Comentários
         </TabsTrigger>
       </TabsList>
       
-      <TabsContent 
-        value="levels" 
-        className="space-y-6"
-        onClick={(e) => {
-          e.stopPropagation();
-          console.log('Levels content clicked');
-        }}
-      >
+      <TabsContent value="levels" className="space-y-6">
         <TaskFormFields 
           formData={formData} 
           handleChange={handleChange} 
@@ -81,21 +74,9 @@ const TaskFormTabs: React.FC<TaskFormTabsProps> = ({
         />
       </TabsContent>
       
-      <TabsContent 
-        value="comments"
-        onClick={(e) => {
-          e.stopPropagation();
-          console.log('Comments content clicked');
-        }}
-      >
+      <TabsContent value="comments">
         {taskId ? (
-          <div 
-            className="space-y-4"
-            onClick={(e) => {
-              e.stopPropagation();
-              console.log('Comments container clicked');
-            }}
-          >
+          <div className="space-y-4">
             {task && task.comments && task.comments.length > 0 && (
               <TaskComments taskId={taskId} comments={task.comments} />
             )}

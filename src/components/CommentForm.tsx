@@ -34,21 +34,19 @@ const CommentForm: React.FC<CommentFormProps> = ({ taskId }) => {
     setCommentText(e.target.value);
   };
 
+  // Prevent clicks inside the comment form from closing the modal
+  const handleContainerClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log('Comment form container clicked, propagation stopped');
+  };
+
   return (
-    <div 
-      className="mt-4" 
-      onClick={(e) => {
-        e.stopPropagation();
-        console.log('Comment form container clicked');
-      }}
-    >
+    <div className="mt-4" onClick={handleContainerClick}>
       <h4 className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">
         Adicionar comentário
       </h4>
-      <div 
-        className="flex flex-col space-y-2" 
-        onClick={(e) => e.stopPropagation()}
-      >
+      <div className="flex flex-col space-y-2">
         <textarea
           value={commentText}
           onChange={handleTextChange}
@@ -56,7 +54,6 @@ const CommentForm: React.FC<CommentFormProps> = ({ taskId }) => {
             e.stopPropagation();
             console.log('Comment textarea clicked');
           }}
-          onFocus={(e) => e.stopPropagation()}
           className="w-full p-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all resize-none"
           placeholder="Escreva seu comentário..."
           rows={3}

@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { TaskFormData, Task } from '../types';
 import TaskFormTabs from './TaskFormTabs';
@@ -62,7 +62,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, initialData, taskId, task,
   };
 
   // Close only when clicking directly on the backdrop
-  const handleBackdropClick = (e: React.MouseEvent) => {
+  const handleBackdropClick = useCallback((e: React.MouseEvent) => {
     // Only close if the click is directly on the backdrop element
     if (e.target === e.currentTarget) {
       console.log('Backdrop clicked, closing modal');
@@ -70,8 +70,15 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, initialData, taskId, task,
     } else {
       // This click was on some element inside the modal, don't close
       console.log('Click inside modal, not closing');
+      e.stopPropagation();
     }
-  };
+  }, [onClose]);
+  
+  // Prevent clicks on the modal container from propagating to the backdrop
+  const handleModalClick = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    console.log('Modal container clicked, propagation stopped');
+  }, []);
 
   useEffect(() => {
     // Add a global event handler for the Escape key
@@ -98,16 +105,10 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, initialData, taskId, task,
     >
       <div 
         className="bg-white dark:bg-gray-800 rounded-xl w-full max-w-md shadow-lg overflow-hidden"
-        onClick={(e) => {
-          e.stopPropagation();
-          console.log('Modal container clicked, propagation stopped');
-        }}
+        onClick={handleModalClick}
         data-testid="task-form-modal"
       >
-        <div 
-          className="flex justify-between items-center p-5 border-b"
-          onClick={(e) => e.stopPropagation()}
-        >
+        <div className="flex justify-between items-center p-5 border-b">
           <h2 className="text-xl font-semibold">{isEditing ? 'Editar Tarefa' : 'Nova Tarefa'}</h2>
           <button 
             onClick={(e) => {
