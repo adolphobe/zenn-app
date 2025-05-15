@@ -2,6 +2,7 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { LucideIcon } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface SidebarNavItemProps {
   icon: LucideIcon;
@@ -32,11 +33,16 @@ const SidebarNavItem: React.FC<SidebarNavItemProps> = ({
 
   return (
     <button 
-      className={`sidebar-item ${isActive ? 'active' : ''} w-full`}
+      className={cn(
+        "flex items-center w-full px-3 py-2 text-sm rounded-md transition-colors",
+        isActive 
+          ? "bg-primary/10 text-primary font-medium" 
+          : "hover:bg-muted/50 text-muted-foreground hover:text-foreground"
+      )}
       onClick={handleClick}
     >
-      <Icon size={20} />
-      <span>{label}</span>
+      <Icon size={20} className="mr-2 flex-shrink-0" />
+      <span className="truncate">{label}</span>
     </button>
   );
 };

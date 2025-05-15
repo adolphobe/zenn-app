@@ -15,8 +15,9 @@ const SidebarModeSection: React.FC<{ sidebarOpen: boolean }> = ({ sidebarOpen })
   const location = useLocation();
   const navigate = useNavigate();
   
-  // Check if user is on the strategic review page
+  // Check if user is on specific routes
   const isStrategicReview = location.pathname === '/strategic-review';
+  const isHistory = location.pathname === '/history';
   
   // Navigate to main page with power view mode
   const handlePowerModeClick = () => {
@@ -36,7 +37,7 @@ const SidebarModeSection: React.FC<{ sidebarOpen: boolean }> = ({ sidebarOpen })
         icon={LayoutDashboard} 
         label="Modo Potência"
         path="/"
-        isActive={viewMode === 'power' && !isStrategicReview}
+        isActive={viewMode === 'power' && !isStrategicReview && !isHistory}
         onClick={handlePowerModeClick}
       />
       
@@ -44,7 +45,7 @@ const SidebarModeSection: React.FC<{ sidebarOpen: boolean }> = ({ sidebarOpen })
         icon={CalendarClock} 
         label="Modo Cronologia"
         path="/"
-        isActive={viewMode === 'chronological' && !isStrategicReview}
+        isActive={viewMode === 'chronological' && !isStrategicReview && !isHistory}
         onClick={handleChronologicalModeClick}
       />
       
