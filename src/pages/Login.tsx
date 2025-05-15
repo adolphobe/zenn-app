@@ -132,7 +132,7 @@ const Login: React.FC = () => {
           </div>
 
           <div className="space-y-2 text-left">
-            <h1 className="text-3xl font-bold tracking-tight text-gray-800 dark:text-gray-100">Faça login abaixo:</h1>
+            <h1 className="text-3xl font-bold tracking-tight text-gray-800 dark:text-gray-100">Bem vindo de volta!</h1>
             <p className="text-muted-foreground">
               Um novo dia chegou. É hora de continuar sua jornada.
             </p>
