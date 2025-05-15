@@ -50,8 +50,8 @@ const TaskScoreDisplay: React.FC<TaskScoreDisplayProps> = ({
   return (
     <div className="task-score-container">
       <div className="task-score-header">
-        <span className="task-score-title">Score Total:</span>
-        <span className={cn("task-score-value", scoreClassName, animationClass)}>
+        <span className="task-score-title text-[20px]">Score Total:</span>
+        <span className={cn("task-score-value text-[20px]", scoreClassName, animationClass)}>
           {score}/{maxScore}
         </span>
       </div>
