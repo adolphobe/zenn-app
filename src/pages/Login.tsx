@@ -63,7 +63,7 @@ const Login: React.FC = () => {
       <div className="w-full md:w-1/2 flex flex-col justify-center px-8 sm:px-16 md:px-24 lg:px-32 animate-fade-in">
         <div className="space-y-6 w-full max-w-md mx-auto">
           {/* Logo */}
-          <div className="text-left">
+          <div className="text-left mb-[40px]">
             <img 
               src="https://cdn.shopify.com/s/files/1/0629/1993/4061/files/LOGO_ACTO.jpg?v=1747283022" 
               alt="Acto Logo" 
@@ -175,7 +175,7 @@ const Login: React.FC = () => {
         <div className="h-full w-full relative">
           <div className="absolute inset-0 overflow-hidden">
             <img
-              src="https://images.pexels.com/photos/207237/pexels-photo-207237.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+              src="https://img.freepik.com/fotos-gratis/copo-de-agua-com-sombras_23-2150701849.jpg?t=st=1747283331~exp=1747286931~hmac=34c5470984073a35ee91759495d76cacc2596d43e03eb51d07b5beeae02a5a15&w=2000"
               alt="Fundo de login"
               className="object-cover w-full h-full object-center"
               style={{ minWidth: '100%', minHeight: '100%' }}
