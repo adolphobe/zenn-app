@@ -1,5 +1,4 @@
-
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useAppContext } from '@/context/AppContext';
 import { Task } from '@/types';
 
@@ -11,6 +10,15 @@ import { TaskGroupGrid } from '@/components/task-history/TaskCards';
 import { TasksTable } from '@/components/task-history/TaskTable';
 import { NoTasksMessage } from '@/components/task-history/NoTasksMessage';
 import { groupTasksByTimeline } from '@/components/task-history/utils';
+import { 
+  Pagination, 
+  PaginationContent, 
+  PaginationItem, 
+  PaginationLink, 
+  PaginationNext, 
+  PaginationPrevious,
+  PaginationEllipsis
+} from '@/components/ui/pagination';
 
 const TaskHistory = () => {
   const { state } = useAppContext();
@@ -22,6 +30,10 @@ const TaskHistory = () => {
   const [pillarFilter, setPillarFilter] = useState('all');
   const [sortBy, setSortBy] = useState('recent');
   const [showFilters, setShowFilters] = useState(false);
+  
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 30;
 
   // Filter for completed tasks only with completedAt
   const completedTasks = useMemo(() => {
@@ -102,10 +114,77 @@ const TaskHistory = () => {
     });
   }, [filteredTasks, sortBy]);
 
-  // Group by timeline for grid view
+  // Reset pagination when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, periodFilter, scoreFilter, feedbackFilter, pillarFilter, sortBy]);
+
+  // Calculate total pages
+  const totalPages = Math.max(1, Math.ceil(sortedTasks.length / itemsPerPage));
+  
+  // Get current page items
+  const paginatedTasks = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return sortedTasks.slice(startIndex, startIndex + itemsPerPage);
+  }, [sortedTasks, currentPage, itemsPerPage]);
+
+  // Group by timeline for grid view (using paginated tasks)
   const groupedTasks = useMemo(() => {
-    return groupTasksByTimeline(sortedTasks);
-  }, [sortedTasks]);
+    return groupTasksByTimeline(paginatedTasks);
+  }, [paginatedTasks]);
+
+  // Handle page change
+  const handlePageChange = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+      // Scroll to top of the page for better UX
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    }
+  };
+
+  // Generate page numbers for pagination
+  const getPageNumbers = () => {
+    const pageNumbers = [];
+    
+    // If few pages, show all
+    if (totalPages <= 7) {
+      for (let i = 1; i <= totalPages; i++) {
+        pageNumbers.push(i);
+      }
+      return pageNumbers;
+    }
+    
+    // Always include first page
+    pageNumbers.push(1);
+    
+    // Add ellipsis if current page is far from the beginning
+    if (currentPage > 3) {
+      pageNumbers.push('ellipsis-start');
+    }
+    
+    // Pages around current page
+    const startPage = Math.max(2, currentPage - 1);
+    const endPage = Math.min(totalPages - 1, currentPage + 1);
+    
+    for (let i = startPage; i <= endPage; i++) {
+      pageNumbers.push(i);
+    }
+    
+    // Add ellipsis if current page is far from the end
+    if (currentPage < totalPages - 2) {
+      pageNumbers.push('ellipsis-end');
+    }
+    
+    // Always include last page if more than 1 page
+    if (totalPages > 1) {
+      pageNumbers.push(totalPages);
+    }
+    
+    return pageNumbers;
+  };
 
   return (
     <div className="container p-4 mx-auto">
@@ -155,10 +234,53 @@ const TaskHistory = () => {
         {sortedTasks.length === 0 && <NoTasksMessage />}
         
         {/* Task list view */}
-        {viewMode === 'list' && sortedTasks.length > 0 && <TasksTable tasks={sortedTasks} />}
+        {viewMode === 'list' && paginatedTasks.length > 0 && <TasksTable tasks={paginatedTasks} />}
         
         {/* Grid view with timeline grouping */}
-        {viewMode === 'grid' && sortedTasks.length > 0 && <TaskGroupGrid groups={groupedTasks} />}
+        {viewMode === 'grid' && paginatedTasks.length > 0 && <TaskGroupGrid groups={groupedTasks} />}
+        
+        {/* Pagination */}
+        {sortedTasks.length > 0 && (
+          <div className="mt-6">
+            <Pagination>
+              <PaginationContent>
+                {/* Previous button */}
+                <PaginationItem>
+                  <PaginationPrevious 
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
+                  />
+                </PaginationItem>
+                
+                {/* Page numbers */}
+                {getPageNumbers().map((page, index) => (
+                  page === 'ellipsis-start' || page === 'ellipsis-end' ? (
+                    <PaginationItem key={`ellipsis-${index}`}>
+                      <PaginationEllipsis />
+                    </PaginationItem>
+                  ) : (
+                    <PaginationItem key={index}>
+                      <PaginationLink
+                        isActive={currentPage === page}
+                        onClick={() => handlePageChange(page as number)}
+                      >
+                        {page}
+                      </PaginationLink>
+                    </PaginationItem>
+                  )
+                ))}
+                
+                {/* Next button */}
+                <PaginationItem>
+                  <PaginationNext 
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          </div>
+        )}
       </div>
     </div>
   );
