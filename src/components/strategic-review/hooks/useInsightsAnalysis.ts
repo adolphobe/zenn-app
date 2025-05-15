@@ -40,8 +40,8 @@ export const useInsightsAnalysis = (tasks: Task[]): PillarDataType => {
     if (!tasks || tasks.length === 0) {
       return {
         averages: [
-          { name: 'Importância de fazer', value: 0, color: COLORS.consequence, id: 'consequence' },
-          { name: 'Orgulho de ter feito', value: 0, color: COLORS.pride, id: 'pride' },
+          { name: 'Era importante fazer', value: 0, color: COLORS.consequence, id: 'consequence' },
+          { name: 'Deu orgulho de ter feito', value: 0, color: COLORS.pride, id: 'pride' },
           { name: 'Gerou evolução pessoal', value: 0, color: COLORS.construction, id: 'construction' }
         ],
         highest: null,
@@ -56,8 +56,8 @@ export const useInsightsAnalysis = (tasks: Task[]): PillarDataType => {
     const avgConstruction = tasks.reduce((sum, task) => sum + task.constructionScore, 0) / tasks.length;
     
     const pillars = [
-      { name: 'Importância de fazer', value: avgConsequence, color: COLORS.consequence, id: 'consequence' },
-      { name: 'Orgulho de ter feito', value: avgPride, color: COLORS.pride, id: 'pride' },
+      { name: 'Era importante fazer', value: avgConsequence, color: COLORS.consequence, id: 'consequence' },
+      { name: 'Deu orgulho de ter feito', value: avgPride, color: COLORS.pride, id: 'pride' },
       { name: 'Gerou evolução pessoal', value: avgConstruction, color: COLORS.construction, id: 'construction' }
     ];
     
