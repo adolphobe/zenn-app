@@ -62,8 +62,8 @@ const FeedbackAnalysisCard: React.FC<FeedbackAnalysisCardProps> = ({ tasks }) =>
         <CardTitle>Impacto emocional das tarefas:</CardTitle>
         <CardDescription className="!mt-[25px]">Veja a proporção entre tarefas que te transformaram, trouxeram alívio ou foram apenas cumpridas por obrigação.</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4 flex-grow flex flex-col justify-between">
-        <div className="h-64 mb-6">
+      <CardContent className="space-y-4 flex-grow flex flex-col">
+        <div className="h-64">
           {feedbackData.withFeedback ? (
             <ChartContainer 
               className="h-full w-full"
@@ -111,9 +111,9 @@ const FeedbackAnalysisCard: React.FC<FeedbackAnalysisCardProps> = ({ tasks }) =>
           )}
         </div>
         
-        {/* Dynamic Insight Box */}
+        {/* Dynamic Insight Box - moved directly below the chart without spacing */}
         {feedbackData.withFeedback && feedbackData.topFeedback && (
-          <div className="space-y-4 mt-auto">
+          <div>
             <div 
               className="border rounded-lg p-4 animate-fade-in"
               style={{ 
@@ -131,6 +131,9 @@ const FeedbackAnalysisCard: React.FC<FeedbackAnalysisCardProps> = ({ tasks }) =>
             </div>
           </div>
         )}
+        
+        {/* Empty space filler that pushes content up */}
+        <div className="flex-grow"></div>
       </CardContent>
     </Card>
   );
