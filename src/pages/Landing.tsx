@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
@@ -41,7 +40,18 @@ const Landing: React.FC = () => {
   ));
 
   return (
-    <div className="min-h-screen bg-[#f9fbff] overflow-hidden relative">
+    <div className="min-h-screen overflow-hidden relative">
+      {/* Background image with overlay */}
+      <div className="absolute inset-0 z-0">
+        <img 
+          src="https://images.unsplash.com/photo-1503756058522-2390ea8cff45?q=80&w=3870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
+          alt="Background" 
+          className="object-cover w-full h-full"
+        />
+        {/* Overlay with reduced opacity to keep the image subtle */}
+        <div className="absolute inset-0 bg-[#f9fbff]/90 backdrop-blur-[2px]"></div>
+      </div>
+      
       {/* Custom animations */}
       <style>
         {`
