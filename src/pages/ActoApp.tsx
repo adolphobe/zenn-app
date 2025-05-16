@@ -1,14 +1,12 @@
 
 import React, { useEffect } from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import Dashboard from '../components/Dashboard';
 import { useAppContext } from '../context/AppContext';
-import { useIsMobile } from '@/hooks/use-mobile';
-import { useLocation } from 'react-router-dom';
-import { cn } from '@/lib/utils';
-import { Menu } from 'lucide-react';
 import { useSidebar } from '@/context/hooks';
+import { Menu } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 const ActoApp: React.FC = () => {
   const { state, toggleSidebar } = useAppContext();
@@ -18,7 +16,7 @@ const ActoApp: React.FC = () => {
   const navigate = useNavigate();
   const isDashboardRoute = location.pathname === '/dashboard';
 
-  // Check if user is logged in (this is just a mock check)
+  // Check if user is logged in
   const isLoggedIn = localStorage.getItem('acto_is_logged_in') === 'true';
 
   useEffect(() => {
@@ -32,7 +30,7 @@ const ActoApp: React.FC = () => {
     if (isMobile && sidebarOpen) {
       toggleSidebar();
     }
-  }, [isMobile, location.pathname]);
+  }, [isMobile, location.pathname, sidebarOpen, toggleSidebar]);
 
   // Determine if we should use a narrower max-width for task cards (only in power and chronological mode)
   const isTaskCardView = isDashboardRoute && (viewMode === 'power' || viewMode === 'chronological');

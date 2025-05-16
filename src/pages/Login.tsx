@@ -19,7 +19,7 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
-  const { addToast } = useToast();
+  const { toast } = useToast();
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [loaded, setLoaded] = useState(false);
@@ -54,7 +54,7 @@ const Login: React.FC = () => {
       // Set logged in state in localStorage
       localStorage.setItem('acto_is_logged_in', 'true');
       
-      addToast({
+      toast({
         title: "Bem-vindo de volta!",
         description: "Login realizado com sucesso",
       });
@@ -233,7 +233,7 @@ const Login: React.FC = () => {
       <div className="hidden md:block md:w-1/2 relative">
         <div className="absolute inset-0 overflow-hidden">
           <img
-            src="https://images.unsplash.com/photo-1595131264179-84bb2f9e17b9?q=80&w=2787&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+            src="https://images.unsplash.com/photo-1595131264264-377ba3b61f46?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
             alt="Fundo de login"
             className="object-cover w-full h-full object-center"
             style={{ minWidth: '100%', minHeight: '100%' }}
