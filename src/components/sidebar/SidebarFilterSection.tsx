@@ -4,6 +4,7 @@ import { useAppContext } from '@/context/AppContext';
 import { Eye } from 'lucide-react';
 import SidebarSection from './SidebarSection';
 import SidebarNavItem from './SidebarNavItem';
+import { useAppState } from '@/context/hooks';
 
 const SidebarFilterSection: React.FC<{ sidebarOpen: boolean }> = ({ sidebarOpen }) => {
   const { 
@@ -12,6 +13,13 @@ const SidebarFilterSection: React.FC<{ sidebarOpen: boolean }> = ({ sidebarOpen 
     toggleShowPillars,
     toggleShowDates
   } = useAppContext();
+
+  const { viewMode } = useAppState();
+  
+  // Only show filters in power or chronological view modes
+  if (viewMode !== 'power' && viewMode !== 'chronological') {
+    return null;
+  }
   
   return (
     <SidebarSection title="Filtros" sidebarOpen={sidebarOpen}>
