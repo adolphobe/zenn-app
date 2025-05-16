@@ -1,8 +1,8 @@
-
 import React from 'react';
 import { Eye, EyeOff, Edit2, CheckSquare, Trash2 } from 'lucide-react';
 import { Button } from './ui/button';
 import { ViewMode } from '@/types';
+import { cn } from '@/lib/utils'; // Assumindo que você use o auxiliar de classe cn
 
 interface TaskCardActionsProps {
   isHidden: boolean;
@@ -21,6 +21,12 @@ const TaskCardActions: React.FC<TaskCardActionsProps> = ({
   onDeleteTask,
   viewMode = 'power'
 }) => {
+  // Estilo base para os botões normais
+  const buttonStyles = "bg-white text-gray-700 border-gray-200 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700 dark:hover:bg-gray-700/50";
+  
+  // Estilo para o botão de exclusão
+  const deleteButtonStyles = "bg-white text-gray-700 border-[#ffcaca] hover:bg-[#fff5f5] dark:bg-gray-800 dark:text-gray-300 dark:border-red-900/30 dark:hover:bg-red-900/20";
+  
   return (
     <div className="flex justify-between space-x-2 mt-4">
       {/* Left side actions: Edit, Hide, Delete */}
@@ -30,6 +36,7 @@ const TaskCardActions: React.FC<TaskCardActionsProps> = ({
           size="sm"
           onClick={onEditTask}
           title="Editar"
+          className={buttonStyles}
         >
           <Edit2 size={16} />
           <span className="ml-1">Editar</span>
@@ -41,6 +48,7 @@ const TaskCardActions: React.FC<TaskCardActionsProps> = ({
             size="sm"
             onClick={onToggleHidden}
             title={isHidden ? "Mostrar" : "Ocultar"}
+            className={buttonStyles}
           >
             {isHidden ? <Eye size={16} /> : <EyeOff size={16} />}
             <span className="ml-1">{isHidden ? "Mostrar" : "Ocultar"}</span>
@@ -52,7 +60,7 @@ const TaskCardActions: React.FC<TaskCardActionsProps> = ({
           size="sm"
           onClick={onDeleteTask}
           title="Excluir"
-          className="text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+          className={deleteButtonStyles}
         >
           <Trash2 size={16} />
         </Button>
@@ -64,7 +72,7 @@ const TaskCardActions: React.FC<TaskCardActionsProps> = ({
         size="sm"
         onClick={onCompleteTask}
         title="Completar"
-        className="bg-green-600 hover:bg-green-700"
+        className="bg-green-600 hover:bg-green-700 text-white dark:bg-green-700 dark:hover:bg-green-800"
       >
         <CheckSquare size={16} />
         <span className="ml-1">Completar</span>
