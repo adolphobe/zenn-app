@@ -121,6 +121,32 @@ export default {
 						opacity: '1'
 					}
 				},
+				'float': {
+					'0%, 100%': { 
+						transform: 'translateY(0px)'
+					},
+					'50%': {
+						transform: 'translateY(-20px)'
+					}
+				},
+				'pulse': {
+					'0%, 100%': {
+						opacity: '0.5',
+						transform: 'scale(1)'
+					},
+					'50%': {
+						opacity: '0.8',
+						transform: 'scale(1.05)'
+					}
+				},
+				'pulse-slow': {
+					'0%, 100%': {
+						opacity: '0.6'
+					},
+					'50%': {
+						opacity: '0.8'
+					}
+				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
@@ -128,6 +154,8 @@ export default {
 				'slide-in-right': 'slide-in-right 0.3s ease-out',
 				'fade-in': 'fade-in 0.3s ease-out',
 				'scale-in': 'scale-in 0.2s ease-out',
+				'float': 'float 6s ease-in-out infinite',
+				'pulse-slow': 'pulse-slow 4s ease-in-out infinite',
 			},
 			boxShadow: {
 				'sm': '0 1px 2px 0 rgba(0, 0, 0, 0.05)',

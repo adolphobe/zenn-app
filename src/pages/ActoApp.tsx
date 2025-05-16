@@ -16,7 +16,7 @@ const ActoApp: React.FC = () => {
   const { isOpen: sidebarOpen, open: openSidebar, isMobile } = useSidebar();
   const location = useLocation();
   const navigate = useNavigate();
-  const isDashboardRoute = location.pathname === '/' || location.pathname === '/dashboard';
+  const isDashboardRoute = location.pathname === '/dashboard';
 
   // Check if user is logged in (this is just a mock check)
   const isLoggedIn = localStorage.getItem('acto_is_logged_in') === 'true';
