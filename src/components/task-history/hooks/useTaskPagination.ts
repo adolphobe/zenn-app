@@ -3,7 +3,11 @@ import { useState, useMemo, useEffect } from 'react';
 import { Task } from '@/types';
 import { groupTasksByTimeline } from '../utils';
 
-export const useTaskPagination = (sortedTasks: Task[], itemsPerPage: number = 30) => {
+export const useTaskPagination = (
+  sortedTasks: Task[], 
+  periodFilter: string = 'all',
+  itemsPerPage: number = 30
+) => {
   const [currentPage, setCurrentPage] = useState(1);
 
   // Reset pagination when tasks change
@@ -20,10 +24,10 @@ export const useTaskPagination = (sortedTasks: Task[], itemsPerPage: number = 30
     return sortedTasks.slice(startIndex, startIndex + itemsPerPage);
   }, [sortedTasks, currentPage, itemsPerPage]);
 
-  // Group by timeline for grid view
+  // Group by timeline for grid view, passing the period filter
   const groupedTasks = useMemo(() => {
-    return groupTasksByTimeline(paginatedTasks);
-  }, [paginatedTasks]);
+    return groupTasksByTimeline(paginatedTasks, periodFilter);
+  }, [paginatedTasks, periodFilter]);
 
   // Handle page change
   const handlePageChange = (page: number) => {

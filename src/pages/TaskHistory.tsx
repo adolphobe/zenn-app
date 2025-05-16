@@ -34,6 +34,7 @@ const TaskHistory = () => {
     sortedTasks
   } = useTaskFilters(completedTasks);
   
+  // Pass periodFilter to useTaskPagination
   const {
     currentPage,
     totalPages,
@@ -41,7 +42,7 @@ const TaskHistory = () => {
     groupedTasks,
     handlePageChange,
     getPageNumbers
-  } = useTaskPagination(sortedTasks);
+  } = useTaskPagination(sortedTasks, periodFilter);
 
   return (
     <div className="container p-4 mx-auto">

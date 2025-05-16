@@ -3,7 +3,15 @@ import { Task } from '@/types';
 import { format } from 'date-fns';
 
 // Timeline grouping function
-export const groupTasksByTimeline = (tasks: Task[]) => {
+export const groupTasksByTimeline = (tasks: Task[], periodFilter: string = 'all') => {
+  // If a specific period filter is active, return all tasks in a single group without timeline labels
+  if (periodFilter !== 'all') {
+    return [{
+      label: '',  // Empty label means no timeline division header
+      tasks: [...tasks]
+    }];
+  }
+  
   // Using May 16, 2024 as the reference "today" date
   const today = new Date(2024, 4, 16);
   today.setHours(0, 0, 0, 0);
