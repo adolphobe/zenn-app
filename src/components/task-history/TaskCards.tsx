@@ -66,8 +66,18 @@ export const CompletedTaskCard: React.FC<{ task: Task }> = ({ task }) => {
     obligation: 'Terminei por obrigação'
   };
 
-  // Format the completion date
-  const completedDate = task.completedAt ? format(new Date(task.completedAt), 'dd/MM/yyyy') : '-';
+  // Format the completion date and time in Brazilian format (DD/MM/YYYY HH:MM)
+  const formatCompletionDateTime = (dateString: string | null | undefined) => {
+    if (!dateString) return '-';
+    try {
+      const date = new Date(dateString);
+      return format(date, 'dd/MM/yyyy HH:mm');
+    } catch (e) {
+      return '-';
+    }
+  };
+
+  const completedDateTime = formatCompletionDateTime(task.completedAt);
 
   const handleRestore = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -86,7 +96,7 @@ export const CompletedTaskCard: React.FC<{ task: Task }> = ({ task }) => {
           <div>
             <h3 className="font-medium text-gray-900 dark:text-gray-100 opacity-70">{task.title}</h3>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-              Concluída em {completedDate}
+              Concluída em {completedDateTime}
             </p>
           </div>
           <div className="flex gap-2">
@@ -133,11 +143,12 @@ export const TaskGroupGrid: React.FC<{ groups: TaskGroup[] }> = ({ groups }) => 
   <div className="space-y-6">
     {groups.map((group, index) => (
       <div key={index}>
-        <div className="flex items-center gap-2 mb-2">
-          <h3 className="text-lg font-medium">{group.label}</h3>
-          <Badge variant="outline">{group.tasks.length}</Badge>
-          
-        </div>
+        {group.label && (
+          <div className="flex items-center gap-2 mb-2">
+            <h3 className="text-lg font-medium">{group.label}</h3>
+            <Badge variant="outline">{group.tasks.length}</Badge>
+          </div>
+        )}
         <div className="grid grid-cols-1">
           {group.tasks.map(task => (
             <CompletedTaskCard key={task.id} task={task} />

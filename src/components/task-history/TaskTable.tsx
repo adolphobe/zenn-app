@@ -43,8 +43,18 @@ export const CompletedTaskRow: React.FC<{ task: Task }> = ({ task }) => {
     obligation: 'Terminei por obrigação'
   };
 
-  // Make sure we have a completedAt value before trying to format it
-  const completedDate = task.completedAt ? format(new Date(task.completedAt), 'dd/MM/yyyy') : '-';
+  // Format the completion date and time in Brazilian format (DD/MM/YYYY HH:MM)
+  const formatCompletionDateTime = (dateString: string | null | undefined) => {
+    if (!dateString) return '-';
+    try {
+      const date = new Date(dateString);
+      return format(date, 'dd/MM/yyyy HH:mm');
+    } catch (e) {
+      return '-';
+    }
+  };
+
+  const completedDateTime = formatCompletionDateTime(task.completedAt);
 
   const handleRestore = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -56,7 +66,7 @@ export const CompletedTaskRow: React.FC<{ task: Task }> = ({ task }) => {
   return (
     <TableRow onClick={() => setShowRestore(!showRestore)} className="cursor-pointer">
       <TableCell className="opacity-70">{task.title}</TableCell>
-      <TableCell>{completedDate}</TableCell>
+      <TableCell>{completedDateTime}</TableCell>
       <TableCell>{task.totalScore}/15</TableCell>
       <TableCell className="capitalize">{dominantPillar}</TableCell>
       <TableCell>{task.feedback ? feedbackLabels[task.feedback] : '-'}</TableCell>
