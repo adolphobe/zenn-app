@@ -19,7 +19,7 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
+  const { addToast } = useToast();
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [loaded, setLoaded] = useState(false);
@@ -54,7 +54,7 @@ const Login: React.FC = () => {
       // Set logged in state in localStorage
       localStorage.setItem('acto_is_logged_in', 'true');
       
-      toast({
+      addToast({
         title: "Bem-vindo de volta!",
         description: "Login realizado com sucesso",
       });
