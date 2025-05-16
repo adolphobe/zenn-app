@@ -23,8 +23,13 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
   const [feedbackModalOpen, setFeedbackModalOpen] = useState(false);
   const [editTaskModalOpen, setEditTaskModalOpen] = useState(false);
   const { toggleTaskCompleted, toggleTaskHidden, updateTaskTitle, state, setTaskFeedback } = useAppContext();
-  const { dateDisplayOptions, showHiddenTasks } = state;
-  const priorityClass = getTaskPriorityClass(task.totalScore);
+  const { dateDisplayOptions, showHiddenTasks, viewMode } = state;
+  
+  // Only apply priority class in power mode
+  // In chronological mode, use a neutral light style
+  const cardClass = viewMode === 'chronological' 
+    ? 'bg-white text-gray-800 border-gray-200' 
+    : getTaskPriorityClass(task.totalScore);
   
   const handleTitleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -92,7 +97,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
   return (
     <>
       <div
-        className={`task-card ${priorityClass} ${task.completed ? 'opacity-50' : ''} relative cursor-pointer`}
+        className={`task-card ${cardClass} ${task.completed ? 'opacity-50' : ''} relative cursor-pointer`}
         onClick={() => !isEditingTitle && onToggleExpand(task.id)}
       >
         <TaskCardHeader 
