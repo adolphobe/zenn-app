@@ -50,7 +50,7 @@ const SidebarFilterSection: React.FC<{ sidebarOpen: boolean }> = ({ sidebarOpen 
           onClick={toggleShowPillars}
         />
         {/* Only show date toggle in power mode */}
-        {!isChronologicalMode && (
+        {viewMode === 'power' && (
           <SidebarNavItem
             icon={Calendar}
             label="Data visível"

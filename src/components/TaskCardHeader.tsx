@@ -3,7 +3,7 @@ import React from 'react';
 import { formatDate, isTaskOverdue } from '@/utils';
 import { DateDisplayOptions } from '@/types';
 import TaskCardTitle from './TaskCardTitle';
-import { Eye, AlertTriangle, Bell } from 'lucide-react';
+import { Eye, Bell } from 'lucide-react';
 import { useAppContext } from '@/context/AppContext';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
@@ -74,6 +74,9 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
   // Check if task is overdue (before current date and time)
   const taskIsOverdue = idealDate ? isTaskOverdue(idealDate) : false;
   
+  // In chronological mode, always show dates regardless of showDates setting
+  const shouldShowDate = viewMode === 'chronological' || showDates;
+  
   return (
     <>
       {/* Eye icon for hidden tasks that are only visible because of the filter - now with tooltip */}
@@ -106,7 +109,7 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
         </div>
         
         <div className="flex items-center">
-          {idealDate && showDates && (
+          {idealDate && shouldShowDate && (
             <div className="text-xs text-right ml-3 flex items-center">
               {taskIsOverdue && (
                 <Bell size={14} className="text-amber-500 mr-1" />
