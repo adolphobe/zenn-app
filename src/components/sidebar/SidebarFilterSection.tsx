@@ -27,7 +27,7 @@ const SidebarFilterSection: React.FC<{ sidebarOpen: boolean }> = ({ sidebarOpen 
   
   return (
     <div className="animate-fade-in">
-      <SidebarSection title="Filtros" sidebarOpen={sidebarOpen}>
+      <SidebarSection title="Exibir" sidebarOpen={sidebarOpen}>
         <SidebarNavItem
           icon={ClipboardList} // Alterado para ClipboardList - ícone de lista de tarefas
           label="Tarefas ocultas"
