@@ -21,11 +21,8 @@ const TaskCardActions: React.FC<TaskCardActionsProps> = ({
   onDeleteTask,
   viewMode = 'power'
 }) => {
-  // Estilo base para os botões normais
-  const buttonStyles = "bg-white text-gray-700 border-gray-200 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700 dark:hover:bg-gray-700/50";
-  
-  // Estilo para o botão de exclusão
-  const deleteButtonStyles = "bg-white text-gray-700 border-[#ffcaca] hover:bg-[#fff5f5] dark:bg-gray-800 dark:text-gray-300 dark:border-red-900/30 dark:hover:bg-red-900/20";
+  // Estilo base para todos os botões (incluindo o de exclusão)
+  const buttonStyles = "bg-white text-gray-700 border-gray-200 hover:bg-gray-50 hover:border-gray-300 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700 dark:hover:bg-gray-700/50 dark:hover:border-gray-600";
   
   return (
     <div className="flex justify-between space-x-2 mt-4">
@@ -60,7 +57,7 @@ const TaskCardActions: React.FC<TaskCardActionsProps> = ({
           size="sm"
           onClick={onDeleteTask}
           title="Excluir"
-          className={deleteButtonStyles}
+          className={buttonStyles}
         >
           <Trash2 size={16} />
         </Button>
@@ -72,7 +69,7 @@ const TaskCardActions: React.FC<TaskCardActionsProps> = ({
         size="sm"
         onClick={onCompleteTask}
         title="Completar"
-        className="bg-green-600 hover:bg-green-700 text-white dark:bg-green-700 dark:hover:bg-green-800"
+        className="bg-green-600 text-white hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800"
       >
         <CheckSquare size={16} />
         <span className="ml-1">Completar</span>
