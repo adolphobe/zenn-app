@@ -22,9 +22,9 @@ const CustomTooltip = ({ active, payload }: any) => {
   };
   
   const titleMapping: Record<string, string> = {
-    transformed: "Me transformou",
-    relief: "Deu alívio",
-    obligation: "Foi só obrigação"
+    transformed: "Me transformou 😎",
+    relief: "Deu alívio 🍃",
+    obligation: "Foi só obrigação 😒"
   };
   
   return (
