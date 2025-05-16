@@ -36,6 +36,21 @@ const Dashboard: React.FC = () => {
     viewMode,
     sortOptions[viewMode]
   );
+
+  // Generate dynamic description text based on viewMode and sort direction
+  const getDescriptionText = () => {
+    if (viewMode === 'power') {
+      const sortDirection = sortOptions.power.sortDirection;
+      return sortDirection === 'desc' 
+        ? 'Neste modo, as tarefas com maior potência aparecem primeiro.' 
+        : 'Neste modo, as tarefas com menor potência aparecem primeiro.';
+    } else {
+      const sortDirection = sortOptions.chronological.sortDirection;
+      return sortDirection === 'asc' 
+        ? 'Neste modo, as tarefas com datas mais próximas aparecem primeiro.' 
+        : 'Neste modo, as tarefas com datas mais distantes aparecem primeiro.';
+    }
+  };
   
   return (
     <div className="container p-4 mx-auto max-w-5xl">
@@ -62,9 +77,7 @@ const Dashboard: React.FC = () => {
             </div>
           </div>
           <p className="text-sm text-muted-foreground mt-1">
-            {viewMode === 'power' 
-              ? 'Neste modo, as tarefas são organizadas por potência/score. Tarefas com maior score têm prioridade.' 
-              : 'Neste modo, a data é o único fator de priorização das tarefas.'}
+            {getDescriptionText()}
           </p>
         </div>
         <div className="grid grid-cols-1 gap-4 md:gap-6">
