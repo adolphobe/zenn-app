@@ -131,7 +131,7 @@ const Dashboard: React.FC = () => {
             <div className="border-2 border-[#ea384c]/30 rounded-lg p-4 relative mb-2">
               <div className="absolute -top-3 left-4 bg-background px-2">
                 <Badge 
-                  className="bg-[#ea384c]/10 text-[#ea384c] border-[#ea384c]/30 flex items-center gap-1 cursor-pointer hover:bg-[#ea384c]/20 transition-colors"
+                  className="bg-[#ff0000]/10 text-[#ea384c] border-[#ea384c]/30 flex items-center gap-1 cursor-pointer hover:bg-[#ea384c]/20 transition-colors"
                   onClick={toggleOverdueTasks}
                 >
                   <Bell size={14} />
