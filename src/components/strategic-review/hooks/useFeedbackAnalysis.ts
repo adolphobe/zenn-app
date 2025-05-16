@@ -31,9 +31,9 @@ export const useFeedbackAnalysis = (tasks: Task[]) => {
     if (tasks.length === 0) {
       return {
         distribution: [
-          { name: 'Me transformou', value: 0, percent: 0, color: COLORS.feedback.transformed, id: 'transformed' },
+          { name: 'Foi só obrigação', value: 0, percent: 0, color: COLORS.feedback.obligation, id: 'obligation' },
           { name: 'Deu alívio', value: 0, percent: 0, color: COLORS.feedback.relief, id: 'relief' },
-          { name: 'Foi só obrigação', value: 0, percent: 0, color: COLORS.feedback.obligation, id: 'obligation' }
+          { name: 'Me transformou', value: 0, percent: 0, color: COLORS.feedback.transformed, id: 'transformed' }
         ],
         insight: '',
         withFeedback: false,
@@ -83,9 +83,9 @@ export const useFeedbackAnalysis = (tasks: Task[]) => {
       // Use sample data instead of updating the actual counts
       return {
         distribution: [
-          { name: 'Me transformou', value: 3, percent: 38, color: COLORS.feedback.transformed, id: 'transformed' },
+          { name: 'Foi só obrigação', value: 1, percent: 12, color: COLORS.feedback.obligation, id: 'obligation' },
           { name: 'Deu alívio', value: 4, percent: 50, color: COLORS.feedback.relief, id: 'relief' },
-          { name: 'Foi só obrigação', value: 1, percent: 12, color: COLORS.feedback.obligation, id: 'obligation' }
+          { name: 'Me transformou', value: 3, percent: 38, color: COLORS.feedback.transformed, id: 'transformed' }
         ],
         insight: `50${FEEDBACK_MESSAGES.relief}`,
         withFeedback: true,
@@ -95,9 +95,9 @@ export const useFeedbackAnalysis = (tasks: Task[]) => {
     
     return {
       distribution: [
-        { name: 'Me transformou', value: transformed, percent: transformedPercent, color: COLORS.feedback.transformed, id: 'transformed' },
+        { name: 'Foi só obrigação', value: obligation, percent: obligationPercent, color: COLORS.feedback.obligation, id: 'obligation' },
         { name: 'Deu alívio', value: relief, percent: reliefPercent, color: COLORS.feedback.relief, id: 'relief' },
-        { name: 'Foi só obrigação', value: obligation, percent: obligationPercent, color: COLORS.feedback.obligation, id: 'obligation' }
+        { name: 'Me transformou', value: transformed, percent: transformedPercent, color: COLORS.feedback.transformed, id: 'transformed' }
       ],
       insight,
       withFeedback,
