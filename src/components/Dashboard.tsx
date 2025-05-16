@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '@/context/AppContext';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -58,17 +59,23 @@ const Dashboard: React.FC = () => {
     task => !task.completed && (shouldShowHiddenTasks || !task.hidden)
   );
   
-  // First do the overall sort of all tasks
-  const sortedTasks = sortTasks(filteredTasks, viewMode, sortOptions[viewMode]);
-  
-  // Then separate out overdue from non-overdue tasks (keeping the sort order from above)
+  // Primeiro separamos as tarefas em vencidas e não vencidas
   const overdueTasksChronological = viewMode === 'chronological'
-    ? sortedTasks.filter(task => task.idealDate && isTaskOverdue(task.idealDate))
+    ? filteredTasks.filter(task => task.idealDate && isTaskOverdue(task.idealDate))
     : [];
     
   const nonOverdueTasksChronological = viewMode === 'chronological'
-    ? sortedTasks.filter(task => !task.idealDate || !isTaskOverdue(task.idealDate))
-    : sortedTasks;
+    ? filteredTasks.filter(task => !task.idealDate || !isTaskOverdue(task.idealDate))
+    : filteredTasks;
+    
+  // Depois aplicamos a ordenação a cada grupo separadamente
+  const sortedOverdueTasks = viewMode === 'chronological'
+    ? sortTasks(overdueTasksChronological, viewMode, sortOptions[viewMode])
+    : [];
+    
+  const sortedNonOverdueTasks = viewMode === 'chronological'
+    ? sortTasks(nonOverdueTasksChronological, viewMode, sortOptions[viewMode])
+    : sortTasks(nonOverdueTasksChronological, viewMode, sortOptions[viewMode]);
 
   // Generate dynamic description text based on viewMode and sort direction
   const getDescriptionText = () => {
@@ -80,8 +87,8 @@ const Dashboard: React.FC = () => {
     } else {
       const sortDirection = sortOptions.chronological.sortDirection;
       return sortDirection === 'desc' 
-        ? 'Tarefas ordenadas da data mais recente para a mais antiga.' 
-        : 'Tarefas ordenadas da data mais antiga para a mais recente.';
+        ? 'Tarefas ordenadas da data mais próxima para a mais distante.' 
+        : 'Tarefas ordenadas da data mais distante para a mais próxima.';
     }
   };
 
@@ -120,7 +127,7 @@ const Dashboard: React.FC = () => {
         </div>
         <div className="grid grid-cols-1 gap-4 md:gap-6">
           {/* Overdue tasks box - only show in chronological mode */}
-          {viewMode === 'chronological' && overdueTasksChronological.length > 0 && (
+          {viewMode === 'chronological' && sortedOverdueTasks.length > 0 && (
             <div className="border-2 border-[#ea384c]/30 rounded-lg p-4 relative mb-2">
               <div className="absolute -top-3 left-4 bg-background px-2">
                 <Badge 
@@ -140,7 +147,7 @@ const Dashboard: React.FC = () => {
                   showOverdueTasks ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'
                 }`}
               >
-                {overdueTasksChronological.map(task => (
+                {sortedOverdueTasks.map(task => (
                   <TaskCard 
                     key={task.id} 
                     task={task} 
@@ -153,7 +160,7 @@ const Dashboard: React.FC = () => {
           )}
 
           {/* Non-overdue tasks */}
-          {nonOverdueTasksChronological.map(task => (
+          {sortedNonOverdueTasks.map(task => (
             <TaskCard 
               key={task.id} 
               task={task} 

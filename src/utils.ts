@@ -54,6 +54,7 @@ export const sortTasks = (
   
   return [...tasks].sort((a, b) => {
     const sortMultiplier = sortDirection === 'desc' ? -1 : 1;
+    const now = new Date();
     
     if (viewMode === 'power') {
       // Power mode - sort by score first
@@ -80,8 +81,35 @@ export const sortTasks = (
         const aTime = a.idealDate.getTime();
         const bTime = b.idealDate.getTime();
         
-        // Aplicar a ordenação cronológica com base na direção escolhida
-        return (aTime - bTime) * sortMultiplier;
+        // Para tarefas vencidas e não vencidas, usamos a mesma lógica de ordenação
+        // Se sortDirection for 'desc' (mais recente primeiro):
+        //   - Para tarefas futuras (não vencidas), o "mais recente" é a data mais próxima de hoje (19/05 vem antes de 25/05)
+        //   - Para tarefas passadas (vencidas), o "mais recente" é a data mais próxima de hoje (15/05 vem antes de 10/05)
+        // Se sortDirection for 'asc' (mais antigo primeiro), a lógica é invertida
+        
+        // No modo cronológico, tratamos a proximidade com o presente 
+        const nowTime = now.getTime();
+        
+        if (isTaskOverdue(a.idealDate) && isTaskOverdue(b.idealDate)) {
+          // Ambas são vencidas, a mais "recente" é a mais próxima de hoje
+          if (sortDirection === 'desc') {
+            return (bTime - aTime); // Mais próxima do presente primeiro (ordem decrescente)
+          } else {
+            return (aTime - bTime); // Mais distante do presente primeiro (ordem crescente)
+          }
+        } else if (!isTaskOverdue(a.idealDate) && !isTaskOverdue(b.idealDate)) {
+          // Ambas são futuras, a mais "recente" é a mais próxima de hoje
+          if (sortDirection === 'desc') {
+            return (aTime - bTime); // Mais próxima do presente primeiro (ordem crescente)
+          } else {
+            return (bTime - aTime); // Mais distante do presente primeiro (ordem decrescente)
+          }
+        } else {
+          // Uma é vencida e outra é futura - este caso não deveria ocorrer aqui
+          // pois as tarefas já foram separadas, mas mantemos por segurança
+          if (isTaskOverdue(a.idealDate)) return -1;
+          return 1;
+        }
       }
       
       // If one has date and other doesn't

@@ -64,13 +64,13 @@ const SortDropdown: React.FC = () => {
               onClick={() => handleSortDirectionChange('desc')}
               className={`${dropdownStyles.item} ${sortDirection === 'desc' ? dropdownStyles.itemSelected : ''} cursor-pointer`}
             >
-              Data: Mais recente → Mais antiga
+              Datas mais próximas primeiro
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => handleSortDirectionChange('asc')}
               className={`${dropdownStyles.item} ${sortDirection === 'asc' ? dropdownStyles.itemSelected : ''} cursor-pointer`}
             >
-              Data: Mais antiga → Mais recente
+              Datas mais distantes primeiro
             </DropdownMenuItem>
           </>
         )}
