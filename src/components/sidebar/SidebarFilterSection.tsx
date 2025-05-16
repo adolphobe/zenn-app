@@ -1,7 +1,6 @@
-
 import React from 'react';
 import { useAppContext } from '@/context/AppContext';
-import { Eye } from 'lucide-react';
+import { Eye, EyeOff, Layers, Calendar } from 'lucide-react'; // Atualizada a importação
 import SidebarSection from './SidebarSection';
 import SidebarNavItem from './SidebarNavItem';
 import { useAppState } from '@/context/hooks';
@@ -14,7 +13,6 @@ const SidebarFilterSection: React.FC<{ sidebarOpen: boolean }> = ({ sidebarOpen 
     toggleShowPillars,
     toggleShowDates
   } = useAppContext();
-
   const { viewMode } = useAppState();
   const location = useLocation();
   
@@ -31,21 +29,21 @@ const SidebarFilterSection: React.FC<{ sidebarOpen: boolean }> = ({ sidebarOpen 
     <div className="animate-fade-in">
       <SidebarSection title="Filtros" sidebarOpen={sidebarOpen}>
         <SidebarNavItem
-          icon={EyeOff}
+          icon={EyeOff} // Alterado para EyeOff
           label="Tarefas ocultas"
           path="#"
           isActive={showHiddenTasks}
           onClick={toggleShowHiddenTasks}
         />
         <SidebarNavItem
-          icon={Layers}
+          icon={Layers} // Alterado para Layers
           label="Pilares no card"
           path="#"
           isActive={showPillars}
           onClick={toggleShowPillars}
         />
         <SidebarNavItem
-          icon={Calendar}
+          icon={Calendar} // Alterado para Calendar
           label="Data visível"
           path="#"
           isActive={showDates}
