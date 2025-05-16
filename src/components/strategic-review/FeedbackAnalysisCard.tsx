@@ -41,19 +41,18 @@ const FeedbackAnalysisCard: React.FC<FeedbackAnalysisCardProps> = ({ tasks }) =>
   
   // Function to get feedback title based on id
   const getFeedbackTitle = (id: string) => {
-    const titles = {
+    const titles: Record<string, string> = {
       transformed: 'Me transformou 😎',
       relief: 'Deu alívio 🍃',
-      obligation: 'Foi só obrigação 😒'
+      obligation: 'Foi só obrigação 😒',
+      transformed_relief: 'Me transformou e deu alívio 🌱',
+      transformed_obligation: 'Me transformou mas também senti obrigação 🤔',
+      relief_obligation: 'Deu alívio mas também senti obrigação 🤷‍♂️',
+      balanced: 'Um pouco de cada sensação 🎭'
     };
     
-    const emoji = id === 'transformed' 
-      ? '🟢' 
-      : id === 'relief' 
-        ? '🔵' 
-        : '⚪️';
-    
-    return `${titles[id as keyof typeof titles]}`;
+    // Use the mapped title or fallback to the id if not found
+    return titles[id] || id;
   };
   
   return (
@@ -124,7 +123,7 @@ const FeedbackAnalysisCard: React.FC<FeedbackAnalysisCardProps> = ({ tasks }) =>
               }}
             >
               <h4 className="font-medium mb-3 text-base">
-                A sensação mais comum foi: {getFeedbackTitle(feedbackData.topFeedback)}
+                A sensação predominante foi: {getFeedbackTitle(feedbackData.topFeedback)}
               </h4>
               <p className="text-sm text-muted-foreground whitespace-pre-line">
                 {feedbackData.insight}
