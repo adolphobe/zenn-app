@@ -49,7 +49,7 @@ const Landing: React.FC = () => {
           className="object-cover w-full h-full"
         />
         {/* Overlay with reduced opacity to keep the image subtle */}
-        <div className="absolute inset-0 bg-[#f9fbff]/90 backdrop-blur-[2px]"></div>
+        <div className="absolute inset-0 bg-[#f9fbff]/80 backdrop-blur-[20px]"></div>
       </div>
       
       {/* Custom animations */}
