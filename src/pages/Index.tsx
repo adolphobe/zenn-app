@@ -79,7 +79,8 @@ const Index: React.FC = () => {
       </main>
 
       {/* Animated background styling */}
-      <style jsx>{`
+      <style>
+        {`
         @keyframes float-animate {
           0% {
             transform: translate(0, 0) scale(1) rotate(0deg);
@@ -110,7 +111,8 @@ const Index: React.FC = () => {
           will-change: transform, opacity;
           border-radius: 50%;
         }
-      `}</style>
+      `}
+      </style>
 
       {/* Decorative element - subtle line */}
       <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 w-16 h-1 bg-blue-200 rounded-full opacity-70"></div>
