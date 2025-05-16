@@ -91,19 +91,9 @@ const Dashboard: React.FC = () => {
           </p>
         </div>
         <div className="grid grid-cols-1 gap-4 md:gap-6">
-          {/* Non-overdue tasks - display first */}
-          {nonOverdueTasksChronological.map(task => (
-            <TaskCard 
-              key={task.id} 
-              task={task} 
-              isExpanded={isTaskExpanded(task.id)} 
-              onToggleExpand={toggleTaskExpanded} 
-            />
-          ))}
-
-          {/* Overdue tasks box - only show in chronological mode and moved to the bottom */}
+          {/* Overdue tasks box - only show in chronological mode */}
           {viewMode === 'chronological' && overdueTasksChronological.length > 0 && (
-            <div className="border-2 border-[#ea384c]/30 rounded-lg p-4 relative mt-2">
+            <div className="border-2 border-[#ea384c]/30 rounded-lg p-4 relative mb-2">
               <div className="absolute -top-3 left-4 bg-background px-2">
                 <Badge className="bg-[#ea384c]/10 text-[#ea384c] border-[#ea384c]/30 flex items-center gap-1">
                   <Bell size={14} />
@@ -122,6 +112,16 @@ const Dashboard: React.FC = () => {
               </div>
             </div>
           )}
+          
+          {/* Non-overdue tasks */}
+          {nonOverdueTasksChronological.map(task => (
+            <TaskCard 
+              key={task.id} 
+              task={task} 
+              isExpanded={isTaskExpanded(task.id)} 
+              onToggleExpand={toggleTaskExpanded} 
+            />
+          ))}
 
           {filteredTasks.length === 0 && (
             <div className="text-center py-12 border border-dashed rounded-lg bg-muted/30 border-border">
