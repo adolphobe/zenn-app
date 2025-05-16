@@ -63,7 +63,7 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
       } else {
         return (
           <>
-            Essa tarefa não está visível.<br />
+            Você ocultou esta tarefa.<br />
             Você pode torná-la visível clicando no botão "Mostrar"
           </>
         );
