@@ -43,7 +43,7 @@ const SidebarModeSection: React.FC<{ sidebarOpen: boolean }> = ({ sidebarOpen })
       
       <SidebarNavItem 
         icon={CalendarClock} 
-        label="Modo Cronologia"
+        label="Modo Cronológico"
         path="/"
         isActive={viewMode === 'chronological' && !isStrategicReview && !isHistory}
         onClick={handleChronologicalModeClick}
