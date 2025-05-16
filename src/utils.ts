@@ -56,13 +56,13 @@ export const sortTasks = (
     const sortMultiplier = sortDirection === 'desc' ? -1 : 1;
     
     if (viewMode === 'power') {
-      // Sort by score according to direction
+      // Power mode - sort by score first
       if (a.totalScore !== b.totalScore) {
         return (a.totalScore - b.totalScore) * sortMultiplier;
       }
       
       // Secondary sort by date if scores are equal
-      if (a.idealDate && b.idealDate) return a.idealDate.getTime() - b.idealDate.getTime();
+      if (a.idealDate && b.idealDate) return (a.idealDate.getTime() - b.idealDate.getTime());
       if (a.idealDate) return -1;
       if (b.idealDate) return 1;
       return 0;
@@ -80,7 +80,7 @@ export const sortTasks = (
         const aTime = a.idealDate.getTime();
         const bTime = b.idealDate.getTime();
         
-        // Consistent chronological order based on sortDirection
+        // Aplicar a ordenação cronológica com base na direção escolhida
         return (aTime - bTime) * sortMultiplier;
       }
       

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '@/context/AppContext';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -59,10 +58,10 @@ const Dashboard: React.FC = () => {
     task => !task.completed && (shouldShowHiddenTasks || !task.hidden)
   );
   
-  // Sort tasks according to current view mode and sort options
+  // First do the overall sort of all tasks
   const sortedTasks = sortTasks(filteredTasks, viewMode, sortOptions[viewMode]);
   
-  // First separate overdue from non-overdue tasks
+  // Then separate out overdue from non-overdue tasks (keeping the sort order from above)
   const overdueTasksChronological = viewMode === 'chronological'
     ? sortedTasks.filter(task => task.idealDate && isTaskOverdue(task.idealDate))
     : [];
