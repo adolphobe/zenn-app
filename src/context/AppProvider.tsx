@@ -2,7 +2,7 @@
 import React, { useReducer, useEffect } from 'react';
 import { AppContext } from './AppContext';
 import { AppContextType } from './types';
-import appReducer from './appReducer'; // Changed from { appReducer } to default import
+import { appReducer } from './appReducer';
 import { initialState } from './initialState';
 import { initializeDemoTasks } from './demo/demoTasksInit';
 import * as taskActions from './tasks/taskActions';
@@ -45,8 +45,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     // UI actions
     setViewMode: (mode) => uiActions.setViewMode(dispatch, mode),
     toggleShowHiddenTasks: () => uiActions.toggleShowHiddenTasks(dispatch),
-    toggleShowPillars: () => uiActions.toggleShowPillars(dispatch),
-    toggleShowDates: () => uiActions.toggleShowDates(dispatch),
     toggleDarkMode: () => uiActions.toggleDarkMode(dispatch),
     toggleSidebar: () => uiActions.toggleSidebar(dispatch),
     updateDateDisplayOptions: (options) => uiActions.updateDateDisplayOptions(dispatch, options),

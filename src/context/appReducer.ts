@@ -1,7 +1,8 @@
 
 import { AppState, Action } from './types';
+
+// Importing UI reducer functions correctly
 import { 
-  toggleViewMode, 
   setViewMode,
   toggleShowHiddenTasks,
   toggleDarkMode,
@@ -9,6 +10,7 @@ import {
   updateDateDisplayOptions,
   updateSortOptions
 } from './reducers/uiReducers';
+
 import { 
   addTask, 
   deleteTask,
@@ -23,6 +25,7 @@ import {
   setTaskFeedbackByTitle,
   clearTasks
 } from './reducers/taskReducers';
+
 import { 
   addComment, 
   deleteComment 
@@ -30,7 +33,7 @@ import {
 
 // Main reducer
 export const appReducer = (state: AppState, action: Action): AppState => {
-  console.log('Action:', action.type, action.payload);
+  console.log('Action:', action.type, action);
   
   // Task reducers
   if (action.type === 'ADD_TASK') return addTask(state, action);
