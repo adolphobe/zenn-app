@@ -21,5 +21,8 @@ export const initialState: AppState = {
       sortDirection: 'asc',
       noDateAtEnd: true
     }
-  }
+  },
+  // Adicionamos as novas propriedades ao estado inicial
+  showPillars: true,
+  showDates: true
 };

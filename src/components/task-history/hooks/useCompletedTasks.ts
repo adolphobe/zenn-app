@@ -7,25 +7,13 @@ export const useCompletedTasks = (tasks: Task[]) => {
     // Get all completed tasks
     const completed = tasks.filter(task => task.completed) as Task[];
     
-    // For tasks that don't have feedback, assign them
-    return completed.map((task, index) => {
-      const updatedTask = { ...task };
-      
-      // Log task completion date for debugging
+    // Apenas registramos as tarefas concluídas no console para depuração
+    completed.forEach(task => {
       console.log(`[useCompletedTasks] Task "${task.title}" completed at: ${task.completedAt}`);
-      
-      // If task doesn't have feedback (for demo data), assign one
-      if (!updatedTask.feedback) {
-        const feedbackOptions: ('transformed' | 'relief' | 'obligation')[] = [
-          'transformed', 'relief', 'obligation'
-        ];
-        // Use modulo to cycle through the feedback options
-        const feedbackIndex = index % feedbackOptions.length;
-        updatedTask.feedback = feedbackOptions[feedbackIndex];
-      }
-      
-      return updatedTask;
     });
+    
+    // Retorna as tarefas sem modificá-las - importante para manter as datas originais
+    return completed;
   }, [tasks]);
 
   return { completedTasks };

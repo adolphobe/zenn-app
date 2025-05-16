@@ -19,6 +19,14 @@ export const toggleSidebar = (dispatch: AppDispatch) => {
   dispatch({ type: 'TOGGLE_SIDEBAR' });
 };
 
+export const toggleShowPillars = (dispatch: AppDispatch) => {
+  dispatch({ type: 'TOGGLE_SHOW_PILLARS' });
+};
+
+export const toggleShowDates = (dispatch: AppDispatch) => {
+  dispatch({ type: 'TOGGLE_SHOW_DATES' });
+};
+
 export const updateDateDisplayOptions = (dispatch: AppDispatch, options: Partial<DateDisplayOptions>) => {
   dispatch({ type: 'UPDATE_DATE_DISPLAY_OPTIONS', payload: options });
 };
@@ -28,10 +36,7 @@ export const setSortOptions = (
   options: { sortDirection: SortDirection; noDateAtEnd?: boolean }
 ) => {
   dispatch({ 
-    type: 'UPDATE_SORT_OPTIONS', 
-    payload: { 
-      viewMode: 'chronological', 
-      options 
-    } 
+    type: 'SET_SORT_OPTIONS', 
+    payload: options 
   });
 };

@@ -14,6 +14,9 @@ export interface AppState {
     power: SortOption;
     chronological: SortOption;
   };
+  // Adicionar flags para controlar a exibição de pilares e datas
+  showPillars: boolean;
+  showDates: boolean;
 }
 
 // Define Action
@@ -38,12 +41,15 @@ export type Action =
   | { type: 'UPDATE_DATE_DISPLAY_OPTIONS'; payload: Partial<DateDisplayOptions> }
   | { type: 'UPDATE_SORT_OPTIONS'; payload: { viewMode: 'power' | 'chronological'; options: Partial<SortOption> } }
   | { type: 'ADD_COMMENT'; payload: { taskId: string; text: string } }
-  | { type: 'DELETE_COMMENT'; payload: { taskId: string; commentId: string } };
+  | { type: 'DELETE_COMMENT'; payload: { taskId: string; commentId: string } }
+  | { type: 'TOGGLE_SHOW_PILLARS' }
+  | { type: 'TOGGLE_SHOW_DATES' }
+  | { type: 'SET_SORT_OPTIONS'; payload: { sortDirection: 'asc' | 'desc'; noDateAtEnd?: boolean } };
 
 // AppDispatch type
 export type AppDispatch = Dispatch<Action>;
 
-// AppContextType definition that was missing
+// AppContextType definition
 export interface AppContextType {
   state: AppState;
   dispatch: AppDispatch;
@@ -63,4 +69,7 @@ export interface AppContextType {
   toggleSidebar: () => void;
   updateDateDisplayOptions: (options: Partial<DateDisplayOptions>) => void;
   setSortOptions: (options: { sortDirection: 'asc' | 'desc'; noDateAtEnd?: boolean }) => void;
+  // Adicionar novos métodos
+  toggleShowPillars: () => void;
+  toggleShowDates: () => void;
 }

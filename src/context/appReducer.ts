@@ -8,7 +8,11 @@ import {
   toggleDarkMode,
   toggleSidebar,
   updateDateDisplayOptions,
-  updateSortOptions
+  updateSortOptions,
+  toggleViewMode,
+  toggleShowPillars,
+  toggleShowDates,
+  setSortOptions
 } from './reducers/uiReducers';
 
 import { 
@@ -55,8 +59,11 @@ export const appReducer = (state: AppState, action: Action): AppState => {
   if (action.type === 'TOGGLE_SHOW_HIDDEN_TASKS') return toggleShowHiddenTasks(state, action);
   if (action.type === 'TOGGLE_DARK_MODE') return toggleDarkMode(state, action);
   if (action.type === 'TOGGLE_SIDEBAR') return toggleSidebar(state, action);
+  if (action.type === 'TOGGLE_SHOW_PILLARS') return toggleShowPillars(state, action);
+  if (action.type === 'TOGGLE_SHOW_DATES') return toggleShowDates(state, action);
   if (action.type === 'UPDATE_DATE_DISPLAY_OPTIONS') return updateDateDisplayOptions(state, action);
   if (action.type === 'UPDATE_SORT_OPTIONS') return updateSortOptions(state, action);
+  if (action.type === 'SET_SORT_OPTIONS') return setSortOptions(state, action);
   
   // Comment reducers
   if (action.type === 'ADD_COMMENT') return addComment(state, action);

@@ -32,6 +32,16 @@ export const toggleSidebar = (state: AppState, action: Action): AppState => {
   return { ...state, sidebarOpen: !state.sidebarOpen };
 };
 
+export const toggleShowPillars = (state: AppState, action: Action): AppState => {
+  if (action.type !== 'TOGGLE_SHOW_PILLARS') return state;
+  return { ...state, showPillars: !state.showPillars };
+};
+
+export const toggleShowDates = (state: AppState, action: Action): AppState => {
+  if (action.type !== 'TOGGLE_SHOW_DATES') return state;
+  return { ...state, showDates: !state.showDates };
+};
+
 export const updateDateDisplayOptions = (state: AppState, action: Action): AppState => {
   if (action.type !== 'UPDATE_DATE_DISPLAY_OPTIONS') return state;
   
@@ -55,6 +65,23 @@ export const updateSortOptions = (state: AppState, action: Action): AppState => 
       ...state.sortOptions,
       [viewMode]: {
         ...state.sortOptions[viewMode],
+        ...options
+      }
+    }
+  };
+};
+
+export const setSortOptions = (state: AppState, action: Action): AppState => {
+  if (action.type !== 'SET_SORT_OPTIONS') return state;
+  
+  const options = action.payload;
+  
+  return {
+    ...state,
+    sortOptions: {
+      ...state.sortOptions,
+      [state.viewMode]: {
+        ...state.sortOptions[state.viewMode],
         ...options
       }
     }
