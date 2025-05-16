@@ -22,7 +22,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
   const [titleValue, setTitleValue] = useState(task.title);
   const [feedbackModalOpen, setFeedbackModalOpen] = useState(false);
   const [editTaskModalOpen, setEditTaskModalOpen] = useState(false);
-  const { toggleTaskCompleted, toggleTaskHidden, updateTaskTitle, state } = useAppContext();
+  const { toggleTaskCompleted, toggleTaskHidden, updateTaskTitle, state, setTaskFeedback } = useAppContext();
   const { dateDisplayOptions, showHiddenTasks } = state;
   const priorityClass = getTaskPriorityClass(task.totalScore);
   
@@ -69,10 +69,15 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
     setEditTaskModalOpen(true);
   };
 
-  const handleFeedbackConfirm = (feedbackType: string) => {
-    // In a future implementation, we would store the feedback
-    // For now, just complete the task
+  const handleFeedbackConfirm = (feedbackType: 'transformed' | 'relief' | 'obligation') => {
+    // Primeiro marcamos a tarefa como completa
     toggleTaskCompleted(task.id);
+    
+    // Depois salvamos o feedback (importante ser nessa ordem para garantir que ambos os dados sejam atualizados)
+    if (setTaskFeedback) {
+      setTaskFeedback(task.id, feedbackType);
+    }
+    
     setFeedbackModalOpen(false);
   };
 
