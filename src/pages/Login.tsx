@@ -68,19 +68,19 @@ const Login: React.FC = () => {
   // Animated floating items for the background with random positions and continuous animations
   const floatingItems = Array(7).fill(null).map((_, i) => (
     <div 
-    className="absolute rounded-full animated-float"
-    style={{
-      backgroundColor: 'rgba(88, 213, 211, 0.2)',
-      width: `${Math.random() * 100 + 50}px`,
-      height: `${Math.random() * 100 + 50}px`,
-      left: `${Math.random() * 70}%`,
-      top: `${Math.random() * 100}%`,
-      animationDelay: `${Math.random() * 2}s`,
-      animationDuration: `${Math.random() * 6 + 6}s`,
-      opacity: Math.random() * 0.4 + 0.3,
-    }}
-  />
-));
+      className="absolute rounded-full animated-float"
+      style={{
+        backgroundColor: 'rgba(59, 130, 246, 0.2)',
+        width: `${Math.random() * 100 + 50}px`,
+        height: `${Math.random() * 100 + 50}px`,
+        left: `${Math.random() * 70}%`,
+        top: `${Math.random() * 100}%`,
+        animationDelay: `${Math.random() * 2}s`,
+        animationDuration: `${Math.random() * 6 + 6}s`,
+        opacity: Math.random() * 0.4 + 0.3,
+      }}
+    />
+  ));
 
   return (
     <div className="flex min-h-screen bg-gradient-to-b from-white to-blue-50 dark:from-gray-950 dark:to-gray-900 overflow-hidden relative">
@@ -208,7 +208,7 @@ const Login: React.FC = () => {
 
               <Button 
                 type="submit" 
-                className="w-full h-12 text-base transition-all duration-300 transform hover:scale-[1.02] bg-[#58d5d3] hover:bg-[#4cbcba] shadow-md hover:shadow-lg"
+                className="w-full h-12 text-base transition-all duration-300 transform hover:scale-[1.02] bg-blue-600 hover:bg-blue-700 shadow-md hover:shadow-lg"
                 disabled={isSubmitting}
               >
                 {isSubmitting ? "Entrando..." : "Entrar"}
@@ -216,7 +216,7 @@ const Login: React.FC = () => {
 
               <div className="text-center text-sm">
                 <span className="text-muted-foreground">Não tem uma conta? </span>
-                <a href="#" className="text-[#58d5d3] hover:underline hover:text-[#4cbcba] transition-colors duration-300">
+                <a href="#" className="text-blue-600 hover:underline hover:text-blue-700 transition-colors duration-300">
                   Criar conta
                 </a>
               </div>
@@ -238,7 +238,7 @@ const Login: React.FC = () => {
             className="object-cover w-full h-full object-center"
             style={{ minWidth: '100%', minHeight: '100%' }}
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#58d5d3]/30 to-[#4cbcba]/20 mix-blend-multiply" />
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-500/30 to-blue-600/20 mix-blend-multiply" />
         </div>
       </div>
     </div>
