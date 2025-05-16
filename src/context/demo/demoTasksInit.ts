@@ -26,7 +26,12 @@ export const initializeDemoTasks = (dispatch: AppDispatch, tasksLength: number) 
       // Tarefas mais cotidianas com scores menores
       { title: "Arrumar tomada de casa", consequenceScore: 2, prideScore: 2, constructionScore: 1, daysFromNow: 6 },
       { title: "Organizar armário do escritório", consequenceScore: 1, prideScore: 3, constructionScore: 2, daysFromNow: 8 },
-      { title: "Atualizar aplicativos do celular", consequenceScore: 1, prideScore: 1, constructionScore: 1, daysFromNow: 9 }
+      { title: "Atualizar aplicativos do celular", consequenceScore: 1, prideScore: 1, constructionScore: 1, daysFromNow: 9 },
+      
+      // Tarefas vencidas (com datas anteriores a 10/05/2025)
+      { title: "Enviar documentos para contabilidade", consequenceScore: 4, prideScore: 3, constructionScore: 2, specificDate: new Date(2025, 4, 3, 11, 54) }, // 03/05/2025 11:54
+      { title: "Atualizar plano de marketing", consequenceScore: 5, prideScore: 4, constructionScore: 4, specificDate: new Date(2025, 4, 7, 9, 30) }, // 07/05/2025 09:30
+      { title: "Revisar contrato de parceria", consequenceScore: 5, prideScore: 5, constructionScore: 3, specificDate: new Date(2025, 3, 28, 14, 15) }  // 28/04/2025 14:15
     ];
     
     // Clear array of existing tasks to prevent any possibility of duplication
@@ -34,9 +39,15 @@ export const initializeDemoTasks = (dispatch: AppDispatch, tasksLength: number) 
     
     pendingTasks.forEach(task => {
       const today = new Date();
-      const idealDate = task.daysFromNow !== undefined 
-        ? addDaysToDate(today, task.daysFromNow) 
-        : null;
+      let idealDate;
+      
+      if (task.specificDate) {
+        idealDate = task.specificDate;
+      } else if (task.daysFromNow !== undefined) {
+        idealDate = addDaysToDate(today, task.daysFromNow);
+      } else {
+        idealDate = null;
+      }
       
       dispatch({
         type: 'ADD_TASK',

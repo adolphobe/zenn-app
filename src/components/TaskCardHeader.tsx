@@ -1,9 +1,10 @@
+
 // src/components/TaskCardHeader.tsx
 import React from 'react';
 import { formatDate } from '@/utils';
 import { DateDisplayOptions } from '@/types';
 import TaskCardTitle from './TaskCardTitle';
-import { Eye } from 'lucide-react';
+import { Eye, AlertTriangle } from 'lucide-react';
 import { useAppContext } from '@/context/AppContext';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
@@ -54,6 +55,13 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
     }
   };
   
+  // Check if task is overdue (before 10/05/2025)
+  const isOverdue = () => {
+    if (!idealDate) return false;
+    const cutoffDate = new Date(2025, 4, 10); // 10/05/2025
+    return idealDate < cutoffDate;
+  };
+  
   return (
     <>
       {/* Eye icon for hidden tasks that are only visible because of the filter - now with tooltip */}
@@ -87,7 +95,10 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
         
         <div className="flex items-center">
           {idealDate && showDates && (
-            <div className="text-xs text-right ml-3">
+            <div className="text-xs text-right ml-3 flex items-center">
+              {isOverdue() && (
+                <AlertTriangle size={14} className="text-amber-500 mr-1" />
+              )}
               {formatDate(idealDate, dateDisplayOptions)}
             </div>
           )}
