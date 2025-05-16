@@ -19,17 +19,6 @@ const TaskCardActions: React.FC<TaskCardActionsProps> = ({
 }) => {
   return (
     <div className="flex gap-2 mt-4 justify-between">
-      <div>
-        <Button 
-          variant="outline"
-          size="sm"
-          className="flex items-center gap-1 text-gray-700 dark:text-gray-300 hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-900/20 dark:hover:text-blue-400"
-          onClick={onToggleHidden}
-        >
-          <EyeOff size={14} />
-          {isHidden ? 'Mostrar' : 'Ocultar'}
-        </Button>
-      </div>
       <div className="flex gap-2">
         <Button 
           variant="outline"
@@ -48,6 +37,17 @@ const TaskCardActions: React.FC<TaskCardActionsProps> = ({
         >
           <CheckCircle size={14} />
           Concluir
+        </Button>
+      </div>
+      <div>
+        <Button 
+          variant="outline"
+          size="sm"
+          className="flex items-center gap-1 text-gray-700 dark:text-gray-300 hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-900/20 dark:hover:text-blue-400"
+          onClick={onToggleHidden}
+        >
+          <EyeOff size={14} />
+          {isHidden ? 'Mostrar' : 'Ocultar'}
         </Button>
       </div>
     </div>
