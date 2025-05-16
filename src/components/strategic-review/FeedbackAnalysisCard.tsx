@@ -77,7 +77,7 @@ const FeedbackAnalysisCard: React.FC<FeedbackAnalysisCardProps> = ({ tasks }) =>
                 <BarChart 
                   data={feedbackData.distribution} 
                   barGap={12} 
-                  margin={{ top: 10, right: 10, left: 10, bottom: 10 }}
+                  margin={{ top: 20, right: 10, left: 10, bottom: 10 }}
                 >
                   <XAxis dataKey="name" axisLine={false} tickLine={false} />
                   <Tooltip content={<CustomTooltip />} cursor={{fill: 'rgba(0, 0, 0, 0.05)'}} />
@@ -96,6 +96,7 @@ const FeedbackAnalysisCard: React.FC<FeedbackAnalysisCardProps> = ({ tasks }) =>
                       fill="#888888"
                       formatter={(value: number) => `${value}%`}
                       style={{ fontSize: '12px', fontWeight: 'bold' }}
+                      offset={10}
                     />
                     {feedbackData.distribution.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.color} />
