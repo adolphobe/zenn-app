@@ -84,7 +84,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
   }, [task.title]);
 
   return (
-    <>
+    <div className="animate-fade-in">
       <div
         className={`task-card ${priorityClass} ${task.completed ? 'opacity-50' : ''} relative cursor-pointer`}
         onClick={() => !isEditingTitle && onToggleExpand(task.id)}
@@ -147,7 +147,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
           isEditing={true}
         />
       )}
-    </>
+    </div>
   );
 };
 
