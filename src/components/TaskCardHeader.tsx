@@ -114,7 +114,7 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
           {idealDate && shouldShowDate && (
             <div className="text-xs text-right ml-3 flex items-center">
               {taskIsOverdue && (
-                <Bell size={14} className="text-red-500 mr-1" />
+                <Bell size={14} className="text-red-200 mr-1" />
               )}
               {formatDate(idealDate, dateDisplayOptions)}
             </div>
