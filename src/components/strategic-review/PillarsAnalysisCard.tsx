@@ -131,7 +131,7 @@ const PillarsAnalysisCard: React.FC<PillarsAnalysisCardProps> = ({ tasks }) => {
               }}
             >
               <h4 className="font-medium mb-3 text-base">
-                {getPillarTitle(activeInsight.id, activeInsight.classification)}
+                {activeInsight.customTitle}
               </h4>
               {activeInsight.messages.map((message, msgIndex) => (
                 <p key={msgIndex} className="text-sm text-muted-foreground">{message}</p>

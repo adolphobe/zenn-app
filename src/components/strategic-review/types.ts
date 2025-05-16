@@ -6,6 +6,7 @@ export interface InsightMessage {
   title: string;
   classification: 'prioridade_alta' | 'equilibrado' | 'negligenciado';
   messages: string[];
+  customTitle?: string; // Adicionando o campo customTitle
 }
 
 export interface PillarDataType {

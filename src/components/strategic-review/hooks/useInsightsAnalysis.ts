@@ -10,29 +10,53 @@ const COLORS = {
   construction: '#10B981' // Verde
 };
 
-// Messages for each pillar based on classification - Updated with new messages
+// Messages for each pillar based on classification - Updated with titles and text structure
 const PILLAR_MESSAGES = {
   consequence: {
-    prioridade_alta: "Você tem criado tarefas que, pra você, eram importantes de fazer. Você reconheceu que não dava pra deixar de lado — e concluiu mesmo assim. Isso mostra clareza e responsabilidade com o que realmente importa.",
-    equilibrado: "Você tem equilibrado tarefas importantes com outras mais leves. Nem tudo era urgente, mas você soube reconhecer o que precisava ser feito e o que podia esperar.",
-    negligenciado: "Você concluiu tarefas que, na hora de criar, não pareciam tão importantes. Isso pode indicar que o que mais pesa pra você ainda tá ficando pra depois."
+    prioridade_alta: {
+      titulo: "🧠 Você focou no que importa",
+      texto: "Você tem criado tarefas que, pra você, eram importantes de fazer. Você reconheceu que não dava pra deixar de lado — e concluiu mesmo assim. Isso mostra clareza e responsabilidade com o que realmente importa."
+    },
+    equilibrado: {
+      titulo: "⚖️ Você tem escolhido com critério",
+      texto: "Você tem equilibrado tarefas importantes com outras mais leves. Nem tudo era urgente, mas você soube reconhecer o que precisava ser feito e o que podia esperar."
+    },
+    negligenciado: {
+      titulo: "⏳ Coisas importantes ficaram pra depois",
+      texto: "Você concluiu tarefas que, na hora de criar, não pareciam tão importantes. Isso pode indicar que o que mais pesa pra você ainda tá ficando pra depois."
+    }
   },
 
   pride: {
-    prioridade_alta: "Boa parte das tarefas que você concluiu foram pensadas pra te dar orgulho. Você tem escolhido fazer o que te representa — e isso reforça seu senso de identidade.",
-    equilibrado: "Você tem feito um pouco do que precisa e um pouco do que te dá satisfação. Isso mostra equilíbrio entre execução e envolvimento pessoal.",
-    negligenciado: "A maioria das suas tarefas não foram criadas pra te gerar orgulho. Você pode estar fazendo muito, mas sem sentir que tá construindo algo que tem a sua cara."
+    prioridade_alta: {
+      titulo: "🔥 Você quis se sentir realizado",
+      texto: "Boa parte das tarefas que você concluiu foram pensadas pra te dar orgulho. Você tem escolhido fazer o que te representa — e isso reforça seu senso de identidade."
+    },
+    equilibrado: {
+      titulo: "🙂 Você tem feito o que te representa",
+      texto: "Você tem feito um pouco do que precisa e um pouco do que te dá satisfação. Isso mostra equilíbrio entre execução e envolvimento pessoal."
+    },
+    negligenciado: {
+      titulo: "📦 Você entregou, mas não sentiu nada",
+      texto: "A maioria das suas tarefas não foram criadas pra te gerar orgulho. Você pode estar fazendo muito, mas sem sentir que tá construindo algo que tem a sua cara."
+    }
   },
 
   construction: {
-    prioridade_alta: "Você tem criado tarefas que te puxam pra cima. Mesmo antes de começar, já enxergava valor nelas como parte do seu crescimento. Isso mostra foco em se tornar alguém melhor.",
-    equilibrado: "Suas tarefas têm misturado rotina com construção. Você tá se mantendo em movimento sem deixar de crescer aos poucos.",
-    negligenciado: "Você concluiu tarefas que, pra você, não fariam diferença real. Isso pode indicar que seu esforço recente te manteve ocupado, mas não em evolução."
+    prioridade_alta: {
+      titulo: "🚀 Você escolheu crescer de verdade",
+      texto: "Você tem criado tarefas que te puxam pra cima. Mesmo antes de começar, já enxergava valor nelas como parte do seu crescimento. Isso mostra foco em se tornar alguém melhor."
+    },
+    equilibrado: {
+      titulo: "🔁 Você tem crescido aos poucos",
+      texto: "Suas tarefas têm misturado rotina com construção. Você tá se mantendo em movimento sem deixar de crescer aos poucos."
+    },
+    negligenciado: {
+      titulo: "🪤 Você se ocupou, mas não evoluiu",
+      texto: "Você concluiu tarefas que, pra você, não fariam diferença real. Isso pode indicar que seu esforço recente te manteve ocupado, mas não em evolução."
+    }
   }
 };
-
-
-
 
 export const useInsightsAnalysis = (tasks: Task[]): PillarDataType => {
   return useMemo(() => {
@@ -74,7 +98,8 @@ export const useInsightsAnalysis = (tasks: Task[]): PillarDataType => {
       id: 'consequence',
       title: 'Risco',
       classification: consequenceClassification,
-      messages: [PILLAR_MESSAGES.consequence[consequenceClassification]]
+      messages: [PILLAR_MESSAGES.consequence[consequenceClassification].texto],
+      customTitle: PILLAR_MESSAGES.consequence[consequenceClassification].titulo
     });
     
     const prideClassification = getClassification(avgPride, HIGH_THRESHOLD, LOW_THRESHOLD);
@@ -82,7 +107,8 @@ export const useInsightsAnalysis = (tasks: Task[]): PillarDataType => {
       id: 'pride',
       title: 'Orgulho',
       classification: prideClassification, 
-      messages: [PILLAR_MESSAGES.pride[prideClassification]]
+      messages: [PILLAR_MESSAGES.pride[prideClassification].texto],
+      customTitle: PILLAR_MESSAGES.pride[prideClassification].titulo
     });
     
     const constructionClassification = getClassification(avgConstruction, HIGH_THRESHOLD, LOW_THRESHOLD);
@@ -90,7 +116,8 @@ export const useInsightsAnalysis = (tasks: Task[]): PillarDataType => {
       id: 'construction',
       title: 'Crescimento pessoal',
       classification: constructionClassification,
-      messages: [PILLAR_MESSAGES.construction[constructionClassification]]
+      messages: [PILLAR_MESSAGES.construction[constructionClassification].texto],
+      customTitle: PILLAR_MESSAGES.construction[constructionClassification].titulo
     });
     
     // Find highest and lowest pillars
