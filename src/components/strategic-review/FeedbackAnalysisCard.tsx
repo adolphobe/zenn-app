@@ -35,7 +35,7 @@ const FeedbackAnalysisCard: React.FC<FeedbackAnalysisCardProps> = ({ tasks }) =>
     <Card>
       <CardHeader>
         <CardTitle>Impacto emocional das tarefas:</CardTitle>
-        <CardDescription>Veja a proporção entre tarefas que te transformaram, trouxeram alívio ou foram apenas cumpridas por obrigação.</CardDescription>
+        <CardDescription className="!mt-[25px]">Veja a proporção entre tarefas que te transformaram, trouxeram alívio ou foram apenas cumpridas por obrigação.</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="h-64 mb-6">
