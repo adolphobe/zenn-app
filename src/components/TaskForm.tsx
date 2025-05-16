@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { TaskFormData, Task } from '../types';
@@ -123,7 +122,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, initialData, taskId, task,
       data-testid="task-form-backdrop"
     >
       <div 
-        className={`bg-white dark:bg-gray-800 rounded-xl shadow-lg ${isMobile ? 'w-full max-w-md' : 'w-full max-w-2xl'} flex flex-col`}
+        className={`bg-white dark:bg-gray-800 rounded-xl shadow-lg ${isMobile ? 'w-full max-w-lg' : 'w-full max-w-3xl'} flex flex-col`}
         onClick={handleModalClick}
         onMouseDown={(e) => {
           e.stopPropagation();
