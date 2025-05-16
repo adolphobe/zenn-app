@@ -6,6 +6,7 @@ import { DateDisplayOptions } from '@/types';
 import TaskCardTitle from './TaskCardTitle';
 import { Eye } from 'lucide-react';
 import { useAppContext } from '@/context/AppContext';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface TaskCardHeaderProps {
   title: string;
@@ -36,15 +37,33 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
   onTitleBlur,
   onTitleKeyDown
 }) => {
-  const { state: { showPillars, showDates } } = useAppContext();
+  const { state: { showPillars, showDates, viewMode } } = useAppContext();
+  
+  // Define tooltip message based on view mode
+  const getTooltipMessage = () => {
+    if (viewMode === 'chronological') {
+      return "Esta tarefa está oculta no Modo Potência";
+    } else {
+      return `Essa tarefa está oculta porque sua potência é inferior a 8`;
+    }
+  };
   
   return (
     <>
-      {/* Eye icon for hidden tasks that are only visible because of the filter - now with reduced opacity */}
+      {/* Eye icon for hidden tasks that are only visible because of the filter - now with tooltip */}
       {isHidden && showHiddenTasks && (
-        <div className="absolute bottom-2 right-2 bg-gray-800/30 dark:bg-gray-200/30 text-white dark:text-gray-800 rounded-full p-1 z-10 opacity-40">
-          <Eye size={16} />
-        </div>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="absolute bottom-2 right-2 bg-gray-800/30 dark:bg-gray-200/30 text-white dark:text-gray-800 rounded-full p-1 z-10 opacity-40">
+                <Eye size={16} />
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>
+              {getTooltipMessage()}
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       )}
       
       <div className="flex justify-between items-start">

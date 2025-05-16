@@ -1,6 +1,7 @@
+
 import React from 'react';
 import { useAppContext } from '@/context/AppContext';
-import { ClipboardList, Layers, Calendar } from 'lucide-react'; // Atualizada a importação
+import { ClipboardList, Layers, Calendar } from 'lucide-react'; 
 import SidebarSection from './SidebarSection';
 import SidebarNavItem from './SidebarNavItem';
 import { useAppState } from '@/context/hooks';
@@ -28,22 +29,25 @@ const SidebarFilterSection: React.FC<{ sidebarOpen: boolean }> = ({ sidebarOpen 
   return (
     <div className="animate-fade-in">
       <SidebarSection title="Exibir" sidebarOpen={sidebarOpen}>
+        {/* Only show the hidden tasks toggle in power mode */}
+        {viewMode === 'power' && (
+          <SidebarNavItem
+            icon={ClipboardList}
+            label="Tarefas ocultas"
+            path="#"
+            isActive={showHiddenTasks}
+            onClick={toggleShowHiddenTasks}
+          />
+        )}
         <SidebarNavItem
-          icon={ClipboardList} // Alterado para ClipboardList - ícone de lista de tarefas
-          label="Tarefas ocultas"
-          path="#"
-          isActive={showHiddenTasks}
-          onClick={toggleShowHiddenTasks}
-        />
-        <SidebarNavItem
-          icon={Layers} // Mantido Layers
+          icon={Layers}
           label="Pilares no card"
           path="#"
           isActive={showPillars}
           onClick={toggleShowPillars}
         />
         <SidebarNavItem
-          icon={Calendar} // Mantido Calendar
+          icon={Calendar}
           label="Data visível"
           path="#"
           isActive={showDates}

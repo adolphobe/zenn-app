@@ -27,9 +27,12 @@ const Dashboard: React.FC = () => {
     return <StrategicReview />;
   }
   
+  // In chronological mode, always show hidden tasks
+  const shouldShowHiddenTasks = viewMode === 'chronological' || showHiddenTasks;
+  
   // Sort and filter tasks
   const filteredTasks = sortTasks(
-    tasks.filter(task => !task.completed && (showHiddenTasks || !task.hidden)),
+    tasks.filter(task => !task.completed && (shouldShowHiddenTasks || !task.hidden)),
     viewMode,
     sortOptions[viewMode]
   );
@@ -70,7 +73,7 @@ const Dashboard: React.FC = () => {
           {filteredTasks.length === 0 && (
             <div className="text-center py-12 border border-dashed rounded-lg bg-muted/30 border-border">
               <p className="text-muted-foreground">
-                {showHiddenTasks 
+                {shouldShowHiddenTasks 
                   ? 'Nenhuma tarefa encontrada. Adicione sua primeira tarefa!' 
                   : 'Nenhuma tarefa visível. Você pode habilitar tarefas ocultas nas configurações.'}
               </p>
