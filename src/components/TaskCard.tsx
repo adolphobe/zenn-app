@@ -90,6 +90,21 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
     setFeedbackModalOpen(false);
   };
 
+  // Manipulador para expansão do card que verifica se o clique veio de um elemento na área de conteúdo expandido
+  const handleCardClick = (e: React.MouseEvent) => {
+    // Se estivermos editando o título, não faremos nada
+    if (isEditingTitle) return;
+    
+    // Chamar a função de toggle
+    onToggleExpand(task.id);
+  };
+
+  // Manipulador para cliques em áreas expandidas
+  const handleExpandedContentClick = (e: React.MouseEvent) => {
+    // Impedir a propagação para o card, assim o card não vai colapsar quando clicamos no conteúdo
+    e.stopPropagation();
+  };
+
   useEffect(() => {
     setTitleValue(task.title);
   }, [task.title]);
@@ -98,7 +113,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
     <>
       <div
         className={`task-card ${cardClass} ${task.completed ? 'opacity-50' : ''} relative cursor-pointer`}
-        onClick={() => !isEditingTitle && onToggleExpand(task.id)}
+        onClick={handleCardClick}
       >
         <TaskCardHeader 
           title={task.title}
@@ -119,7 +134,10 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
         />
 
         {isExpanded && (
-          <div className="mt-4 animate-fade-in">
+          <div 
+            className="mt-4 animate-fade-in" 
+            onClick={handleExpandedContentClick}
+          >
             <TaskPillarDetails task={task} />
             
             {/* Display comments if they exist */}

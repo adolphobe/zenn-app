@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState, useRef } from 'react';
 import { format } from 'date-fns';
 import { Comment } from '@/types';
@@ -100,20 +101,28 @@ const TaskComments: React.FC<TaskCommentsProps> = ({ taskId, comments }) => {
     }
   };
   
+  // Impedir a propagação do evento de clique
+  const handleContainerClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    console.log('Comment container clicked, stopped propagation');
+  };
+  
   return (
-    <div className="mt-4">
+    <div className="mt-4" onClick={handleContainerClick}>
       <h4 className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">Comentários</h4>
       
-      {/* Div com scrollbar nativa e estilização, agora com ref */}
+      {/* Div com scrollbar nativa e estilização, agora com ref e onClick para evitar propagação */}
       <div 
         ref={scrollContainerRef}
         className="native-scrollbar h-60 overflow-auto rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"
+        onClick={handleContainerClick}
       >
         <div className="space-y-3 p-4">
           {comments.map(comment => (
             <div 
               key={comment.id} 
               className="bg-gray-50 dark:bg-gray-800 p-3 rounded-md relative"
+              onClick={handleContainerClick}
             >
               <p className="text-sm text-gray-700 dark:text-gray-200">{comment.text}</p>
               <div className="flex justify-between items-center mt-2">
@@ -126,11 +135,21 @@ const TaskComments: React.FC<TaskCommentsProps> = ({ taskId, comments }) => {
                     <button
                       className="text-gray-400 hover:text-red-500 transition-colors"
                       title="Remover comentário"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        console.log('Delete button clicked, stopped propagation');
+                      }}
                     >
                       <X size={14} />
                     </button>
                   </AlertDialogTrigger>
-                  <AlertDialogContent className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+                  <AlertDialogContent 
+                    className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      console.log('Dialog content clicked, stopped propagation');
+                    }}
+                  >
                     <AlertDialogHeader>
                       <AlertDialogTitle className="text-gray-900 dark:text-gray-100">
                         Confirmar exclusão
@@ -141,11 +160,17 @@ const TaskComments: React.FC<TaskCommentsProps> = ({ taskId, comments }) => {
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                      <AlertDialogCancel className="bg-gray-50 hover:bg-gray-200 text-gray-700 hover:text-gray-700 dark:bg-gray-600 dark:hover:bg-gray-700 dark:text-gray-200 dark:hover:text-gray-200 border-gray-200 dark:border-gray-600">
+                      <AlertDialogCancel 
+                        className="bg-gray-50 hover:bg-gray-200 text-gray-700 hover:text-gray-700 dark:bg-gray-600 dark:hover:bg-gray-700 dark:text-gray-200 dark:hover:text-gray-200 border-gray-200 dark:border-gray-600"
+                        onClick={(e) => e.stopPropagation()}
+                      >
                         Cancelar
                       </AlertDialogCancel>
                       <AlertDialogAction
-                        onClick={() => handleDeleteComment(comment.id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteComment(comment.id);
+                        }}
                         className="bg-red-50 hover:bg-red-100 text-red-600 border border-red-100 hover:border-red-200"
                       >
                         Excluir
