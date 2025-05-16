@@ -10,6 +10,31 @@ interface FeedbackAnalysisCardProps {
   tasks: Task[];
 }
 
+// Custom tooltip component for the feedback chart
+const CustomTooltip = ({ active, payload }: any) => {
+  if (!active || !payload || !payload.length) return null;
+  
+  const data = payload[0].payload;
+  const feedbackMessages: Record<string, string> = {
+    transformed: "das suas tarefas te transformaram.",
+    relief: "das suas tarefas te deram alívio.",
+    obligation: "das suas tarefas foram só obrigação."
+  };
+  
+  const titleMapping: Record<string, string> = {
+    transformed: "Me transformou",
+    relief: "Deu alívio",
+    obligation: "Foi só obrigação"
+  };
+  
+  return (
+    <div className="bg-background border rounded-md shadow-md p-3 text-sm">
+      <p className="font-medium">{titleMapping[data.id]}:</p>
+      <p className="text-muted-foreground">{data.percent}% {feedbackMessages[data.id]}</p>
+    </div>
+  );
+};
+
 const FeedbackAnalysisCard: React.FC<FeedbackAnalysisCardProps> = ({ tasks }) => {
   // Use the feedback analysis hook
   const feedbackData = useFeedbackAnalysis(tasks);
@@ -55,7 +80,7 @@ const FeedbackAnalysisCard: React.FC<FeedbackAnalysisCardProps> = ({ tasks }) =>
                   margin={{ top: 10, right: 10, left: 10, bottom: 10 }}
                 >
                   <XAxis dataKey="name" axisLine={false} tickLine={false} />
-                  <Tooltip content={<ChartTooltipContent />} />
+                  <Tooltip content={<CustomTooltip />} cursor={{fill: 'rgba(0, 0, 0, 0.05)'}} />
                   <Bar 
                     dataKey="value" 
                     radius={[4, 4, 0, 0]} 
