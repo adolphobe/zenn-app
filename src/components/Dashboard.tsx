@@ -47,8 +47,8 @@ const Dashboard: React.FC = () => {
     } else {
       const sortDirection = sortOptions.chronological.sortDirection;
       return sortDirection === 'asc' 
-        ? 'Neste modo, as tarefas com datas mais próximas aparecem primeiro.' 
-        : 'Neste modo, as tarefas com datas mais distantes aparecem primeiro.';
+        ? 'Neste modo, as tarefas com datas mais próximas de hoje aparecem primeiro.' 
+        : 'Neste modo, as tarefas com datas mais distantes de hoje aparecem primeiro.';
     }
   };
   

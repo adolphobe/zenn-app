@@ -1,3 +1,4 @@
+
 import { Task, DateDisplayOptions, ViewMode, SortDirection, SortOption } from './types';
 
 export const formatDate = (date: Date | null, options?: DateDisplayOptions): string => {
@@ -74,24 +75,28 @@ export const sortTasks = (
         if (!a.idealDate && b.idealDate) return 1;
       }
       
-      // Sort dates according to direction - FIX: The issue is here in the chronological sort
-      // In chronological mode for "Próximas primeiro" (asc), we need to sort by how close dates are to today
-      // Rather than just comparing dates directly
+      // Fixed chronological sorting
       if (a.idealDate && b.idealDate) {
-        const today = new Date().getTime();
-        const distanceA = Math.abs(a.idealDate.getTime() - today);
-        const distanceB = Math.abs(b.idealDate.getTime() - today);
-        
         if (sortDirection === 'asc') {
-          // "Próximas primeiro" - closest dates first
+          // "Próximas primeiro" - closest dates to today first
+          const today = new Date().getTime();
+          const distanceA = Math.abs(a.idealDate.getTime() - today);
+          const distanceB = Math.abs(b.idealDate.getTime() - today);
           return distanceA - distanceB;
         } else {
-          // "Distantes primeiro" - furthest dates first 
+          // "Distantes primeiro" - furthest dates from today first
+          const today = new Date().getTime();
+          const distanceA = Math.abs(a.idealDate.getTime() - today);
+          const distanceB = Math.abs(b.idealDate.getTime() - today);
           return distanceB - distanceA;
         }
       }
       
-      // If not noDateAtEnd or both have/don't have dates, use score as secondary sort
+      // If one has date and other doesn't
+      if (a.idealDate && !b.idealDate) return -1;
+      if (!a.idealDate && b.idealDate) return 1;
+      
+      // If both don't have dates, use score as secondary sort
       return (b.totalScore - a.totalScore);
     }
   });
