@@ -1,4 +1,3 @@
-
 import { Task, DateDisplayOptions, ViewMode, SortDirection, SortOption } from './types';
 
 export const formatDate = (date: Date | null, options?: DateDisplayOptions): string => {
@@ -81,38 +80,18 @@ export const sortTasks = (
         
         if (sortDirection === 'asc') {
           // "Próximas primeiro" - closest dates to today first
-          // For dates after today, closer is better
-          // For dates before today, those are already past and should come after future dates
-          const aFuture = a.idealDate.getTime() >= now;
-          const bFuture = b.idealDate.getTime() >= now;
+          const aDistance = Math.abs(a.idealDate.getTime() - now);
+          const bDistance = Math.abs(b.idealDate.getTime() - now);
           
-          if (aFuture && bFuture) {
-            // Both in future, closest comes first
-            return a.idealDate.getTime() - b.idealDate.getTime();
-          } else if (!aFuture && !bFuture) {
-            // Both in past, most recent comes first
-            return b.idealDate.getTime() - a.idealDate.getTime();
-          } else {
-            // One past, one future - future comes first
-            return aFuture ? -1 : 1;
-          }
+          // Menor distância primeiro (mais próximo)
+          return aDistance - bDistance;
         } else {
           // "Distantes primeiro" - furthest dates from today first
-          // For future dates, further is better
-          // For past dates, older is better
-          const aFuture = a.idealDate.getTime() >= now;
-          const bFuture = b.idealDate.getTime() >= now;
+          const aDistance = Math.abs(a.idealDate.getTime() - now);
+          const bDistance = Math.abs(b.idealDate.getTime() - now);
           
-          if (aFuture && bFuture) {
-            // Both in future, furthest comes first
-            return b.idealDate.getTime() - a.idealDate.getTime();
-          } else if (!aFuture && !bFuture) {
-            // Both in past, oldest comes first
-            return a.idealDate.getTime() - b.idealDate.getTime();
-          } else {
-            // One past, one future - past comes first (it's further from "now")
-            return aFuture ? 1 : -1;
-          }
+          // Maior distância primeiro (mais distante)
+          return bDistance - aDistance;
         }
       }
       
