@@ -31,21 +31,21 @@ const SidebarFilterSection: React.FC<{ sidebarOpen: boolean }> = ({ sidebarOpen 
     <div className="animate-fade-in">
       <SidebarSection title="Filtros" sidebarOpen={sidebarOpen}>
         <SidebarNavItem
-          icon={Eye}
+          icon={EyeOff}
           label="Tarefas ocultas"
           path="#"
           isActive={showHiddenTasks}
           onClick={toggleShowHiddenTasks}
         />
         <SidebarNavItem
-          icon={Eye}
+          icon={Layers}
           label="Pilares no card"
           path="#"
           isActive={showPillars}
           onClick={toggleShowPillars}
         />
         <SidebarNavItem
-          icon={Eye}
+          icon={Calendar}
           label="Data visível"
           path="#"
           isActive={showDates}
