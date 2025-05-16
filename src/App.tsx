@@ -11,7 +11,6 @@ import NotFound from "./pages/NotFound";
 import StrategicReview from "./pages/StrategicReview";
 import TaskHistory from "./pages/TaskHistory";
 import Login from "./pages/Login";
-import Index from "./pages/Index";
 
 const queryClient = new QueryClient();
 
@@ -24,10 +23,9 @@ const App = () => (
           <Sonner />
           <BrowserRouter>
             <Routes>
-              <Route path="/" element={<Index />} />
               <Route path="/login" element={<Login />} />
-              <Route path="/app" element={<ActoApp />}>
-                <Route index element={<Navigate to="/app/dashboard" replace />} />
+              <Route path="/" element={<ActoApp />}>
+                <Route index element={<Navigate to="/dashboard" replace />} />
                 <Route path="dashboard" element={<></>} />
                 <Route path="strategic-review" element={<StrategicReview />} />
                 <Route path="history" element={<TaskHistory />} />
