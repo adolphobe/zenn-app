@@ -1,4 +1,4 @@
-import { Task, DateDisplayOptions, ViewMode, SortDirection, SortOption } from './types';
+import { Task, DateDisplayOptions, ViewMode, SortOption } from './types';
 
 export const formatDate = (date: Date | null, options?: DateDisplayOptions): string => {
   if (!date) return '';
@@ -74,19 +74,13 @@ export const sortTasks = (
         if (!a.idealDate && b.idealDate) return 1;
       }
       
-      // Simplified chronological sorting - sort only by date value
+      // Both have dates, sort by date value based on direction
       if (a.idealDate && b.idealDate) {
         const aTime = a.idealDate.getTime();
         const bTime = b.idealDate.getTime();
         
-        // Simple chronological order - no special treatment for past/future
-        if (sortDirection === 'asc') {
-          // Ordem crescente: datas mais antigas primeiro, mais recentes depois
-          return aTime - bTime;
-        } else {
-          // Ordem decrescente: datas mais recentes primeiro, mais antigas depois
-          return bTime - aTime;
-        }
+        // Simple chronological order based on sortDirection
+        return (aTime - bTime) * sortMultiplier;
       }
       
       // If one has date and other doesn't

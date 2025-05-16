@@ -49,7 +49,7 @@ const Dashboard: React.FC = () => {
     sortOptions[viewMode]
   );
 
-  // Separate overdue tasks for chronological view
+  // Filter out overdue and non-overdue tasks for chronological view
   const overdueTasksChronological = viewMode === 'chronological'
     ? filteredTasks.filter(task => task.idealDate && isTaskOverdue(task.idealDate))
     : [];
@@ -67,9 +67,9 @@ const Dashboard: React.FC = () => {
         : 'Tarefas com menor potência aparecem primeiro.';
     } else {
       const sortDirection = sortOptions.chronological.sortDirection;
-      return sortDirection === 'asc' 
-        ? 'Tarefas ordenadas da data mais próxima para a mais distante.' 
-        : 'Tarefas ordenadas da data mais distante para a mais próxima.';
+      return sortDirection === 'desc' 
+        ? 'Tarefas ordenadas da data mais recente para a mais antiga.' 
+        : 'Tarefas ordenadas da data mais antiga para a mais recente.';
     }
   };
 

@@ -61,16 +61,16 @@ const SortDropdown: React.FC = () => {
         ) : (
           <>
             <DropdownMenuItem
-              onClick={() => handleSortDirectionChange('asc')}
-              className={`${dropdownStyles.item} ${sortDirection === 'asc' ? dropdownStyles.itemSelected : ''} cursor-pointer`}
-            >
-              Data: Mais próxima → Mais distante
-            </DropdownMenuItem>
-            <DropdownMenuItem
               onClick={() => handleSortDirectionChange('desc')}
               className={`${dropdownStyles.item} ${sortDirection === 'desc' ? dropdownStyles.itemSelected : ''} cursor-pointer`}
             >
-              Data: Mais distante → Mais próxima
+              Mais recente
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => handleSortDirectionChange('asc')}
+              className={`${dropdownStyles.item} ${sortDirection === 'asc' ? dropdownStyles.itemSelected : ''} cursor-pointer`}
+            >
+              Mais antigo
             </DropdownMenuItem>
           </>
         )}
