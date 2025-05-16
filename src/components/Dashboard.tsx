@@ -40,25 +40,32 @@ const Dashboard: React.FC = () => {
   return (
     <div className="container p-4 mx-auto max-w-5xl">
       <div className="flex flex-col space-y-4">
-        <div className="mb-6 flex justify-between items-center">
-          <h1 className="text-2xl font-bold tracking-tight">
-            {viewMode === 'power' ? 'Modo Potência' : 'Modo Cronológico'}
-          </h1>
-          <div className="flex items-center gap-2">
-            <SortDropdown />
+        <div className="mb-6">
+          <div className="flex justify-between items-center">
+            <h1 className="text-2xl font-bold tracking-tight">
+              {viewMode === 'power' ? 'Modo Potência' : 'Modo Cronológico'}
+            </h1>
+            <div className="flex items-center gap-2">
+              <SortDropdown />
 
-            {isTaskFormOpen ? (
-              <TaskForm onClose={() => setIsTaskFormOpen(false)} />
-            ) : (
-              <button
-                onClick={() => setIsTaskFormOpen(true)}
-                className="flex rounded-[10px] items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                <Plus size={18} />
-                <span>Nova Tarefa</span>
-              </button>
-            )}
+              {isTaskFormOpen ? (
+                <TaskForm onClose={() => setIsTaskFormOpen(false)} />
+              ) : (
+                <button
+                  onClick={() => setIsTaskFormOpen(true)}
+                  className="flex rounded-[10px] items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  <Plus size={18} />
+                  <span>Nova Tarefa</span>
+                </button>
+              )}
+            </div>
           </div>
+          <p className="text-sm text-muted-foreground mt-1">
+            {viewMode === 'power' 
+              ? 'Neste modo, as tarefas são organizadas por potência/score. Tarefas com maior score têm prioridade.' 
+              : 'Neste modo, a data é o único fator de priorização das tarefas.'}
+          </p>
         </div>
         <div className="grid grid-cols-1 gap-4 md:gap-6">
           {filteredTasks.map(task => (
