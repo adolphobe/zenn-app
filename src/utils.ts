@@ -1,4 +1,3 @@
-
 import { Task, DateDisplayOptions, ViewMode, SortDirection, SortOption } from './types';
 
 export const formatDate = (date: Date | null, options?: DateDisplayOptions): string => {
@@ -58,9 +57,7 @@ export const sortTasks = (
     if (viewMode === 'power') {
       // Sort by score according to direction
       if (a.totalScore !== b.totalScore) {
-        // Corrected sorting logic: we need to multiply the difference by sortMultiplier
-        // to ensure proper ordering based on sortDirection
-        return (b.totalScore - a.totalScore) * sortMultiplier;
+        return (a.totalScore - b.totalScore) * sortMultiplier;
       }
       
       // Secondary sort by date if scores are equal
