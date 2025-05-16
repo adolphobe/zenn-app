@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAppContext } from '@/context/AppContext';
 import { useIsMobile } from '@/hooks/use-mobile';
 import TaskForm from './TaskForm';
@@ -8,7 +8,7 @@ import SortDropdown from './SortDropdown';
 import StrategicReview from '../pages/StrategicReview';
 import { useLocation } from 'react-router-dom';
 import { sortTasks, isTaskOverdue } from '@/utils';
-import { Plus, Bell } from 'lucide-react';
+import { Plus, Bell, ChevronDown, ChevronUp } from 'lucide-react';
 import { useExpandedTask } from '@/context/hooks';
 import { Badge } from './ui/badge';
 
@@ -19,6 +19,17 @@ const Dashboard: React.FC = () => {
   const location = useLocation();
   const [isTaskFormOpen, setIsTaskFormOpen] = useState(false);
   const { isTaskExpanded, toggleTaskExpanded } = useExpandedTask();
+  
+  // State for showing/hiding overdue tasks, initialized from localStorage
+  const [showOverdueTasks, setShowOverdueTasks] = useState(() => {
+    const stored = localStorage.getItem('showOverdueTasks');
+    return stored !== null ? JSON.parse(stored) : true;
+  });
+
+  // Save showOverdueTasks state to localStorage when it changes
+  useEffect(() => {
+    localStorage.setItem('showOverdueTasks', JSON.stringify(showOverdueTasks));
+  }, [showOverdueTasks]);
   
   // Check if we're on strategic review route
   const isStrategicReview = location.pathname === '/strategic-review';
@@ -61,6 +72,11 @@ const Dashboard: React.FC = () => {
         : 'Tarefas ordenadas da data mais distante para a mais próxima.';
     }
   };
+
+  // Toggle function for showing/hiding overdue tasks
+  const toggleOverdueTasks = () => {
+    setShowOverdueTasks(prev => !prev);
+  };
   
   return (
     <div className="container p-4 mx-auto max-w-5xl">
@@ -91,28 +107,6 @@ const Dashboard: React.FC = () => {
           </p>
         </div>
         <div className="grid grid-cols-1 gap-4 md:gap-6">
-          {/* Overdue tasks box - only show in chronological mode */}
-          {viewMode === 'chronological' && overdueTasksChronological.length > 0 && (
-            <div className="border-2 border-[#ea384c]/30 rounded-lg p-4 relative mb-2">
-              <div className="absolute -top-3 left-4 bg-background px-2">
-                <Badge className="bg-[#ea384c]/10 text-[#ea384c] border-[#ea384c]/30 flex items-center gap-1">
-                  <Bell size={14} />
-                  <span>Vencidas</span>
-                </Badge>
-              </div>
-              <div className="grid grid-cols-1 gap-4">
-                {overdueTasksChronological.map(task => (
-                  <TaskCard 
-                    key={task.id} 
-                    task={task} 
-                    isExpanded={isTaskExpanded(task.id)} 
-                    onToggleExpand={toggleTaskExpanded} 
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-          
           {/* Non-overdue tasks */}
           {nonOverdueTasksChronological.map(task => (
             <TaskCard 
@@ -130,6 +124,39 @@ const Dashboard: React.FC = () => {
                   ? 'Nenhuma tarefa encontrada. Adicione sua primeira tarefa!' 
                   : 'Nenhuma tarefa visível. Você pode habilitar tarefas ocultas nas configurações.'}
               </p>
+            </div>
+          )}
+          
+          {/* Overdue tasks box - only show in chronological mode */}
+          {viewMode === 'chronological' && overdueTasksChronological.length > 0 && (
+            <div className="border-2 border-[#ea384c]/30 rounded-lg p-4 relative mb-2">
+              <div className="absolute -top-3 left-4 bg-background px-2">
+                <Badge 
+                  className="bg-[#ea384c]/10 text-[#ea384c] border-[#ea384c]/30 flex items-center gap-1 cursor-pointer hover:bg-[#ea384c]/20 transition-colors"
+                  onClick={toggleOverdueTasks}
+                >
+                  <Bell size={14} />
+                  <span>Vencidas</span>
+                  {showOverdueTasks ? 
+                    <ChevronUp size={14} className="ml-1" /> : 
+                    <ChevronDown size={14} className="ml-1" />
+                  }
+                </Badge>
+              </div>
+              <div 
+                className={`grid grid-cols-1 gap-4 overflow-hidden transition-all duration-300 ease-in-out ${
+                  showOverdueTasks ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'
+                }`}
+              >
+                {overdueTasksChronological.map(task => (
+                  <TaskCard 
+                    key={task.id} 
+                    task={task} 
+                    isExpanded={isTaskExpanded(task.id)} 
+                    onToggleExpand={toggleTaskExpanded} 
+                  />
+                ))}
+              </div>
             </div>
           )}
         </div>
