@@ -64,15 +64,15 @@ const TaskCardActions: React.FC<TaskCardActionsProps> = ({
       
       {/* Right side action: Complete */}
       <Button
-        variant="outline"
-        size="sm"
-        onClick={onCompleteTask}
-        title="Completar"
-        className="bg-green-50 text-gray-700 border-green-200 hover:bg-green-100 hover:text-gray-900 hover:border-green-300 dark:bg-green-900/20 dark:text-gray-300 dark:border-green-800/30 dark:hover:bg-green-900/30 dark:hover:text-gray-200 dark:hover:border-green-800/50"
-      >
-        <CheckSquare size={16} />
-        <span className="ml-1">Completar</span>
-      </Button>
+      variant="outline"
+      size="sm"
+      onClick={onCompleteTask}
+      title="Completar"
+      className="bg-green-50 text-gray-700 border-gray-200 hover:bg-green-100 hover:text-gray-900 hover:border-gray-300 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700 dark:hover:bg-gray-750 dark:hover:text-gray-200 dark:hover:border-gray-600"
+    >
+      <CheckSquare size={16} />
+      <span className="ml-1">Completar</span>
+    </Button>
     </div>
   );
 };
