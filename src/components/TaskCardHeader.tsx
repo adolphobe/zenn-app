@@ -1,4 +1,3 @@
-
 // src/components/TaskCardHeader.tsx
 import React from 'react';
 import { formatDate } from '@/utils';
@@ -66,7 +65,7 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
                 <Eye size={16} />
               </div>
             </TooltipTrigger>
-            <TooltipContent>
+            <TooltipContent className="text-xs max-w-xs leading-relaxed">
               {getTooltipMessage()}
             </TooltipContent>
           </Tooltip>
