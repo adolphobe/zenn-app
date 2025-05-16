@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { TaskFormData, Task } from '../types';
@@ -122,14 +123,14 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, initialData, taskId, task,
       data-testid="task-form-backdrop"
     >
       <div 
-        className={`bg-white dark:bg-gray-800 rounded-xl shadow-lg ${isMobile ? 'w-full max-w-md h-[90vh]' : 'w-full max-w-4xl h-[80vh]'}`}
+        className={`bg-white dark:bg-gray-800 rounded-xl shadow-lg ${isMobile ? 'w-full max-w-md' : 'w-full max-w-2xl'} flex flex-col`}
         onClick={handleModalClick}
         onMouseDown={(e) => {
           e.stopPropagation();
           console.log('Preventing mousedown propagation from modal container');
         }}
         data-testid="task-form-modal"
-        style={{ display: 'flex', flexDirection: 'column' }}
+        style={{ maxHeight: isMobile ? '80vh' : '70vh' }}
       >
         {/* Header */}
         <div className="flex justify-between items-center p-5 border-b shrink-0">
