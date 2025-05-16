@@ -78,7 +78,7 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
   const shouldShowDate = viewMode === 'chronological' || showDates;
   
   return (
-    <>
+    <div className={`${isHidden && showHiddenTasks ? 'pt-[37px]' : ''}`}>
       {/* Hidden label for hidden tasks that are only visible because of the filter - now with tooltip */}
       {isHidden && showHiddenTasks && (
         <TooltipProvider>
@@ -142,7 +142,7 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
           <span>Crescimento: {constructionScore}</span>
         </div>
       )}
-    </>
+    </div>
   );
 };
 
