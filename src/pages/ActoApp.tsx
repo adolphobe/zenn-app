@@ -16,7 +16,7 @@ const ActoApp: React.FC = () => {
   const { isOpen: sidebarOpen, open: openSidebar, isMobile } = useSidebar();
   const location = useLocation();
   const navigate = useNavigate();
-  const isDashboardRoute = location.pathname === '/' || location.pathname === '/dashboard';
+  const isDashboardRoute = location.pathname === '/app' || location.pathname === '/app/dashboard';
 
   // Check if user is logged in (this is just a mock check)
   const isLoggedIn = localStorage.getItem('acto_is_logged_in') === 'true';
@@ -32,7 +32,7 @@ const ActoApp: React.FC = () => {
     if (isMobile && sidebarOpen) {
       toggleSidebar();
     }
-  }, [isMobile, location.pathname]);
+  }, [isMobile, location.pathname, sidebarOpen, toggleSidebar]);
 
   // Determine if we should use a narrower max-width for task cards (only in power and chronological mode)
   const isTaskCardView = isDashboardRoute && (viewMode === 'power' || viewMode === 'chronological');

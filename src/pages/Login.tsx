@@ -15,7 +15,7 @@ const Login: React.FC = () => {
   // Check if already logged in
   useEffect(() => {
     if (localStorage.getItem('acto_is_logged_in') === 'true') {
-      navigate('/app/dashboard');
+      navigate('/app');
     }
     
     // Determine animation based on navigation source
