@@ -46,9 +46,9 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
     } else {
       return (
         <>
-          Essa tarefa está oculta porque sua potência é inferior a 8.<br />
+          Essa tarefa está oculta porque sua potência é inferior a 8.<br /><br />
           Aqui somente as tarefas que tem peso são importantes,<br />
-          então ocultamos automáticamente as tarefas menos relevantes.<br />
+          então ocultamos automáticamente as tarefas menos relevantes.<br /><br />
           Você sempre poderá visualiza-las clicando no filtro "Tarefas Ocultas"
         </>
       );
