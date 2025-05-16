@@ -122,15 +122,17 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, initialData, taskId, task,
       data-testid="task-form-backdrop"
     >
       <div 
-        className={`bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden flex flex-col ${isMobile ? 'w-full max-w-md max-h-[90vh]' : 'w-full max-w-4xl max-h-[80vh]'}`}
+        className={`bg-white dark:bg-gray-800 rounded-xl shadow-lg ${isMobile ? 'w-full max-w-md h-[90vh]' : 'w-full max-w-4xl h-[80vh]'}`}
         onClick={handleModalClick}
         onMouseDown={(e) => {
           e.stopPropagation();
           console.log('Preventing mousedown propagation from modal container');
         }}
         data-testid="task-form-modal"
+        style={{ display: 'flex', flexDirection: 'column' }}
       >
-        <div className="flex justify-between items-center p-5 border-b">
+        {/* Header */}
+        <div className="flex justify-between items-center p-5 border-b shrink-0">
           <h2 className="text-xl font-semibold">{isEditing ? 'Editar Tarefa' : 'Nova Tarefa'}</h2>
           <button 
             onClick={(e) => {
@@ -144,7 +146,8 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, initialData, taskId, task,
           </button>
         </div>
         
-        <div className="flex-1 min-h-0 overflow-hidden">
+        {/* Scrollable content */}
+        <div className="flex-grow overflow-hidden">
           <AlwaysVisibleScrollArea className="h-full">
             <form 
               onSubmit={(e) => {
