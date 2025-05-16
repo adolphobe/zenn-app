@@ -1,4 +1,3 @@
-
 import { Task, DateDisplayOptions, ViewMode, SortDirection, SortOption } from './types';
 
 export const formatDate = (date: Date | null, options?: DateDisplayOptions): string => {
@@ -75,56 +74,18 @@ export const sortTasks = (
         if (!a.idealDate && b.idealDate) return 1;
       }
       
-      // Improved chronological sorting
+      // Simplified chronological sorting - sort only by date value
       if (a.idealDate && b.idealDate) {
-        const now = new Date().getTime();
+        const aTime = a.idealDate.getTime();
+        const bTime = b.idealDate.getTime();
         
+        // Simple chronological order - no special treatment for past/future
         if (sortDirection === 'asc') {
-          // "Próximas primeiro" - closest dates to today first
-          const aTime = a.idealDate.getTime();
-          const bTime = b.idealDate.getTime();
-          
-          // Organize by future/past first
-          const aIsFuture = aTime > now;
-          const bIsFuture = bTime > now;
-          
-          if (aIsFuture && !bIsFuture) return -1; // Future dates before past dates
-          if (!aIsFuture && bIsFuture) return 1;
-          
-          // If both are future or both are past
-          if (aIsFuture === bIsFuture) {
-            // For future: closest first
-            if (aIsFuture) {
-              return aTime - bTime;
-            } 
-            // For past: most recent first
-            else {
-              return bTime - aTime;
-            }
-          }
+          // Ordem crescente: datas mais antigas primeiro, mais recentes depois
+          return aTime - bTime;
         } else {
-          // "Distantes primeiro" - furthest dates first
-          const aTime = a.idealDate.getTime();
-          const bTime = b.idealDate.getTime();
-          
-          // Organize by future/past first
-          const aIsFuture = aTime > now;
-          const bIsFuture = bTime > now;
-          
-          if (aIsFuture && !bIsFuture) return -1; // Future dates before past dates
-          if (!aIsFuture && bIsFuture) return 1;
-          
-          // If both are future or both are past
-          if (aIsFuture === bIsFuture) {
-            // For future: furthest first
-            if (aIsFuture) {
-              return bTime - aTime;
-            } 
-            // For past: oldest first
-            else {
-              return aTime - bTime;
-            }
-          }
+          // Ordem decrescente: datas mais recentes primeiro, mais antigas depois
+          return bTime - aTime;
         }
       }
       
