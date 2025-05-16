@@ -114,7 +114,7 @@ const RatingSlider: React.FC<RatingSliderProps> = ({
       </div>
       
       {/* Description text that changes based on selected value */}
-      <p className={cn("text-sm mt-3 text-[16px]", styles.text)}>
+      <p className={cn("text-sm mt-3 text-[14px]", styles.text)}>
         {description[value - 1]}
       </p>
     </div>
