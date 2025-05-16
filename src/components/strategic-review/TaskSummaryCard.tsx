@@ -51,7 +51,7 @@ const TaskSummaryCard: React.FC<TaskSummaryCardProps> = ({ tasks }) => {
         
         {/* Summary text with line breaks */}
       <div className="border rounded-lg py-[20px] px-[22px] bg-gradient-to-r from-blue-50 to-blue-50/30">
-          <h4 className="font-medium text-sm mb-1">📊 Distribuição por Zonas de Importância</h4>
+          <h4 className="font-medium text-sm mb-1">📊 Detalhes</h4>
           <p className="text-sm text-muted-foreground">
             Neste período, você completou {tasks.length} tarefas com uma média de score de {taskStats.avgTotal.toFixed(1)}.
             {taskStats.criticalCount > 0 && <><br />{taskStats.criticalCount} tarefas eram críticas.</>}
