@@ -1,6 +1,7 @@
 
 import { useMemo } from 'react';
 import { Task } from '@/types';
+import { format, subDays, setHours, setMinutes } from 'date-fns';
 
 export const useCompletedTasks = (tasks: Task[]) => {
   const completedTasks = useMemo(() => {
@@ -17,14 +18,16 @@ export const useCompletedTasks = (tasks: Task[]) => {
         const now = new Date();
         // Generate a reasonable time in the past using the index
         const daysAgo = index % 60; // Distribute over the last 60 days
+        
+        // Create a more varied distribution of hours and minutes
         const hours = Math.floor(Math.random() * 13) + 8; // 8 AM to 8 PM
         const minutes = Math.floor(Math.random() * 60);
         
-        const completionDate = new Date();
-        completionDate.setDate(now.getDate() - daysAgo);
-        completionDate.setHours(hours, minutes);
+        // Create a new date in the past
+        const completionDate = subDays(now, daysAgo);
+        const dateWithTime = setHours(setMinutes(completionDate, minutes), hours);
         
-        updatedTask.completedAt = completionDate.toISOString();
+        updatedTask.completedAt = dateWithTime.toISOString();
       }
       
       // If task doesn't have feedback (for demo data), assign one

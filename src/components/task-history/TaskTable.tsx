@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 import { Task } from '@/types'; 
 import { 
   Card,
@@ -49,9 +50,10 @@ export const CompletedTaskRow: React.FC<{ task: Task }> = ({ task }) => {
   const formatCompletionDateTime = (dateString: string | null | undefined) => {
     if (!dateString) return '-';
     try {
-      const date = new Date(dateString);
-      return format(date, 'dd/MM/yyyy HH:mm');
+      const date = parseISO(dateString);
+      return format(date, 'dd/MM/yyyy HH:mm', { locale: ptBR });
     } catch (e) {
+      console.error("Error formatting date:", e);
       return '-';
     }
   };

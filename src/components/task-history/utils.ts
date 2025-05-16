@@ -1,6 +1,7 @@
 
 import { Task } from '@/types';
-import { format, isToday, isYesterday, startOfWeek, startOfMonth, isSameMonth, differenceInMonths } from 'date-fns';
+import { format, isToday, isYesterday, startOfWeek, startOfMonth, parseISO, differenceInMonths } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 
 // Timeline grouping function
 export const groupTasksByTimeline = (tasks: Task[], periodFilter: string = 'all') => {
@@ -16,7 +17,7 @@ export const groupTasksByTimeline = (tasks: Task[], periodFilter: string = 'all'
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   
-  const thisWeekStart = startOfWeek(today);
+  const thisWeekStart = startOfWeek(today, { locale: ptBR });
   const thisMonthStart = startOfMonth(today);
   
   const groups = {
@@ -33,7 +34,7 @@ export const groupTasksByTimeline = (tasks: Task[], periodFilter: string = 'all'
     // Skip tasks without completedAt
     if (!task.completedAt) return;
     
-    const completedDate = new Date(task.completedAt);
+    const completedDate = parseISO(task.completedAt);
     
     if (isToday(completedDate)) {
       groups.today.tasks.push(task);
