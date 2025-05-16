@@ -1,4 +1,3 @@
-
 import { AppState, Action } from '../types';
 
 // UI-related reducers
@@ -14,12 +13,38 @@ export const toggleViewMode = (state: AppState, action: Action): AppState => {
 export const setViewMode = (state: AppState, action: Action): AppState => {
   if (action.type !== 'SET_VIEW_MODE') return state;
   
-  return { ...state, viewMode: action.payload };
+  // When switching view modes, update the global settings based on the new mode's settings
+  const newMode = action.payload;
+  const modeSettings = state.viewModeSettings[newMode];
+  
+  return { 
+    ...state, 
+    viewMode: newMode,
+    // Sync global settings with mode-specific settings
+    showHiddenTasks: modeSettings.showHiddenTasks,
+    showPillars: modeSettings.showPillars,
+    showDates: modeSettings.showDates,
+    showScores: modeSettings.showScores
+  };
 };
 
 export const toggleShowHiddenTasks = (state: AppState, action: Action): AppState => {
   if (action.type !== 'TOGGLE_SHOW_HIDDEN_TASKS') return state;
-  return { ...state, showHiddenTasks: !state.showHiddenTasks };
+  
+  const newValue = !state.showHiddenTasks;
+  
+  // Update both global setting and the current mode-specific setting
+  return { 
+    ...state, 
+    showHiddenTasks: newValue,
+    viewModeSettings: {
+      ...state.viewModeSettings,
+      [state.viewMode]: {
+        ...state.viewModeSettings[state.viewMode],
+        showHiddenTasks: newValue
+      }
+    } 
+  };
 };
 
 export const toggleDarkMode = (state: AppState, action: Action): AppState => {
@@ -34,17 +59,59 @@ export const toggleSidebar = (state: AppState, action: Action): AppState => {
 
 export const toggleShowPillars = (state: AppState, action: Action): AppState => {
   if (action.type !== 'TOGGLE_SHOW_PILLARS') return state;
-  return { ...state, showPillars: !state.showPillars };
+  
+  const newValue = !state.showPillars;
+  
+  // Update both global setting and the current mode-specific setting
+  return { 
+    ...state, 
+    showPillars: newValue,
+    viewModeSettings: {
+      ...state.viewModeSettings,
+      [state.viewMode]: {
+        ...state.viewModeSettings[state.viewMode],
+        showPillars: newValue
+      }
+    }
+  };
 };
 
 export const toggleShowDates = (state: AppState, action: Action): AppState => {
   if (action.type !== 'TOGGLE_SHOW_DATES') return state;
-  return { ...state, showDates: !state.showDates };
+  
+  const newValue = !state.showDates;
+  
+  // Update both global setting and the current mode-specific setting
+  return { 
+    ...state, 
+    showDates: newValue,
+    viewModeSettings: {
+      ...state.viewModeSettings,
+      [state.viewMode]: {
+        ...state.viewModeSettings[state.viewMode],
+        showDates: newValue
+      }
+    }
+  };
 };
 
 export const toggleShowScores = (state: AppState, action: Action): AppState => {
   if (action.type !== 'TOGGLE_SHOW_SCORES') return state;
-  return { ...state, showScores: !state.showScores };
+  
+  const newValue = !state.showScores;
+  
+  // Update both global setting and the current mode-specific setting
+  return { 
+    ...state, 
+    showScores: newValue,
+    viewModeSettings: {
+      ...state.viewModeSettings,
+      [state.viewMode]: {
+        ...state.viewModeSettings[state.viewMode],
+        showScores: newValue
+      }
+    }
+  };
 };
 
 export const updateDateDisplayOptions = (state: AppState, action: Action): AppState => {

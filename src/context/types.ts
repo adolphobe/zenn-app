@@ -2,11 +2,18 @@
 import { Task, DateDisplayOptions, ViewMode, SortOption } from '../types';
 import { Dispatch } from 'react';
 
+// Define ViewModeSettings to store mode-specific settings
+export interface ViewModeSettings {
+  showHiddenTasks: boolean;
+  showPillars: boolean;
+  showDates: boolean;
+  showScores: boolean;
+}
+
 // Define AppState
 export interface AppState {
   tasks: Task[];
   viewMode: ViewMode;
-  showHiddenTasks: boolean;
   darkMode: boolean;
   sidebarOpen: boolean;
   dateDisplayOptions: DateDisplayOptions;
@@ -14,10 +21,15 @@ export interface AppState {
     power: SortOption;
     chronological: SortOption;
   };
-  // Adicionar flags para controlar a exibição de pilares e datas
+  // Mode-specific settings
+  viewModeSettings: {
+    power: ViewModeSettings;
+    chronological: ViewModeSettings;
+  };
+  // These remain as global settings (backward compatibility)
+  showHiddenTasks: boolean;
   showPillars: boolean;
   showDates: boolean;
-  // New state to control score visibility
   showScores: boolean;
 }
 
@@ -46,7 +58,7 @@ export type Action =
   | { type: 'DELETE_COMMENT'; payload: { taskId: string; commentId: string } }
   | { type: 'TOGGLE_SHOW_PILLARS' }
   | { type: 'TOGGLE_SHOW_DATES' }
-  | { type: 'TOGGLE_SHOW_SCORES' } // New action type
+  | { type: 'TOGGLE_SHOW_SCORES' }
   | { type: 'SET_SORT_OPTIONS'; payload: { sortDirection: 'asc' | 'desc'; noDateAtEnd?: boolean } };
 
 // AppDispatch type
@@ -74,5 +86,5 @@ export interface AppContextType {
   setSortOptions: (options: { sortDirection: 'asc' | 'desc'; noDateAtEnd?: boolean }) => void;
   toggleShowPillars: () => void;
   toggleShowDates: () => void;
-  toggleShowScores: () => void; // New toggle method
+  toggleShowScores: () => void;
 }

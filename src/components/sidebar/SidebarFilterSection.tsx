@@ -63,11 +63,11 @@ const SidebarFilterSection: React.FC<{ sidebarOpen: boolean }> = ({ sidebarOpen 
             isFilter={true} // Mark as a filter item
           />
         )}
-        {/* New score toggle - only in chronological mode */}
+        {/* Score toggle - only in chronological mode */}
         {isChronologicalMode && (
           <SidebarNavItem
             icon={Hash}
-            label={showScores ? "Mostrar Score" : "Mostrar Score"}
+            label={showScores ? "Ocultar Score" : "Mostrar Score"}
             path="#"
             isActive={showScores}
             onClick={toggleShowScores}

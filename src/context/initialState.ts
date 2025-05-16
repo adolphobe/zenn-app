@@ -29,7 +29,40 @@ export const initialState: AppState = {
   sidebarOpen: storedState.sidebarOpen !== undefined ? storedState.sidebarOpen : true,
   showPillars: storedState.showPillars !== undefined ? storedState.showPillars : false,
   showDates: storedState.showDates !== undefined ? storedState.showDates : true,
-  showScores: storedState.showScores !== undefined ? storedState.showScores : true, // Default to showing scores
+  showScores: storedState.showScores !== undefined ? storedState.showScores : true,
+  
+  // Initialize the mode-specific settings from stored state or defaults
+  viewModeSettings: {
+    power: {
+      showHiddenTasks: storedState.viewModeSettings?.power?.showHiddenTasks !== undefined
+        ? storedState.viewModeSettings.power.showHiddenTasks
+        : false,
+      showPillars: storedState.viewModeSettings?.power?.showPillars !== undefined
+        ? storedState.viewModeSettings.power.showPillars
+        : false,
+      showDates: storedState.viewModeSettings?.power?.showDates !== undefined
+        ? storedState.viewModeSettings.power.showDates
+        : true,
+      showScores: storedState.viewModeSettings?.power?.showScores !== undefined
+        ? storedState.viewModeSettings.power.showScores
+        : true,
+    },
+    chronological: {
+      showHiddenTasks: storedState.viewModeSettings?.chronological?.showHiddenTasks !== undefined
+        ? storedState.viewModeSettings.chronological.showHiddenTasks
+        : true, // Always true in chronological mode
+      showPillars: storedState.viewModeSettings?.chronological?.showPillars !== undefined
+        ? storedState.viewModeSettings.chronological.showPillars
+        : false,
+      showDates: storedState.viewModeSettings?.chronological?.showDates !== undefined
+        ? storedState.viewModeSettings.chronological.showDates
+        : false, // Hidden by default in chronological mode
+      showScores: storedState.viewModeSettings?.chronological?.showScores !== undefined
+        ? storedState.viewModeSettings.chronological.showScores
+        : true,
+    },
+  },
+  
   dateDisplayOptions: {
     hideYear: storedState.dateDisplayOptions?.hideYear !== undefined 
       ? storedState.dateDisplayOptions.hideYear 
