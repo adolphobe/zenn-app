@@ -10,6 +10,7 @@ import TaskCardActions from './TaskCardActions';
 import PostCompletionFeedback from './PostCompletionFeedback';
 import TaskForm from './TaskForm';
 import TaskComments from './TaskComments';
+import DeleteTaskConfirmation from './DeleteTaskConfirmation';
 
 interface TaskCardProps {
   task: Task;
@@ -22,6 +23,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
   const [titleValue, setTitleValue] = useState(task.title);
   const [feedbackModalOpen, setFeedbackModalOpen] = useState(false);
   const [editTaskModalOpen, setEditTaskModalOpen] = useState(false);
+  const [deleteConfirmModalOpen, setDeleteConfirmModalOpen] = useState(false);
   const { toggleTaskCompleted, toggleTaskHidden, updateTaskTitle, state, setTaskFeedback } = useAppContext();
   const { dateDisplayOptions, showHiddenTasks, viewMode } = state;
   
@@ -72,6 +74,11 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
   const handleEditTask = (e: React.MouseEvent) => {
     e.stopPropagation();
     setEditTaskModalOpen(true);
+  };
+  
+  const handleDeleteTask = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setDeleteConfirmModalOpen(true);
   };
 
   const handleFeedbackConfirm = (feedbackType: 'transformed' | 'relief' | 'obligation') => {
@@ -152,6 +159,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
               onToggleHidden={handleToggleHidden}
               onEditTask={handleEditTask}
               onCompleteTask={handleCompleteTask}
+              onDeleteTask={handleDeleteTask}
               viewMode={viewMode}
             />
           </div>
@@ -180,6 +188,12 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
           isEditing={true}
         />
       )}
+      
+      <DeleteTaskConfirmation
+        task={task}
+        isOpen={deleteConfirmModalOpen}
+        onClose={() => setDeleteConfirmModalOpen(false)}
+      />
     </>
   );
 };
