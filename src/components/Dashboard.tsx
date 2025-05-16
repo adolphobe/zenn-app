@@ -107,26 +107,6 @@ const Dashboard: React.FC = () => {
           </p>
         </div>
         <div className="grid grid-cols-1 gap-4 md:gap-6">
-          {/* Non-overdue tasks */}
-          {nonOverdueTasksChronological.map(task => (
-            <TaskCard 
-              key={task.id} 
-              task={task} 
-              isExpanded={isTaskExpanded(task.id)} 
-              onToggleExpand={toggleTaskExpanded} 
-            />
-          ))}
-
-          {filteredTasks.length === 0 && (
-            <div className="text-center py-12 border border-dashed rounded-lg bg-muted/30 border-border">
-              <p className="text-muted-foreground">
-                {shouldShowHiddenTasks 
-                  ? 'Nenhuma tarefa encontrada. Adicione sua primeira tarefa!' 
-                  : 'Nenhuma tarefa visível. Você pode habilitar tarefas ocultas nas configurações.'}
-              </p>
-            </div>
-          )}
-          
           {/* Overdue tasks box - only show in chronological mode */}
           {viewMode === 'chronological' && overdueTasksChronological.length > 0 && (
             <div className="border-2 border-[#ea384c]/30 rounded-lg p-4 relative mb-2">
@@ -157,6 +137,26 @@ const Dashboard: React.FC = () => {
                   />
                 ))}
               </div>
+            </div>
+          )}
+
+          {/* Non-overdue tasks */}
+          {nonOverdueTasksChronological.map(task => (
+            <TaskCard 
+              key={task.id} 
+              task={task} 
+              isExpanded={isTaskExpanded(task.id)} 
+              onToggleExpand={toggleTaskExpanded} 
+            />
+          ))}
+
+          {filteredTasks.length === 0 && (
+            <div className="text-center py-12 border border-dashed rounded-lg bg-muted/30 border-border">
+              <p className="text-muted-foreground">
+                {shouldShowHiddenTasks 
+                  ? 'Nenhuma tarefa encontrada. Adicione sua primeira tarefa!' 
+                  : 'Nenhuma tarefa visível. Você pode habilitar tarefas ocultas nas configurações.'}
+              </p>
             </div>
           )}
         </div>
