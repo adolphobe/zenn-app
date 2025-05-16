@@ -10,12 +10,17 @@ export const getDateRangeByPeriod = (period: PeriodType): [Date, Date] => {
   switch (period) {
     case 'today':
       return [today, today];
+    case 'yesterday':
+      return [subDays(today, 1), subDays(today, 1)];
     case 'week':
       return [startOfWeek(today, { weekStartsOn: 1 }), endOfWeek(today, { weekStartsOn: 1 })];
     case 'month':
       return [startOfMonth(today), endOfMonth(today)];
     case 'custom':
       // Default to last 30 days if custom
+      return [subDays(today, 30), today];
+    case 'custom-range':
+      // This will be handled separately with explicit date parameters
       return [subDays(today, 30), today];
     default:
       return [today, today];
@@ -26,19 +31,21 @@ export const getDateRangeByPeriod = (period: PeriodType): [Date, Date] => {
 export const filterTasksByDateRange = (tasks: Task[], dateRange: [Date, Date]): Task[] => {
   const [startDate, endDate] = dateRange;
   
+  // Start and end date with time set to beginning and end of day
+  const startDateTime = new Date(startDate);
+  startDateTime.setHours(0, 0, 0, 0);
+  
+  const endDateTime = new Date(endDate);
+  endDateTime.setHours(23, 59, 59, 999);
+  
   // Filter completed tasks within the date range
   return tasks.filter(task => {
     // Only include completed tasks
-    if (!task.completed) return false;
+    if (!task.completed || !task.completedAt) return false;
     
-    // If task has idealDate, check if it's within range
-    if (task.idealDate) {
-      const taskDate = new Date(task.idealDate);
-      return isWithinInterval(taskDate, { start: startDate, end: endDate });
-    }
-    
-    // Include completed tasks without dates in current period
-    return true;
+    // Check if completion date is within the date range
+    const completionDate = new Date(task.completedAt);
+    return completionDate >= startDateTime && completionDate <= endDateTime;
   });
 };
 
