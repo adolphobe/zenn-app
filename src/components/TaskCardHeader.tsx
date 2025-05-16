@@ -105,6 +105,8 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
             onTitleChange={onTitleChange}
             onTitleBlur={onTitleBlur}
             onTitleKeyDown={onTitleKeyDown}
+            idealDate={idealDate}
+            viewMode={viewMode}
           />
         </div>
         
