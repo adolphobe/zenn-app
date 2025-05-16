@@ -31,6 +31,7 @@ const TaskHistory = () => {
     pillarFilter, setPillarFilter,
     sortBy, setSortBy,
     showFilters, setShowFilters,
+    filteredTasks,
     sortedTasks
   } = useTaskFilters(completedTasks);
   
@@ -47,8 +48,8 @@ const TaskHistory = () => {
   return (
     <div className="container p-4 mx-auto">
       <div className="flex flex-col space-y-4">
-        {/* Header with stats */}
-        <TaskHistoryStats completedTasks={completedTasks} />
+        {/* Pass filtered tasks to TaskHistoryStats instead of all completed tasks */}
+        <TaskHistoryStats filteredTasks={sortedTasks} />
         
         {/* Search and filter bar */}
         <div className="flex flex-col md:flex-row justify-between gap-4">
