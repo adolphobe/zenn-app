@@ -18,10 +18,12 @@ import {
 import { Button } from '@/components/ui/button';
 import { RefreshCw } from 'lucide-react';
 import { useAppContext } from '@/context/AppContext';
+import CompletedTaskModal from './CompletedTaskModal';
 
 // Table row component
 export const CompletedTaskRow: React.FC<{ task: Task }> = ({ task }) => {
   const [showRestore, setShowRestore] = useState(false);
+  const [showTaskModal, setShowTaskModal] = useState(false);
   const { restoreTask } = useAppContext();
 
   // Determine dominant pillar based on scores
@@ -69,25 +71,42 @@ export const CompletedTaskRow: React.FC<{ task: Task }> = ({ task }) => {
     }
   };
 
+  const handleRowClick = () => {
+    setShowTaskModal(true);
+  };
+
   return (
-    <TableRow onClick={() => setShowRestore(!showRestore)} className="cursor-pointer">
-      <TableCell className="opacity-70">{task.title}</TableCell>
-      <TableCell>{completedDateTime}</TableCell>
-      <TableCell>{task.totalScore}/15</TableCell>
-      <TableCell className="capitalize">{dominantPillar}</TableCell>
-      <TableCell>{task.feedback ? feedbackLabels[task.feedback] : '-'}</TableCell>
-      <TableCell>
-        <Button 
-          variant="outline" 
-          size="sm" 
-          className="flex items-center gap-1"
-          onClick={handleRestore}
-        >
-          <RefreshCw size={16} />
-          Restaurar
-        </Button>
-      </TableCell>
-    </TableRow>
+    <>
+      <TableRow onClick={handleRowClick} className="cursor-pointer">
+        <TableCell className="opacity-70">{task.title}</TableCell>
+        <TableCell>{completedDateTime}</TableCell>
+        <TableCell>{task.totalScore}/15</TableCell>
+        <TableCell className="capitalize">{dominantPillar}</TableCell>
+        <TableCell>{task.feedback ? feedbackLabels[task.feedback] : '-'}</TableCell>
+        <TableCell>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="flex items-center gap-1"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleRestore(e);
+            }}
+          >
+            <RefreshCw size={16} />
+            Restaurar
+          </Button>
+        </TableCell>
+      </TableRow>
+
+      {showTaskModal && (
+        <CompletedTaskModal 
+          task={task} 
+          isOpen={showTaskModal} 
+          onClose={() => setShowTaskModal(false)} 
+        />
+      )}
+    </>
   );
 };
 
