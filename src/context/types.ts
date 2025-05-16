@@ -1,3 +1,4 @@
+
 import { Task, TaskFormData, ViewMode, DateDisplayOptions, SortDirection } from '../types';
 
 // Actions
@@ -73,4 +74,5 @@ export interface AppState {
       noDateAtEnd: boolean;
     };
   };
+  _previousShowDates?: boolean; // Add this field to store previous date visibility state
 }

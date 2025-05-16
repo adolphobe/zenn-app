@@ -1,10 +1,31 @@
-
 import { AppState, Action } from '../types';
 
 // UI-related reducers
 export const setViewMode = (state: AppState, action: Action): AppState => {
   if (action.type !== 'SET_VIEW_MODE') return state;
-  return { ...state, viewMode: action.payload };
+  
+  // Store previous showDates setting when switching away from power mode
+  const newViewMode = action.payload;
+  
+  if (newViewMode === 'chronological') {
+    // When entering chronological mode, always show dates
+    return { 
+      ...state,
+      viewMode: newViewMode,
+      showDates: true, // Force dates to be visible in chronological mode
+      _previousShowDates: state.showDates // Store the previous setting
+    };
+  } else if (newViewMode === 'power' && state.viewMode === 'chronological') {
+    // When going back to power mode from chronological, restore previous date setting
+    return {
+      ...state, 
+      viewMode: newViewMode,
+      showDates: state._previousShowDates !== undefined ? state._previousShowDates : state.showDates
+    };
+  }
+  
+  // Default case: just update the view mode
+  return { ...state, viewMode: newViewMode };
 };
 
 export const toggleShowHiddenTasks = (state: AppState, action: Action): AppState => {
@@ -19,6 +40,12 @@ export const toggleShowPillars = (state: AppState, action: Action): AppState => 
 
 export const toggleShowDates = (state: AppState, action: Action): AppState => {
   if (action.type !== 'TOGGLE_SHOW_DATES') return state;
+  
+  // In chronological mode, we can't hide dates
+  if (state.viewMode === 'chronological') {
+    return state; // Don't allow toggling dates off in chronological mode
+  }
+  
   return { ...state, showDates: !state.showDates };
 };
 
