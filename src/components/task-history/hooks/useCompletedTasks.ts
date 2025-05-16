@@ -10,7 +10,7 @@ export const useCompletedTasks = (tasks: Task[]) => {
     // Reference date: May 16, 2024
     const refDate = new Date(2024, 4, 16); // Month is 0-indexed in JavaScript Date
     
-    // Available feedback options for demo tasks
+    // Available feedback options for demo tasks - use the exact values expected in the system
     const feedbackOptions: ('transformed' | 'relief' | 'obligation')[] = [
       'transformed', 'relief', 'obligation'
     ];
@@ -29,7 +29,7 @@ export const useCompletedTasks = (tasks: Task[]) => {
       
       // If task doesn't have feedback, assign one (for demo data)
       if (!updatedTask.feedback) {
-        // Use modulo to cycle through the feedback options
+        // Use modulo to cycle through the feedback options - ensure equal distribution
         const feedbackIndex = index % feedbackOptions.length;
         updatedTask.feedback = feedbackOptions[feedbackIndex];
       }

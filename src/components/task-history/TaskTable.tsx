@@ -37,6 +37,8 @@ export const CompletedTaskRow: React.FC<{ task: Task }> = ({ task }) => {
   };
 
   const dominantPillar = getDominantPillar();
+  
+  // Consistent feedback mapping across the application
   const feedbackLabels = {
     transformed: 'Foi transformador terminar',
     relief: 'Tive alívio ao finalizar',

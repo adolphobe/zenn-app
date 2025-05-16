@@ -9,7 +9,7 @@ interface PostCompletionFeedbackProps {
   task: Task;
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: (feedbackType: string) => void;
+  onConfirm: (feedbackType: 'transformed' | 'relief' | 'obligation') => void;
 }
 
 const PostCompletionFeedback: React.FC<PostCompletionFeedbackProps> = ({ task, isOpen, onClose, onConfirm }) => {
@@ -18,14 +18,13 @@ const PostCompletionFeedback: React.FC<PostCompletionFeedbackProps> = ({ task, i
 
   const handleConfirm = () => {
     if (selectedFeedback) {
-      // Mapeamos os valores do UI para os valores corretos do sistema
-      const feedbackMapping = {
+      // Map UI values to the correct system values with proper typing
+      const feedbackMapping: Record<string, 'transformed' | 'relief' | 'obligation'> = {
         'satisfaction': 'transformed', // Me transformou -> transformed
         'relief': 'relief',            // Deu alívio -> relief
         'neutral': 'obligation'        // Foi só obrigação -> obligation
       };
       
-      // @ts-ignore - Estamos seguros que a chave existe
       onConfirm(feedbackMapping[selectedFeedback]);
     }
   };
