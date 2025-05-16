@@ -8,7 +8,7 @@ export const formatDate = (date: Date | null, options?: DateDisplayOptions): str
   
   if (hideDate) return '';
   
-  // Formatação da data
+  // Formatação da data no formato brasileiro
   let result = '';
   
   if (!hideDate) {
@@ -23,7 +23,7 @@ export const formatDate = (date: Date | null, options?: DateDisplayOptions): str
     }
   }
   
-  // Adicionar horário sem vírgula
+  // Adicionar horário sem vírgula (formato 24 horas)
   if (!hideTime) {
     const hours = date.getHours().toString().padStart(2, '0');
     const minutes = date.getMinutes().toString().padStart(2, '0');
@@ -75,20 +75,44 @@ export const sortTasks = (
         if (!a.idealDate && b.idealDate) return 1;
       }
       
-      // Fixed chronological sorting
+      // Corrected chronological sorting
       if (a.idealDate && b.idealDate) {
+        const now = new Date().getTime();
+        
         if (sortDirection === 'asc') {
           // "Próximas primeiro" - closest dates to today first
-          const today = new Date().getTime();
-          const distanceA = Math.abs(a.idealDate.getTime() - today);
-          const distanceB = Math.abs(b.idealDate.getTime() - today);
-          return distanceA - distanceB;
+          // For dates after today, closer is better
+          // For dates before today, those are already past and should come after future dates
+          const aFuture = a.idealDate.getTime() >= now;
+          const bFuture = b.idealDate.getTime() >= now;
+          
+          if (aFuture && bFuture) {
+            // Both in future, closest comes first
+            return a.idealDate.getTime() - b.idealDate.getTime();
+          } else if (!aFuture && !bFuture) {
+            // Both in past, most recent comes first
+            return b.idealDate.getTime() - a.idealDate.getTime();
+          } else {
+            // One past, one future - future comes first
+            return aFuture ? -1 : 1;
+          }
         } else {
           // "Distantes primeiro" - furthest dates from today first
-          const today = new Date().getTime();
-          const distanceA = Math.abs(a.idealDate.getTime() - today);
-          const distanceB = Math.abs(b.idealDate.getTime() - today);
-          return distanceB - distanceA;
+          // For future dates, further is better
+          // For past dates, older is better
+          const aFuture = a.idealDate.getTime() >= now;
+          const bFuture = b.idealDate.getTime() >= now;
+          
+          if (aFuture && bFuture) {
+            // Both in future, furthest comes first
+            return b.idealDate.getTime() - a.idealDate.getTime();
+          } else if (!aFuture && !bFuture) {
+            // Both in past, oldest comes first
+            return a.idealDate.getTime() - b.idealDate.getTime();
+          } else {
+            // One past, one future - past comes first (it's further from "now")
+            return aFuture ? 1 : -1;
+          }
         }
       }
       

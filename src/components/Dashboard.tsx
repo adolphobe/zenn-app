@@ -42,13 +42,13 @@ const Dashboard: React.FC = () => {
     if (viewMode === 'power') {
       const sortDirection = sortOptions.power.sortDirection;
       return sortDirection === 'desc' 
-        ? 'Neste modo, as tarefas com maior potência aparecem primeiro.' 
-        : 'Neste modo, as tarefas com menor potência aparecem primeiro.';
+        ? 'Tarefas com maior potência aparecem primeiro.' 
+        : 'Tarefas com menor potência aparecem primeiro.';
     } else {
       const sortDirection = sortOptions.chronological.sortDirection;
       return sortDirection === 'asc' 
-        ? 'Neste modo, as tarefas com datas mais próximas de hoje aparecem primeiro.' 
-        : 'Neste modo, as tarefas com datas mais distantes de hoje aparecem primeiro.';
+        ? 'Tarefas futuras mais próximas aparecem primeiro, seguidas pelas recém passadas.' 
+        : 'Tarefas futuras mais distantes aparecem primeiro, seguidas pelas mais antigas.';
     }
   };
   

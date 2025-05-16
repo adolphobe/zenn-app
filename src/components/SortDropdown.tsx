@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { ArrowUpDown } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
@@ -63,13 +64,13 @@ const SortDropdown: React.FC = () => {
               onClick={() => handleSortDirectionChange('asc')}
               className={`${dropdownStyles.item} ${sortDirection === 'asc' ? dropdownStyles.itemSelected : ''} cursor-pointer`}
             >
-              Data: Próximas primeiro
+              Datas próximas primeiro
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => handleSortDirectionChange('desc')}
               className={`${dropdownStyles.item} ${sortDirection === 'desc' ? dropdownStyles.itemSelected : ''} cursor-pointer`}
             >
-              Data: Distantes primeiro
+              Datas distantes primeiro
             </DropdownMenuItem>
           </>
         )}
