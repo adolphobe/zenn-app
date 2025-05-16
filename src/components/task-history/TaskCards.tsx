@@ -55,9 +55,9 @@ export const CompletedTaskCard: React.FC<{ task: Task }> = ({ task }) => {
   };
 
   const feedbackColors = {
-  transformed: 'bg-[#96d999] text-[#2d7a30] border-[#75c679]',
-  relief: 'bg-[#8bc5f4] text-[#1a5e96] border-[#6ab0e8]',
-  obligation: 'bg-[#d8d8d8] text-[#5a5a5a] border-[#b8b8b8]',
+  transformed: 'bg-[#c9eacb] text-[#3d8c40] border-[#a8d9aa]',
+  relief: 'bg-[#c4e1f7] text-[#2970a8] border-[#a3d0f0]',
+  obligation: 'bg-[#e8e8e8] text-[#6e6e6e] border-[#d0d0d0]',
 };
 
   const feedbackLabels = {
