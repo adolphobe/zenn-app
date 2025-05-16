@@ -30,8 +30,8 @@ const PostCompletionFeedback: React.FC<PostCompletionFeedbackProps> = ({ task, i
   };
 
   return (
-    <DialogContent className="sm:max-w-lg md:max-w-xl lg:max-w-2xl">
-      <DialogContent className="sm:max-w-md w-[450px]">
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-lg md:max-w-xl lg:max-w-2xl">
         <DialogHeader>
           <DialogTitle className="text-xl text-center">Como você se sentiu ao concluir essa tarefa?</DialogTitle>
           <DialogDescription className="text-center">
