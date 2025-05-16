@@ -82,8 +82,8 @@ const Dashboard: React.FC = () => {
     if (viewMode === 'power') {
       const sortDirection = sortOptions.power.sortDirection;
       return sortDirection === 'desc' 
-        ? 'Tarefas com maior peso sendo exibidas primeiro.' 
-        : 'Exibindo as tarefas do menor peso primeiro.';
+        ? 'As tarefas mais relevantes estão aparecendo primeiro .' 
+        : 'Exibindo as tarefas menos relevantes primeiro.';
     } else {
       const sortDirection = sortOptions.chronological.sortDirection;
       return sortDirection === 'desc' 
