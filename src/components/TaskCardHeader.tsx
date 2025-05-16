@@ -82,17 +82,24 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
       {/* Hidden label for hidden tasks that are only visible because of the filter - now with tooltip */}
       {isHidden && showHiddenTasks && (
         <TooltipProvider>
-          <Tooltip delayDuration={0}>
-            <TooltipTrigger asChild>
-              <div className="absolute top-0 left-0 bg-gray-600 text-white text-xs font-semibold px-3 py-1 rounded-tl-lg z-10">
-                OCULTO
-              </div>
-            </TooltipTrigger>
-            <TooltipContent className="text-sm max-w-xs leading-relaxed">
-              {getTooltipMessage()}
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <Tooltip delayDuration={0}>
+          <TooltipTrigger asChild>
+            <div className="absolute top-0 left-0 bg-gray-200/80 text-gray-700 text-xs font-medium px-3 py-1 z-10 shadow-sm backdrop-blur-sm border-b border-r border-gray-300/50"
+                 style={{ 
+                   borderTopLeftRadius: '8px', 
+                   borderBottomRightRadius: '8px',
+                   borderTopRightRadius: '0px',
+                   borderBottomLeftRadius: '0px'
+                 }}>
+              OCULTO
+            </div>
+          </TooltipTrigger>
+          <TooltipContent className="text-sm max-w-xs leading-relaxed border border-gray-200 bg-white/95 backdrop-blur-sm shadow-md"
+                         style={{ borderRadius: '6px' }}>
+            {getTooltipMessage()}
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
       )}
       
       <div className="flex justify-between items-start">
