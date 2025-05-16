@@ -1,4 +1,3 @@
-
 import { AppDispatch } from '../types';
 import { SAMPLE_TASKS } from '@/constants';
 import { addDaysToDate } from '@/utils';
@@ -61,40 +60,41 @@ export const initializeDemoTasks = (dispatch: AppDispatch, tasksLength: number) 
       });
     });
     
-    // Add completed tasks for the past 7 days for demonstration
+    // Add completed tasks distributed over the last 60 days for better filter testing
     const demoCompletedTasks = [
-      // Day -7
-      { title: "Concluir relatório mensal", consequenceScore: 4, prideScore: 3, constructionScore: 2, daysAgo: 7, feedback: 'obligation' },
-      { title: "Organizar planejamento Q3", consequenceScore: 5, prideScore: 5, constructionScore: 5, daysAgo: 7, feedback: 'transformed' },
+      // Older tasks (40-60 days ago)
+      { title: "Concluir relatório semestral", consequenceScore: 5, prideScore: 4, constructionScore: 4, daysAgo: 58, feedback: 'transformed' },
+      { title: "Revisar documentação legal", consequenceScore: 4, prideScore: 3, constructionScore: 3, daysAgo: 55, feedback: 'obligation' },
+      { title: "Finalizar auditoria interna", consequenceScore: 5, prideScore: 4, constructionScore: 3, daysAgo: 52, feedback: 'relief' },
+      { title: "Elaborar plano estratégico anual", consequenceScore: 5, prideScore: 5, constructionScore: 5, daysAgo: 48, feedback: 'transformed' },
+      { title: "Revisar contratos de fornecedores", consequenceScore: 3, prideScore: 3, constructionScore: 2, daysAgo: 45, feedback: 'obligation' },
+      { title: "Implementar nova política de RH", consequenceScore: 4, prideScore: 4, constructionScore: 3, daysAgo: 42, feedback: 'relief' },
       
-      // Day -6
-      { title: "Enviar proposta cliente A", consequenceScore: 5, prideScore: 4, constructionScore: 4, daysAgo: 6, feedback: 'transformed' },
-      { title: "Revisar documentação técnica", consequenceScore: 2, prideScore: 2, constructionScore: 4, daysAgo: 6, feedback: 'relief' },
-      { title: "Validar pendências fiscais", consequenceScore: 4, prideScore: 1, constructionScore: 1, daysAgo: 6, feedback: 'obligation' },
+      // 30-40 days ago
+      { title: "Atualizar manuais operacionais", consequenceScore: 2, prideScore: 3, constructionScore: 4, daysAgo: 38, feedback: 'relief' },
+      { title: "Finalizar orçamento do próximo trimestre", consequenceScore: 5, prideScore: 3, constructionScore: 3, daysAgo: 35, feedback: 'obligation' },
+      { title: "Concluir treinamento da equipe", consequenceScore: 4, prideScore: 5, constructionScore: 5, daysAgo: 33, feedback: 'transformed' },
       
-      // Day -5 
-      { title: "Preparar apresentação executiva", consequenceScore: 5, prideScore: 5, constructionScore: 4, daysAgo: 5, feedback: 'transformed' },
-      { title: "Limpar inbox de emails", consequenceScore: 3, prideScore: 2, constructionScore: 1, daysAgo: 5, feedback: 'relief' },
+      // 20-30 days ago
+      { title: "Implementar melhorias no sistema", consequenceScore: 3, prideScore: 4, constructionScore: 5, daysAgo: 28, feedback: 'transformed' },
+      { title: "Finalizar negociação com cliente premium", consequenceScore: 5, prideScore: 5, constructionScore: 3, daysAgo: 26, feedback: 'relief' },
+      { title: "Revisar métricas de desempenho", consequenceScore: 4, prideScore: 3, constructionScore: 3, daysAgo: 24, feedback: 'obligation' },
+      { title: "Organizar evento corporativo", consequenceScore: 3, prideScore: 5, constructionScore: 4, daysAgo: 21, feedback: 'transformed' },
       
-      // Day -4
-      { title: "Publicar artigo técnico", consequenceScore: 3, prideScore: 5, constructionScore: 4, daysAgo: 4, feedback: 'transformed' },
-      { title: "Refatorar código do módulo X", consequenceScore: 2, prideScore: 4, constructionScore: 5, daysAgo: 4, feedback: 'transformed' },
+      // 10-20 days ago
+      { title: "Concluir pesquisa de satisfação", consequenceScore: 3, prideScore: 3, constructionScore: 4, daysAgo: 18, feedback: 'relief' },
+      { title: "Atualizar site institucional", consequenceScore: 2, prideScore: 4, constructionScore: 3, daysAgo: 16, feedback: 'transformed' },
+      { title: "Finalizar relatório de sustentabilidade", consequenceScore: 4, prideScore: 4, constructionScore: 4, daysAgo: 14, feedback: 'relief' },
+      { title: "Revisar plano de marketing digital", consequenceScore: 3, prideScore: 4, constructionScore: 3, daysAgo: 12, feedback: 'obligation' },
       
-      // Day -3
-      { title: "Finalizar análise de mercado", consequenceScore: 5, prideScore: 3, constructionScore: 3, daysAgo: 3, feedback: 'relief' },
-      { title: "Revisar orçamento trimestral", consequenceScore: 5, prideScore: 2, constructionScore: 2, daysAgo: 3, feedback: 'obligation' },
-      { title: "Atualizar pipeline de vendas", consequenceScore: 4, prideScore: 3, constructionScore: 2, daysAgo: 3, feedback: 'obligation' },
+      // Last 10 days
+      { title: "Implementar nova funcionalidade no app", consequenceScore: 3, prideScore: 5, constructionScore: 5, daysAgo: 9, feedback: 'transformed' },
+      { title: "Resolver problemas técnicos críticos", consequenceScore: 5, prideScore: 3, constructionScore: 2, daysAgo: 7, feedback: 'relief' },
+      { title: "Finalizar apresentação para investidores", consequenceScore: 5, prideScore: 5, constructionScore: 4, daysAgo: 5, feedback: 'transformed' },
+      { title: "Concluir análise de concorrência", consequenceScore: 4, prideScore: 4, constructionScore: 3, daysAgo: 3, feedback: 'obligation' },
       
-      // Day -2
-      { title: "Conduzir reunião de alinhamento", consequenceScore: 4, prideScore: 4, constructionScore: 3, daysAgo: 2, feedback: 'relief' },
-      { title: "Implementar feature principal", consequenceScore: 3, prideScore: 5, constructionScore: 5, daysAgo: 2, feedback: 'transformed' },
-      { title: "Resolver problemas do cliente B", consequenceScore: 5, prideScore: 3, constructionScore: 2, daysAgo: 2, feedback: 'relief' },
-      
-      // Day -1
-      { title: "Finalizar apresentação de vendas", consequenceScore: 4, prideScore: 5, constructionScore: 4, daysAgo: 1, feedback: 'transformed' },
-      { title: "Revisar métricas de desempenho", consequenceScore: 3, prideScore: 3, constructionScore: 4, daysAgo: 1, feedback: 'relief' },
-      
-      // Today
+      // Most recent tasks
+      { title: "Atualizar planilha de resultados", consequenceScore: 3, prideScore: 2, constructionScore: 2, daysAgo: 1, feedback: 'obligation' },
       { title: "Preparar roadmap trimestral", consequenceScore: 5, prideScore: 5, constructionScore: 5, daysAgo: 0, feedback: 'transformed' },
       { title: "Responder solicitações pendentes", consequenceScore: 3, prideScore: 2, constructionScore: 1, daysAgo: 0, feedback: 'obligation' },
       { title: "Fechar planilha de custos", consequenceScore: 4, prideScore: 3, constructionScore: 2, daysAgo: 0, feedback: 'relief' }
