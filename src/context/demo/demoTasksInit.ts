@@ -6,8 +6,38 @@ import { addDaysToDate } from '@/utils';
 // Function to initialize demo tasks
 export const initializeDemoTasks = (dispatch: AppDispatch, tasksLength: number) => {
   if (tasksLength === 0) {
-    // Add original sample tasks
-    SAMPLE_TASKS.forEach(task => {
+    // Add original sample tasks - REMOVIDO para evitar duplicação
+    // SAMPLE_TASKS.forEach(task => {
+    //  dispatch({...})
+    // });
+    
+    // Tarefas pendentes variadas com diferentes scores para os pilares
+    const pendingTasks = [
+      // Tarefas com foco em crescimento pessoal
+      { title: "Fazer 4 aulas de inglês", consequenceScore: 3, prideScore: 4, constructionScore: 5, daysFromNow: 2 },
+      { title: "Meditar por 20 minutos diários", consequenceScore: 2, prideScore: 4, constructionScore: 5, daysFromNow: 0 },
+      { title: "Ler livro sobre desenvolvimento pessoal", consequenceScore: 2, prideScore: 3, constructionScore: 5, daysFromNow: 5 },
+      
+      // Tarefas profissionais importantes
+      { title: "Finalizar relatório trimestral", consequenceScore: 5, prideScore: 4, constructionScore: 3, daysFromNow: 1 },
+      { title: "Preparar apresentação para diretoria", consequenceScore: 5, prideScore: 5, constructionScore: 4, daysFromNow: 3 },
+      
+      // Tarefas com balanceamento nos pilares
+      { title: "Planejar férias familiares", consequenceScore: 4, prideScore: 5, constructionScore: 3, daysFromNow: 7 },
+      { title: "Revisar planejamento financeiro", consequenceScore: 5, prideScore: 3, constructionScore: 4, daysFromNow: 4 },
+      
+      // Tarefas mais cotidianas com scores menores
+      { title: "Arrumar tomada de casa", consequenceScore: 2, prideScore: 2, constructionScore: 1, daysFromNow: 6 },
+      { title: "Organizar armário do escritório", consequenceScore: 1, prideScore: 3, constructionScore: 2, daysFromNow: 8 },
+      { title: "Atualizar aplicativos do celular", consequenceScore: 1, prideScore: 1, constructionScore: 1, daysFromNow: 9 }
+    ];
+    
+    pendingTasks.forEach(task => {
+      const today = new Date();
+      const idealDate = task.daysFromNow !== undefined 
+        ? addDaysToDate(today, task.daysFromNow) 
+        : null;
+      
       dispatch({
         type: 'ADD_TASK',
         payload: {
@@ -15,7 +45,7 @@ export const initializeDemoTasks = (dispatch: AppDispatch, tasksLength: number) 
           consequenceScore: task.consequenceScore,
           prideScore: task.prideScore,
           constructionScore: task.constructionScore,
-          idealDate: task.idealDate || undefined
+          idealDate: idealDate
         }
       });
     });
