@@ -51,6 +51,7 @@ export const CompletedTaskRow: React.FC<{ task: Task }> = ({ task }) => {
     if (!dateString) return '-';
     try {
       const date = parseISO(dateString);
+      console.log(`[TaskTable] Formatting date for "${task.title}": ${dateString} -> parsed as ${date}`);
       return format(date, 'dd/MM/yyyy HH:mm', { locale: ptBR });
     } catch (e) {
       console.error("Error formatting date:", e);

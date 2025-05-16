@@ -101,7 +101,7 @@ export const initializeDemoTasks = (dispatch: AppDispatch, tasksLength: number) 
       { title: "Fechar planilha de custos", consequenceScore: 4, prideScore: 3, constructionScore: 2, daysAgo: 0, feedback: 'relief' }
     ];
     
-    demoCompletedTasks.forEach(task => {
+    demoCompletedTasks.forEach((task, index) => {
       const today = new Date();
       
       // Add variable hours and minutes to make times more realistic and diverse
@@ -112,6 +112,8 @@ export const initializeDemoTasks = (dispatch: AppDispatch, tasksLength: number) 
       const completionDate = new Date(today);
       completionDate.setDate(today.getDate() - task.daysAgo);
       completionDate.setHours(hours, minutes);
+      
+      console.log(`Creating completed task "${task.title}" with date ${completionDate.toISOString()} (${task.daysAgo} days ago)`);
       
       // Add the task
       dispatch({
@@ -125,10 +127,13 @@ export const initializeDemoTasks = (dispatch: AppDispatch, tasksLength: number) 
         }
       });
       
-      // Mark it as completed directly
+      // Mark it as completed directly with timestamp
       dispatch({
-        type: 'COMPLETE_TASK_BY_TITLE',
-        payload: task.title
+        type: 'COMPLETE_TASK_WITH_DATE',
+        payload: {
+          title: task.title,
+          completedAt: completionDate.toISOString()
+        }
       });
       
       // Add feedback

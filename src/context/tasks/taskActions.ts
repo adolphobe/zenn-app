@@ -51,6 +51,14 @@ export const restoreTask = (dispatch: AppDispatch, taskId: string) => {
   });
 };
 
+export const completeTaskWithDate = (
+  dispatch: AppDispatch,
+  title: string,
+  completedAt: string
+) => {
+  dispatch({ type: 'COMPLETE_TASK_WITH_DATE', payload: { title, completedAt } });
+};
+
 export const addComment = (dispatch: AppDispatch, taskId: string, text: string) => {
   dispatch({ type: 'ADD_COMMENT', payload: { taskId, text } });
   toast({
