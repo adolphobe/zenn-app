@@ -3,7 +3,7 @@ import React from 'react';
 import { formatDate, isTaskOverdue } from '@/utils';
 import { DateDisplayOptions } from '@/types';
 import TaskCardTitle from './TaskCardTitle';
-import { Eye, Bell } from 'lucide-react';
+import { Bell } from 'lucide-react';
 import { useAppContext } from '@/context/AppContext';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
@@ -79,13 +79,13 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
   
   return (
     <>
-      {/* Eye icon for hidden tasks that are only visible because of the filter - now with tooltip */}
+      {/* Hidden label for hidden tasks that are only visible because of the filter - now with tooltip */}
       {isHidden && showHiddenTasks && (
         <TooltipProvider>
           <Tooltip delayDuration={0}>
             <TooltipTrigger asChild>
-              <div className="absolute bottom-2 right-2 bg-gray-800/30 dark:bg-gray-200/30 text-white dark:text-gray-800 rounded-full p-1 z-10 opacity-40">
-                <Eye size={16} />
+              <div className="absolute top-0 left-0 bg-gray-600 text-white text-xs font-semibold px-3 py-1 rounded-tl-lg z-10">
+                OCULTO
               </div>
             </TooltipTrigger>
             <TooltipContent className="text-sm max-w-xs leading-relaxed">
