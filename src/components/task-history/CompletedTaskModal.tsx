@@ -136,7 +136,7 @@ const CompletedTaskModal: React.FC<CompletedTaskModalProps> = ({ task, isOpen, o
                   </div>
                   {task.idealDate && (
                     <div className="mb-2">
-                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Data ideal:</span>
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Data da tarefa:</span>
                       <span className="ml-2 text-sm text-gray-600 dark:text-gray-400">{idealDate}</span>
                     </div>
                   )}
