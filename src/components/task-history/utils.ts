@@ -12,8 +12,8 @@ export const groupTasksByTimeline = (tasks: Task[], periodFilter: string = 'all'
     }];
   }
   
-  // Using May 16, 2024 as the reference "today" date
-  const today = new Date(2024, 4, 16);
+  // Use the current date
+  const today = new Date();
   today.setHours(0, 0, 0, 0);
   
   const yesterday = new Date(today);
@@ -37,11 +37,27 @@ export const groupTasksByTimeline = (tasks: Task[], periodFilter: string = 'all'
     if (!task.completedAt) return;
     
     const completedDate = new Date(task.completedAt);
-    completedDate.setHours(0, 0, 0, 0);
+    const completedDateOnly = new Date(
+      completedDate.getFullYear(), 
+      completedDate.getMonth(), 
+      completedDate.getDate()
+    );
     
-    if (completedDate.getTime() === today.getTime()) {
+    const todayDate = new Date(
+      today.getFullYear(), 
+      today.getMonth(), 
+      today.getDate()
+    );
+    
+    const yesterdayDate = new Date(
+      yesterday.getFullYear(), 
+      yesterday.getMonth(), 
+      yesterday.getDate()
+    );
+    
+    if (completedDateOnly.getTime() === todayDate.getTime()) {
       groups.today.tasks.push(task);
-    } else if (completedDate.getTime() === yesterday.getTime()) {
+    } else if (completedDateOnly.getTime() === yesterdayDate.getTime()) {
       groups.yesterday.tasks.push(task);
     } else if (completedDate >= thisWeekStart && completedDate < today) {
       groups.thisWeek.tasks.push(task);

@@ -22,16 +22,26 @@ export const useTaskFilters = (completedTasks: Task[]) => {
       let matchesPeriod = true;
       
       if (periodFilter !== 'all' && task.completedAt) {
-        const now = new Date(2024, 4, 16); // May 16, 2024
+        // Get the current date (use date-fns for proper timezone handling)
+        const now = new Date();
         const completedDate = new Date(task.completedAt);
         
+        // Format dates to remove time component for comparing only dates
+        const nowDateOnly = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const completedDateOnly = new Date(completedDate.getFullYear(), completedDate.getMonth(), completedDate.getDate());
+        
         if (periodFilter === 'today') {
-          matchesPeriod = completedDate.toDateString() === now.toDateString();
+          // Compare only the date components (year, month, day)
+          matchesPeriod = completedDateOnly.getTime() === nowDateOnly.getTime();
         } else if (periodFilter === 'week') {
-          const weekStart = new Date(now);
-          weekStart.setDate(now.getDate() - now.getDay());
-          matchesPeriod = completedDate >= weekStart;
+          // Calculate the start of the current week (Sunday)
+          const weekStart = new Date(nowDateOnly);
+          weekStart.setDate(nowDateOnly.getDate() - nowDateOnly.getDay());
+          
+          // Compare if the completed date is after the start of this week
+          matchesPeriod = completedDateOnly >= weekStart;
         } else if (periodFilter === 'month') {
+          // Compare if it's in the current month and year
           matchesPeriod = completedDate.getMonth() === now.getMonth() && 
                           completedDate.getFullYear() === now.getFullYear();
         }
