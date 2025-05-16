@@ -3,6 +3,7 @@
 import React from 'react';
 import { Button } from './ui/button';
 import { EyeOff, CheckCircle, Edit } from 'lucide-react';
+import { useAppContext } from '@/context/AppContext';
 
 interface TaskCardActionsProps {
   isHidden: boolean;
@@ -17,6 +18,11 @@ const TaskCardActions: React.FC<TaskCardActionsProps> = ({
   onCompleteTask,
   onEditTask
 }) => {
+  const { state: { viewMode } } = useAppContext();
+  
+  // Hide the toggle visibility button in chronological mode
+  const showToggleButton = viewMode !== 'chronological';
+  
   return (
     <div className="flex gap-2 mt-4 justify-between">
       <div className="flex gap-2">
@@ -39,17 +45,19 @@ const TaskCardActions: React.FC<TaskCardActionsProps> = ({
           Concluir
         </Button>
       </div>
-      <div>
-        <Button 
-          variant="outline"
-          size="sm"
-          className="flex items-center gap-1 text-gray-700 dark:text-gray-300 hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-900/20 dark:hover:text-blue-400"
-          onClick={onToggleHidden}
-        >
-          <EyeOff size={14} />
-          {isHidden ? 'Mostrar' : 'Ocultar'}
-        </Button>
-      </div>
+      {showToggleButton && (
+        <div>
+          <Button 
+            variant="outline"
+            size="sm"
+            className="flex items-center gap-1 text-gray-700 dark:text-gray-300 hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-900/20 dark:hover:text-blue-400"
+            onClick={onToggleHidden}
+          >
+            <EyeOff size={14} />
+            {isHidden ? 'Mostrar' : 'Ocultar'}
+          </Button>
+        </div>
+      )}
     </div>
   );
 };
