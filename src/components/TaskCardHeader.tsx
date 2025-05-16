@@ -3,7 +3,7 @@ import React from 'react';
 import { formatDate, isTaskOverdue } from '@/utils';
 import { DateDisplayOptions } from '@/types';
 import TaskCardTitle from './TaskCardTitle';
-import { Eye, AlertTriangle } from 'lucide-react';
+import { Eye, AlertTriangle, Bell } from 'lucide-react';
 import { useAppContext } from '@/context/AppContext';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
