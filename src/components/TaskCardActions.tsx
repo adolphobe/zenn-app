@@ -2,13 +2,14 @@
 import React from 'react';
 import { Eye, EyeOff, Edit2, CheckSquare } from 'lucide-react';
 import { Button } from './ui/button';
+import { ViewMode } from '@/types';
 
 interface TaskCardActionsProps {
   isHidden: boolean;
   onToggleHidden: (e: React.MouseEvent) => void;
   onEditTask: (e: React.MouseEvent) => void;
   onCompleteTask: (e: React.MouseEvent) => void;
-  viewMode?: 'power' | 'chronological';
+  viewMode?: ViewMode;
 }
 
 const TaskCardActions: React.FC<TaskCardActionsProps> = ({
@@ -21,7 +22,7 @@ const TaskCardActions: React.FC<TaskCardActionsProps> = ({
   return (
     <div className="flex justify-end space-x-2 mt-4">
       {/* Only show the hide/show button in Power mode */}
-      {viewMode !== 'chronological' && (
+      {viewMode === 'power' && (
         <Button
           variant="outline"
           size="sm"
