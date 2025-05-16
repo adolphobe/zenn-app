@@ -1,4 +1,3 @@
-
 import { Task, TaskFormData, ViewMode, DateDisplayOptions, SortDirection } from '../types';
 
 // Actions
@@ -22,7 +21,8 @@ export type Action =
   | { type: 'SET_TASK_FEEDBACK_BY_TITLE'; payload: { title: string; feedback: 'transformed' | 'relief' | 'obligation' } }
   | { type: 'RESTORE_TASK'; payload: string }
   | { type: 'ADD_COMMENT'; payload: { taskId: string; text: string } }
-  | { type: 'DELETE_COMMENT'; payload: { taskId: string; commentId: string } };
+  | { type: 'DELETE_COMMENT'; payload: { taskId: string; commentId: string } }
+  | { type: 'CLEAR_TASKS' };
 
 // Add AppDispatch type for action creators
 export type AppDispatch = React.Dispatch<Action>;

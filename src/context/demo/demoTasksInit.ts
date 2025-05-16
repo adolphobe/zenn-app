@@ -6,10 +6,7 @@ import { addDaysToDate } from '@/utils';
 // Function to initialize demo tasks
 export const initializeDemoTasks = (dispatch: AppDispatch, tasksLength: number) => {
   if (tasksLength === 0) {
-    // Add original sample tasks - REMOVIDO para evitar duplicação
-    // SAMPLE_TASKS.forEach(task => {
-    //  dispatch({...})
-    // });
+    // SAMPLE_TASKS have been removed to avoid duplication
     
     // Tarefas pendentes variadas com diferentes scores para os pilares
     const pendingTasks = [
@@ -31,6 +28,9 @@ export const initializeDemoTasks = (dispatch: AppDispatch, tasksLength: number) 
       { title: "Organizar armário do escritório", consequenceScore: 1, prideScore: 3, constructionScore: 2, daysFromNow: 8 },
       { title: "Atualizar aplicativos do celular", consequenceScore: 1, prideScore: 1, constructionScore: 1, daysFromNow: 9 }
     ];
+    
+    // Clear array of existing tasks to prevent any possibility of duplication
+    dispatch({ type: 'CLEAR_TASKS' });
     
     pendingTasks.forEach(task => {
       const today = new Date();

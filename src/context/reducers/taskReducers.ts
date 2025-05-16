@@ -24,6 +24,12 @@ export const addTask = (state: AppState, action: Action): AppState => {
   return { ...state, tasks: [...state.tasks, newTask] };
 };
 
+// Added a new reducer to clear all tasks
+export const clearTasks = (state: AppState, action: Action): AppState => {
+  if (action.type !== 'CLEAR_TASKS') return state;
+  return { ...state, tasks: [] };
+};
+
 export const deleteTask = (state: AppState, action: Action): AppState => {
   if (action.type !== 'DELETE_TASK') return state;
 

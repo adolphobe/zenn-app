@@ -1,59 +1,66 @@
 
 import { AppState, Action } from './types';
-import * as taskReducers from './reducers/taskReducers';
-import * as commentReducers from './reducers/commentReducers';
-import * as uiReducers from './reducers/uiReducers';
+import { 
+  addTask, deleteTask, toggleTaskCompleted, toggleTaskHidden, 
+  updateTask, updateTaskTitle, restoreTask, clearTasks,  // Added clearTasks
+  setTaskFeedback, completeTaskByTitle, setTaskFeedbackByTitle 
+} from './reducers/taskReducers';
+import { addComment, deleteComment } from './reducers/commentReducers';
+import { 
+  setViewMode, toggleShowHiddenTasks, toggleShowPillars, 
+  toggleShowDates, toggleDarkMode, toggleSidebar, 
+  updateDateDisplayOptions, setSortOptions 
+} from './reducers/uiReducers';
 
-// Main reducer that delegates to specialized reducers
-export const appReducer = (state: AppState, action: Action): AppState => {
+// Main reducer function
+export default function appReducer(state: AppState, action: Action): AppState {
   switch (action.type) {
-    // Task-related actions
+    // Task actions
     case 'ADD_TASK':
-      return taskReducers.addTask(state, action);
+      return addTask(state, action);
     case 'DELETE_TASK':
-      return taskReducers.deleteTask(state, action);
+      return deleteTask(state, action);
     case 'TOGGLE_TASK_COMPLETED':
-      return taskReducers.toggleTaskCompleted(state, action);
+      return toggleTaskCompleted(state, action);
     case 'TOGGLE_TASK_HIDDEN':
-      return taskReducers.toggleTaskHidden(state, action);
+      return toggleTaskHidden(state, action);
     case 'UPDATE_TASK':
-      return taskReducers.updateTask(state, action);
+      return updateTask(state, action);
     case 'UPDATE_TASK_TITLE':
-      return taskReducers.updateTaskTitle(state, action);
+      return updateTaskTitle(state, action);
     case 'RESTORE_TASK':
-      return taskReducers.restoreTask(state, action);
+      return restoreTask(state, action);
     case 'SET_TASK_FEEDBACK':
-      return taskReducers.setTaskFeedback(state, action);
+      return setTaskFeedback(state, action);
     case 'COMPLETE_TASK_BY_TITLE':
-      return taskReducers.completeTaskByTitle(state, action);
+      return completeTaskByTitle(state, action);
     case 'SET_TASK_FEEDBACK_BY_TITLE':
-      return taskReducers.setTaskFeedbackByTitle(state, action);
-      
-    // Comment-related actions
+      return setTaskFeedbackByTitle(state, action);
+    case 'CLEAR_TASKS': // Added new action handling
+      return clearTasks(state, action);
+    // Comment actions
     case 'ADD_COMMENT':
-      return commentReducers.addComment(state, action);
+      return addComment(state, action);
     case 'DELETE_COMMENT':
-      return commentReducers.deleteComment(state, action);
-      
-    // UI-related actions
+      return deleteComment(state, action);
+    // UI actions
     case 'SET_VIEW_MODE':
-      return uiReducers.setViewMode(state, action);
+      return setViewMode(state, action);
     case 'TOGGLE_SHOW_HIDDEN_TASKS':
-      return uiReducers.toggleShowHiddenTasks(state, action);
+      return toggleShowHiddenTasks(state, action);
     case 'TOGGLE_SHOW_PILLARS':
-      return uiReducers.toggleShowPillars(state, action);
+      return toggleShowPillars(state, action);
     case 'TOGGLE_SHOW_DATES':
-      return uiReducers.toggleShowDates(state, action);
+      return toggleShowDates(state, action);
     case 'TOGGLE_DARK_MODE':
-      return uiReducers.toggleDarkMode(state, action);
+      return toggleDarkMode(state, action);
     case 'TOGGLE_SIDEBAR':
-      return uiReducers.toggleSidebar(state, action);
+      return toggleSidebar(state, action);
     case 'UPDATE_DATE_DISPLAY_OPTIONS':
-      return uiReducers.updateDateDisplayOptions(state, action);
+      return updateDateDisplayOptions(state, action);
     case 'SET_SORT_OPTIONS':
-      return uiReducers.setSortOptions(state, action);
-      
+      return setSortOptions(state, action);
     default:
       return state;
   }
-};
+}
