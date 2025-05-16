@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Task } from '@/types';
 import { useInsightsAnalysis } from './hooks/useInsightsAnalysis';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
-import { ResponsiveContainer, BarChart, Bar, XAxis, LabelList, Cell } from 'recharts';
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, LabelList, Cell } from 'recharts';
 import { usePillarHover } from '@/context/hooks';
 
 interface PillarsAnalysisCardProps {
@@ -55,6 +55,61 @@ const PillarsAnalysisCard: React.FC<PillarsAnalysisCardProps> = ({ tasks }) => {
     return `${emoji} ${titles[id as keyof typeof titles]} - ${status}`;
   };
   
+  // Helper function to generate tooltip text based on pillar and score
+  const getPillarTooltip = (pilarId: string, score: number) => {
+    let nivel = "";
+    let mensagem = "";
+
+    if (score >= 4.2) nivel = "Muito forte";
+    else if (score >= 3.6) nivel = "Acima da média";
+    else if (score >= 3.0) nivel = "Moderado";
+    else if (score >= 2.5) nivel = "Fraco";
+    else nivel = "Muito fraco";
+
+    switch (pilarId) {
+      case "consequence":
+        if (score >= 4.2) mensagem = "Você priorizou o que realmente não podia ficar pra depois.";
+        else if (score >= 3.6) mensagem = "Você deu atenção a tarefas que pareciam importantes.";
+        else if (score >= 3.0) mensagem = "Você fez algumas tarefas importantes, mas outras ficaram pra depois.";
+        else mensagem = "O que mais exigia ação pode ter sido deixado de lado.";
+        break;
+
+      case "pride":
+        if (score >= 4.2) mensagem = "Você buscou sentir orgulho do que entregou.";
+        else if (score >= 3.6) mensagem = "Você fez tarefas que, em parte, te representam.";
+        else if (score >= 3.0) mensagem = "Você concluiu o que precisava, mas nem tudo te deu orgulho.";
+        else mensagem = "Você entregou, mas quase nada que tenha te deixado satisfeito.";
+        break;
+
+      case "construction":
+        if (score >= 4.2) mensagem = "Você escolheu crescer de verdade com o que faz.";
+        else if (score >= 3.6) mensagem = "Você buscou evoluir enquanto mantinha o ritmo.";
+        else if (score >= 3.0) mensagem = "Você se manteve ativo, mas sem grandes saltos.";
+        else mensagem = "Você se ocupou, mas não se transformou.";
+        break;
+    }
+
+    return { nivel, mensagem };
+  };
+  
+  // Custom tooltip content component
+  const CustomTooltipContent = ({ active, payload }: any) => {
+    if (active && payload && payload.length) {
+      const data = payload[0].payload;
+      const { nivel, mensagem } = getPillarTooltip(data.id, data.value);
+      
+      return (
+        <div className="bg-white p-2 border rounded-md shadow-md text-sm">
+          <p className="font-bold">{data.name}</p>
+          <p className="font-semibold text-blue-600">{nivel}</p>
+          <p className="text-gray-700">{mensagem}</p>
+          <p className="font-mono mt-1">Nota: {data.value.toFixed(1)}</p>
+        </div>
+      );
+    }
+    return null;
+  };
+  
   return (
     <Card>
       <CardHeader>
@@ -79,12 +134,20 @@ const PillarsAnalysisCard: React.FC<PillarsAnalysisCardProps> = ({ tasks }) => {
               }}
             >
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={pillarData.averages} barGap={12} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
+                <BarChart 
+                  data={pillarData.averages} 
+                  barGap={12} 
+                  margin={{ top: 10, right: 10, left: 10, bottom: 10 }}
+                >
                   <XAxis dataKey="name" axisLine={false} tickLine={false} />
+                  <YAxis 
+                    domain={[2.5, 5.0]} 
+                    tickCount={6} 
+                    hide={true} 
+                  />
                   <ChartTooltip 
-                    content={({ active, payload }) => (
-                      <ChartTooltipContent active={active} payload={payload} />
-                    )} 
+                    content={<CustomTooltipContent />}
+                    cursor={{fill: 'rgba(0, 0, 0, 0.05)'}}
                   />
                   <Bar 
                     dataKey="value" 
