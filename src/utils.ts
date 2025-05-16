@@ -1,3 +1,4 @@
+
 import { Task, DateDisplayOptions, ViewMode, SortOption } from './types';
 
 export const formatDate = (date: Date | null, options?: DateDisplayOptions): string => {
@@ -68,7 +69,7 @@ export const sortTasks = (
       
     } else {
       // Chronological mode
-      // If noDateAtEnd is enabled, push tasks without dates to the end
+      // Handle tasks without dates based on noDateAtEnd setting
       if (noDateAtEnd) {
         if (a.idealDate && !b.idealDate) return -1;
         if (!a.idealDate && b.idealDate) return 1;

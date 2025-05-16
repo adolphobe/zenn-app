@@ -26,6 +26,18 @@ const Dashboard: React.FC = () => {
     return stored !== null ? JSON.parse(stored) : true;
   });
 
+  // Force re-render every minute to update overdue status in real-time
+  const [, setTime] = useState(new Date());
+  
+  useEffect(() => {
+    // Update current time every minute to check for newly overdue tasks
+    const interval = setInterval(() => {
+      setTime(new Date());
+    }, 60000); // Check every minute
+    
+    return () => clearInterval(interval);
+  }, []);
+
   // Save showOverdueTasks state to localStorage when it changes
   useEffect(() => {
     localStorage.setItem('showOverdueTasks', JSON.stringify(showOverdueTasks));
@@ -42,21 +54,22 @@ const Dashboard: React.FC = () => {
   // In chronological mode, always show hidden tasks
   const shouldShowHiddenTasks = viewMode === 'chronological' || showHiddenTasks;
   
-  // Sort and filter tasks
-  const filteredTasks = sortTasks(
-    tasks.filter(task => !task.completed && (shouldShowHiddenTasks || !task.hidden)),
-    viewMode,
-    sortOptions[viewMode]
+  // Filter tasks to only show non-completed and visible ones based on settings
+  const filteredTasks = tasks.filter(
+    task => !task.completed && (shouldShowHiddenTasks || !task.hidden)
   );
+  
+  // Sort tasks according to current view mode and sort options
+  const sortedTasks = sortTasks(filteredTasks, viewMode, sortOptions[viewMode]);
 
-  // Filter out overdue and non-overdue tasks for chronological view
+  // Separate overdue tasks for chronological view
   const overdueTasksChronological = viewMode === 'chronological'
-    ? filteredTasks.filter(task => task.idealDate && isTaskOverdue(task.idealDate))
+    ? sortedTasks.filter(task => task.idealDate && isTaskOverdue(task.idealDate))
     : [];
     
   const nonOverdueTasksChronological = viewMode === 'chronological'
-    ? filteredTasks.filter(task => !task.idealDate || !isTaskOverdue(task.idealDate))
-    : filteredTasks;
+    ? sortedTasks.filter(task => !task.idealDate || !isTaskOverdue(task.idealDate))
+    : sortedTasks;
 
   // Generate dynamic description text based on viewMode and sort direction
   const getDescriptionText = () => {
