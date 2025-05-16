@@ -10,6 +10,7 @@ import PillarsAnalysisCard from '@/components/strategic-review/PillarsAnalysisCa
 import FeedbackAnalysisCard from '@/components/strategic-review/FeedbackAnalysisCard';
 import { toast } from '@/hooks/use-toast';
 import { useTaskPillars } from '@/context/hooks';
+import { ResizablePanelGroup, ResizablePanel } from '@/components/ui/resizable';
 
 // Main Strategic Review Page Component
 const StrategicReview: React.FC = () => {
@@ -79,13 +80,13 @@ const StrategicReview: React.FC = () => {
           {/* Only show analysis cards if there are tasks */}
           {hasCompletedTasks && (
             <div className="grid gap-6 md:grid-cols-2">
-              {/* Left column */}
-              <div className="space-y-6">
+              {/* Making each card have the same height with matching flex */}
+              <div className="flex">
                 <FeedbackAnalysisCard tasks={filteredTasks} />
               </div>
               
               {/* Right column */}
-              <div>
+              <div className="flex">
                 <PillarsAnalysisCard tasks={filteredTasks} />
               </div>
             </div>

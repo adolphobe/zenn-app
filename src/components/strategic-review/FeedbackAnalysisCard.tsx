@@ -57,12 +57,12 @@ const FeedbackAnalysisCard: React.FC<FeedbackAnalysisCardProps> = ({ tasks }) =>
   };
   
   return (
-    <Card>
+    <Card className="w-full h-full flex flex-col">
       <CardHeader>
         <CardTitle>Impacto emocional das tarefas:</CardTitle>
         <CardDescription className="!mt-[25px]">Veja a proporção entre tarefas que te transformaram, trouxeram alívio ou foram apenas cumpridas por obrigação.</CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-4 flex-grow flex flex-col justify-between">
         <div className="h-64 mb-6">
           {feedbackData.withFeedback ? (
             <ChartContainer 
@@ -113,7 +113,7 @@ const FeedbackAnalysisCard: React.FC<FeedbackAnalysisCardProps> = ({ tasks }) =>
         
         {/* Dynamic Insight Box */}
         {feedbackData.withFeedback && feedbackData.topFeedback && (
-          <div className="space-y-4 mt-6">
+          <div className="space-y-4 mt-auto">
             <div 
               className="border rounded-lg p-4 animate-fade-in"
               style={{ 
