@@ -97,7 +97,7 @@ const StrategicReview: React.FC = () => {
   return (
     <div className="w-full">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold tracking-tight">Revisão Estratégica</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Insights das suas tarefas</h1>
         <p className="text-muted-foreground">Período: {dateRangeDisplay}</p>
       </div>
       
