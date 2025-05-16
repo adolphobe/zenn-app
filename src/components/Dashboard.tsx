@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useAppContext } from '@/context/AppContext';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -47,8 +46,8 @@ const Dashboard: React.FC = () => {
     } else {
       const sortDirection = sortOptions.chronological.sortDirection;
       return sortDirection === 'asc' 
-        ? 'Tarefas futuras mais próximas aparecem primeiro, depois as mais recentemente vencidas.' 
-        : 'Tarefas futuras mais distantes aparecem primeiro, depois as mais antigas vencidas.';
+        ? 'Tarefas ordenadas da data mais antiga para a mais recente.' 
+        : 'Tarefas ordenadas da data mais recente para a mais antiga.';
     }
   };
   
