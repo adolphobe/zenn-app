@@ -12,6 +12,7 @@ import {
   toggleViewMode,
   toggleShowPillars,
   toggleShowDates,
+  toggleShowScores,
   setSortOptions
 } from './reducers/uiReducers';
 
@@ -61,6 +62,7 @@ export const appReducer = (state: AppState, action: Action): AppState => {
   if (action.type === 'TOGGLE_SIDEBAR') return toggleSidebar(state, action);
   if (action.type === 'TOGGLE_SHOW_PILLARS') return toggleShowPillars(state, action);
   if (action.type === 'TOGGLE_SHOW_DATES') return toggleShowDates(state, action);
+  if (action.type === 'TOGGLE_SHOW_SCORES') return toggleShowScores(state, action);
   if (action.type === 'UPDATE_DATE_DISPLAY_OPTIONS') return updateDateDisplayOptions(state, action);
   if (action.type === 'UPDATE_SORT_OPTIONS') return updateSortOptions(state, action);
   if (action.type === 'SET_SORT_OPTIONS') return setSortOptions(state, action);

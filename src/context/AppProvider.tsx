@@ -49,6 +49,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     toggleSidebar: () => uiActions.toggleSidebar(dispatch),
     toggleShowPillars: () => uiActions.toggleShowPillars(dispatch),
     toggleShowDates: () => uiActions.toggleShowDates(dispatch),
+    toggleShowScores: () => uiActions.toggleShowScores(dispatch),
     updateDateDisplayOptions: (options) => uiActions.updateDateDisplayOptions(dispatch, options),
     setSortOptions: (options) => uiActions.setSortOptions(dispatch, options)
   };

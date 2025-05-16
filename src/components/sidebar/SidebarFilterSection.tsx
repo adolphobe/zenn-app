@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { useAppContext } from '@/context/AppContext';
-import { ClipboardList, Layers, Calendar } from 'lucide-react'; 
+import { ClipboardList, Layers, Calendar, Hash } from 'lucide-react'; 
 import SidebarSection from './SidebarSection';
 import SidebarNavItem from './SidebarNavItem';
 import { useAppState } from '@/context/hooks';
@@ -9,10 +9,11 @@ import { useLocation } from 'react-router-dom';
 
 const SidebarFilterSection: React.FC<{ sidebarOpen: boolean }> = ({ sidebarOpen }) => {
   const { 
-    state: { showHiddenTasks, showPillars, showDates }, 
+    state: { showHiddenTasks, showPillars, showDates, showScores }, 
     toggleShowHiddenTasks,
     toggleShowPillars,
-    toggleShowDates
+    toggleShowDates,
+    toggleShowScores
   } = useAppContext();
   const { viewMode } = useAppState();
   const location = useLocation();
@@ -59,6 +60,17 @@ const SidebarFilterSection: React.FC<{ sidebarOpen: boolean }> = ({ sidebarOpen 
             path="#"
             isActive={showDates}
             onClick={toggleShowDates}
+            isFilter={true} // Mark as a filter item
+          />
+        )}
+        {/* New score toggle - only in chronological mode */}
+        {isChronologicalMode && (
+          <SidebarNavItem
+            icon={Hash}
+            label={showScores ? "Ocultar Score" : "Mostrar Score"}
+            path="#"
+            isActive={showScores}
+            onClick={toggleShowScores}
             isFilter={true} // Mark as a filter item
           />
         )}

@@ -42,6 +42,11 @@ export const toggleShowDates = (state: AppState, action: Action): AppState => {
   return { ...state, showDates: !state.showDates };
 };
 
+export const toggleShowScores = (state: AppState, action: Action): AppState => {
+  if (action.type !== 'TOGGLE_SHOW_SCORES') return state;
+  return { ...state, showScores: !state.showScores };
+};
+
 export const updateDateDisplayOptions = (state: AppState, action: Action): AppState => {
   if (action.type !== 'UPDATE_DATE_DISPLAY_OPTIONS') return state;
   

@@ -27,6 +27,10 @@ export const toggleShowDates = (dispatch: AppDispatch) => {
   dispatch({ type: 'TOGGLE_SHOW_DATES' });
 };
 
+export const toggleShowScores = (dispatch: AppDispatch) => {
+  dispatch({ type: 'TOGGLE_SHOW_SCORES' });
+};
+
 export const updateDateDisplayOptions = (dispatch: AppDispatch, options: Partial<DateDisplayOptions>) => {
   dispatch({ type: 'UPDATE_DATE_DISPLAY_OPTIONS', payload: options });
 };

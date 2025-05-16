@@ -17,6 +17,8 @@ export interface AppState {
   // Adicionar flags para controlar a exibição de pilares e datas
   showPillars: boolean;
   showDates: boolean;
+  // New state to control score visibility
+  showScores: boolean;
 }
 
 // Define Action
@@ -44,6 +46,7 @@ export type Action =
   | { type: 'DELETE_COMMENT'; payload: { taskId: string; commentId: string } }
   | { type: 'TOGGLE_SHOW_PILLARS' }
   | { type: 'TOGGLE_SHOW_DATES' }
+  | { type: 'TOGGLE_SHOW_SCORES' } // New action type
   | { type: 'SET_SORT_OPTIONS'; payload: { sortDirection: 'asc' | 'desc'; noDateAtEnd?: boolean } };
 
 // AppDispatch type
@@ -69,7 +72,7 @@ export interface AppContextType {
   toggleSidebar: () => void;
   updateDateDisplayOptions: (options: Partial<DateDisplayOptions>) => void;
   setSortOptions: (options: { sortDirection: 'asc' | 'desc'; noDateAtEnd?: boolean }) => void;
-  // Adicionar novos métodos
   toggleShowPillars: () => void;
   toggleShowDates: () => void;
+  toggleShowScores: () => void; // New toggle method
 }

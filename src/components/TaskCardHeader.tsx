@@ -3,7 +3,7 @@ import React from 'react';
 import { formatDate, isTaskOverdue } from '@/utils';
 import { DateDisplayOptions } from '@/types';
 import TaskCardTitle from './TaskCardTitle';
-import { Bell } from 'lucide-react';
+import { Bell, Hash } from 'lucide-react';
 import { useAppContext } from '@/context/AppContext';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
@@ -43,7 +43,7 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
   prideScore = 0,
   constructionScore = 0
 }) => {
-  const { state: { showPillars, showDates, viewMode } } = useAppContext();
+  const { state: { showPillars, showDates, viewMode, showScores } } = useAppContext();
   
   // Define tooltip message based on view mode and score
   const getTooltipMessage = () => {
@@ -76,6 +76,9 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
   
   // In chronological mode, always show dates regardless of showDates setting
   const shouldShowDate = viewMode === 'chronological' || showDates;
+  
+  // In chronological mode, only show score if showScores is true
+  const shouldShowScore = viewMode !== 'chronological' || showScores;
   
   return (
     <div className={`${isHidden && showHiddenTasks ? 'pt-[15px]' : ''}`}>
@@ -128,10 +131,12 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
               {formatDate(idealDate, dateDisplayOptions)}
             </div>
           )}
-          <div className="flex items-center justify-center bg-white bg-opacity-40 rounded-full px-3 py-1.5 font-semibold ml-2">
-            <span className="text-[16px]">{totalScore}</span>
-            <span className="text-[10px] self-end mb-1 ml-0.5">/ 15</span>
-          </div>
+          {shouldShowScore && (
+            <div className="flex items-center justify-center bg-white bg-opacity-40 rounded-full px-3 py-1.5 font-semibold ml-2">
+              <span className="text-[16px]">{totalScore}</span>
+              <span className="text-[10px] self-end mb-1 ml-0.5">/ 15</span>
+            </div>
+          )}
         </div>
       </div>
       
