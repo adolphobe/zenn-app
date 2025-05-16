@@ -34,8 +34,8 @@ const FeedbackAnalysisCard: React.FC<FeedbackAnalysisCardProps> = ({ tasks }) =>
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Análise de Feedback</CardTitle>
-        <CardDescription>Avaliação do feedback das tarefas concluídas.</CardDescription>
+        <CardTitle>Impacto Emocional das tarefas concluídas:</CardTitle>
+        <CardDescription>Veja a proporção entre tarefas que te transformaram, trouxeram alívio ou foram apenas cumpridas por obrigação.</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="h-64 mb-6">
