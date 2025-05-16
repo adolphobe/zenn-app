@@ -1,3 +1,4 @@
+
 import { Task, DateDisplayOptions, ViewMode, SortDirection, SortOption } from './types';
 
 export const formatDate = (date: Date | null, options?: DateDisplayOptions): string => {
@@ -74,24 +75,56 @@ export const sortTasks = (
         if (!a.idealDate && b.idealDate) return 1;
       }
       
-      // Corrected chronological sorting
+      // Improved chronological sorting
       if (a.idealDate && b.idealDate) {
         const now = new Date().getTime();
         
         if (sortDirection === 'asc') {
           // "Próximas primeiro" - closest dates to today first
-          const aDistance = Math.abs(a.idealDate.getTime() - now);
-          const bDistance = Math.abs(b.idealDate.getTime() - now);
+          const aTime = a.idealDate.getTime();
+          const bTime = b.idealDate.getTime();
           
-          // Menor distância primeiro (mais próximo)
-          return aDistance - bDistance;
+          // Organize by future/past first
+          const aIsFuture = aTime > now;
+          const bIsFuture = bTime > now;
+          
+          if (aIsFuture && !bIsFuture) return -1; // Future dates before past dates
+          if (!aIsFuture && bIsFuture) return 1;
+          
+          // If both are future or both are past
+          if (aIsFuture === bIsFuture) {
+            // For future: closest first
+            if (aIsFuture) {
+              return aTime - bTime;
+            } 
+            // For past: most recent first
+            else {
+              return bTime - aTime;
+            }
+          }
         } else {
-          // "Distantes primeiro" - furthest dates from today first
-          const aDistance = Math.abs(a.idealDate.getTime() - now);
-          const bDistance = Math.abs(b.idealDate.getTime() - now);
+          // "Distantes primeiro" - furthest dates first
+          const aTime = a.idealDate.getTime();
+          const bTime = b.idealDate.getTime();
           
-          // Maior distância primeiro (mais distante)
-          return bDistance - aDistance;
+          // Organize by future/past first
+          const aIsFuture = aTime > now;
+          const bIsFuture = bTime > now;
+          
+          if (aIsFuture && !bIsFuture) return -1; // Future dates before past dates
+          if (!aIsFuture && bIsFuture) return 1;
+          
+          // If both are future or both are past
+          if (aIsFuture === bIsFuture) {
+            // For future: furthest first
+            if (aIsFuture) {
+              return bTime - aTime;
+            } 
+            // For past: oldest first
+            else {
+              return aTime - bTime;
+            }
+          }
         }
       }
       
@@ -110,4 +143,11 @@ export const addDaysToDate = (date: Date, days: number): Date => {
   const result = new Date(date);
   result.setDate(result.getDate() + days);
   return result;
+};
+
+// Verifica se uma tarefa está vencida (antes da data/hora atual)
+export const isTaskOverdue = (date: Date | null): boolean => {
+  if (!date) return false;
+  const now = new Date();
+  return date < now;
 };

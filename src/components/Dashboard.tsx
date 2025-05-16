@@ -47,8 +47,8 @@ const Dashboard: React.FC = () => {
     } else {
       const sortDirection = sortOptions.chronological.sortDirection;
       return sortDirection === 'asc' 
-        ? 'Tarefas futuras mais próximas aparecem primeiro, seguidas pelas recém passadas.' 
-        : 'Tarefas futuras mais distantes aparecem primeiro, seguidas pelas mais antigas.';
+        ? 'Tarefas futuras mais próximas aparecem primeiro, depois as mais recentemente vencidas.' 
+        : 'Tarefas futuras mais distantes aparecem primeiro, depois as mais antigas vencidas.';
     }
   };
   

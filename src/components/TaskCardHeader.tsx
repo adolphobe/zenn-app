@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { formatDate } from '@/utils';
+import { formatDate, isTaskOverdue } from '@/utils';
 import { DateDisplayOptions } from '@/types';
 import TaskCardTitle from './TaskCardTitle';
 import { Eye, AlertTriangle } from 'lucide-react';
@@ -71,12 +71,8 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
     }
   };
   
-  // Check if task is overdue (before 10/05/2025)
-  const isOverdue = () => {
-    if (!idealDate) return false;
-    const cutoffDate = new Date(2025, 4, 10); // 10/05/2025
-    return idealDate < cutoffDate;
-  };
+  // Check if task is overdue (before current date and time)
+  const taskIsOverdue = idealDate ? isTaskOverdue(idealDate) : false;
   
   return (
     <>
@@ -112,7 +108,7 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
         <div className="flex items-center">
           {idealDate && showDates && (
             <div className="text-xs text-right ml-3 flex items-center">
-              {isOverdue() && (
+              {taskIsOverdue && (
                 <AlertTriangle size={14} className="text-amber-500 mr-1" />
               )}
               {formatDate(idealDate, dateDisplayOptions)}
