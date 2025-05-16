@@ -2,7 +2,6 @@ import React from 'react';
 import { Eye, EyeOff, Edit2, CheckSquare, Trash2 } from 'lucide-react';
 import { Button } from './ui/button';
 import { ViewMode } from '@/types';
-import { cn } from '@/lib/utils'; // Assumindo que você use o auxiliar de classe cn
 
 interface TaskCardActionsProps {
   isHidden: boolean;
@@ -21,8 +20,8 @@ const TaskCardActions: React.FC<TaskCardActionsProps> = ({
   onDeleteTask,
   viewMode = 'power'
 }) => {
-  // Estilo base para todos os botões (incluindo o de exclusão)
-  const buttonStyles = "bg-white text-gray-700 border-gray-200 hover:bg-gray-50 hover:border-gray-300 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700 dark:hover:bg-gray-700/50 dark:hover:border-gray-600";
+  // Estilo base para todos os botões de ação (excluindo o de completar)
+  const buttonStyles = "bg-white text-gray-700 hover:text-gray-900 border-gray-200 hover:bg-gray-50 hover:border-gray-300 dark:bg-gray-800 dark:text-gray-300 dark:hover:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-700/50 dark:hover:border-gray-600";
   
   return (
     <div className="flex justify-between space-x-2 mt-4">
@@ -69,7 +68,7 @@ const TaskCardActions: React.FC<TaskCardActionsProps> = ({
         size="sm"
         onClick={onCompleteTask}
         title="Completar"
-        className="bg-green-600 text-white hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800"
+        className="bg-green-600 text-white hover:bg-green-700 hover:text-white dark:bg-green-700 dark:hover:bg-green-800 dark:text-white dark:hover:text-white"
       >
         <CheckSquare size={16} />
         <span className="ml-1">Completar</span>
