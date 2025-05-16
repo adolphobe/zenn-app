@@ -8,7 +8,6 @@ import SidebarFilterSection from './sidebar/SidebarFilterSection';
 import SidebarSettingsSection from './sidebar/SidebarSettingsSection';
 import SidebarUserProfile from './sidebar/SidebarUserProfile';
 import SidebarMobileOverlay from './sidebar/SidebarMobileOverlay';
-import HistoryNavItem from './sidebar/HistoryNavItem';
 
 const Sidebar: React.FC = () => {
   const { 
@@ -70,12 +69,6 @@ const Sidebar: React.FC = () => {
 
         <div className="p-3 flex-1">
           <SidebarModeSection sidebarOpen={sidebarOpen} />
-          
-          {/* Add History Nav Item */}
-          <div className="my-3">
-            <HistoryNavItem />
-          </div>
-          
           <SidebarFilterSection sidebarOpen={sidebarOpen} />
           <SidebarSettingsSection sidebarOpen={sidebarOpen} />
         </div>

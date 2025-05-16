@@ -35,7 +35,7 @@ const Dashboard: React.FC = () => {
   );
   
   return (
-    <div className="container p-4 mx-auto">
+    <div className="container p-4 mx-auto max-w-5xl">
       <div className="flex flex-col space-y-4">
         <div className="mb-6 flex justify-between items-center">
           <h1 className="text-2xl font-bold tracking-tight">

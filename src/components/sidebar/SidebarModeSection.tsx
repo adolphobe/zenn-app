@@ -2,7 +2,7 @@
 import React from 'react';
 import { useAppContext } from '@/context/AppContext';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, CalendarClock, BarChart } from 'lucide-react';
+import { LayoutDashboard, CalendarClock, BarChart, History } from 'lucide-react';
 import SidebarNavItem from './SidebarNavItem';
 import SidebarSection from './SidebarSection';
 
@@ -32,7 +32,7 @@ const SidebarModeSection: React.FC<{ sidebarOpen: boolean }> = ({ sidebarOpen })
   };
   
   return (
-    <SidebarSection title="Modos" sidebarOpen={sidebarOpen}>
+    <SidebarSection title="Menu" sidebarOpen={sidebarOpen}>
       <SidebarNavItem 
         icon={LayoutDashboard} 
         label="Modo Potência"
@@ -54,6 +54,13 @@ const SidebarModeSection: React.FC<{ sidebarOpen: boolean }> = ({ sidebarOpen })
         label="Revisão Estratégica"
         path="/strategic-review"
         isActive={isStrategicReview}
+      />
+
+      <SidebarNavItem 
+        icon={History}
+        label="Histórico"
+        path="/history"
+        isActive={isHistory}
       />
     </SidebarSection>
   );
