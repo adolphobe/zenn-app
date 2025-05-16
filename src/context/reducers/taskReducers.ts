@@ -146,7 +146,7 @@ export const completeTaskByTitle = (state: AppState, action: Action): AppState =
         ? { 
             ...task, 
             completed: true,
-            completedAt: new Date().toISOString(),
+            completedAt: task.completedAt || new Date().toISOString(),
           } 
         : task
     )

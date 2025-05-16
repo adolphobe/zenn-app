@@ -1,6 +1,6 @@
 
 import { Task } from '@/types';
-import { format } from 'date-fns';
+import { format, isToday, isYesterday, startOfWeek, startOfMonth, isSameMonth, differenceInMonths } from 'date-fns';
 
 // Timeline grouping function
 export const groupTasksByTimeline = (tasks: Task[], periodFilter: string = 'all') => {
@@ -16,19 +16,16 @@ export const groupTasksByTimeline = (tasks: Task[], periodFilter: string = 'all'
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   
-  const yesterday = new Date(today);
-  yesterday.setDate(yesterday.getDate() - 1);
-  
-  const thisWeekStart = new Date(today);
-  thisWeekStart.setDate(today.getDate() - today.getDay());
-  
-  const thisMonthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+  const thisWeekStart = startOfWeek(today);
+  const thisMonthStart = startOfMonth(today);
   
   const groups = {
     today: { label: 'Hoje', tasks: [] },
     yesterday: { label: 'Ontem', tasks: [] },
     thisWeek: { label: 'Esta semana', tasks: [] },
     thisMonth: { label: 'Este mês', tasks: [] },
+    lastMonth: { label: 'Mês passado', tasks: [] },
+    twoMonthsAgo: { label: 'Dois meses atrás', tasks: [] },
     older: { label: 'Anteriores', tasks: [] },
   };
   
@@ -37,36 +34,28 @@ export const groupTasksByTimeline = (tasks: Task[], periodFilter: string = 'all'
     if (!task.completedAt) return;
     
     const completedDate = new Date(task.completedAt);
-    const completedDateOnly = new Date(
-      completedDate.getFullYear(), 
-      completedDate.getMonth(), 
-      completedDate.getDate()
-    );
     
-    const todayDate = new Date(
-      today.getFullYear(), 
-      today.getMonth(), 
-      today.getDate()
-    );
-    
-    const yesterdayDate = new Date(
-      yesterday.getFullYear(), 
-      yesterday.getMonth(), 
-      yesterday.getDate()
-    );
-    
-    if (completedDateOnly.getTime() === todayDate.getTime()) {
+    if (isToday(completedDate)) {
       groups.today.tasks.push(task);
-    } else if (completedDateOnly.getTime() === yesterdayDate.getTime()) {
+    } else if (isYesterday(completedDate)) {
       groups.yesterday.tasks.push(task);
     } else if (completedDate >= thisWeekStart && completedDate < today) {
       groups.thisWeek.tasks.push(task);
     } else if (completedDate >= thisMonthStart && completedDate < thisWeekStart) {
       groups.thisMonth.tasks.push(task);
     } else {
-      groups.older.tasks.push(task);
+      const monthsDifference = differenceInMonths(today, completedDate);
+      
+      if (monthsDifference === 1) {
+        groups.lastMonth.tasks.push(task);
+      } else if (monthsDifference === 2) {
+        groups.twoMonthsAgo.tasks.push(task);
+      } else {
+        groups.older.tasks.push(task);
+      }
     }
   });
   
+  // Filter out empty groups and return
   return Object.values(groups).filter(group => group.tasks.length > 0);
 };

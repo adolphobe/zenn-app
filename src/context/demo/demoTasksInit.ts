@@ -1,3 +1,4 @@
+
 import { AppDispatch } from '../types';
 import { SAMPLE_TASKS } from '@/constants';
 import { addDaysToDate } from '@/utils';
@@ -102,7 +103,15 @@ export const initializeDemoTasks = (dispatch: AppDispatch, tasksLength: number) 
     
     demoCompletedTasks.forEach(task => {
       const today = new Date();
-      const taskDate = addDaysToDate(today, -task.daysAgo);
+      
+      // Add variable hours and minutes to make times more realistic and diverse
+      const hours = Math.floor(Math.random() * 13) + 8; // Random hour between 8-20
+      const minutes = Math.floor(Math.random() * 60); // Random minutes
+      
+      // Calculate the completion date with random time
+      const completionDate = new Date(today);
+      completionDate.setDate(today.getDate() - task.daysAgo);
+      completionDate.setHours(hours, minutes);
       
       // Add the task
       dispatch({
@@ -112,7 +121,7 @@ export const initializeDemoTasks = (dispatch: AppDispatch, tasksLength: number) 
           consequenceScore: task.consequenceScore,
           prideScore: task.prideScore,
           constructionScore: task.constructionScore,
-          idealDate: taskDate
+          idealDate: completionDate // Use the completion date as the ideal date
         }
       });
       
