@@ -44,7 +44,14 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
     if (viewMode === 'chronological') {
       return "Esta tarefa está oculta no Modo Potência";
     } else {
-      return `Essa tarefa está oculta porque sua potência é inferior a 8. Aqui somente as tarefas que tem peso são importantes então ocultamos automáticamente as tarefas menos relevantes. Você sempre poderá visualiza-las clicando no filtro "Tarefas Ocultas"`;
+      return (
+        <>
+          Essa tarefa está oculta porque sua potência é inferior a 8.<br />
+          Aqui somente as tarefas que tem peso são importantes,<br />
+          então ocultamos automáticamente as tarefas menos relevantes.<br />
+          Você sempre poderá visualiza-las clicando no filtro "Tarefas Ocultas"
+        </>
+      );
     }
   };
   
