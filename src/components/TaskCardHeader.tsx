@@ -1,5 +1,4 @@
 
-// src/components/TaskCardHeader.tsx
 import React from 'react';
 import { formatDate } from '@/utils';
 import { DateDisplayOptions } from '@/types';
@@ -46,19 +45,29 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
 }) => {
   const { state: { showPillars, showDates, viewMode } } = useAppContext();
   
-  // Define tooltip message based on view mode
+  // Define tooltip message based on view mode and score
   const getTooltipMessage = () => {
     if (viewMode === 'chronological') {
       return "Esta tarefa está oculta no Modo Potência";
     } else {
-      return (
-        <>
-          Essa tarefa está oculta porque sua potência é inferior a 8.<br /><br />
-          Aqui somente as tarefas que tem peso são importantes,<br />
-          então ocultamos automáticamente as tarefas menos relevantes.<br /><br />
-          Você sempre poderá visualiza-las clicando no filtro "Tarefas Ocultas"
-        </>
-      );
+      // For Power Mode, check the task's score
+      if (totalScore < 8) {
+        return (
+          <>
+            Essa tarefa está oculta porque sua potência é inferior a 8.<br /><br />
+            Aqui somente as tarefas que tem peso são importantes,<br />
+            então ocultamos automáticamente as tarefas menos relevantes.<br /><br />
+            Você sempre poderá visualiza-las clicando no filtro "Tarefas Ocultas"
+          </>
+        );
+      } else {
+        return (
+          <>
+            Essa tarefa não está visível.<br />
+            Você pode torná-la visível clicando no botão "Mostrar"
+          </>
+        );
+      }
     }
   };
   
