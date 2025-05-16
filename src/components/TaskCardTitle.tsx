@@ -1,6 +1,7 @@
 
 import React, { useRef, useEffect } from 'react';
 import { isTaskOverdue } from '@/utils';
+import { ViewMode } from '@/types';
 
 interface TaskCardTitleProps {
   title: string;
@@ -11,7 +12,7 @@ interface TaskCardTitleProps {
   onTitleBlur: () => void;
   onTitleKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   idealDate?: Date | null;
-  viewMode?: 'chronological' | 'power';
+  viewMode?: ViewMode;
 }
 
 const TaskCardTitle: React.FC<TaskCardTitleProps> = ({
