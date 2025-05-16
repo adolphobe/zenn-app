@@ -38,7 +38,7 @@ const ActoApp: React.FC = () => {
   const isTaskCardView = isDashboardRoute && (viewMode === 'power' || viewMode === 'chronological');
   
   return (
-    <div className="min-h-screen bg-[#f6f6f6] dark:bg-gray-950 text-gray-900 dark:text-gray-100 flex">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 flex">
       <Sidebar />
       
       {/* Mobile Menu Toggle Button - Visible only when sidebar is closed on mobile */}
