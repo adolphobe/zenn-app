@@ -68,10 +68,10 @@ const PillarsAnalysisCard: React.FC<PillarsAnalysisCardProps> = ({ tasks }) => {
 
     switch (pilarId) {
       case "consequence":
-        if (score >= 4.2) mensagem = "Você priorizou o que realmente não podia ficar pra depois.";
-        else if (score >= 3.6) mensagem = "Você deu atenção a tarefas que pareciam importantes.";
-        else if (score >= 3.0) mensagem = "Você fez algumas tarefas importantes, mas outras ficaram pra depois.";
-        else mensagem = "O que mais exigia ação pode ter sido deixado de lado.";
+        if (score >= 4.2) mensagem = "Você concluiu tarefas que, pra você, eram realmente importantes";
+        else if (score >= 3.6) mensagem = "Você resolveu coisas relevantes, mas não urgentes.";
+        else if (score >= 3.0) mensagem = "Você completou tarefas sem tanta relevância.";
+        else mensagem = "Você fez tarefas que pouco importavam.";
         break;
 
       case "pride":
