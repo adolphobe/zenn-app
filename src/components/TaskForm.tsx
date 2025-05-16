@@ -1,11 +1,10 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { TaskFormData, Task } from '../types';
 import TaskFormTabs from './TaskFormTabs';
 import TaskFormActions from './TaskFormActions';
 import { X } from 'lucide-react';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { AlwaysVisibleScrollArea } from '@/components/ui/always-visible-scroll-area';
 import { useTabNavigation } from '../context/hooks/useTabNavigation';
 import { useIsMobile } from '../hooks/use-mobile';
 
@@ -123,7 +122,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, initialData, taskId, task,
       data-testid="task-form-backdrop"
     >
       <div 
-        className={`bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden ${isMobile ? 'w-full max-w-md' : 'w-full max-w-4xl'}`}
+        className={`bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden flex flex-col ${isMobile ? 'w-full max-w-md max-h-[90vh]' : 'w-full max-w-4xl max-h-[80vh]'}`}
         onClick={handleModalClick}
         onMouseDown={(e) => {
           e.stopPropagation();
@@ -145,48 +144,50 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, initialData, taskId, task,
           </button>
         </div>
         
-        <ScrollArea className="max-h-[calc(100vh-12rem)]">
-          <form 
-            onSubmit={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              handleSubmit(e);
-            }} 
-            className="p-5 space-y-6"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div onClick={(e) => e.stopPropagation()}>
-              <label htmlFor="title" className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
-                Título da Tarefa
-              </label>
-              <input
-                type="text"
-                id="title"
-                name="title"
-                value={formData.title}
-                onChange={handleChange}
-                onClick={(e) => e.stopPropagation()}
-                className="w-full p-3 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-                placeholder="O que precisa ser feito?"
-                required
+        <div className="flex-1 min-h-0 overflow-hidden">
+          <AlwaysVisibleScrollArea className="h-full">
+            <form 
+              onSubmit={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleSubmit(e);
+              }} 
+              className="p-5 space-y-6"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div onClick={(e) => e.stopPropagation()}>
+                <label htmlFor="title" className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+                  Título da Tarefa
+                </label>
+                <input
+                  type="text"
+                  id="title"
+                  name="title"
+                  value={formData.title}
+                  onChange={handleChange}
+                  onClick={(e) => e.stopPropagation()}
+                  className="w-full p-3 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                  placeholder="O que precisa ser feito?"
+                  required
+                />
+              </div>
+              
+              <TaskFormTabs 
+                activeTab={activeTab}
+                setActiveTab={setActiveTab}
+                formData={formData}
+                handleChange={handleChange}
+                handleDateChange={handleDateChange}
+                setFormData={setFormData}
+                taskId={taskId}
+                task={task}
+                isEditing={isEditing}
               />
-            </div>
-            
-            <TaskFormTabs 
-              activeTab={activeTab}
-              setActiveTab={setActiveTab}
-              formData={formData}
-              handleChange={handleChange}
-              handleDateChange={handleDateChange}
-              setFormData={setFormData}
-              taskId={taskId}
-              task={task}
-              isEditing={isEditing}
-            />
 
-            <TaskFormActions onClose={onClose} />
-          </form>
-        </ScrollArea>
+              <TaskFormActions onClose={onClose} />
+            </form>
+          </AlwaysVisibleScrollArea>
+        </div>
       </div>
     </div>
   );
