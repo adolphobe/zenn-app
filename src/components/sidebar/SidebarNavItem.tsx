@@ -11,7 +11,8 @@ interface SidebarNavItemProps {
   path: string;
   isActive?: boolean;
   onClick?: () => void;
-  disabled?: boolean; // Add the disabled prop to the interface
+  disabled?: boolean;
+  isFilter?: boolean; // New prop to identify filter items
 }
 
 const SidebarNavItem: React.FC<SidebarNavItemProps> = ({ 
@@ -20,7 +21,8 @@ const SidebarNavItem: React.FC<SidebarNavItemProps> = ({
   path, 
   isActive: propIsActive, 
   onClick,
-  disabled = false // Add default value
+  disabled = false,
+  isFilter = false // Default to false
 }) => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -44,9 +46,14 @@ const SidebarNavItem: React.FC<SidebarNavItemProps> = ({
       <button 
         className={cn(
           "flex items-center w-full px-3 py-2 text-sm rounded-md transition-colors",
-          isActive 
-            ? "bg-primary/10 text-primary font-medium" 
-            : "hover:bg-muted/50 text-muted-foreground hover:text-foreground",
+          // Use different styles for filters vs regular nav items
+          isFilter
+            ? isActive 
+              ? "bg-[#f5f5f5] dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-medium" 
+              : "hover:bg-gray-100 dark:hover:bg-gray-800 text-muted-foreground hover:text-foreground"
+            : isActive 
+              ? "bg-primary/10 text-primary font-medium" 
+              : "hover:bg-muted/50 text-muted-foreground hover:text-foreground",
           disabled && "opacity-50 cursor-not-allowed hover:bg-transparent"
         )}
         onClick={handleClick}

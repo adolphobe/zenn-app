@@ -40,6 +40,7 @@ const SidebarFilterSection: React.FC<{ sidebarOpen: boolean }> = ({ sidebarOpen 
             path="#"
             isActive={showHiddenTasks}
             onClick={toggleShowHiddenTasks}
+            isFilter={true} // Mark as a filter item
           />
         )}
         <SidebarNavItem
@@ -48,6 +49,7 @@ const SidebarFilterSection: React.FC<{ sidebarOpen: boolean }> = ({ sidebarOpen 
           path="#"
           isActive={showPillars}
           onClick={toggleShowPillars}
+          isFilter={true} // Mark as a filter item
         />
         {/* Only show date toggle in power mode */}
         {viewMode === 'power' && (
@@ -57,6 +59,7 @@ const SidebarFilterSection: React.FC<{ sidebarOpen: boolean }> = ({ sidebarOpen 
             path="#"
             isActive={showDates}
             onClick={toggleShowDates}
+            isFilter={true} // Mark as a filter item
           />
         )}
       </SidebarSection>

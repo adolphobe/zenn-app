@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -123,6 +122,19 @@
 
   .task-light {
     @apply bg-acto-light text-acto-light-text border-border;
+  }
+
+  /* Filter styling for sidebar */
+  .filter-item {
+    @apply transition-colors duration-200;
+  }
+  
+  .filter-item-active {
+    @apply bg-[#f5f5f5] dark:bg-gray-700 text-gray-800 dark:text-gray-200;
+  }
+  
+  .filter-item-inactive {
+    @apply hover:bg-gray-100 dark:hover:bg-gray-800;
   }
 
   /* Rest of the CSS remains the same */
