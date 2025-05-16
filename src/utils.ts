@@ -80,7 +80,7 @@ export const sortTasks = (
         const aTime = a.idealDate.getTime();
         const bTime = b.idealDate.getTime();
         
-        // Simple chronological order based on sortDirection
+        // Consistent chronological order based on sortDirection
         return (aTime - bTime) * sortMultiplier;
       }
       

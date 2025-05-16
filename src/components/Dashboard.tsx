@@ -61,8 +61,8 @@ const Dashboard: React.FC = () => {
   
   // Sort tasks according to current view mode and sort options
   const sortedTasks = sortTasks(filteredTasks, viewMode, sortOptions[viewMode]);
-
-  // Separate overdue tasks for chronological view
+  
+  // First separate overdue from non-overdue tasks
   const overdueTasksChronological = viewMode === 'chronological'
     ? sortedTasks.filter(task => task.idealDate && isTaskOverdue(task.idealDate))
     : [];
