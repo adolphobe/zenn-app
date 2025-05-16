@@ -60,6 +60,7 @@ export const CompletedTaskCard: React.FC<{ task: Task }> = ({ task }) => {
     obligation: 'bg-[#f1f1f1] text-[#6e6e6e] border-[#d0d0d0]',
   };
 
+  // Correto mapeamento entre os valores de feedback e os textos exibidos
   const feedbackLabels = {
     transformed: 'Foi transformador terminar',
     relief: 'Tive alívio ao finalizar',

@@ -1,3 +1,4 @@
+
 import { useMemo } from 'react';
 import { Task } from '@/types';
 
@@ -9,23 +10,31 @@ export const useCompletedTasks = (tasks: Task[]) => {
     // Reference date: May 16, 2024
     const refDate = new Date(2024, 4, 16); // Month is 0-indexed in JavaScript Date
     
-    // For tasks that don't have a completedAt date (demo data), 
-    // distribute them across the last 30 days
+    // Available feedback options for demo tasks
+    const feedbackOptions: ('transformed' | 'relief' | 'obligation')[] = [
+      'transformed', 'relief', 'obligation'
+    ];
+    
+    // For tasks that don't have completedAt or feedback, assign them
     return completed.map((task, index) => {
-      // If task already has a valid completedAt date, use it
-      if (task.completedAt) {
-        return task;
+      const updatedTask = { ...task };
+      
+      // If task doesn't have a completedAt date (demo data), assign one
+      if (!updatedTask.completedAt) {
+        const daysAgo = index % 30;
+        const completionDate = new Date(refDate);
+        completionDate.setDate(refDate.getDate() - daysAgo);
+        updatedTask.completedAt = completionDate.toISOString();
       }
       
-      // Otherwise, assign a fixed date for demo/testing purposes
-      const daysAgo = index % 30;
-      const completionDate = new Date(refDate);
-      completionDate.setDate(refDate.getDate() - daysAgo);
+      // If task doesn't have feedback, assign one (for demo data)
+      if (!updatedTask.feedback) {
+        // Use modulo to cycle through the feedback options
+        const feedbackIndex = index % feedbackOptions.length;
+        updatedTask.feedback = feedbackOptions[feedbackIndex];
+      }
       
-      return {
-        ...task,
-        completedAt: completionDate.toISOString()
-      };
+      return updatedTask;
     });
   }, [tasks]);
 

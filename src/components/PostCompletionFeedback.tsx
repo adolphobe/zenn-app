@@ -18,7 +18,15 @@ const PostCompletionFeedback: React.FC<PostCompletionFeedbackProps> = ({ task, i
 
   const handleConfirm = () => {
     if (selectedFeedback) {
-      onConfirm(selectedFeedback);
+      // Mapeamos os valores do UI para os valores corretos do sistema
+      const feedbackMapping = {
+        'satisfaction': 'transformed', // Me transformou -> transformed
+        'relief': 'relief',            // Deu alívio -> relief
+        'neutral': 'obligation'        // Foi só obrigação -> obligation
+      };
+      
+      // @ts-ignore - Estamos seguros que a chave existe
+      onConfirm(feedbackMapping[selectedFeedback]);
     }
   };
 
