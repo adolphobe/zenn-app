@@ -1,4 +1,3 @@
-
 import { useMemo } from 'react';
 import { Task } from '@/types';
 
@@ -7,7 +6,7 @@ const COLORS = {
   zone: {
     critical: '#ffcdd2',
     important: '#ffe0b2',
-    moderate: '#bbdefb',
+    moderate: '#bbdefb', // Keeping this as is since it's for charts, not text
     hidden: '#e0e0e0'
   }
 };

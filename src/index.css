@@ -190,8 +190,9 @@
     @apply text-orange-500;
   }
   
+  /* Updated color for moderate tasks */
   .task-score-moderate {
-    @apply text-gray-600;
+    @apply text-[#5083c1];
   }
   
   .task-score-light {
