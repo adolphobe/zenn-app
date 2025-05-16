@@ -1,6 +1,15 @@
 
 import { AppState } from './types';
-import { getLocalStorage } from '../utils';
+
+// Define simple localStorage helper function directly in this file
+const getLocalStorage = (key: string): string | null => {
+  try {
+    return localStorage.getItem(key);
+  } catch (e) {
+    console.error('Error accessing localStorage:', e);
+    return null;
+  }
+};
 
 // Get stored state from localStorage or use defaults
 const getStoredState = () => {
@@ -22,14 +31,14 @@ export const initialState: AppState = {
   showDates: storedState.showDates !== undefined ? storedState.showDates : true,
   showScores: storedState.showScores !== undefined ? storedState.showScores : true, // Default to showing scores
   dateDisplayOptions: {
-    showDate: storedState.dateDisplayOptions?.showDate !== undefined 
-      ? storedState.dateDisplayOptions.showDate 
-      : true,
-    showTime: storedState.dateDisplayOptions?.showTime !== undefined 
-      ? storedState.dateDisplayOptions.showTime 
-      : true,
-    showDayOfWeek: storedState.dateDisplayOptions?.showDayOfWeek !== undefined 
-      ? storedState.dateDisplayOptions.showDayOfWeek 
+    hideYear: storedState.dateDisplayOptions?.hideYear !== undefined 
+      ? storedState.dateDisplayOptions.hideYear 
+      : false,
+    hideTime: storedState.dateDisplayOptions?.hideTime !== undefined 
+      ? storedState.dateDisplayOptions.hideTime 
+      : false,
+    hideDate: storedState.dateDisplayOptions?.hideDate !== undefined 
+      ? storedState.dateDisplayOptions.hideDate 
       : false,
   },
   sortOptions: {
