@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Eye, EyeClosed, Mail, Lock } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -19,15 +19,22 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { addToast } = useToast();
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  const [entranceAnimation, setEntranceAnimation] = useState('fade-in');
 
   // Check if already logged in
   useEffect(() => {
     if (localStorage.getItem('acto_is_logged_in') === 'true') {
-      navigate('/dashboard');
+      navigate('/app/dashboard');
+    }
+    
+    // Determine animation based on navigation source
+    if (location.state?.from === 'landing') {
+      setEntranceAnimation('slide-in-right');
     }
     
     // Set loaded state for animations
@@ -36,7 +43,7 @@ const Login: React.FC = () => {
     }, 100);
     
     return () => clearTimeout(timer);
-  }, [navigate]);
+  }, [navigate, location]);
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -58,7 +65,7 @@ const Login: React.FC = () => {
         title: "Bem-vindo de volta!",
         description: "Login realizado com sucesso",
       });
-      navigate('/dashboard');
+      navigate('/app/dashboard');
       setIsSubmitting(false);
     }, 1000);
   };
@@ -68,19 +75,20 @@ const Login: React.FC = () => {
   // Animated floating items for the background with random positions and continuous animations
   const floatingItems = Array(7).fill(null).map((_, i) => (
     <div 
-    className="absolute rounded-full animated-float"
-    style={{
-      backgroundColor: 'rgba(142, 206, 234, 0.2)',
-      width: `${Math.random() * 100 + 50}px`,
-      height: `${Math.random() * 100 + 50}px`,
-      left: `${Math.random() * 70}%`,
-      top: `${Math.random() * 100}%`,
-      animationDelay: `${Math.random() * 2}s`,
-      animationDuration: `${Math.random() * 6 + 6}s`,
-      opacity: Math.random() * 0.4 + 0.3,
-    }}
-  />
-));
+      key={i}
+      className="absolute rounded-full animated-float"
+      style={{
+        backgroundColor: 'rgba(142, 206, 234, 0.2)',
+        width: `${Math.random() * 100 + 50}px`,
+        height: `${Math.random() * 100 + 50}px`,
+        left: `${Math.random() * 70}%`,
+        top: `${Math.random() * 100}%`,
+        animationDelay: `${Math.random() * 2}s`,
+        animationDuration: `${Math.random() * 6 + 6}s`,
+        opacity: Math.random() * 0.4 + 0.3,
+      }}
+    />
+  ));
 
   return (
     <div className="flex min-h-screen bg-gradient-to-b from-white to-blue-50 dark:from-gray-950 dark:to-gray-900 overflow-hidden relative">
@@ -113,21 +121,33 @@ const Login: React.FC = () => {
         .animated-float {
             animation: float-animate ease-in-out infinite alternate;
         }
+
+        @keyframes slide-in-right {
+          from { 
+            transform: translateX(100px);
+            opacity: 0;
+          }
+          to { 
+            transform: translateX(0);
+            opacity: 1;
+          }
+        }
+
+        .animate-slide-in-right {
+          animation: slide-in-right 0.5s ease-out forwards;
+        }
       `}
       </style>
       
       {floatingItems}
       
       {/* Left column: Login Form */}
-      <div className="w-full md:w-1/2 flex flex-col justify-center px-8 sm:px-16 md:px-24 lg:px-32 z-10">
-        <div className={`space-y-6 w-full max-w-md mx-auto transition-all duration-1000 ease-in-out ${loaded ? 'opacity-100' : 'opacity-0 translate-y-4'}`}>
+      <div className={`w-full md:w-1/2 flex flex-col justify-center px-8 sm:px-16 md:px-24 lg:px-32 z-10`}>
+        <div className={`space-y-6 w-full max-w-md mx-auto transition-all duration-1000 ease-in-out ${loaded ? 'opacity-100' : 'opacity-0 translate-y-4'} ${entranceAnimation === 'slide-in-right' ? 'animate-slide-in-right' : ''}`}>
           {/* Logo */}
           <div className="text-left mb-12">
-            <img 
-              src="https://cdn.shopify.com/s/files/1/0629/1993/4061/files/Sem_Titulo-8.jpg?v=1747284016" 
-              alt="Acto Logo" 
-              className="w-[120px] mb-4"
-            />
+            <div className="text-3xl font-medium text-primary">Zenn</div>
+            <div className="mt-2 h-1 w-8 bg-primary rounded-full"></div>
           </div>
 
           <div className="space-y-2 text-left">
@@ -225,7 +245,7 @@ const Login: React.FC = () => {
         </div>
 
         <div className="mt-12 text-center text-xs text-muted-foreground opacity-70">
-          © {new Date().getFullYear()} Acto. Todos os direitos reservados.
+          © {new Date().getFullYear()} Zenn. Todos os direitos reservados.
         </div>
       </div>
 
