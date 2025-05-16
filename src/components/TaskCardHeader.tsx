@@ -21,6 +21,10 @@ interface TaskCardHeaderProps {
   onTitleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onTitleBlur: () => void;
   onTitleKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void;
+  // Add these new props to access the individual pillar scores
+  consequenceScore?: number;
+  prideScore?: number;
+  constructionScore?: number;
 }
 
 const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
@@ -35,7 +39,10 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
   onTitleClick,
   onTitleChange,
   onTitleBlur,
-  onTitleKeyDown
+  onTitleKeyDown,
+  consequenceScore = 0,
+  prideScore = 0,
+  constructionScore = 0
 }) => {
   const { state: { showPillars, showDates, viewMode } } = useAppContext();
   
@@ -111,11 +118,11 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
       
       {showPillars && (
         <div className="mt-2 text-xs flex flex-wrap gap-2">
-          <span>Risco: {totalScore ? Math.floor(totalScore / 3) : 0}</span>
+          <span>Risco: {consequenceScore}</span>
           <span>|</span>
-          <span>Orgulho: {totalScore ? Math.floor(totalScore / 3) : 0}</span>
+          <span>Orgulho: {prideScore}</span>
           <span>|</span>
-          <span>Crescimento: {totalScore ? Math.ceil(totalScore / 3) : 0}</span>
+          <span>Crescimento: {constructionScore}</span>
         </div>
       )}
     </>

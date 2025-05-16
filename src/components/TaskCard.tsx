@@ -1,3 +1,4 @@
+
 //src/components/TaskCard.tsx
 import React, { useState, useEffect } from 'react';
 import { Task } from '@/types';
@@ -102,6 +103,9 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
           onTitleChange={handleTitleChange}
           onTitleBlur={handleTitleBlur}
           onTitleKeyDown={handleTitleKeyDown}
+          consequenceScore={task.consequenceScore}
+          prideScore={task.prideScore}
+          constructionScore={task.constructionScore}
         />
 
         {isExpanded && (
