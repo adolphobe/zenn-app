@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Task } from '@/types'; 
@@ -11,6 +11,7 @@ import { useAppContext } from '@/context/AppContext';
 import { useExpandedTask } from '@/context/hooks';
 import TaskPillarDetails from '@/components/TaskPillarDetails';
 import TaskComments from '@/components/TaskComments';
+import RestoreTaskConfirmation from './RestoreTaskConfirmation';
 
 interface TaskGroup {
   label: string;
@@ -22,6 +23,7 @@ export const CompletedTaskCard: React.FC<{ task: Task }> = ({ task }) => {
   const { restoreTask } = useAppContext();
   const { expandedTaskId, toggleTaskExpanded, isTaskExpanded } = useExpandedTask();
   const expanded = isTaskExpanded(task.id);
+  const [showRestoreConfirmation, setShowRestoreConfirmation] = useState(false);
 
   // Determine dominant pillar based on scores
   const getDominantPillar = () => {
@@ -87,9 +89,7 @@ export const CompletedTaskCard: React.FC<{ task: Task }> = ({ task }) => {
 
   const handleRestore = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (restoreTask) {
-      restoreTask(task.id);
-    }
+    setShowRestoreConfirmation(true);
   };
 
   // Prevent expanded content from collapsing card on click
@@ -98,62 +98,72 @@ export const CompletedTaskCard: React.FC<{ task: Task }> = ({ task }) => {
   };
 
   return (
-    <Card 
-      className={`mb-3 border-l-4 ${getBorderColor()}`}
-      onClick={() => toggleTaskExpanded(task.id)}
-    >
-      <CardContent className="pt-4">
-        <div className="flex justify-between items-start">
-          <div>
-            <h3 className="font-medium text-gray-900 dark:text-gray-100 opacity-70">{task.title}</h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-              Concluída em {completedDateTime}
-            </p>
-          </div>
-          <div className="flex gap-2">
-            {task.feedback && (
-              <Badge className={feedbackColors[task.feedback] || 'bg-gray-100 text-gray-800'} variant="outline">
-                {feedbackLabels[task.feedback] || '-'}
-              </Badge>
-            )}
-            <Badge
-              className={`${pillarColors[dominantPillar] || 'bg-gray-100 text-gray-800'} hidden`}
-              variant="outline"
-            >
-              {dominantPillar}
-            </Badge>
-            <Badge variant="outline" className="bg-gray-100 text-gray-800">
-              {task.totalScore}/15
-            </Badge>
-          </div>
-        </div>
-
-        {expanded && (
-          <div className="mt-4 animate-fade-in" onClick={handleExpandedContentClick}>
-            <TaskPillarDetails task={task} />
-            
-            {/* Display comments if they exist */}
-            {task.comments && task.comments.length > 0 && (
-              <div className="mt-4">
-                <TaskComments taskId={task.id} comments={task.comments} />
-              </div>
-            )}
-            
-            <div className="mt-4 flex justify-end">
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="flex items-center gap-1"
-                onClick={handleRestore}
+    <>
+      <Card 
+        className={`mb-3 border-l-4 ${getBorderColor()}`}
+        onClick={() => toggleTaskExpanded(task.id)}
+      >
+        <CardContent className="pt-4">
+          <div className="flex justify-between items-start">
+            <div>
+              <h3 className="font-medium text-gray-900 dark:text-gray-100 opacity-70">{task.title}</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                Concluída em {completedDateTime}
+              </p>
+            </div>
+            <div className="flex gap-2">
+              {task.feedback && (
+                <Badge className={feedbackColors[task.feedback] || 'bg-gray-100 text-gray-800'} variant="outline">
+                  {feedbackLabels[task.feedback] || '-'}
+                </Badge>
+              )}
+              <Badge
+                className={`${pillarColors[dominantPillar] || 'bg-gray-100 text-gray-800'} hidden`}
+                variant="outline"
               >
-                <RefreshCw size={16} />
-                Restaurar
-              </Button>
+                {dominantPillar}
+              </Badge>
+              <Badge variant="outline" className="bg-gray-100 text-gray-800">
+                {task.totalScore}/15
+              </Badge>
             </div>
           </div>
-        )}
-      </CardContent>
-    </Card>
+
+          {expanded && (
+            <div className="mt-4 animate-fade-in" onClick={handleExpandedContentClick}>
+              <TaskPillarDetails task={task} />
+              
+              {/* Display comments if they exist */}
+              {task.comments && task.comments.length > 0 && (
+                <div className="mt-4">
+                  <TaskComments taskId={task.id} comments={task.comments} />
+                </div>
+              )}
+              
+              <div className="mt-4 flex justify-end">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="flex items-center gap-1"
+                  onClick={handleRestore}
+                >
+                  <RefreshCw size={16} />
+                  Restaurar
+                </Button>
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {showRestoreConfirmation && (
+        <RestoreTaskConfirmation
+          task={task}
+          isOpen={showRestoreConfirmation}
+          onClose={() => setShowRestoreConfirmation(false)}
+        />
+      )}
+    </>
   );
 };
 

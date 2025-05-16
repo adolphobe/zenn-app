@@ -19,11 +19,13 @@ import { Button } from '@/components/ui/button';
 import { RefreshCw } from 'lucide-react';
 import { useAppContext } from '@/context/AppContext';
 import CompletedTaskModal from './CompletedTaskModal';
+import RestoreTaskConfirmation from './RestoreTaskConfirmation';
 
 // Table row component
 export const CompletedTaskRow: React.FC<{ task: Task }> = ({ task }) => {
   const [showRestore, setShowRestore] = useState(false);
   const [showTaskModal, setShowTaskModal] = useState(false);
+  const [showRestoreConfirmation, setShowRestoreConfirmation] = useState(false);
   const { restoreTask } = useAppContext();
 
   // Determine dominant pillar based on scores
@@ -66,9 +68,7 @@ export const CompletedTaskRow: React.FC<{ task: Task }> = ({ task }) => {
 
   const handleRestore = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (restoreTask) {
-      restoreTask(task.id);
-    }
+    setShowRestoreConfirmation(true);
   };
 
   const handleRowClick = () => {
@@ -104,6 +104,14 @@ export const CompletedTaskRow: React.FC<{ task: Task }> = ({ task }) => {
           task={task} 
           isOpen={showTaskModal} 
           onClose={() => setShowTaskModal(false)} 
+        />
+      )}
+
+      {showRestoreConfirmation && (
+        <RestoreTaskConfirmation
+          task={task}
+          isOpen={showRestoreConfirmation}
+          onClose={() => setShowRestoreConfirmation(false)}
         />
       )}
     </>
