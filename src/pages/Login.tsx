@@ -70,7 +70,7 @@ const Login: React.FC = () => {
     <div 
     className="absolute rounded-full animated-float"
     style={{
-      backgroundColor: 'rgba(142, 206, 234, 0.2)',
+      backgroundColor: 'rgba(88, 213, 211, 0.2)',
       width: `${Math.random() * 100 + 50}px`,
       height: `${Math.random() * 100 + 50}px`,
       left: `${Math.random() * 70}%`,
@@ -208,7 +208,7 @@ const Login: React.FC = () => {
 
               <Button 
                 type="submit" 
-                className="w-full h-12 text-base transition-all duration-300 transform hover:scale-[1.02] bg-primary hover:bg-primary/90 shadow-md hover:shadow-lg"
+                className="w-full h-12 text-base transition-all duration-300 transform hover:scale-[1.02] bg-[#58d5d3] hover:bg-[#4cbcba] shadow-md hover:shadow-lg"
                 disabled={isSubmitting}
               >
                 {isSubmitting ? "Entrando..." : "Entrar"}
@@ -216,7 +216,7 @@ const Login: React.FC = () => {
 
               <div className="text-center text-sm">
                 <span className="text-muted-foreground">Não tem uma conta? </span>
-                <a href="#" className="text-primary hover:underline hover:text-primary/80 transition-colors duration-300">
+                <a href="#" className="text-[#58d5d3] hover:underline hover:text-[#4cbcba] transition-colors duration-300">
                   Criar conta
                 </a>
               </div>
@@ -238,7 +238,7 @@ const Login: React.FC = () => {
             className="object-cover w-full h-full object-center"
             style={{ minWidth: '100%', minHeight: '100%' }}
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-500/30 to-primary/20 mix-blend-multiply" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#58d5d3]/30 to-[#4cbcba]/20 mix-blend-multiply" />
         </div>
       </div>
     </div>
