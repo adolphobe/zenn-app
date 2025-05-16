@@ -67,7 +67,7 @@ const SidebarFilterSection: React.FC<{ sidebarOpen: boolean }> = ({ sidebarOpen 
         {isChronologicalMode && (
           <SidebarNavItem
             icon={Hash}
-            label={showScores ? "Ocultar Score" : "Mostrar Score"}
+            label={showScores ? "Mostrar Score" : "Mostrar Score"}
             path="#"
             isActive={showScores}
             onClick={toggleShowScores}
