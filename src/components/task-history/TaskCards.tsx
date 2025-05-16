@@ -55,10 +55,10 @@ export const CompletedTaskCard: React.FC<{ task: Task }> = ({ task }) => {
   };
 
   const feedbackColors = {
-    transformed: 'bg-emerald-100 text-emerald-800 border-emerald-200',
-    relief: 'bg-blue-100 text-blue-800 border-blue-200',
-    obligation: 'bg-amber-100 text-amber-800 border-amber-200',
-  };
+  transformed: 'bg-[#96d999] text-[#2d7a30] border-[#75c679]',
+  relief: 'bg-[#8bc5f4] text-[#1a5e96] border-[#6ab0e8]',
+  obligation: 'bg-[#d8d8d8] text-[#5a5a5a] border-[#b8b8b8]',
+};
 
   const feedbackLabels = {
     transformed: 'Foi transformador terminar',
