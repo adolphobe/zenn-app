@@ -1,12 +1,13 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import LoginForm from '@/components/LoginForm';
 
 const Landing: React.FC = () => {
   const navigate = useNavigate();
   const [loaded, setLoaded] = useState(false);
+  const [showLogin, setShowLogin] = useState(false);
   
   useEffect(() => {
     // Handle animation on load
@@ -17,12 +18,19 @@ const Landing: React.FC = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  // Navigate to login page
+  // Show login form with animation
   const handleGetStarted = () => {
-    navigate('/login');
+    setShowLogin(true);
   };
 
-  // Generate animated floating elements with blue color instead of #58d5d3
+  // Navigate directly to dashboard if already logged in
+  useEffect(() => {
+    if (localStorage.getItem('acto_is_logged_in') === 'true') {
+      navigate('/dashboard');
+    }
+  }, [navigate]);
+
+  // Generate animated floating elements with blue color
   const floatingElements = Array(6).fill(null).map((_, i) => (
     <div 
       key={i}
@@ -45,7 +53,7 @@ const Landing: React.FC = () => {
       {/* Background image with overlay */}
       <div className="absolute inset-0 z-0">
         <img 
-          src="https://images.unsplash.com/photo-1658998765622-962cb51e7888?q=80&w=3240&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
+          src="https://images.unsplash.com/photo-1503756058522-2390ea8cff45?q=80&w=3870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
           alt="Background" 
           className="object-cover w-full h-full"
         />
@@ -105,6 +113,36 @@ const Landing: React.FC = () => {
           .fade-up-delay-3 {
             animation-delay: 0.6s;
           }
+          
+          @keyframes slideIn {
+            from {
+              opacity: 0;
+              transform: translateY(30px);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+          
+          .slide-in {
+            animation: slideIn 0.6s ease-out forwards;
+          }
+          
+          @keyframes slideOut {
+            from {
+              opacity: 1;
+              transform: translateY(0);
+            }
+            to {
+              opacity: 0;
+              transform: translateY(-30px);
+            }
+          }
+          
+          .slide-out {
+            animation: slideOut 0.6s ease-out forwards;
+          }
         `}
       </style>
       
@@ -114,7 +152,11 @@ const Landing: React.FC = () => {
       {/* Main content */}
       <div className="container mx-auto min-h-screen grid grid-cols-1 lg:grid-cols-12 relative z-10">
         {/* Left column - Text content */}
-        <div className="lg:col-span-7 flex flex-col justify-center px-8 md:px-16 lg:px-20 py-16 lg:py-0">
+        <div 
+          className={`lg:col-span-7 flex flex-col justify-center px-8 md:px-16 lg:px-20 py-16 lg:py-0 transition-all duration-700 ${
+            showLogin ? 'opacity-0 pointer-events-none' : 'opacity-100'
+          }`}
+        >
           {/* Logo */}
           <div className={`mb-12 opacity-0 ${loaded ? 'opacity-100 transition-opacity duration-700' : ''}`}>
             <h3 className="text-2xl font-bold tracking-tight text-blue-500">Zenn</h3>
@@ -133,7 +175,7 @@ const Landing: React.FC = () => {
             importância real, orgulho pós-execução e crescimento pessoal.
           </p>
           
-          {/* CTA Button using the blue color instead of #58d5d3 */}
+          {/* CTA Button using the blue color */}
           <div className={`opacity-0 ${loaded ? 'fade-up fade-up-delay-2' : ''}`}>
             <Button 
               onClick={handleGetStarted}
@@ -150,10 +192,35 @@ const Landing: React.FC = () => {
           </div>
         </div>
         
-        {/* Right column - Image */}
-        <div className="lg:col-span-5 relative hidden lg:flex items-center justify-center">
-          <div className={`relative w-full h-[600px] opacity-0 ${loaded ? 'opacity-100 transition-all duration-1000 ease-in-out' : ''}`}>
-            {/* 3D image with glassmorphism effect - updated back to blue color */}
+        {/* Right column - Image or Login */}
+        <div className="lg:col-span-5 relative flex items-center justify-center">
+          {/* Login form that appears when CTA is clicked */}
+          <div className={`absolute inset-0 w-full h-full flex items-center justify-center transition-all duration-700 ${
+            showLogin 
+              ? 'opacity-100 z-20' 
+              : 'opacity-0 z-0 pointer-events-none'
+          }`}>
+            <div className={`w-full max-w-md bg-white/80 backdrop-blur-md p-8 rounded-xl shadow-xl ${
+              showLogin ? 'slide-in' : ''
+            }`}>
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-xl font-semibold">Bem-vindo de volta!</h3>
+                <button 
+                  onClick={() => setShowLogin(false)}
+                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  ✕
+                </button>
+              </div>
+              <LoginForm />
+            </div>
+          </div>
+          
+          {/* 3D image that shows when login is not active */}
+          <div className={`relative w-full h-[600px] transition-all duration-1000 ease-in-out ${
+            loaded && !showLogin ? 'opacity-100' : 'opacity-0'
+          }`}>
+            {/* 3D image with glassmorphism effect */}
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="w-[350px] h-[350px] rounded-full bg-gradient-to-tr from-blue-500/20 to-blue-400/20 backdrop-blur-sm animate-pulse-slow"></div>
               <div className="absolute w-[300px] h-[300px] rounded-full bg-gradient-to-bl from-blue-500/20 to-blue-300/20 backdrop-blur-md animate-float" style={{ animationDuration: '20s' }}></div>
