@@ -86,8 +86,8 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
           <TooltipTrigger asChild>
             <div className="absolute top-0 left-0 bg-gray-200/80 text-gray-700 text-xs font-medium px-3 py-1 z-10 shadow-sm backdrop-blur-sm border-b border-r border-gray-300/50"
                  style={{ 
-                   borderTopLeftRadius: '8px', 
-                   borderBottomRightRadius: '8px',
+                   borderTopLeftRadius: '9px', 
+                   borderBottomRightRadius: '9px',
                    borderTopRightRadius: '0px',
                    borderBottomLeftRadius: '0px'
                  }}>
