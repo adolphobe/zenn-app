@@ -51,7 +51,7 @@ const SidebarModeSection: React.FC<{ sidebarOpen: boolean }> = ({ sidebarOpen })
       
       <SidebarNavItem 
         icon={BarChart} 
-        label="Revisão Estratégica"
+        label="Insights"
         path="/strategic-review"
         isActive={isStrategicReview}
       />
