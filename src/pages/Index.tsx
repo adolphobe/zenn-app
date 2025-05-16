@@ -24,13 +24,13 @@ const Index: React.FC = () => {
     setIsNavigating(true);
     // Delay navigation to allow for exit animation
     setTimeout(() => {
-      navigate(path);
-    }, 400);
+      navigate(path, { state: { from: 'landing' } });
+    }, 800); // Aumentando o tempo de transição para 800ms para uma saída mais suave
   };
   
   return (
     <div className="w-full min-h-screen bg-gradient-to-b from-white to-blue-50 dark:from-gray-950 dark:to-gray-900 overflow-hidden relative">
-      {/* Animated floating circles for the background */}
+      {/* Animated floating circles and background image */}
       <AnimatedBackground />
 
       {/* Top navigation */}
