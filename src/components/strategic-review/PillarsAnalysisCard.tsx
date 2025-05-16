@@ -70,22 +70,22 @@ const PillarsAnalysisCard: React.FC<PillarsAnalysisCardProps> = ({ tasks }) => {
       case "consequence":
         if (score >= 4.2) mensagem = "Você concluiu tarefas que, pra você, eram realmente importantes";
         else if (score >= 3.6) mensagem = "Você resolveu coisas relevantes, mas não urgentes.";
-        else if (score >= 3.0) mensagem = "Você completou tarefas sem tanta relevância.";
-        else mensagem = "Você fez tarefas que pouco importavam.";
+        else if (score >= 3.0) mensagem = "Você fez tarefas com alguma utilidade, mas sem grande peso.";
+        else mensagem = "Você concluiu tarefas que tinham pouca importância pra você.";
         break;
 
       case "pride":
         if (score >= 4.2) mensagem = "Você buscou sentir orgulho do que entregou.";
         else if (score >= 3.6) mensagem = "Você fez tarefas que, em parte, te representam.";
-        else if (score >= 3.0) mensagem = "Você concluiu o que precisava, mas nem tudo te deu orgulho.";
-        else mensagem = "Você entregou, mas quase nada que tenha te deixado satisfeito.";
+        else if (score >= 3.0) mensagem = "Você entregou o que precisava, mas sem orgulho real.";
+        else mensagem = "Você concluiu tarefas que não te deixaram satisfeito.";
         break;
 
       case "construction":
-        if (score >= 4.2) mensagem = "Você escolheu crescer de verdade com o que faz.";
-        else if (score >= 3.6) mensagem = "Você buscou evoluir enquanto mantinha o ritmo.";
-        else if (score >= 3.0) mensagem = "Você se manteve ativo, mas sem grandes saltos.";
-        else mensagem = "Você se ocupou, mas não se transformou.";
+        if (score >= 4.2) mensagem = "Você escolheu crescer de verdade com o que fez.";
+        else if (score >= 3.6) mensagem = "Você buscou evoluir, mas sem se desafiar tanto.";
+        else if (score >= 3.0) mensagem = "Você se manteve ativo, mas não saiu do lugar.";
+        else mensagem = "Você se ocupou, mas não cresceu.";
         break;
     }
 
