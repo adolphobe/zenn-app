@@ -2,7 +2,7 @@
 import React, { useReducer, useEffect } from 'react';
 import { AppContext } from './AppContext';
 import { AppContextType } from './types';
-import { appReducer } from './appReducer';
+import appReducer from './appReducer'; // Changed from { appReducer } to default import
 import { initialState } from './initialState';
 import { initializeDemoTasks } from './demo/demoTasksInit';
 import * as taskActions from './tasks/taskActions';
