@@ -22,9 +22,9 @@ const CustomTooltip = ({ active, payload }: any) => {
   };
   
   const titleMapping: Record<string, string> = {
-    transformed: "Me transformou",
-    relief: "Deu alívio",
-    obligation: "Foi só obrigação"
+    transformed: "Me transformou 😎",
+    relief: "Deu alívio 🍃",
+    obligation: "Foi só obrigação 😒"
   };
   
   return (
@@ -42,9 +42,9 @@ const FeedbackAnalysisCard: React.FC<FeedbackAnalysisCardProps> = ({ tasks }) =>
   // Function to get feedback title based on id
   const getFeedbackTitle = (id: string) => {
     const titles = {
-      transformed: 'Me transformou',
-      relief: 'Deu alívio',
-      obligation: 'Foi só obrigação'
+      transformed: 'Me transformou 😎',
+      relief: 'Deu alívio 🍃',
+      obligation: 'Foi só obrigação 😒'
     };
     
     const emoji = id === 'transformed' 
