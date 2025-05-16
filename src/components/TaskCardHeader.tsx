@@ -8,33 +8,11 @@ import { useAppContext } from '@/context/AppContext';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface TaskCardHeaderProps {
-  title: string;
-  totalScore: number;
-  idealDate?: Date | null;
-  isEditing: boolean;
-  titleValue: string;
-  dateDisplayOptions: DateDisplayOptions;
-  isHidden: boolean;
-  showHiddenTasks: boolean;
-  onTitleClick: (e: React.MouseEvent) => void;
-  onTitleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onTitleBlur: () => void;
-  onTitleKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void;
+  // [código omitido para brevidade]
 }
 
 const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
-  title,
-  totalScore,
-  idealDate,
-  isEditing,
-  titleValue,
-  dateDisplayOptions,
-  isHidden,
-  showHiddenTasks,
-  onTitleClick,
-  onTitleChange,
-  onTitleBlur,
-  onTitleKeyDown
+  // [código omitido para brevidade]
 }) => {
   const { state: { showPillars, showDates, viewMode } } = useAppContext();
   
@@ -65,7 +43,7 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
                 <Eye size={16} />
               </div>
             </TooltipTrigger>
-            <TooltipContent className="text-xs max-w-xs leading-relaxed">
+            <TooltipContent className="text-sm max-w-xs leading-relaxed">
               {getTooltipMessage()}
             </TooltipContent>
           </Tooltip>
