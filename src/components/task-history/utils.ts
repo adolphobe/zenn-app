@@ -4,7 +4,8 @@ import { format } from 'date-fns';
 
 // Timeline grouping function
 export const groupTasksByTimeline = (tasks: Task[]) => {
-  const today = new Date();
+  // Using May 16, 2024 as the reference "today" date
+  const today = new Date(2024, 4, 16);
   today.setHours(0, 0, 0, 0);
   
   const yesterday = new Date(today);

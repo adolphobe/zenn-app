@@ -55,10 +55,10 @@ export const CompletedTaskCard: React.FC<{ task: Task }> = ({ task }) => {
   };
 
   const feedbackColors = {
-  transformed: 'bg-[#deffe0] text-[#3d8c40] border-[#a8d9aa]',
-  relief: 'bg-[#e2f2ff] text-[#2970a8] border-[#a3d0f0]',
-  obligation: 'bg-[#f1f1f1] text-[#6e6e6e] border-[#d0d0d0]',
-};
+    transformed: 'bg-[#deffe0] text-[#3d8c40] border-[#a8d9aa]',
+    relief: 'bg-[#e2f2ff] text-[#2970a8] border-[#a3d0f0]',
+    obligation: 'bg-[#f1f1f1] text-[#6e6e6e] border-[#d0d0d0]',
+  };
 
   const feedbackLabels = {
     transformed: 'Foi transformador terminar',
@@ -66,7 +66,7 @@ export const CompletedTaskCard: React.FC<{ task: Task }> = ({ task }) => {
     obligation: 'Terminei por obrigação'
   };
 
-  // Make sure we have a completedAt value before trying to format it
+  // Format the completion date
   const completedDate = task.completedAt ? format(new Date(task.completedAt), 'dd/MM/yyyy') : '-';
 
   const handleRestore = (e: React.MouseEvent) => {
