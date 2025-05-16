@@ -1,6 +1,7 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import { Task } from '@/types';
+import { startOfDay, endOfDay, isWithinInterval } from 'date-fns';
 
 export const useTaskFilters = (completedTasks: Task[]) => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -10,6 +11,8 @@ export const useTaskFilters = (completedTasks: Task[]) => {
   const [pillarFilter, setPillarFilter] = useState('all');
   const [sortBy, setSortBy] = useState('recent');
   const [showFilters, setShowFilters] = useState(false);
+  const [startDate, setStartDate] = useState<Date | undefined>(undefined);
+  const [endDate, setEndDate] = useState<Date | undefined>(undefined);
 
   // Apply filters and search
   const filteredTasks = useMemo(() => {
@@ -44,6 +47,14 @@ export const useTaskFilters = (completedTasks: Task[]) => {
           // Compare if it's in the current month and year
           matchesPeriod = completedDate.getMonth() === now.getMonth() && 
                           completedDate.getFullYear() === now.getFullYear();
+        } else if (periodFilter === 'custom' && startDate && endDate) {
+          // Apply the custom date range filter
+          const start = startOfDay(startDate);
+          const end = endOfDay(endDate);
+          matchesPeriod = isWithinInterval(completedDate, { start, end });
+        } else if (periodFilter === 'custom') {
+          // If custom is selected but dates are not set yet, show all tasks
+          matchesPeriod = true;
         }
       }
       
@@ -75,7 +86,7 @@ export const useTaskFilters = (completedTasks: Task[]) => {
       
       return matchesSearch && matchesPeriod && matchesScore && matchesFeedback && matchesPillar;
     });
-  }, [completedTasks, searchQuery, periodFilter, scoreFilter, feedbackFilter, pillarFilter]);
+  }, [completedTasks, searchQuery, periodFilter, scoreFilter, feedbackFilter, pillarFilter, startDate, endDate]);
 
   // Apply sorting
   const sortedTasks = useMemo(() => {
@@ -110,6 +121,10 @@ export const useTaskFilters = (completedTasks: Task[]) => {
     setSortBy,
     showFilters,
     setShowFilters,
+    startDate,
+    setStartDate,
+    endDate,
+    setEndDate,
     filteredTasks,
     sortedTasks
   };

@@ -29,6 +29,8 @@ const TaskHistory = () => {
     scoreFilter, setScoreFilter,
     feedbackFilter, setFeedbackFilter, 
     pillarFilter, setPillarFilter,
+    startDate, setStartDate,
+    endDate, setEndDate,
     sortBy, setSortBy,
     showFilters, setShowFilters,
     filteredTasks,
@@ -86,6 +88,10 @@ const TaskHistory = () => {
             setFeedbackFilter={setFeedbackFilter}
             pillarFilter={pillarFilter}
             setPillarFilter={setPillarFilter}
+            startDate={startDate}
+            setStartDate={setStartDate}
+            endDate={endDate}
+            setEndDate={setEndDate}
           />
         )}
 

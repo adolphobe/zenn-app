@@ -4,8 +4,8 @@ import { format } from 'date-fns';
 
 // Timeline grouping function
 export const groupTasksByTimeline = (tasks: Task[], periodFilter: string = 'all') => {
-  // If a specific period filter is active, return all tasks in a single group without timeline labels
-  if (periodFilter !== 'all') {
+  // If a specific period filter is active (except custom), return all tasks in a single group without timeline labels
+  if (periodFilter !== 'all' && periodFilter !== 'custom') {
     return [{
       label: '',  // Empty label means no timeline division header
       tasks: [...tasks]
