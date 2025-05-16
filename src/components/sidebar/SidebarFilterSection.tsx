@@ -26,8 +26,8 @@ const SidebarFilterSection: React.FC<{ sidebarOpen: boolean }> = ({ sidebarOpen 
     return null;
   }
   
-  // Determine if dates toggle is disabled (should be disabled in chronological mode)
-  const isDateToggleDisabled = viewMode === 'chronological';
+  // Check if we're in chronological mode
+  const isChronologicalMode = viewMode === 'chronological';
   
   return (
     <div className="animate-fade-in">
@@ -49,14 +49,16 @@ const SidebarFilterSection: React.FC<{ sidebarOpen: boolean }> = ({ sidebarOpen 
           isActive={showPillars}
           onClick={toggleShowPillars}
         />
-        <SidebarNavItem
-          icon={Calendar}
-          label="Data visível"
-          path="#"
-          isActive={showDates}
-          onClick={toggleShowDates}
-          disabled={isDateToggleDisabled} // Disable the toggle in chronological mode
-        />
+        {/* Only show date toggle in power mode */}
+        {!isChronologicalMode && (
+          <SidebarNavItem
+            icon={Calendar}
+            label="Data visível"
+            path="#"
+            isActive={showDates}
+            onClick={toggleShowDates}
+          />
+        )}
       </SidebarSection>
     </div>
   );
