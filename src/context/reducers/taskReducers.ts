@@ -139,6 +139,8 @@ export const setTaskFeedback = (state: AppState, action: Action): AppState => {
 export const completeTaskByTitle = (state: AppState, action: Action): AppState => {
   if (action.type !== 'COMPLETE_TASK_BY_TITLE') return state;
 
+  const now = new Date();
+  
   return {
     ...state,
     tasks: state.tasks.map(task => 
@@ -146,7 +148,8 @@ export const completeTaskByTitle = (state: AppState, action: Action): AppState =
         ? { 
             ...task, 
             completed: true,
-            completedAt: task.completedAt || new Date().toISOString(),
+            // Garantir que sempre tenha uma data de conclusão válida para cada tarefa concluída
+            completedAt: task.completedAt || now.toISOString(),
           } 
         : task
     )

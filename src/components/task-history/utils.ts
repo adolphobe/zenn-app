@@ -34,26 +34,35 @@ export const groupTasksByTimeline = (tasks: Task[], periodFilter: string = 'all'
     // Skip tasks without completedAt
     if (!task.completedAt) return;
     
-    const completedDate = parseISO(task.completedAt);
-    
-    if (isToday(completedDate)) {
-      groups.today.tasks.push(task);
-    } else if (isYesterday(completedDate)) {
-      groups.yesterday.tasks.push(task);
-    } else if (completedDate >= thisWeekStart && completedDate < today) {
-      groups.thisWeek.tasks.push(task);
-    } else if (completedDate >= thisMonthStart && completedDate < thisWeekStart) {
-      groups.thisMonth.tasks.push(task);
-    } else {
-      const monthsDifference = differenceInMonths(today, completedDate);
+    try {
+      const completedDate = parseISO(task.completedAt);
       
-      if (monthsDifference === 1) {
-        groups.lastMonth.tasks.push(task);
-      } else if (monthsDifference === 2) {
-        groups.twoMonthsAgo.tasks.push(task);
+      // Debug info
+      console.log(`Task ${task.title}: Completed at ${task.completedAt}, Parsed as ${completedDate}`);
+      
+      if (isToday(completedDate)) {
+        groups.today.tasks.push(task);
+      } else if (isYesterday(completedDate)) {
+        groups.yesterday.tasks.push(task);
+      } else if (completedDate >= thisWeekStart && completedDate < today) {
+        groups.thisWeek.tasks.push(task);
+      } else if (completedDate >= thisMonthStart && completedDate < thisWeekStart) {
+        groups.thisMonth.tasks.push(task);
       } else {
-        groups.older.tasks.push(task);
+        const monthsDifference = differenceInMonths(today, completedDate);
+        
+        if (monthsDifference === 1) {
+          groups.lastMonth.tasks.push(task);
+        } else if (monthsDifference === 2) {
+          groups.twoMonthsAgo.tasks.push(task);
+        } else {
+          groups.older.tasks.push(task);
+        }
       }
+    } catch (error) {
+      console.error(`Error processing completedDate for task "${task.title}":`, error);
+      console.error(`Invalid completedAt value: ${task.completedAt}`);
+      groups.older.tasks.push(task); // Fallback to "older" if date parsing fails
     }
   });
   

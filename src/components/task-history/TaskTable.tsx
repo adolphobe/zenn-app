@@ -54,6 +54,7 @@ export const CompletedTaskRow: React.FC<{ task: Task }> = ({ task }) => {
       return format(date, 'dd/MM/yyyy HH:mm', { locale: ptBR });
     } catch (e) {
       console.error("Error formatting date:", e);
+      console.error("Invalid date string:", dateString);
       return '-';
     }
   };

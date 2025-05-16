@@ -1,7 +1,7 @@
 
 import { useMemo } from 'react';
 import { Task } from '@/types';
-import { format, subDays, setHours, setMinutes } from 'date-fns';
+import { format, subDays, setHours, setMinutes, addDays } from 'date-fns';
 
 export const useCompletedTasks = (tasks: Task[]) => {
   const completedTasks = useMemo(() => {
@@ -15,7 +15,7 @@ export const useCompletedTasks = (tasks: Task[]) => {
       // If task doesn't have a completedAt date (shouldn't happen with our fixes now)
       // This is just a fallback for any unexpected cases
       if (!updatedTask.completedAt) {
-        const now = new Date();
+        const now = new Date(); // Current date: 16/05/2025
         // Generate a reasonable time in the past using the index
         const daysAgo = index % 60; // Distribute over the last 60 days
         
@@ -28,6 +28,8 @@ export const useCompletedTasks = (tasks: Task[]) => {
         const dateWithTime = setHours(setMinutes(completionDate, minutes), hours);
         
         updatedTask.completedAt = dateWithTime.toISOString();
+        
+        console.log(`Generated date for task ${index}: ${updatedTask.completedAt}, which is ${daysAgo} days ago`);
       }
       
       // If task doesn't have feedback (for demo data), assign one
