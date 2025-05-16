@@ -10,6 +10,7 @@ import { RefreshCw } from 'lucide-react';
 import { useAppContext } from '@/context/AppContext';
 import { useExpandedTask } from '@/context/hooks';
 import TaskPillarDetails from '@/components/TaskPillarDetails';
+import TaskComments from '@/components/TaskComments';
 
 interface TaskGroup {
   label: string;
@@ -91,6 +92,11 @@ export const CompletedTaskCard: React.FC<{ task: Task }> = ({ task }) => {
     }
   };
 
+  // Prevent expanded content from collapsing card on click
+  const handleExpandedContentClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+  };
+
   return (
     <Card 
       className={`mb-3 border-l-4 ${getBorderColor()}`}
@@ -123,8 +129,15 @@ export const CompletedTaskCard: React.FC<{ task: Task }> = ({ task }) => {
         </div>
 
         {expanded && (
-          <div className="mt-4 animate-fade-in">
+          <div className="mt-4 animate-fade-in" onClick={handleExpandedContentClick}>
             <TaskPillarDetails task={task} />
+            
+            {/* Display comments if they exist */}
+            {task.comments && task.comments.length > 0 && (
+              <div className="mt-4">
+                <TaskComments taskId={task.id} comments={task.comments} />
+              </div>
+            )}
             
             <div className="mt-4 flex justify-end">
               <Button 

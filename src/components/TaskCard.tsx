@@ -140,7 +140,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
           >
             <TaskPillarDetails task={task} />
             
-            {/* Display comments if they exist */}
+            {/* Display comments if they exist - shown in both modes */}
             {task.comments && task.comments.length > 0 && (
               <div className="mt-4">
                 <TaskComments taskId={task.id} comments={task.comments} />
@@ -152,6 +152,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
               onToggleHidden={handleToggleHidden}
               onEditTask={handleEditTask}
               onCompleteTask={handleCompleteTask}
+              viewMode={viewMode}
             />
           </div>
         )}

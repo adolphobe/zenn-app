@@ -1,63 +1,58 @@
 
-// src/components/TaskCardActions.tsx
 import React from 'react';
+import { Eye, EyeOff, Edit2, CheckSquare } from 'lucide-react';
 import { Button } from './ui/button';
-import { EyeOff, CheckCircle, Edit } from 'lucide-react';
-import { useAppContext } from '@/context/AppContext';
 
 interface TaskCardActionsProps {
   isHidden: boolean;
   onToggleHidden: (e: React.MouseEvent) => void;
-  onCompleteTask: (e: React.MouseEvent) => void;
   onEditTask: (e: React.MouseEvent) => void;
+  onCompleteTask: (e: React.MouseEvent) => void;
+  viewMode?: 'power' | 'chronological';
 }
 
-const TaskCardActions: React.FC<TaskCardActionsProps> = ({ 
-  isHidden, 
-  onToggleHidden, 
+const TaskCardActions: React.FC<TaskCardActionsProps> = ({
+  isHidden,
+  onToggleHidden,
+  onEditTask,
   onCompleteTask,
-  onEditTask
+  viewMode = 'power'
 }) => {
-  const { state: { viewMode } } = useAppContext();
-  
-  // Hide the toggle visibility button in chronological mode
-  const showToggleButton = viewMode !== 'chronological';
-  
   return (
-    <div className="flex gap-2 mt-4 justify-between">
-      <div className="flex gap-2">
-        <Button 
+    <div className="flex justify-end space-x-2 mt-4">
+      {/* Only show the hide/show button in Power mode */}
+      {viewMode !== 'chronological' && (
+        <Button
           variant="outline"
           size="sm"
-          className="flex items-center gap-1 text-gray-700 dark:text-gray-300 hover:bg-purple-50 hover:text-purple-600 dark:hover:bg-purple-900/20 dark:hover:text-purple-400"
-          onClick={onEditTask}
+          onClick={onToggleHidden}
+          title={isHidden ? "Mostrar" : "Ocultar"}
         >
-          <Edit size={14} />
-          Editar
+          {isHidden ? <Eye size={16} /> : <EyeOff size={16} />}
+          <span className="ml-1">{isHidden ? "Mostrar" : "Ocultar"}</span>
         </Button>
-        <Button 
-          variant="outline"
-          size="sm"
-          className="flex items-center gap-1 text-gray-700 dark:text-gray-300 hover:bg-green-50 hover:text-green-600 dark:hover:bg-green-900/20 dark:hover:text-green-400"
-          onClick={onCompleteTask}
-        >
-          <CheckCircle size={14} />
-          Concluir
-        </Button>
-      </div>
-      {showToggleButton && (
-        <div>
-          <Button 
-            variant="outline"
-            size="sm"
-            className="flex items-center gap-1 text-gray-700 dark:text-gray-300 hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-900/20 dark:hover:text-blue-400"
-            onClick={onToggleHidden}
-          >
-            <EyeOff size={14} />
-            {isHidden ? 'Mostrar' : 'Ocultar'}
-          </Button>
-        </div>
       )}
+      
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={onEditTask}
+        title="Editar"
+      >
+        <Edit2 size={16} />
+        <span className="ml-1">Editar</span>
+      </Button>
+      
+      <Button
+        variant="default"
+        size="sm"
+        onClick={onCompleteTask}
+        title="Completar"
+        className="bg-green-600 hover:bg-green-700"
+      >
+        <CheckSquare size={16} />
+        <span className="ml-1">Completar</span>
+      </Button>
     </div>
   );
 };
