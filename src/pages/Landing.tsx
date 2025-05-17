@@ -10,8 +10,6 @@ const Landing: React.FC = () => {
   const [loaded, setLoaded] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
   const [activeTestimonial, setActiveTestimonial] = useState(0);
-  
-  // State para forçar a key do container dos círculos a mudar
   const [circlesKey, setCirclesKey] = useState(Date.now());
 
   useEffect(() => {
@@ -26,7 +24,6 @@ const Landing: React.FC = () => {
     setShowLogin(true);
   };
 
-  // Quando o login é fechado, mudamos a key para forçar a remontagem dos círculos
   useEffect(() => {
     if (!showLogin) {
       setCirclesKey(Date.now());
@@ -86,7 +83,10 @@ const Landing: React.FC = () => {
             75% { transform: translateY(-10px) translateX(-5px); opacity: 0.3; }
           }
           .animate-floating { animation: floating 15s ease-in-out infinite; }
-          @keyframes floating-enhanced {
+          
+          /* Animação de flutuação melhorada */
+          /* Opacidade inicial (0%) é 0.2 */
+          @keyframes floating-enhanced { 
             0% { transform: translateY(0) translateX(0) scale(1); opacity: 0.2; }
             20% { transform: translateY(-25px) translateX(20px) scale(1.05); opacity: 0.4; }
             40% { transform: translateY(-35px) translateX(-15px) scale(0.95); opacity: 0.5; }
@@ -96,16 +96,21 @@ const Landing: React.FC = () => {
           }
           .animate-floating-enhanced { 
             animation: floating-enhanced 12s ease-in-out infinite;
-            will-change: transform, opacity; /* Movido para cá para ser mais específico */
+            will-change: transform, opacity;
            }
+          
+          /* Animação de pulso melhorada */
+          /* Opacidade inicial (0%) é 0.3 */
           @keyframes pulse-enhanced {
             0%, 100% { transform: scale(1); opacity: 0.3; }
             50% { transform: scale(1.1); opacity: 0.5; }
           }
           .animate-pulse-enhanced { 
             animation: pulse-enhanced 8s ease-in-out infinite; 
-            will-change: transform, opacity; /* Movido para cá para ser mais específico */
+            will-change: transform, opacity;
           }
+
+          /* ... (restante do seu CSS) ... */
           @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
           .fade-up { animation: fadeUp 1.2s ease-out forwards; }
           .fade-up-delay-1 { animation-delay: 0.2s; }
@@ -194,7 +199,7 @@ const Landing: React.FC = () => {
               </div>
             ) : (
               <div 
-                key={circlesKey} // Key muda para forçar remontagem
+                key={circlesKey} 
                 className={`relative w-full h-[600px] transition-all duration-1000 ease-in-out ${loaded ? 'opacity-100' : 'opacity-0'}`}
                 style={{ isolation: 'isolate', transform: 'translateZ(0)' }} 
               >
@@ -204,8 +209,9 @@ const Landing: React.FC = () => {
                     className="w-[350px] h-[350px] rounded-full backdrop-blur-sm animate-pulse-enhanced" 
                     style={{ 
                       backgroundColor: 'rgb(159 215 255)',
-                      isolation: 'isolate', // Adicionado
-                      transform: 'translateZ(0px)' // Adicionado
+                      isolation: 'isolate', 
+                      transform: 'translateZ(0px)',
+                      opacity: 0.3 /* Opacidade inicial da animação pulse-enhanced */
                     }}
                   ></div>
                   {/* Círculo 2 */}
@@ -214,8 +220,9 @@ const Landing: React.FC = () => {
                     style={{ 
                       animationDuration: '10s', 
                       backgroundColor: 'rgb(164 211 245)',
-                      isolation: 'isolate', // Adicionado
-                      transform: 'translateZ(0px)' // Adicionado
+                      isolation: 'isolate', 
+                      transform: 'translateZ(0px)',
+                      opacity: 0.2 /* Opacidade inicial da animação floating-enhanced */
                     }}
                   ></div>
                   {/* Círculo 3 (problemático) */}
@@ -225,9 +232,10 @@ const Landing: React.FC = () => {
                       animationDuration: '8s', 
                       animationDelay: '1s', 
                       backgroundColor: 'rgb(159 209 243)',
-                      isolation: 'isolate', // Adicionado para o círculo específico
-                      transform: 'translateZ(0px)', // Adicionado para o círculo específico
-                      willChange: 'backdrop-filter, transform, opacity' // Mais específico
+                      isolation: 'isolate', 
+                      transform: 'translateZ(0px)', 
+                      willChange: 'backdrop-filter, transform, opacity',
+                      opacity: 0.2 /* CORREÇÃO: Definir opacidade inicial aqui */
                     }}
                   ></div>
                 </div>
@@ -245,9 +253,11 @@ const Landing: React.FC = () => {
       </div>
       </section>
 
-     {/* Seções restantes (Features, How It Works, Testimonials, CTA, Footer) permanecem as mesmas da versão anterior sem sombras */}
-     {/* ... (cole o restante do código aqui, igual à versão anterior que você aprovou para a remoção de sombras e parallax) ... */}
+    {/* Colar o restante do código aqui (Features, How It Works, etc.) */}
+    {/* Features Section - ENHANCED */}
      <section className="py-32 relative z-10 overflow-hidden bg-gradient-to-b from-white via-blue-100 to-white" style={{backfaceVisibility: 'hidden', transform: 'translateZ(0)'}}>
+
+        {/* Animated blobs background */}
         <div className="blob-animation w-64 h-64 top-20 left-10" style={{ animation: 'float-around 25s infinite ease-in-out' }}></div>
         <div className="blob-animation w-96 h-96 bottom-40 right-20" style={{ animation: 'float-around 30s infinite ease-in-out reverse' }}></div>
         
@@ -264,33 +274,74 @@ const Landing: React.FC = () => {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+            {/* Feature 1 */}
             <div className="animate-on-scroll" style={{ transitionDelay: '0.1s' }}>
               <Card className="gradient-card-hover bg-white/90 backdrop-blur-sm border-none h-full rounded-xl overflow-hidden transition-all duration-300">
                 <CardContent className="p-10 flex flex-col h-full">
-                  <div className="rounded-full bg-blue-50 w-16 h-16 flex items-center justify-center mb-8 transition-transform duration-300 group-hover:scale-110"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 12L11 14L15 10M12 3L4.5 10.5L4.5 20.5H19.5V10.5L12 3Z" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg></div>
+                  <div className="rounded-full bg-blue-50 w-16 h-16 flex items-center justify-center mb-8 transition-transform duration-300 group-hover:scale-110">
+                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M9 12L11 14L15 10M12 3L4.5 10.5L4.5 20.5H19.5V10.5L12 3Z" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </div>
                   <h3 className="text-2xl font-semibold mb-5 text-gray-800">Análise por pilares</h3>
-                  <p className="text-gray-600 text-lg flex-grow">Avalie cada tarefa pelos três pilares fundamentais: importância real, orgulho pós-execução e contribuição para seu crescimento pessoal.</p>
-                  <div className="mt-8"><Button variant="ghost" className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 p-0 flex items-center gap-2 group">Saiba mais<ArrowUpRight size={18} className="transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" /></Button></div>
+                  <p className="text-gray-600 text-lg flex-grow">
+                    Avalie cada tarefa pelos três pilares fundamentais: importância real, 
+                    orgulho pós-execução e contribuição para seu crescimento pessoal.
+                  </p>
+                  <div className="mt-8">
+                    <Button variant="ghost" className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 p-0 flex items-center gap-2 group">
+                      Saiba mais
+                      <ArrowUpRight size={18} className="transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             </div>
+            
+            {/* Feature 2 */}
             <div className="animate-on-scroll" style={{ transitionDelay: '0.3s' }}>
               <Card className="gradient-card-hover bg-white/90 backdrop-blur-sm border-none h-full rounded-xl overflow-hidden transition-all duration-300">
                 <CardContent className="p-10 flex flex-col h-full">
-                  <div className="rounded-full bg-blue-50 w-16 h-16 flex items-center justify-center mb-8"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 16.5V14M7 10.5H17M7 7.5H17M9 19.5H15C16.1046 19.5 17 18.6046 17 17.5V6.5C17 5.39543 16.1046 4.5 15 4.5H9C7.89543 4.5 7 5.39543 7 6.5V17.5C7 18.6046 7.89543 19.5 9 19.5Z" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg></div>
+                  <div className="rounded-full bg-blue-50 w-16 h-16 flex items-center justify-center mb-8">
+                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M12 16.5V14M7 10.5H17M7 7.5H17M9 19.5H15C16.1046 19.5 17 18.6046 17 17.5V6.5C17 5.39543 16.1046 4.5 15 4.5H9C7.89543 4.5 7 5.39543 7 6.5V17.5C7 18.6046 7.89543 19.5 9 19.5Z" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </div>
                   <h3 className="text-2xl font-semibold mb-5 text-gray-800">Clareza nas escolhas</h3>
-                  <p className="text-gray-600 text-lg flex-grow">Abandone o ruído das tarefas sem propósito. Foque apenas no que realmente vai te levar aonde você quer chegar.</p>
-                  <div className="mt-8"><Button variant="ghost" className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 p-0 flex items-center gap-2 group">Saiba mais<ArrowUpRight size={18} className="transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" /></Button></div>
+                  <p className="text-gray-600 text-lg flex-grow">
+                    Abandone o ruído das tarefas sem propósito. 
+                    Foque apenas no que realmente vai te levar aonde você quer chegar.
+                  </p>
+                  <div className="mt-8">
+                    <Button variant="ghost" className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 p-0 flex items-center gap-2 group">
+                      Saiba mais
+                      <ArrowUpRight size={18} className="transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             </div>
+            
+            {/* Feature 3 */}
             <div className="animate-on-scroll" style={{ transitionDelay: '0.5s' }}>
               <Card className="gradient-card-hover bg-white/90 backdrop-blur-sm border-none h-full rounded-xl overflow-hidden transition-all duration-300">
                 <CardContent className="p-10 flex flex-col h-full">
-                  <div className="rounded-full bg-blue-50 w-16 h-16 flex items-center justify-center mb-8"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 17L15 17M12 13L12 7M12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21Z" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg></div>
+                  <div className="rounded-full bg-blue-50 w-16 h-16 flex items-center justify-center mb-8">
+                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M9 17L15 17M12 13L12 7M12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21Z" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </div>
                   <h3 className="text-2xl font-semibold mb-5 text-gray-800">Análise estratégica</h3>
-                  <p className="text-gray-600 text-lg flex-grow">Entenda padrões e tendências nas suas escolhas para refinar continuamente sua abordagem e melhorar sua execução.</p>
-                  <div className="mt-8"><Button variant="ghost" className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 p-0 flex items-center gap-2 group">Saiba mais<ArrowUpRight size={18} className="transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" /></Button></div>
+                  <p className="text-gray-600 text-lg flex-grow">
+                    Entenda padrões e tendências nas suas escolhas para refinar 
+                    continuamente sua abordagem e melhorar sua execução.
+                  </p>
+                  <div className="mt-8">
+                    <Button variant="ghost" className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 p-0 flex items-center gap-2 group">
+                      Saiba mais
+                      <ArrowUpRight size={18} className="transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             </div>
@@ -298,51 +349,136 @@ const Landing: React.FC = () => {
         </div>
       </section>
       
+      {/* How It Works Section - ENHANCED */}
     <section className="relative z-10 overflow-hidden bg-gradient-to-b from-white via-blue-100 to-white">
+    
         <div className="container mx-auto px-8 relative z-10">
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-24 animate-on-scroll">
               <span className="inline-block px-4 py-2 rounded-full bg-blue-100 text-blue-600 text-sm font-medium mb-4">Fluxo Simples</span>
-              <h2 className="text-4xl md:text-5xl font-semibold mb-8 text-gray-900">Como o <span className="text-blue-600">Zenn</span> funciona</h2>
+              <h2 className="text-4xl md:text-5xl font-semibold mb-8 text-gray-900">
+                Como o <span className="text-blue-600">Zenn</span> funciona
+              </h2>
             </div>
+            
             <div className="relative">
+              {/* Vertical line connecting steps */}
               <div className="absolute left-16 top-4 bottom-4 w-0.5 bg-gradient-to-b from-blue-200 via-blue-400 to-blue-200 hidden md:block"></div>
+              
               <div className="space-y-20">
+                {/* Step 1 */}
                 <div className="flex flex-col md:flex-row gap-8 md:gap-12 items-start animate-on-scroll">
-                  <div className="flex-shrink-0 relative"><div className="w-32 h-32 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-400 flex items-center justify-center text-white text-4xl font-bold">1</div><div className="absolute -bottom-2 -right-2 w-10 h-10 rounded-full bg-blue-100 opacity-70"></div></div>
-                  <div className="md:pt-3"><h3 className="text-2xl font-semibold mb-4">Defina suas tarefas</h3><p className="text-gray-600 text-lg mb-6">Adicione suas tarefas no Zenn e as classifique usando os três pilares fundamentais: importância real para seus objetivos, orgulho que sentirá após concluí-la, e contribuição para seu crescimento pessoal.</p><div className="p-5 bg-blue-50 rounded-xl"><div className="flex items-start gap-3"><CheckCircle2 className="text-blue-500 mt-1 flex-shrink-0" size={20} /><p className="text-blue-700">Interface intuitiva que torna simples a classificação de cada tarefa</p></div></div></div>
+                  <div className="flex-shrink-0 relative">
+                    <div className="w-32 h-32 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-400 flex items-center justify-center text-white text-4xl font-bold">
+                      1
+                    </div>
+                    <div className="absolute -bottom-2 -right-2 w-10 h-10 rounded-full bg-blue-100 opacity-70"></div>
+                  </div>
+                  <div className="md:pt-3">
+                    <h3 className="text-2xl font-semibold mb-4">Defina suas tarefas</h3>
+                    <p className="text-gray-600 text-lg mb-6">
+                      Adicione suas tarefas no Zenn e as classifique usando os três pilares fundamentais: importância real para seus objetivos, orgulho que sentirá após concluí-la, e contribuição para seu crescimento pessoal.
+                    </p>
+                    <div className="p-5 bg-blue-50 rounded-xl">
+                      <div className="flex items-start gap-3">
+                        <CheckCircle2 className="text-blue-500 mt-1 flex-shrink-0" size={20} />
+                        <p className="text-blue-700">Interface intuitiva que torna simples a classificação de cada tarefa</p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
+                
+                {/* Step 2 */}
                 <div className="flex flex-col md:flex-row gap-8 md:gap-12 items-start animate-on-scroll">
-                  <div className="flex-shrink-0 relative"><div className="w-32 h-32 rounded-2xl bg-gradient-to-br from-blue-600 to-blue-500 flex items-center justify-center text-white text-4xl font-bold">2</div><div className="absolute -bottom-2 -right-2 w-10 h-10 rounded-full bg-blue-100 opacity-70"></div></div>
-                  <div className="md:pt-3"><h3 className="text-2xl font-semibold mb-4">Priorize o que importa</h3><p className="text-gray-600 text-lg mb-6">A análise de pilares gera um score que te ajuda a distinguir o essencial do acessório. Foque nas tarefas com maior impacto e significado para seus objetivos de longo prazo.</p><div className="p-5 bg-blue-50 rounded-xl"><div className="flex items-start gap-3"><CheckCircle2 className="text-blue-500 mt-1 flex-shrink-0" size={20} /><p className="text-blue-700">Sistema de score visual que permite identificar imediatamente o que merece sua atenção</p></div></div></div>
+                  <div className="flex-shrink-0 relative">
+                    <div className="w-32 h-32 rounded-2xl bg-gradient-to-br from-blue-600 to-blue-500 flex items-center justify-center text-white text-4xl font-bold">
+                      2
+                    </div>
+                    <div className="absolute -bottom-2 -right-2 w-10 h-10 rounded-full bg-blue-100 opacity-70"></div>
+                  </div>
+                  <div className="md:pt-3">
+                    <h3 className="text-2xl font-semibold mb-4">Priorize o que importa</h3>
+                    <p className="text-gray-600 text-lg mb-6">
+                     A análise de pilares gera um score que te ajuda a distinguir o essencial do acessório. Foque nas tarefas com maior impacto e significado para seus objetivos de longo prazo.
+                    </p>
+                    <div className="p-5 bg-blue-50 rounded-xl">
+                      <div className="flex items-start gap-3">
+                        <CheckCircle2 className="text-blue-500 mt-1 flex-shrink-0" size={20} />
+                        <p className="text-blue-700">Sistema de score visual que permite identificar imediatamente o que merece sua atenção</p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
+                
+                {/* Step 3 */}
                 <div className="flex flex-col md:flex-row gap-8 md:gap-12 items-start animate-on-scroll">
-                  <div className="flex-shrink-0 relative"><div className="w-32 h-32 rounded-2xl bg-gradient-to-br from-blue-700 to-blue-600 flex items-center justify-center text-white text-4xl font-bold">3</div><div className="absolute -bottom-2 -right-2 w-10 h-10 rounded-full bg-blue-100 opacity-70"></div></div>
-                  <div className="md:pt-3"><h3 className="text-2xl font-semibold mb-4">Revise e aprenda</h3><p className="text-gray-600 text-lg mb-6">Acompanhe seu progresso através de insights estratégicos que revelam padrões em suas escolhas. Refine sua abordagem ao longo do tempo para maximizar seu impacto e satisfação pessoal.</p><div className="p-5 bg-blue-50 rounded-xl"><div className="flex items-start gap-3"><CheckCircle2 className="text-blue-500 mt-1 flex-shrink-0" size={20} /><p className="text-blue-700">Relatórios semanais personalizados para aprimorar constantemente suas decisões</p></div></div></div>
+                  <div className="flex-shrink-0 relative">
+                    <div className="w-32 h-32 rounded-2xl bg-gradient-to-br from-blue-700 to-blue-600 flex items-center justify-center text-white text-4xl font-bold">
+                      3
+                    </div>
+                    <div className="absolute -bottom-2 -right-2 w-10 h-10 rounded-full bg-blue-100 opacity-70"></div>
+                  </div>
+                  <div className="md:pt-3">
+                    <h3 className="text-2xl font-semibold mb-4">Revise e aprenda</h3>
+                    <p className="text-gray-600 text-lg mb-6">
+                      Acompanhe seu progresso através de insights estratégicos que revelam padrões em suas escolhas. Refine sua abordagem ao longo do tempo para maximizar seu impacto e satisfação pessoal.
+                    </p>
+                    <div className="p-5 bg-blue-50 rounded-xl">
+                      <div className="flex items-start gap-3">
+                        <CheckCircle2 className="text-blue-500 mt-1 flex-shrink-0" size={20} />
+                        <p className="text-blue-700">Relatórios semanais personalizados para aprimorar constantemente suas decisões</p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
+          
+          {/* App Screenshot */}
           <div className="mt-32 animate-on-scroll">
             <div className="relative mx-auto max-w-4xl">
-              <div className="absolute -top-8 -left-8 w-64 h-64 bg-blue-100 rounded-full opacity-70 blur-3xl"></div><div className="absolute -bottom-8 -right-8 w-64 h-64 bg-blue-200 rounded-full opacity-70 blur-3xl"></div>
-              <div className="relative overflow-hidden rounded-2xl border border-white/30"><img src="https://images.unsplash.com/photo-1555421689-3f034debb7a6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Dashboard" className="w-full h-auto"/><div className="absolute inset-0 bg-gradient-to-tr from-blue-600/20 via-blue-400/10 to-transparent"></div></div>
-              <div className="absolute top-10 right-10 max-w-xs bg-white/90 backdrop-blur-sm p-4 rounded-lg border border-blue-100"><h4 className="font-medium text-blue-700 mb-1">Visão por Pilares</h4><p className="text-sm text-gray-600">Visualize rapidamente suas tarefas organizadas de acordo com os três pilares fundamentais.</p></div>
-              <div className="absolute bottom-10 left-10 max-w-xs bg-white/90 backdrop-blur-sm p-4 rounded-lg border border-blue-100"><h4 className="font-medium text-blue-700 mb-1">Score Intuitivo</h4><p className="text-sm text-gray-600">Identifique facilmente quais tarefas merecem sua atenção prioritária através dos scores visuais.</p></div>
+              <div className="absolute -top-8 -left-8 w-64 h-64 bg-blue-100 rounded-full opacity-70 blur-3xl"></div>
+              <div className="absolute -bottom-8 -right-8 w-64 h-64 bg-blue-200 rounded-full opacity-70 blur-3xl"></div>
+              <div className="relative overflow-hidden rounded-2xl border border-white/30">
+                <img 
+                  src="https://images.unsplash.com/photo-1555421689-3f034debb7a6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" 
+                  alt="Dashboard" 
+                  className="w-full h-auto"
+                />
+                <div className="absolute inset-0 bg-gradient-to-tr from-blue-600/20 via-blue-400/10 to-transparent"></div>
+              </div>
+              
+              <div className="absolute top-10 right-10 max-w-xs bg-white/90 backdrop-blur-sm p-4 rounded-lg border border-blue-100">
+                <h4 className="font-medium text-blue-700 mb-1">Visão por Pilares</h4>
+                <p className="text-sm text-gray-600">Visualize rapidamente suas tarefas organizadas de acordo com os três pilares fundamentais.</p>
+              </div>
+              
+              <div className="absolute bottom-10 left-10 max-w-xs bg-white/90 backdrop-blur-sm p-4 rounded-lg border border-blue-100">
+                <h4 className="font-medium text-blue-700 mb-1">Score Intuitivo</h4>
+                <p className="text-sm text-gray-600">Identifique facilmente quais tarefas merecem sua atenção prioritária através dos scores visuais.</p>
+              </div>
             </div>
           </div>
         </div>
       </section>
       
+      {/* Testimonial Section - ENHANCED */}
       <section className="py-32 relative z-10 overflow-hidden bg-gradient-to-b from-white via-blue-100 to-white">
         <div className="blob-animation w-72 h-72 top-40 right-20 opacity-50" style={{ animation: 'float-around 20s infinite ease-in-out' }}></div>
         <div className="blob-animation w-80 h-80 bottom-40 left-10 opacity-40" style={{ animation: 'float-around 25s infinite ease-in-out reverse' }}></div>
+        
         <div className="container mx-auto px-8 relative z-10">
           <div className="text-center mb-20 animate-on-scroll">
             <span className="inline-block px-4 py-2 rounded-full bg-blue-100 text-blue-600 text-sm font-medium mb-4">Experiências Reais</span>
-            <h2 className="text-4xl md:text-5xl font-semibold mb-8 text-gray-900">O que nossos usuários dizem</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">Pessoas que encontraram clareza e propósito em suas tarefas diárias com o Zenn</p>
+            <h2 className="text-4xl md:text-5xl font-semibold mb-8 text-gray-900">
+              O que nossos usuários dizem
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Pessoas que encontraram clareza e propósito em suas tarefas diárias com o Zenn
+            </p>
           </div>
+          
           <div className="max-w-6xl mx-auto">
             <div className="relative">
               <div className="flex flex-col lg:flex-row gap-6 justify-center items-center">
@@ -375,10 +511,13 @@ const Landing: React.FC = () => {
         </div>
       </section>
       
+      {/* Final CTA Section - ENHANCED */}
       <section className="py-32 relative z-10 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-blue-500 z-0"></div>
         <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -top-40 -left-40 w-80 h-80 bg-white/10 rounded-full blur-xl"></div><div className="absolute top-20 right-20 w-60 h-60 bg-white/10 rounded-full blur-xl"></div><div className="absolute bottom-20 left-1/3 w-40 h-40 bg-white/10 rounded-full blur-xl"></div>
+          <div className="absolute -top-40 -left-40 w-80 h-80 bg-white/10 rounded-full blur-xl"></div>
+          <div className="absolute top-20 right-20 w-60 h-60 bg-white/10 rounded-full blur-xl"></div>
+          <div className="absolute bottom-20 left-1/3 w-40 h-40 bg-white/10 rounded-full blur-xl"></div>
           <svg className="absolute bottom-0 left-0 w-full" viewBox="0 0 1440 320" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0,256L80,261.3C160,267,320,277,480,250.7C640,224,800,160,960,138.7C1120,117,1280,139,1360,149.3L1440,160L1440,320L1360,320C1280,320,1120,320,960,320C800,320,640,320,480,320C320,320,160,320,80,320L0,320Z" fill="rgba(255,255,255,0.05)"></path></svg>
           <svg className="absolute bottom-0 left-0 w-full" viewBox="0 0 1440 200" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0,128L48,117.3C96,107,192,85,288,90.7C384,96,480,128,576,144C672,160,768,160,864,138.7C960,117,1056,75,1152,58.7C1248,43,1344,53,1392,58.7L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z" fill="rgba(255,255,255,0.1)"></path></svg>
         </div>
@@ -413,6 +552,7 @@ const Landing: React.FC = () => {
     </div>
   </div>
 </footer>
+
     </div>
   );
 };
