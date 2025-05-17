@@ -1,7 +1,7 @@
 
 import React, { createContext, useContext } from 'react';
 import { User } from '../types/user';
-import { useAuth } from '@/auth/AuthContext';
+import { useAuth } from '../context/AuthContext';
 
 // Tipo do contexto do usuário
 interface UserContextType {
@@ -16,7 +16,7 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 
 // Provider do contexto
 export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Agora estamos usando o nosso sistema de autenticação simplificado
+  // Agora estamos usando nosso contexto de autenticação simplificado
   const { currentUser, isLoading, isAuthenticated, logout } = useAuth();
   
   // Log para depuração

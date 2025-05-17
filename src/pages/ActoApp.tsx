@@ -6,7 +6,7 @@ import { useAppContext } from '../context/AppContext';
 import { useSidebar } from '@/context/hooks';
 import { Menu } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useAuth } from '@/auth/useAuth';
+import { useAuth } from '@/context/AuthContext';
 
 // ActoApp agora funciona como layout para rotas aninhadas
 const ActoApp: React.FC = () => {

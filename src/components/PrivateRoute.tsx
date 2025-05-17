@@ -1,11 +1,7 @@
 
-import { Outlet, Navigate } from 'react-router-dom';
-import { useAuth } from './AuthContext';
+import { Navigate, Outlet } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
-/**
- * Componente simplificado que protege rotas, permitindo acesso apenas a usuários autenticados
- * ou deixando passar qualquer requisição se estivermos em modo de desenvolvimento
- */
 export const PrivateRoute = () => {
   const { isAuthenticated } = useAuth();
   

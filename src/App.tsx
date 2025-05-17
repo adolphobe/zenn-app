@@ -13,8 +13,8 @@ import TaskHistory from "./pages/TaskHistory";
 import Landing from "./pages/Landing";
 import Dashboard from "./components/Dashboard";
 import Login from "./pages/Login";
-import { AuthProvider } from "./auth/AuthProvider";
-import { PrivateRoute } from "./auth/PrivateRoute";
+import { AuthProvider } from "./context/AuthContext";
+import { PrivateRoute } from "./components/PrivateRoute";
 import { UserProvider } from "./context/UserContext";
 
 const queryClient = new QueryClient();
