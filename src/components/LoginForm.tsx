@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Eye, EyeClosed, Mail, Lock } from 'lucide-react'; // Eye e EyeClosed também são text-gray-400, pode querer ajustá-los também
+import { Eye, EyeClosed, Mail, Lock } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
@@ -57,13 +57,13 @@ const LoginForm: React.FC = () => {
             <FormItem className="transition-all duration-300 ease-in-out hover:translate-x-1">
               <div className="relative">
                 <Mail 
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-700" // TENTANDO text-gray-700
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-700" // COR ALTERADA
                   size={18}
                 />
                 <FormControl>
                   <Input
                     placeholder="E-mail"
-                    className="pl-10 h-12 bg-white/80 backdrop-blur-sm border-gray-200 shadow-sm transition-all duration-300"
+                    className="pl-10 h-12 bg-white/80 backdrop-blur-sm border-gray-200 transition-all duration-300" // shadow-sm REMOVIDA
                     {...field}
                   />
                 </FormControl>
@@ -80,20 +80,20 @@ const LoginForm: React.FC = () => {
             <FormItem className="transition-all duration-300 ease-in-out hover:translate-x-1">
               <div className="relative">
                 <Lock
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-700" // TENTANDO text-gray-700
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-700" // COR ALTERADA
                   size={18}
                 />
                 <FormControl>
                   <Input
                     type={showPassword ? "text" : "password"}
                     placeholder="Senha"
-                    className="pl-10 pr-10 h-12 bg-white/80 backdrop-blur-sm border-gray-200 shadow-sm transition-all duration-300"
+                    className="pl-10 pr-10 h-12 bg-white/80 backdrop-blur-sm border-gray-200 transition-all duration-300" // shadow-sm REMOVIDA
                     {...field}
                   />
                 </FormControl>
                 <button
                   type="button"
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none" // PODE AJUSTAR AQUI TAMBÉM (ex: text-gray-500 para text-gray-600)
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-700 hover:text-gray-900 focus:outline-none" // COR ALTERADA
                   onClick={togglePasswordVisibility}
                 >
                   {showPassword ? (
@@ -119,7 +119,7 @@ const LoginForm: React.FC = () => {
 
         <Button 
           type="submit" 
-          className="w-full h-12 text-base transition-all duration-300 transform hover:scale-[1.02] bg-blue-600 hover:bg-blue-700 shadow-md hover:shadow-lg"
+          className="w-full h-12 text-base transition-all duration-300 transform hover:scale-[1.02] bg-blue-600 hover:bg-blue-700" // Removido shadow-md hover:shadow-lg se quiser flat total
           disabled={isSubmitting}
         >
           {isSubmitting ? "Entrando..." : "Entrar"}
