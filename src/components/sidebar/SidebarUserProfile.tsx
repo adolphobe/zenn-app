@@ -18,10 +18,13 @@ const SidebarUserProfile: React.FC<SidebarUserProfileProps> = ({ sidebarOpen }) 
 
   const handleLogout = async () => {
     try {
+      console.log("Iniciando processo de logout");
       await logout();
-      navigate('/login');
+      console.log("Logout bem-sucedido, navegando para /login");
+      // Forçar navegação para o login com replace para limpar a pilha de navegação
+      navigate('/login', { replace: true });
     } catch (error) {
-      console.error("Error logging out:", error);
+      console.error("Erro ao fazer logout:", error);
       toast({
         title: "Erro ao fazer logout",
         description: "Ocorreu um erro ao tentar desconectar",
@@ -34,7 +37,7 @@ const SidebarUserProfile: React.FC<SidebarUserProfileProps> = ({ sidebarOpen }) 
     <div className="mt-auto">
       <Separator className="mb-4" />
       <div className={`px-4 pb-4 ${sidebarOpen ? 'space-y-2' : 'flex flex-col items-center'}`}>
-        {/* User profile with online indicator */}
+        {/* Perfil do usuário com indicador online */}
         <div className={`flex ${sidebarOpen ? 'items-start gap-3' : 'justify-center'}`}>
           <div className="relative">
             <Avatar className={`${sidebarOpen ? 'h-12 w-12' : 'h-10 w-10'} border-2 border-white shadow-sm`}>
@@ -43,7 +46,7 @@ const SidebarUserProfile: React.FC<SidebarUserProfileProps> = ({ sidebarOpen }) 
                 <User size={sidebarOpen ? 24 : 18} />
               </AvatarFallback>
             </Avatar>
-            {/* Online status indicator */}
+            {/* Indicador de status online */}
             <div className="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full bg-green-500 border-2 border-white" />
           </div>
           
@@ -55,7 +58,7 @@ const SidebarUserProfile: React.FC<SidebarUserProfileProps> = ({ sidebarOpen }) 
           )}
         </div>
         
-        {/* Logout button */}
+        {/* Botão de logout */}
         <Button 
           variant="outline"
           size={sidebarOpen ? "default" : "icon"}

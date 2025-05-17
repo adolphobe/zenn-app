@@ -3,7 +3,7 @@ import React, { createContext, useContext } from 'react';
 import { User } from '../types/user';
 import { useAuth } from './AuthContext';
 
-// User context type
+// Tipo do contexto do usuário
 interface UserContextType {
   currentUser: User | null;
   isLoading: boolean;
@@ -11,21 +11,22 @@ interface UserContextType {
   logout: () => Promise<void>;  
 }
 
-// Create context
+// Criar contexto
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
-// Context provider
+// Provider do contexto
 export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Use authentication context directly instead of duplicating state
+  // Usar o contexto de autenticação diretamente ao invés de duplicar o estado
   const auth = useAuth();
   
-  console.log("UserProvider: Using auth state", { 
+  // Para debug
+  console.log("UserProvider: Estado de autenticação", { 
     isAuthenticated: auth.isAuthenticated, 
     isLoading: auth.isLoading,
     hasUser: !!auth.currentUser
   });
   
-  // Value provided by the context - directly passing through from AuthContext
+  // Valor fornecido pelo contexto - passando direto do AuthContext
   const value = {
     currentUser: auth.currentUser,
     isLoading: auth.isLoading,
@@ -36,11 +37,11 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 };
 
-// Custom hook to use the context
+// Hook personalizado para usar o contexto
 export const useUser = (): UserContextType => {
   const context = useContext(UserContext);
   if (context === undefined) {
-    throw new Error('useUser must be used within a UserProvider');
+    throw new Error('useUser deve ser usado dentro de um UserProvider');
   }
   return context;
 };

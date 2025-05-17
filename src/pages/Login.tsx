@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import LoginForm from '../components/LoginForm';
@@ -12,22 +11,27 @@ const Login: React.FC = () => {
   const [loaded, setLoaded] = useState(false);
   const [isSignup, setIsSignup] = useState(false);
   
-  // Get the path to redirect to after login
-  const from = location.state?.from?.pathname || "/dashboard";
+  // Obtém o caminho para redirecionar após o login
+  const from = location.state?.from || "/dashboard";
 
-  // Check if already logged in and redirect to dashboard
+  // Debug
   useEffect(() => {
-    // Only redirect when we're sure of the authentication state
+    console.log('Login render:', { isAuthenticated, isLoading, from });
+  }, [isAuthenticated, isLoading, from]);
+
+  // Verificar se já está logado e redirecionar para dashboard
+  useEffect(() => {
+    // Só redireciona quando temos certeza do estado de autenticação
     if (!isLoading) {
-      if (isAuthenticated) {
-        console.log('Already authenticated in Login page, redirecting to:', from);
+      if (isAuthenticated === true) {
+        console.log('Já autenticado na página Login, redirecionando para:', from);
         navigate(from, { replace: true });
       } else {
-        console.log('Not authenticated in Login page, staying here');
+        console.log('Não autenticado na página Login, permanecendo aqui');
       }
     }
     
-    // Set loaded state for animations
+    // Definir estado carregado para animações
     const timer = setTimeout(() => {
       setLoaded(true);
     }, 100);
@@ -35,12 +39,12 @@ const Login: React.FC = () => {
     return () => clearTimeout(timer);
   }, [navigate, isAuthenticated, isLoading, from]);
 
-  // Toggle between login and signup
+  // Alternar entre login e signup
   const toggleSignup = () => {
     setIsSignup(!isSignup);
   };
 
-  // If checking authentication, display a loader
+  // Se verificando autenticação, exibe um loader
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">
@@ -49,12 +53,12 @@ const Login: React.FC = () => {
     );
   }
 
-  // Never show login page if already authenticated
-  if (isAuthenticated) {
-    return null; // Will be redirected by useEffect
+  // Nunca mostrar página de login se já estiver autenticado
+  if (isAuthenticated === true) {
+    return null; // Será redirecionado pelo useEffect
   }
 
-  // Animated floating items for background with random positions and continuous animations
+  // Animated floating items for background with random positions
   const floatingItems = Array(7).fill(null).map((_, i) => (
     <div 
       key={i}
@@ -106,6 +110,7 @@ const Login: React.FC = () => {
       `}
       </style>
       
+      {/* Floating items for background with random positions */}
       {floatingItems}
       
       {/* Left column: Login/Signup Form */}
