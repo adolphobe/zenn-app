@@ -1,12 +1,13 @@
+
 import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { useAuth } from '@/context/auth';
-import TaskHistoryStats from '@/components/task-history/TaskHistoryStats';
-import TaskFilters from '@/components/task-history/TaskFilters';
-import ViewToggle from '@/components/task-history/ViewToggle';
-import TaskCards from '@/components/task-history/TaskCards';
-import TaskTable from '@/components/task-history/TaskTable';
+import { TaskHistoryStats } from '@/components/task-history/TaskHistoryStats';
+import { TaskFilters } from '@/components/task-history/TaskFilters';
+import { ViewToggle } from '@/components/task-history/ViewToggle';
+import { TaskCards } from '@/components/task-history/TaskCards';
+import { TaskTable } from '@/components/task-history/TaskTable';
 
 const TaskHistory: React.FC = () => {
   const { currentUser } = useAuth();

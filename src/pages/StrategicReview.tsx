@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+
+import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from '@/context/auth';
@@ -31,12 +32,17 @@ import { toast } from "@/hooks/use-toast"
 import { cn } from "@/lib/utils"
 import { Calendar } from "lucide-react"
 
+interface Task {
+  // Define the task interface structure here
+  id: string;
+  title: string;
+  // Add other fields as needed
+}
+
 const StrategicReview: React.FC = () => {
   const { currentUser } = useAuth();
   const {
-    taskSummary,
-    pillarsAnalysis,
-    feedbackAnalysis,
+    data: { taskSummary, pillarsAnalysis, feedbackAnalysis },
     isLoading,
     error
   } = useInsightsAnalysis();
@@ -60,13 +66,13 @@ const StrategicReview: React.FC = () => {
           <TabsTrigger value="feedback">Feedback Analysis</TabsTrigger>
         </TabsList>
         <TabsContent value="tasks" className="mt-5">
-          <TaskSummaryCard summary={taskSummary} />
+          <TaskSummaryCard tasks={taskSummary} />
         </TabsContent>
         <TabsContent value="pillars" className="mt-5">
-          <PillarsAnalysisCard analysis={pillarsAnalysis} />
+          <PillarsAnalysisCard data={pillarsAnalysis} />
         </TabsContent>
         <TabsContent value="feedback" className="mt-5">
-          <FeedbackAnalysisCard analysis={feedbackAnalysis} />
+          <FeedbackAnalysisCard tasks={feedbackAnalysis} />
         </TabsContent>
       </Tabs>
     </div>

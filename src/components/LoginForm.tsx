@@ -96,6 +96,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, redirectPath = "/dashb
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        {/* Log and notification area */}
         {console.log('[AUTH:FORM:LOGIN] Renderizando formulário de login')}
         
         {loginError && (

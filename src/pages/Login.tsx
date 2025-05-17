@@ -15,8 +15,11 @@ const Login: React.FC = () => {
   // Get redirect path from location state or default to dashboard
   const from = location.state?.from || "/dashboard";
 
-  // Debug log with console feedback
-  console.log(`[AUTH:LOGIN] Página de login renderizada: Auth=${isAuthenticated}, Loading=${isLoading}, From=${from}, State=${JSON.stringify(location.state)}`);
+  // Debug log
+  const renderDebugLog = () => {
+    console.log(`[AUTH:LOGIN] Página de login renderizada: Auth=${isAuthenticated}, Loading=${isLoading}, From=${from}, State=${JSON.stringify(location.state)}`);
+    return null;
+  };
 
   // Redirect after authentication
   useEffect(() => {
@@ -45,7 +48,7 @@ const Login: React.FC = () => {
 
   return (
     <div className="flex min-h-screen bg-gradient-to-b from-white to-blue-50 dark:from-gray-950 dark:to-gray-900 overflow-hidden relative">
-      {console.log('[AUTH:LOGIN] Renderizando página de login')}
+      {renderDebugLog()}
       <FloatingBackgroundElements />
       
       {/* Left column: Login/Signup Form */}
@@ -53,9 +56,6 @@ const Login: React.FC = () => {
 
       {/* Right column: Image */}
       <AuthImageSidebar />
-      
-      {/* Login Status Debug Info (Console Only) */}
-      {console.log(`[AUTH:LOGIN] Status atual: Logado=${isAuthenticated ? 'Sim' : 'Não'}, Carregando=${isLoading ? 'Sim' : 'Não'}, Redirecionamento para=${from}`)}
     </div>
   );
 };

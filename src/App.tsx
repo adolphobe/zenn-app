@@ -29,8 +29,12 @@ const queryClient = new QueryClient({
 });
 
 const App = () => {
-  console.log('[AUTH:APP] Inicializando aplicação');
-  
+  // Debug logging
+  const renderLog = () => {
+    console.log('[AUTH:APP] Inicializando aplicação');
+    return null;
+  };
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
@@ -40,7 +44,7 @@ const App = () => {
             <Sonner />
             <AuthProvider>
               <UserProvider>
-                {console.log('[AUTH:APP] Renderizando rotas da aplicação')}
+                {renderLog()}
                 <Routes>
                   {/* Public routes */}
                   <Route path="/" element={<Landing />} />

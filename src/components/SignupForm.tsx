@@ -83,6 +83,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ onCancel, redirectPath = "/dash
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        {/* Log and notification area */}
         {console.log('[AUTH:FORM:SIGNUP] Renderizando formulário de cadastro')}
         
         {signupError && (

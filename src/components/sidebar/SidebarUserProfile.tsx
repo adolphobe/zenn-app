@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
@@ -14,11 +15,12 @@ import { Settings, LogOut, ChevronDown, User, Moon, Sun } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface SidebarUserProfileProps {
-  toggleTheme: () => void;
-  isDarkMode: boolean;
+  sidebarOpen: boolean;
+  toggleTheme?: () => void;
+  isDarkMode?: boolean;
 }
 
-const SidebarUserProfile: React.FC<SidebarUserProfileProps> = ({ toggleTheme, isDarkMode }) => {
+const SidebarUserProfile: React.FC<SidebarUserProfileProps> = ({ sidebarOpen, toggleTheme, isDarkMode }) => {
   const { currentUser, logout } = useAuth();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
@@ -46,9 +48,9 @@ const SidebarUserProfile: React.FC<SidebarUserProfileProps> = ({ toggleTheme, is
                 <User size={14} className="text-gray-600 dark:text-gray-300" />
               </div>
             )}
-            <span>{currentUser.name}</span>
+            {sidebarOpen && <span className="truncate">{currentUser.name}</span>}
           </div>
-          <ChevronDown className="size-4 opacity-50 shrink-0" />
+          {sidebarOpen && <ChevronDown className="size-4 opacity-50 shrink-0" />}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[200px]">
@@ -59,19 +61,21 @@ const SidebarUserProfile: React.FC<SidebarUserProfileProps> = ({ toggleTheme, is
             <Settings className="mr-2 h-4 w-4" />
             <span>Configurações</span>
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={toggleTheme}>
-            {isDarkMode ? (
-              <>
-                <Sun className="mr-2 h-4 w-4" />
-                <span>Light</span>
-              </>
-            ) : (
-              <>
-                <Moon className="mr-2 h-4 w-4" />
-                <span>Dark</span>
-              </>
-            )}
-          </DropdownMenuItem>
+          {toggleTheme && (
+            <DropdownMenuItem onClick={toggleTheme}>
+              {isDarkMode ? (
+                <>
+                  <Sun className="mr-2 h-4 w-4" />
+                  <span>Light</span>
+                </>
+              ) : (
+                <>
+                  <Moon className="mr-2 h-4 w-4" />
+                  <span>Dark</span>
+                </>
+              )}
+            </DropdownMenuItem>
+          )}
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleLogout}>

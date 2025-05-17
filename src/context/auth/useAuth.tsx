@@ -24,9 +24,15 @@ export const useAuth = (): AuthContextType => {
     };
   }, [context.isAuthenticated, context.isLoading, context.currentUser]);
   
-  // Logging each time the hook is used
-  const callerComponent = new Error().stack?.split('\n')[2]?.trim() || 'Desconhecido';
-  console.log(`[AUTH:HOOK] useAuth chamado de ${callerComponent}: Auth=${context.isAuthenticated}, Loading=${context.isLoading}, User=${context.currentUser?.email || 'nenhum'}`);
+  // Logging each time the hook is used (using a function to avoid ReactNode issues)
+  const logHookUsage = () => {
+    const callerComponent = new Error().stack?.split('\n')[2]?.trim() || 'Desconhecido';
+    console.log(`[AUTH:HOOK] useAuth chamado de ${callerComponent}: Auth=${context.isAuthenticated}, Loading=${context.isLoading}, User=${context.currentUser?.email || 'nenhum'}`);
+    return null;
+  };
+  
+  // Call the logging function
+  logHookUsage();
   
   return context;
 };
