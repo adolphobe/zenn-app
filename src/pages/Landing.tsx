@@ -1,9 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, ArrowUpRight, CheckCircle2 } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, CheckCircle2, X } from 'lucide-react'; // Adicionado X de volta
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import LoginForm from '@/components/LoginForm';
+
+// PASSO 5.2: Tipo para o conteúdo do modal (ainda simples por enquanto)
+type ModalContentType = 'pilares' | 'clareza' | 'estrategia';
 
 const Landing: React.FC = () => {
   const navigate = useNavigate();
@@ -14,7 +17,17 @@ const Landing: React.FC = () => {
   
   const isLoggedIn = localStorage.getItem('acto_is_logged_in') === 'true';
 
-  const [showSimpleModal, setShowSimpleModal] = useState(false);
+  // PASSO 5.1: Renomear estado
+  const [isExplanationModalOpen, setIsExplanationModalOpen] = useState(false);
+  // PASSO 5.2: Estado para dados do modal (título e texto simples por enquanto)
+  const [currentModalData, setCurrentModalData] = useState<{ title: string; text: string } | null>(null);
+
+  // Dados de teste para o modal (conteúdo como string simples)
+  const modalTestData = {
+    pilares: { title: "🌟 Análise por Pilares", text: "Texto simples sobre Análise por Pilares..." },
+    clareza: { title: "🎯 Clareza nas Escolhas", text: "Texto simples sobre Clareza nas Escolhas..." },
+    estrategia: { title: "📊 Análise Estratégica", text: "Texto simples sobre Análise Estratégica..." }
+  };
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -38,46 +51,48 @@ const Landing: React.FC = () => {
     }
   }, [showLogin]);
 
-  const openSimpleModal = () => {
-    setShowSimpleModal(true);
+  // PASSO 5.1 & 5.3: Renomear e atualizar função de abrir
+  const openExplanationModal = useCallback((type: ModalContentType) => {
+    setCurrentModalData(modalTestData[type]); // Usar dados de teste
+    setIsExplanationModalOpen(true);
     document.body.style.overflow = 'hidden'; 
-  };
+  }, []); // modalTestData é estável, não precisa ser dependência se definido fora ou com useMemo
 
-  const closeSimpleModal = () => {
-    setShowSimpleModal(false);
+  // PASSO 5.1: Renomear função de fechar
+  const closeExplanationModal = useCallback(() => {
+    setIsExplanationModalOpen(false);
+    setCurrentModalData(null); // Limpar dados ao fechar
     document.body.style.overflow = 'auto'; 
-  };
+  }, []);
 
   useEffect(() => {
+    const handleEsc = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        closeExplanationModal();
+      }
+    };
+    if (isExplanationModalOpen) { // Adicionar listener apenas se modal estiver aberto
+        window.addEventListener('keydown', handleEsc);
+    }
     return () => {
-      if (document.body.style.overflow === 'hidden') {
+      window.removeEventListener('keydown', handleEsc);
+       // Garante que o scroll seja restaurado se o componente for desmontado com o modal aberto
+      if (document.body.style.overflow === 'hidden' && !isExplanationModalOpen) { 
         document.body.style.overflow = 'auto';
       }
     };
-  }, []); 
+  }, [isExplanationModalOpen, closeExplanationModal]); // Adicionar dependências
 
 
   useEffect(() => {
-    const observerOptions = {
-      root: null,
-      rootMargin: '0px',
-      threshold: 0.1
-    };
-    const observerCallback = (entries: IntersectionObserverEntry[]) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('animate-in');
-        }
-      });
-    };
+    const observerOptions = { /* ... */ };
+    const observerCallback = (entries: IntersectionObserverEntry[]) => { /* ... */ };
     const observer = new IntersectionObserver(observerCallback, observerOptions);
     const elements = document.querySelectorAll('.animate-on-scroll');
     elements.forEach(section => observer.observe(section));
     return () => {
       elements.forEach(section => {
-        if (section) { 
-          observer.unobserve(section);
-        }
+        if (section) observer.unobserve(section);
       });
     };
   }, []);
@@ -92,38 +107,12 @@ const Landing: React.FC = () => {
       <style>
         {`
           /* Seu CSS existente ... */
-          @keyframes floating { 0%, 100% { transform: translateY(0) translateX(0); opacity: 0.3; } 25% { transform: translateY(-15px) translateX(10px); opacity: 0.5; } 50% { transform: translateY(-25px) translateX(-10px); opacity: 0.4; } 75% { transform: translateY(-10px) translateX(-5px); opacity: 0.3; } }
-          .animate-floating { animation: floating 15s ease-in-out infinite; }
-          @keyframes floating-enhanced {  0% { transform: translateY(0) translateX(0) scale(1); opacity: 0.2; } 20% { transform: translateY(-25px) translateX(20px) scale(1.05); opacity: 0.4; } 40% { transform: translateY(-35px) translateX(-15px) scale(0.95); opacity: 0.5; } 60% { transform: translateY(-15px) translateX(-30px) scale(1.02); opacity: 0.4; } 80% { transform: translateY(-30px) translateX(10px) scale(0.98); opacity: 0.3; } 100% { transform: translateY(0) translateX(0) scale(1); opacity: 0.2; } }
-          .animate-floating-enhanced { animation: floating-enhanced 12s ease-in-out infinite; will-change: transform, opacity; }
-          @keyframes pulse-enhanced { 0%, 100% { transform: scale(1); opacity: 0.3; }  50% { transform: scale(1.1); opacity: 0.5; } }
-          .animate-pulse-enhanced { animation: pulse-enhanced 8s ease-in-out infinite;  will-change: transform, opacity; }
-          @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-          .fade-up { animation: fadeUp 1.2s ease-out forwards; }
-          .fade-up-delay-1 { animation-delay: 0.2s; }
-          .fade-up-delay-2 { animation-delay: 0.4s; }
-          .fade-up-delay-3 { animation-delay: 0.6s; }
-          @keyframes slideIn { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-          .slide-in { animation: slideIn 0.6s ease-out forwards; }
-          @keyframes slideOut { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-30px); } }
-          .slide-out { animation: slideOut 0.6s ease-out forwards; }
-          .animate-on-scroll { opacity: 0; transform: translateY(30px); transition: opacity 0.8s ease-out, transform 0.8s ease-out; }
-          .animate-in { opacity: 1; transform: translateY(0); }
-          @keyframes gradientFlow { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-          .gradient-flow-bg { background: linear-gradient(120deg, #e0f2fe, #bfdbfe, #dbeafe, #eff6ff); background-size: 300% 300%; animation: gradientFlow 15s ease infinite; }
-          .gradient-card-hover { position: relative; overflow: hidden; z-index: 1; transition: transform 0.3s ease; }
-          .gradient-card-hover::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(120deg, #dbeafe, #bfdbfe, #93c5fd); background-size: 300% 300%; animation: gradientFlow 8s ease infinite; z-index: -1; opacity: 0; transition: opacity 0.3s ease; border-radius: 0.5rem; }
-          .gradient-card-hover:hover { transform: translateY(-5px); }
-          .gradient-card-hover:hover::before { opacity: 0.07; }
-          .blob-animation { position: absolute; border-radius: 50%; background: linear-gradient(45deg, rgba(191, 219, 254, 0.4), rgba(96, 165, 250, 0.2)); filter: blur(40px); }
-          @keyframes float-around { 0% { transform: translate(0, 0) scale(1); } 33% { transform: translate(60px, -40px) scale(1.1); } 66% { transform: translate(-30px, 40px) scale(0.9); } 100% { transform: translate(0, 0) scale(1); } }
-          .testimonial-card { transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out, filter 0.5s ease-in-out; will-change: transform, opacity, filter; }
-          .testimonial-active { transform: scale(1); opacity: 1; filter: grayscale(0%); }
-          .testimonial-inactive { transform: scale(0.9); opacity: 0.6; filter: grayscale(50%); }
+          /* Adicionar animações de entrada/saída se desejar, como .modal-enter-active */
         `}
       </style>
       
-      {/* SEÇÃO HERO */}
+      {/* SEÇÃO HERO e outras seções ... */}
+      {/* COLE AQUI O CONTEÚDO DA SEÇÃO HERO ATÉ ANTES DA SEÇÃO FEATURES */}
       <section 
         className="relative h-screen overflow-hidden"
         style={{transform: 'translateZ(0)'}} 
@@ -233,8 +222,8 @@ const Landing: React.FC = () => {
                   <h3 className="text-2xl font-semibold mb-5 text-gray-800 dark:text-white">Análise por pilares</h3>
                   <p className="text-gray-600 dark:text-gray-300 text-lg flex-grow">Avalie cada tarefa pelos três pilares fundamentais: importância real, orgulho pós-execução e contribuição para seu crescimento pessoal.</p>
                   <div className="mt-8">
-                    <Button variant="ghost" className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/70 p-0 flex items-center gap-2 group" onClick={openSimpleModal}>
-                        Saiba mais (Teste Modal)
+                    <Button variant="ghost" className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/70 p-0 flex items-center gap-2 group" onClick={() => openExplanationModal('pilares')}>
+                        Saiba mais
                         <ArrowUpRight size={18} className="transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
                     </Button>
                   </div>
@@ -250,8 +239,9 @@ const Landing: React.FC = () => {
                   <h3 className="text-2xl font-semibold mb-5 text-gray-800 dark:text-white">Clareza nas escolhas</h3>
                   <p className="text-gray-600 dark:text-gray-300 text-lg flex-grow">Abandone o ruído das tarefas sem propósito. Foque apenas no que realmente vai te levar aonde você quer chegar.</p>
                   <div className="mt-8">
-                    <Button variant="ghost" className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/70 p-0 flex items-center gap-2 group" /*onClick={() => openExplanationModal('clareza')}*/>
-                        Saiba mais <ArrowUpRight size={18} className="transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
+                    <Button variant="ghost" className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/70 p-0 flex items-center gap-2 group" onClick={() => openExplanationModal('clareza')}>
+                        Saiba mais 
+                        <ArrowUpRight size={18} className="transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
                     </Button>
                   </div>
                 </CardContent>
@@ -266,8 +256,9 @@ const Landing: React.FC = () => {
                   <h3 className="text-2xl font-semibold mb-5 text-gray-800 dark:text-white">Análise estratégica</h3>
                   <p className="text-gray-600 dark:text-gray-300 text-lg flex-grow">Entenda padrões e tendências nas suas escolhas para refinar continuamente sua abordagem e melhorar sua execução.</p>
                   <div className="mt-8">
-                    <Button variant="ghost" className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/70 p-0 flex items-center gap-2 group" /*onClick={() => openExplanationModal('estrategia')}*/>
-                        Saiba mais <ArrowUpRight size={18} className="transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
+                    <Button variant="ghost" className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/70 p-0 flex items-center gap-2 group" onClick={() => openExplanationModal('estrategia')}>
+                        Saiba mais 
+                        <ArrowUpRight size={18} className="transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
                     </Button>
                   </div>
                 </CardContent>
@@ -279,7 +270,7 @@ const Landing: React.FC = () => {
       
       {/* ... RESTANTE DAS SEÇÕES (How It Works, Testimonials, CTA Final, Footer) ... */}
       {/* COLE O RESTANTE DO SEU CÓDIGO A PARTIR DAQUI */}
-      <section className="relative z-10 overflow-hidden bg-gradient-to-b from-white via-blue-100 to-white dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+       <section className="relative z-10 overflow-hidden bg-gradient-to-b from-white via-blue-100 to-white dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
           <div className="container mx-auto px-8 relative z-10">
             <div className="max-w-4xl mx-auto">
               <div className="text-center mb-24 animate-on-scroll">
@@ -375,21 +366,37 @@ const Landing: React.FC = () => {
       </footer>
 
 
-      {/* PASSO 4: JSX do Modal Simples ESTILIZADO com Tailwind */}
-      {showSimpleModal && (
+      {/* PASSO 5: Modal com Header e Footer, mas conteúdo de texto simples */}
+      {isExplanationModalOpen && currentModalData && (
         <div
-          className="fixed inset-0 bg-black/60 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center z-[9999] p-4" // Estilizado
-          onClick={closeSimpleModal} 
+          className="fixed inset-0 bg-black/60 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center z-[9999] p-4"
+          onClick={closeExplanationModal} 
         >
           <div
-            className="bg-white dark:bg-gray-800 rounded-xl w-full max-w-lg shadow-xl p-6 md:p-8" // Estilizado
+            className="bg-white dark:bg-gray-800 rounded-xl w-full max-w-2xl max-h-[85vh] shadow-2xl p-6 md:p-8 relative flex flex-col animate-in zoom-in-90 duration-300"
             onClick={(e) => e.stopPropagation()} 
           >
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Título do Modal Simples</h2>
-            <p className="text-gray-600 dark:text-gray-300 mb-6">Este é um conteúdo de teste para o modal.</p>
-            <Button onClick={closeSimpleModal} className="bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-500 dark:hover:bg-blue-600">
-              Fechar
-            </Button>
+            {/* Header do Modal */}
+            <div className="flex justify-between items-center mb-4 pb-4 border-b border-gray-200 dark:border-gray-700">
+              <h3 className="text-xl sm:text-2xl font-semibold text-gray-800 dark:text-gray-100">
+                {currentModalData.title}
+              </h3>
+              <Button variant="ghost" size="icon" onClick={closeExplanationModal} className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300">
+                <X size={20} />
+              </Button>
+            </div>
+
+            {/* Corpo do Modal (ainda com texto simples) */}
+            <div className="overflow-y-auto flex-grow pr-2 text-gray-600 dark:text-gray-300 leading-relaxed">
+              <p>{currentModalData.text}</p>
+            </div>
+
+            {/* Footer do Modal */}
+            <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700 text-right">
+              <Button onClick={closeExplanationModal} className="bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-500 dark:hover:bg-blue-600 px-6 py-2">
+                Entendido
+              </Button>
+            </div>
           </div>
         </div>
       )}
