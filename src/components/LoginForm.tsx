@@ -1,13 +1,14 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Eye, EyeClosed, Mail, Lock } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
-import { useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useUser } from '@/context/UserContext';
 
 const loginSchema = z.object({
   email: z.string().email("Digite um e-mail válido"),
@@ -18,9 +19,8 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 
 const LoginForm: React.FC = () => {
   const navigate = useNavigate();
-  const { addToast } = useToast();
+  const { login, isLoading } = useUser();
   const [showPassword, setShowPassword] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -31,18 +31,10 @@ const LoginForm: React.FC = () => {
   });
 
   const onSubmit = async (values: LoginFormValues) => {
-    setIsSubmitting(true);
-    
-    setTimeout(() => {
-      localStorage.setItem('acto_is_logged_in', 'true');
-      
-      addToast({
-        title: "Bem-vindo de volta!",
-        description: "Login realizado com sucesso",
-      });
+    const success = await login(values.email, values.password);
+    if (success) {
       navigate('/dashboard');
-      setIsSubmitting(false);
-    }, 1000);
+    }
   };
 
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
@@ -50,7 +42,6 @@ const LoginForm: React.FC = () => {
   // Vamos usar uma cor bem contrastante para garantir que, uma vez visível, ele seja notado.
   const iconColor = "text-gray-800 dark:text-gray-200"; 
   const eyeIconColor = "text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-100";
-
 
   return (
     <Form {...form}>
@@ -62,7 +53,7 @@ const LoginForm: React.FC = () => {
             <FormItem className="transition-all duration-300 ease-in-out hover:translate-x-1">
               <div className="relative flex items-center"> 
                 <Mail 
-                  className={`absolute left-3 top-1/2 -translate-y-1/2 ${iconColor} opacity-100 z-20`} // AUMENTADO Z-INDEX para z-20
+                  className={`absolute left-3 top-1/2 -translate-y-1/2 ${iconColor} opacity-100 z-20`}
                   size={18}
                 />
                 <FormControl>
@@ -85,7 +76,7 @@ const LoginForm: React.FC = () => {
             <FormItem className="transition-all duration-300 ease-in-out hover:translate-x-1">
               <div className="relative flex items-center"> 
                 <Lock
-                  className={`absolute left-3 top-1/2 -translate-y-1/2 ${iconColor} opacity-100 z-20`} // AUMENTADO Z-INDEX para z-20
+                  className={`absolute left-3 top-1/2 -translate-y-1/2 ${iconColor} opacity-100 z-20`}
                   size={18}
                 />
                 <FormControl>
@@ -98,11 +89,11 @@ const LoginForm: React.FC = () => {
                 </FormControl>
                 <button
                   type="button"
-                  className={`absolute right-3 top-1/2 -translate-y-1/2 ${eyeIconColor} opacity-100 focus:outline-none z-20`} // AUMENTADO Z-INDEX para z-20
+                  className={`absolute right-3 top-1/2 -translate-y-1/2 ${eyeIconColor} opacity-100 focus:outline-none z-20`}
                   onClick={togglePasswordVisibility}
                 >
                   {showPassword ? (
-                    <EyeClosed size={18} />
+                    <EyeOff size={18} />
                   ) : (
                     <Eye size={18} />
                   )}
@@ -125,9 +116,9 @@ const LoginForm: React.FC = () => {
         <Button 
           type="submit" 
           className="w-full h-12 text-base transition-all duration-300 transform hover:scale-[1.02] bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
-          disabled={isSubmitting}
+          disabled={isLoading}
         >
-          {isSubmitting ? "Entrando..." : "Entrar"}
+          {isLoading ? "Entrando..." : "Entrar"}
         </Button>
 
         <div className="text-center text-sm">

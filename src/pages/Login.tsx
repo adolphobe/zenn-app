@@ -2,14 +2,16 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import LoginForm from '../components/LoginForm';
+import { useUser } from '@/context/UserContext';
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
+  const { currentUser } = useUser();
   const [loaded, setLoaded] = useState(false);
 
   // Check if already logged in
   useEffect(() => {
-    if (localStorage.getItem('acto_is_logged_in') === 'true') {
+    if (currentUser) {
       navigate('/dashboard');
     }
     
@@ -19,11 +21,12 @@ const Login: React.FC = () => {
     }, 100);
     
     return () => clearTimeout(timer);
-  }, [navigate]);
+  }, [navigate, currentUser]);
 
   // Animated floating items for the background with random positions and continuous animations
   const floatingItems = Array(7).fill(null).map((_, i) => (
     <div 
+      key={i}
       className="absolute rounded-full animated-float"
       style={{
         backgroundColor: 'rgba(59, 130, 246, 0.2)',

@@ -13,6 +13,7 @@ import TaskHistory from "./pages/TaskHistory";
 import Login from "./pages/Login";
 import Landing from "./pages/Landing";
 import Dashboard from "./components/Dashboard";
+import { UserProvider } from "./context/UserContext";
 
 const queryClient = new QueryClient();
 
@@ -24,20 +25,22 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Landing />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/dashboard" element={<ActoApp />}>
-                <Route index element={<Dashboard />} />
-              </Route>
-              <Route path="/strategic-review" element={<ActoApp />}>
-                <Route index element={<StrategicReview />} />
-              </Route>
-              <Route path="/history" element={<ActoApp />}>
-                <Route index element={<TaskHistory />} />
-              </Route>
-              <Route path="*" element={<NotFound />} />
-            </Routes>
+            <UserProvider>
+              <Routes>
+                <Route path="/" element={<Landing />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/dashboard" element={<ActoApp />}>
+                  <Route index element={<Dashboard />} />
+                </Route>
+                <Route path="/strategic-review" element={<ActoApp />}>
+                  <Route index element={<StrategicReview />} />
+                </Route>
+                <Route path="/history" element={<ActoApp />}>
+                  <Route index element={<TaskHistory />} />
+                </Route>
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </UserProvider>
           </BrowserRouter>
         </ToastProvider>
       </AppProvider>
