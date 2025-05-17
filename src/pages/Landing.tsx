@@ -696,9 +696,10 @@ const Landing: React.FC = () => {
               <div className="flex flex-col lg:flex-row gap-6 justify-center items-center">
                 {/* Testimonial 1 */}
                 <div 
-                  className={`testimonial-card w-full lg:w-1/3 ${activeTestimonial === 0 ? 'testimonial-active' : 'testimonial-inactive'}`}
-                  onClick={() => setActiveTestimonial(0)}
-                >
+                    className={`testimonial-card w-full lg:w-1/3 ${activeTestimonial === 0 ? 'testimonial-active' : 'testimonial-inactive'}`}
+                    onClick={() => setActiveTestimonial(0)}
+                    onMouseEnter={() => setActiveTestimonial(0)}
+                  >
                   <Card className="bg-white border-none shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden rounded-2xl h-full">
                     <CardContent className="p-8">
                       <div className="mb-8">
@@ -726,10 +727,11 @@ const Landing: React.FC = () => {
                 </div>
                 
                 {/* Testimonial 2 */}
-                <div 
-                  className={`testimonial-card w-full lg:w-1/3 ${activeTestimonial === 1 ? 'testimonial-active' : 'testimonial-inactive'}`}
-                  onClick={() => setActiveTestimonial(1)}
-                >
+               <div 
+  className={`testimonial-card w-full lg:w-1/3 ${activeTestimonial === 1 ? 'testimonial-active' : 'testimonial-inactive'}`}
+  onClick={() => setActiveTestimonial(1)}
+  onMouseEnter={() => setActiveTestimonial(1)}
+>
                   <Card className="bg-white border-none shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden rounded-2xl h-full">
                     <CardContent className="p-8">
                       <div className="mb-8">
@@ -758,9 +760,10 @@ const Landing: React.FC = () => {
                 
                 {/* Testimonial 3 */}
                 <div 
-                  className={`testimonial-card w-full lg:w-1/3 ${activeTestimonial === 2 ? 'testimonial-active' : 'testimonial-inactive'}`}
-                  onClick={() => setActiveTestimonial(2)}
-                >
+  className={`testimonial-card w-full lg:w-1/3 ${activeTestimonial === 2 ? 'testimonial-active' : 'testimonial-inactive'}`}
+  onClick={() => setActiveTestimonial(2)}
+  onMouseEnter={() => setActiveTestimonial(2)}
+>
                   <Card className="bg-white border-none shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden rounded-2xl h-full">
                     <CardContent className="p-8">
                       <div className="mb-8">
