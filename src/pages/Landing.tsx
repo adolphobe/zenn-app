@@ -355,10 +355,11 @@ const Landing: React.FC = () => {
               />
             </div>
             
-            {/* Main headline without the circle effects */}
+             {/* Main headline without the circle effects */}
             <div className="relative">
               <h1 className={`text-4xl md:text-5xl lg:text-6xl font-semibold leading-tight md:leading-tight lg:leading-tight text-gray-900 mb-8 opacity-0 ${loaded ? 'fade-up' : ''}`}>
-               
+                Você não precisa de mais tarefas.<br />
+                Precisa de intenção.
               </h1>
             </div>
             
