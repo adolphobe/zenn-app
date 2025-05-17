@@ -1,4 +1,3 @@
-
 import { User } from '../types/user';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -76,6 +75,19 @@ export const updateUserPreferences = (userId: string, preferences: Partial<User[
   };
   
   return users[userIndex];
+};
+
+// Apply user preferences to the app
+export const applyUserPreferences = (preferences: User['preferences']): void => {
+  // Handle dark mode
+  if (preferences.darkMode) {
+    document.documentElement.classList.add('dark');
+  } else {
+    document.documentElement.classList.remove('dark');
+  }
+  
+  // Other preferences will be applied through the AppContext
+  // This is a placeholder for future implementation
 };
 
 // Save user preferences to localStorage for persistence between sessions

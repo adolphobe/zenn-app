@@ -1,6 +1,5 @@
 
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock, AlertCircle } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -8,7 +7,7 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from "@/component
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useUser } from '@/context/UserContext';
+import { useAuth } from '@/auth/useAuth';
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const loginSchema = z.object({
@@ -18,9 +17,12 @@ const loginSchema = z.object({
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 
-const LoginForm: React.FC = () => {
-  const navigate = useNavigate();
-  const { login, isLoading } = useUser();
+interface LoginFormProps {
+  onSuccess?: () => void;
+}
+
+const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
+  const { login, isLoading } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
 
@@ -35,8 +37,11 @@ const LoginForm: React.FC = () => {
   const onSubmit = async (values: LoginFormValues) => {
     setLoginError(null); // Clear previous errors
     const success = await login(values.email, values.password);
+    
     if (success) {
-      navigate('/dashboard');
+      if (onSuccess) {
+        onSuccess();
+      }
     } else {
       setLoginError("E-mail ou senha incorretos. Por favor, tente novamente.");
     }

@@ -7,7 +7,7 @@ import { useAppContext } from '../context/AppContext';
 import { useSidebar } from '@/context/hooks';
 import { Menu } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useUser } from '@/context/UserContext';
+import { useAuth } from '@/auth/useAuth';
 
 const ActoApp: React.FC = () => {
   const { state, toggleSidebar } = useAppContext();
@@ -15,32 +15,25 @@ const ActoApp: React.FC = () => {
   const { isOpen: sidebarOpen, open: openSidebar, isMobile } = useSidebar();
   const location = useLocation();
   const navigate = useNavigate();
-  const { currentUser, isLoading } = useUser(); // Get current user from context
+  const { currentUser, isAuthenticated, isLoading } = useAuth();
   const isDashboardRoute = location.pathname === '/dashboard';
 
   // Authentication check and redirect logic
   useEffect(() => {
     console.log("ActoApp: Checking authentication state...");
     console.log("ActoApp: isLoading:", isLoading);
-    console.log("ActoApp: currentUser:", currentUser ? 'exists' : 'null');
+    console.log("ActoApp: isAuthenticated:", isAuthenticated);
     console.log("ActoApp: current path:", location.pathname);
     
     // Only check after we know if user is logged in or not
     if (!isLoading) {
-      if (!currentUser && 
-          location.pathname !== '/' && 
-          location.pathname !== '/login') {
+      if (!isAuthenticated) {
         // User is not authenticated and trying to access protected route
-        console.log("ActoApp: User not authenticated, redirecting to login");
-        navigate('/login');
-      } else if (currentUser && 
-                (location.pathname === '/login' || location.pathname === '/')) {
-        // User is authenticated and trying to access public route
-        console.log("ActoApp: User already authenticated, redirecting to dashboard");
-        navigate('/dashboard');
+        console.log("ActoApp: User not authenticated, redirecting to home");
+        navigate('/');
       }
     }
-  }, [currentUser, isLoading, navigate, location.pathname]);
+  }, [isAuthenticated, isLoading, navigate, location.pathname]);
 
   // Close sidebar on route change if on mobile
   useEffect(() => {
@@ -57,8 +50,8 @@ const ActoApp: React.FC = () => {
     </div>;
   }
 
-  // If user is not authenticated and not on public route, redirect is handled in useEffect
-  if (!currentUser && location.pathname !== '/' && location.pathname !== '/login') {
+  // If user is not authenticated, redirect is handled in useEffect
+  if (!isAuthenticated) {
     console.log("ActoApp: No user but rendering anyway (redirect will happen in useEffect)");
     return null;
   }
@@ -73,12 +66,12 @@ const ActoApp: React.FC = () => {
       {/* Mobile Menu Toggle Button - Visible only when sidebar is closed on mobile */}
       {isMobile && !sidebarOpen && (
         <button 
-        onClick={openSidebar}
-        className="fixed bottom-4 right-4 z-40 p-2 rounded-md bg-gray-500/50 text-white shadow-md hover:bg-gray-600/70 transition-colors"
-        aria-label="Open menu"
-      >
-        <Menu size={24} />
-      </button>
+          onClick={openSidebar}
+          className="fixed bottom-4 right-4 z-40 p-2 rounded-md bg-gray-500/50 text-white shadow-md hover:bg-gray-600/70 transition-colors"
+          aria-label="Open menu"
+        >
+          <Menu size={24} />
+        </button>
       )}
       
       <main 

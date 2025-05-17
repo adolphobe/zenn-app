@@ -10,10 +10,9 @@ import ActoApp from "./pages/ActoApp";
 import NotFound from "./pages/NotFound";
 import StrategicReview from "./pages/StrategicReview";
 import TaskHistory from "./pages/TaskHistory";
-import Login from "./pages/Login";
 import Landing from "./pages/Landing";
 import Dashboard from "./components/Dashboard";
-import { UserProvider } from "./context/UserContext";
+import { AuthProvider } from "./auth/AuthProvider";
 
 const queryClient = new QueryClient();
 
@@ -25,10 +24,9 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
-            <UserProvider>
+            <AuthProvider>
               <Routes>
                 <Route path="/" element={<Landing />} />
-                <Route path="/login" element={<Login />} />
                 <Route path="/dashboard" element={<ActoApp />}>
                   <Route index element={<Dashboard />} />
                 </Route>
@@ -40,7 +38,7 @@ const App = () => (
                 </Route>
                 <Route path="*" element={<NotFound />} />
               </Routes>
-            </UserProvider>
+            </AuthProvider>
           </BrowserRouter>
         </ToastProvider>
       </AppProvider>
