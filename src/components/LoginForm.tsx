@@ -57,13 +57,13 @@ const LoginForm: React.FC = () => {
             <FormItem className="transition-all duration-300 ease-in-out hover:translate-x-1">
               <div className="relative">
                 <Mail 
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-700" // COR ALTERADA
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400" // COR ALTERADA
                   size={18}
                 />
                 <FormControl>
                   <Input
                     placeholder="E-mail"
-                    className="pl-10 h-12 bg-white/80 backdrop-blur-sm border-gray-200 transition-all duration-300" // shadow-sm REMOVIDA
+                    className="pl-10 h-12 bg-white/80 dark:bg-gray-700/80 backdrop-blur-sm border-gray-200 dark:border-gray-600 transition-all duration-300" 
                     {...field}
                   />
                 </FormControl>
@@ -80,20 +80,20 @@ const LoginForm: React.FC = () => {
             <FormItem className="transition-all duration-300 ease-in-out hover:translate-x-1">
               <div className="relative">
                 <Lock
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-700" // COR ALTERADA
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400" // COR ALTERADA
                   size={18}
                 />
                 <FormControl>
                   <Input
                     type={showPassword ? "text" : "password"}
                     placeholder="Senha"
-                    className="pl-10 pr-10 h-12 bg-white/80 backdrop-blur-sm border-gray-200 transition-all duration-300" // shadow-sm REMOVIDA
+                    className="pl-10 pr-10 h-12 bg-white/80 dark:bg-gray-700/80 backdrop-blur-sm border-gray-200 dark:border-gray-600 transition-all duration-300"
                     {...field}
                   />
                 </FormControl>
                 <button
                   type="button"
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-700 hover:text-gray-900 focus:outline-none" // COR ALTERADA
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300 focus:outline-none" // COR ALTERADA
                   onClick={togglePasswordVisibility}
                 >
                   {showPassword ? (
@@ -111,7 +111,7 @@ const LoginForm: React.FC = () => {
         <div className="flex justify-end">
           <button 
             type="button"
-            className="text-sm text-blue-600 hover:underline hover:text-blue-500 focus:outline-none transition-colors duration-300"
+            className="text-sm text-blue-600 hover:underline hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300 focus:outline-none transition-colors duration-300"
           >
             Esqueceu a senha?
           </button>
@@ -119,15 +119,15 @@ const LoginForm: React.FC = () => {
 
         <Button 
           type="submit" 
-          className="w-full h-12 text-base transition-all duration-300 transform hover:scale-[1.02] bg-blue-600 hover:bg-blue-700" // Removido shadow-md hover:shadow-lg se quiser flat total
+          className="w-full h-12 text-base transition-all duration-300 transform hover:scale-[1.02] bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
           disabled={isSubmitting}
         >
           {isSubmitting ? "Entrando..." : "Entrar"}
         </Button>
 
         <div className="text-center text-sm">
-          <span className="text-muted-foreground">Não tem uma conta? </span>
-          <a href="#" className="text-blue-600 hover:underline hover:text-blue-700 transition-colors duration-300">
+          <span className="text-muted-foreground dark:text-gray-400">Não tem uma conta? </span>
+          <a href="#" className="text-blue-600 hover:underline hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors duration-300">
             Criar conta
           </a>
         </div>
