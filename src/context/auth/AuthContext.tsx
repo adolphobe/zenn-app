@@ -54,7 +54,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                   setCurrentUser(mappedUser);
                 }
               })
-              .catch((error: Error) => {
+              .catch((error) => {
                 console.error(`[AUTH] Erro ao buscar perfil: ${error.message}`);
                 if (mounted) {
                   const mappedUser = mapSupabaseUser(newSession.user);
@@ -92,7 +92,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               setCurrentUser(mappedUser);
             }
           })
-          .catch((error: Error) => {
+          .catch((error) => {
             console.error(`[AUTH] Erro ao buscar perfil inicial: ${error.message}`);
             if (mounted) {
               const mappedUser = mapSupabaseUser(existingSession.user);
@@ -112,7 +112,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setAuthInitialized(true);
         console.log('[AUTH] Sem sessão inicial, autenticação inicializada');
       }
-    }).catch((error: Error) => {
+    }).catch((error) => {
       console.error(`[AUTH] Erro ao verificar sessão: ${error.message}`);
       if (mounted) {
         setIsLoading(false);

@@ -1,77 +1,85 @@
-
-import React from 'react';
-import { LogOut, User } from 'lucide-react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { useAuth } from '@/context/auth';
+import { Settings, LogOut, ChevronDown, User, Moon, Sun } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/context/AuthContext';
-import { toast } from '@/hooks/use-toast';
 
 interface SidebarUserProfileProps {
-  sidebarOpen: boolean;
+  toggleTheme: () => void;
+  isDarkMode: boolean;
 }
 
-const SidebarUserProfile: React.FC<SidebarUserProfileProps> = ({ sidebarOpen }) => {
+const SidebarUserProfile: React.FC<SidebarUserProfileProps> = ({ toggleTheme, isDarkMode }) => {
   const { currentUser, logout } = useAuth();
   const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
 
   const handleLogout = async () => {
-    try {
-      console.log("Iniciando processo de logout");
-      // Process logout
-      await logout();
-      
-      // Navigate to login after logout is complete
-      console.log("Logout concluído, navegando para login");
-      navigate('/login', { replace: true });
-    } catch (error) {
-      console.error("Erro ao fazer logout:", error);
-      toast({
-        title: "Erro ao fazer logout",
-        description: "Ocorreu um erro ao tentar desconectar",
-        variant: "destructive"
-      });
-    }
+    await logout();
+    navigate('/login');
   };
 
+  if (!currentUser) return null;
+
   return (
-    <div className="mt-auto">
-      <Separator className="mb-4" />
-      <div className={`px-4 pb-4 ${sidebarOpen ? 'space-y-2' : 'flex flex-col items-center'}`}>
-        {/* Perfil do usuário com indicador online */}
-        <div className={`flex ${sidebarOpen ? 'items-start gap-3' : 'justify-center'}`}>
-          <div className="relative">
-            <Avatar className={`${sidebarOpen ? 'h-12 w-12' : 'h-10 w-10'} border-2 border-white shadow-sm`}>
-              <AvatarImage src={currentUser?.profileImage} />
-              <AvatarFallback className="bg-blue-100 text-blue-800">
-                <User size={sidebarOpen ? 24 : 18} />
-              </AvatarFallback>
-            </Avatar>
-            {/* Indicador de status online */}
-            <div className="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full bg-green-500 border-2 border-white" />
+    <DropdownMenu open={open} onOpenChange={setOpen}>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" className="gap-2 w-full px-2 border-0 justify-between font-normal data-[state=open]:bg-secondary data-[state=open]:text-muted-foreground">
+          <div className="flex items-center gap-2">
+            {currentUser.profileImage ? (
+              <img
+                src={currentUser.profileImage}
+                alt="Avatar"
+                className="w-7 h-7 rounded-full"
+              />
+            ) : (
+              <div className="w-7 h-7 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                <User size={14} className="text-gray-600 dark:text-gray-300" />
+              </div>
+            )}
+            <span>{currentUser.name}</span>
           </div>
-          
-          {sidebarOpen && (
-            <div className="flex flex-col min-w-0">
-              <span className="font-medium text-gray-800 dark:text-gray-200 truncate">{currentUser?.name || 'Convidado'}</span>
-              <span className="text-xs text-gray-500 dark:text-gray-400 truncate">{currentUser?.email || 'Faça login'}</span>
-            </div>
-          )}
-        </div>
-        
-        {/* Botão de logout */}
-        <Button 
-          variant="outline"
-          size={sidebarOpen ? "default" : "icon"}
-          className={`mt-2 w-full border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 dark:border-red-900 dark:text-red-400 dark:hover:bg-red-950/20 dark:hover:text-red-300`}
-          onClick={handleLogout}
-        >
-          <LogOut size={18} />
-          {sidebarOpen && <span className="ml-2">Sair</span>}
+          <ChevronDown className="size-4 opacity-50 shrink-0" />
         </Button>
-      </div>
-    </div>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-[200px]">
+        <DropdownMenuLabel>Minha conta</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuGroup>
+          <DropdownMenuItem onClick={() => navigate('/profile')}>
+            <Settings className="mr-2 h-4 w-4" />
+            <span>Configurações</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={toggleTheme}>
+            {isDarkMode ? (
+              <>
+                <Sun className="mr-2 h-4 w-4" />
+                <span>Light</span>
+              </>
+            ) : (
+              <>
+                <Moon className="mr-2 h-4 w-4" />
+                <span>Dark</span>
+              </>
+            )}
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={handleLogout}>
+          <LogOut className="mr-2 h-4 w-4" />
+          <span>Sair</span>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };
 
