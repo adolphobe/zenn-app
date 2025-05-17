@@ -7,12 +7,69 @@ import LoginForm from '@/components/LoginForm';
 
 type ModalContentType = 'pilares' | 'clareza' | 'estrategia';
 
-// PASSO 5 CORREÇÃO: Mover modalTestData para fora do componente
-const modalTestData = {
-  pilares: { title: "🌟 Análise por Pilares", text: "Texto simples sobre Análise por Pilares..." },
-  clareza: { title: "🎯 Clareza nas Escolhas", text: "Texto simples sobre Clareza nas Escolhas..." },
-  estrategia: { title: "📊 Análise Estratégica", text: "Texto simples sobre Análise Estratégica..." }
-};
+// PASSO 6.1: Conteúdo final do modal com JSX
+const finalModalDataContent = {
+    pilares: {
+      title: "🌟 Análise por Pilares",
+      content: (
+        <div className="space-y-4 text-gray-700 dark:text-gray-300 leading-relaxed">
+          <p className="font-semibold">No Zenn, você não adiciona uma tarefa apenas com um título e uma data. Você adiciona consciência.</p>
+          <p>Cada tarefa é avaliada com base em três pilares:</p>
+          <div className="pl-4 space-y-3">
+            <div>
+              <h4 className="font-semibold text-blue-600 dark:text-blue-400">Importância real (Risco de não fazer)</h4>
+              <p className="italic text-sm">“Se eu ignorar isso, vai ter consequência?”</p>
+              <p>É o que te faz priorizar o que realmente não pode ser adiado.</p>
+            </div>
+            <div>
+              <h4 className="font-semibold text-blue-600 dark:text-blue-400">Orgulho pós-execução</h4>
+              <p className="italic text-sm">“Quando eu terminar, vou me sentir mais alinhado com quem quero ser?”</p>
+              <p>É o pilar que mede sua conexão com o que você faz. Não é só cumprir — é se respeitar por ter feito.</p>
+            </div>
+            <div>
+              <h4 className="font-semibold text-blue-600 dark:text-blue-400">Crescimento pessoal</h4>
+              <p className="italic text-sm">“Fazer isso me torna alguém melhor?”</p>
+              <p>É o que separa tarefas operacionais de tarefas que constroem a sua evolução real.</p>
+            </div>
+          </div>
+          <p className="font-semibold pt-2">Esses três pilares não são para julgar produtividade. Eles te ajudam a escolher com consciência o que realmente merece seu tempo.</p>
+        </div>
+      )
+    },
+    clareza: {
+      title: "🎯 Clareza nas Escolhas",
+      content: (
+        <div className="space-y-4 text-gray-700 dark:text-gray-300 leading-relaxed">
+          <p className="font-semibold">Todo mundo tem uma lista de tarefas. O Zenn não é mais uma. Ele é o primeiro sistema que organiza a intenção por trás de cada escolha.</p>
+          <p>Não basta fazer. Você precisa sentir que valeu a pena.</p>
+          <p>É por isso que, no momento em que você cria uma tarefa no Zenn, você é convidado a refletir:</p>
+          <ul className="list-disc list-inside space-y-1 text-blue-600 dark:text-blue-400 font-medium pl-2">
+            <li>Isso é importante mesmo?</li>
+            <li>Isso vai me deixar orgulhoso?</li>
+            <li>Isso me faz crescer?</li>
+          </ul>
+          <p>Você começa a abandonar o excesso, a rasura, o “checklist automático”. No lugar disso, você executa com peso emocional e propósito estratégico.</p>
+          <p className="font-semibold pt-2">Resultado? Menos culpa. Mais direção.</p>
+        </div>
+      )
+    },
+    estrategia: {
+      title: "📊 Análise Estratégica",
+      content: (
+        <div className="space-y-4 text-gray-700 dark:text-gray-300 leading-relaxed">
+          <p className="font-semibold">Você não precisa esperar uma crise para perceber que está vivendo no automático. O Zenn analisa, em tempo real, o que suas tarefas estão dizendo sobre você.</p>
+          <p>A cada tarefa concluída, o sistema registra e organiza:</p>
+          <ul className="list-disc list-inside space-y-1 text-blue-600 dark:text-blue-400 font-medium pl-2">
+            <li>Qual pilar você mais fortaleceu?</li>
+            <li>Quais tarefas te transformaram de verdade?</li>
+            <li>O que você concluiu por obrigação?</li>
+          </ul>
+          <p>Esses dados geram um relatório estratégico semanal com frases claras e insights práticos. Você começa a enxergar padrões de comportamento — e pode ajustar seu foco antes de cair em ciclos improdutivos.</p>
+          <p className="font-semibold pt-2">Não é só um app de tarefas. É um sistema de leitura da sua própria execução.</p>
+        </div>
+      )
+    }
+  };
 
 const Landing: React.FC = () => {
   const navigate = useNavigate();
@@ -24,7 +81,9 @@ const Landing: React.FC = () => {
   const isLoggedIn = localStorage.getItem('acto_is_logged_in') === 'true';
 
   const [isExplanationModalOpen, setIsExplanationModalOpen] = useState(false);
-  const [currentModalData, setCurrentModalData] = useState<{ title: string; text: string } | null>(null);
+  // PASSO 6.1: Atualizar tipo para aceitar JSX no content
+  const [currentModalData, setCurrentModalData] = useState<{ title: string; content: JSX.Element } | null>(null);
+
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -48,11 +107,12 @@ const Landing: React.FC = () => {
     }
   }, [showLogin]);
 
+  // PASSO 6.2: Atualizar para usar finalModalDataContent
   const openExplanationModal = useCallback((type: ModalContentType) => {
-    setCurrentModalData(modalTestData[type]); 
+    setCurrentModalData(finalModalDataContent[type]); 
     setIsExplanationModalOpen(true);
     document.body.style.overflow = 'hidden'; 
-  }, []); // modalTestData agora é estável (definido fora), então não precisa ser dependência
+  }, []); 
 
   const closeExplanationModal = useCallback(() => {
     setIsExplanationModalOpen(false);
@@ -133,10 +193,16 @@ const Landing: React.FC = () => {
           .testimonial-card { transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out, filter 0.5s ease-in-out; will-change: transform, opacity, filter; }
           .testimonial-active { transform: scale(1); opacity: 1; filter: grayscale(0%); }
           .testimonial-inactive { transform: scale(0.9); opacity: 0.6; filter: grayscale(50%); }
+
+          .modal-content-area::-webkit-scrollbar { width: 8px; }
+          .modal-content-area::-webkit-scrollbar-track { background: transparent; }
+          .modal-content-area::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+          .modal-content-area::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+          .dark .modal-content-area::-webkit-scrollbar-thumb { background: #4b5563; }
+          .dark .modal-content-area::-webkit-scrollbar-thumb:hover { background: #6b7280; }
         `}
       </style>
       
-      {/* SEÇÃO HERO */}
       <section 
         className="relative h-screen overflow-hidden"
         style={{transform: 'translateZ(0)'}} 
@@ -221,7 +287,6 @@ const Landing: React.FC = () => {
         </div>
       </section>
 
-      {/* SEÇÃO FEATURES */}
       <section className="py-32 relative z-10 overflow-hidden bg-gradient-to-b from-white via-blue-100 to-white dark:from-gray-900 dark:via-gray-800 dark:to-gray-900" style={{backfaceVisibility: 'hidden', transform: 'translateZ(0)'}}>
         <div className="blob-animation w-64 h-64 top-20 left-10" style={{ animation: 'float-around 25s infinite ease-in-out' }}></div>
         <div className="blob-animation w-96 h-96 bottom-40 right-20" style={{ animation: 'float-around 30s infinite ease-in-out reverse' }}></div>
@@ -292,8 +357,6 @@ const Landing: React.FC = () => {
         </div>
       </section>
       
-      {/* ... RESTANTE DAS SEÇÕES (How It Works, Testimonials, CTA Final, Footer) ... */}
-      {/* COLE O RESTANTE DO SEU CÓDIGO A PARTIR DAQUI */}
       <section className="relative z-10 overflow-hidden bg-gradient-to-b from-white via-blue-100 to-white dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
           <div className="container mx-auto px-8 relative z-10">
             <div className="max-w-4xl mx-auto">
@@ -336,7 +399,7 @@ const Landing: React.FC = () => {
             <div className="mt-32 animate-on-scroll">
               <div className="relative mx-auto max-w-4xl">
                 <div className="absolute -top-8 -left-8 w-64 h-64 bg-blue-100 dark:bg-blue-900/50 rounded-full opacity-70 blur-3xl"></div><div className="absolute -bottom-8 -right-8 w-64 h-64 bg-blue-200 dark:bg-blue-800/50 rounded-full opacity-70 blur-3xl"></div>
-                <div className="relative overflow-hidden rounded-2xl border border-white/30 dark:border-gray-700/30"><img src="https://cdn.shopify.com/s/files/1/0629/1993/4061/files/Sem_Titulo-14.webp?v=1747464403" alt="Dashboard" className="w-full h-auto"/><div className="absolute inset-0 bg-gradient-to-tr from-blue-600/20 via-blue-400/10 to-transparent dark:from-blue-900/20 dark:via-blue-700/10"></div></div>
+                <div className="relative overflow-hidden rounded-2xl border border-white/30 dark:border-gray-700/30"><img src="https://img.freepik.com/free-photo/fashionable-hipster-unshaven-student-has-trendy-hairstyle-sits-work-place_273609-8179.jpg?t=st=1747460548~exp=1747464148~hmac=e1d20e4b72003a09fd56b8d9e7141ec0d2fd9933a0b07f5a13d09658ff85c0fa&w=900" alt="Dashboard" className="w-full h-auto"/><div className="absolute inset-0 bg-gradient-to-tr from-blue-600/20 via-blue-400/10 to-transparent dark:from-blue-900/20 dark:via-blue-700/10"></div></div>
                 <div className="absolute top-10 right-10 max-w-xs bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm p-4 rounded-lg border border-blue-100 dark:border-gray-700"><h4 className="font-medium text-blue-700 dark:text-blue-300 mb-1">Visão por Pilares</h4><p className="text-sm text-gray-600 dark:text-gray-400">Visualize rapidamente suas tarefas organizadas de acordo com os três pilares fundamentais.</p></div>
                 <div className="absolute bottom-10 left-10 max-w-xs bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm p-4 rounded-lg border border-blue-100 dark:border-gray-700"><h4 className="font-medium text-blue-700 dark:text-blue-300 mb-1">Score Intuitivo</h4><p className="text-sm text-gray-600 dark:text-gray-400">Identifique facilmente quais tarefas merecem sua atenção prioritária através dos scores visuais.</p></div>
               </div>
@@ -390,32 +453,30 @@ const Landing: React.FC = () => {
       </footer>
 
 
-      {/* PASSO 5: Modal com Header e Footer, e título dinâmico */}
+      {/* MODAL DE EXPLICAÇÃO */}
       {isExplanationModalOpen && currentModalData && (
         <div
-          className="fixed inset-0 bg-black/60 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center z-[9999] p-4"
+          className="fixed inset-0 bg-black/60 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center z-[9999] p-4" // Adicionada classe para animação de entrada que você pode definir no CSS
           onClick={closeExplanationModal} 
         >
           <div
-            className="bg-white dark:bg-gray-800 rounded-xl w-full max-w-2xl max-h-[85vh] shadow-2xl p-6 md:p-8 relative flex flex-col animate-in zoom-in-90 duration-300"
+            className="bg-white dark:bg-gray-800 rounded-xl w-full max-w-2xl max-h-[85vh] shadow-2xl p-6 md:p-8 relative flex flex-col" // Removido animate-in, pode ser controlado por classes CSS de transição
             onClick={(e) => e.stopPropagation()} 
           >
-            {/* Header do Modal */}
             <div className="flex justify-between items-center mb-4 pb-4 border-b border-gray-200 dark:border-gray-700">
               <h3 className="text-xl sm:text-2xl font-semibold text-gray-800 dark:text-gray-100">
-                {currentModalData.title} {/* Título Dinâmico */}
+                {currentModalData.title}
               </h3>
               <Button variant="ghost" size="icon" onClick={closeExplanationModal} className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300">
                 <X size={20} />
               </Button>
             </div>
 
-            {/* Corpo do Modal (ainda com texto simples) */}
-            <div className="overflow-y-auto flex-grow pr-2 text-gray-600 dark:text-gray-300 leading-relaxed modal-content-area">
-              <p>{currentModalData.text}</p> {/* Conteúdo de texto simples */}
+            {/* PASSO 6.3: Renderizar o conteúdo JSX */}
+            <div className="overflow-y-auto flex-grow pr-2 modal-content-area">
+              {currentModalData.content} 
             </div>
 
-            {/* Footer do Modal */}
             <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700 text-right">
               <Button onClick={closeExplanationModal} className="bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-500 dark:hover:bg-blue-600 px-6 py-2">
                 Entendido
