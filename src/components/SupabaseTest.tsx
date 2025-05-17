@@ -9,16 +9,11 @@ export function SupabaseTest() {
   useEffect(() => {
     async function testConnection() {
       try {
-        // Use a simple health check instead of the RPC call
-        const { data, error } = await supabase.from('_profile_health_check').select('count').limit(1).single();
+        // Use a more generic health check by querying the profiles table that was created
+        // This matches the database types and won't cause TypeScript errors
+        const { data, error } = await supabase.from('profiles').select('count').limit(1);
         
         if (error) {
-          // This error is expected if the table doesn't exist, but connection is working
-          if (error.code === '42P01') { // undefined_table error code
-            setStatus('success');
-            setMessage('Conexão com Supabase estabelecida com sucesso!');
-            return;
-          }
           throw error;
         }
 
@@ -32,9 +27,8 @@ export function SupabaseTest() {
           setStatus('error');
           setMessage(`Erro de conexão: Não foi possível conectar ao Supabase. Verifique a URL e a chave.`);
         } else {
-          // Even if we get errors like table not found, that means connection is working
-          setStatus('success');
-          setMessage(`Conexão com Supabase estabelecida com sucesso! (O erro "${error.message}" é esperado durante testes)`);
+          setStatus('error');
+          setMessage(`Erro: ${error.message || 'Desconhecido'}`);
         }
       }
     }
