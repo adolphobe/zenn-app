@@ -1,6 +1,6 @@
 
 import React, { useEffect } from 'react';
-import { Outlet, useNavigate, useLocation } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import Dashboard from '../components/Dashboard';
 import { useAppContext } from '../context/AppContext';
@@ -14,26 +14,8 @@ const ActoApp: React.FC = () => {
   const { viewMode } = state;
   const { isOpen: sidebarOpen, open: openSidebar, isMobile } = useSidebar();
   const location = useLocation();
-  const navigate = useNavigate();
-  const { currentUser, isAuthenticated, isLoading } = useAuth();
+  const { currentUser } = useAuth();
   const isDashboardRoute = location.pathname === '/dashboard';
-
-  // Authentication check and redirect logic
-  useEffect(() => {
-    console.log("ActoApp: Checking authentication state...");
-    console.log("ActoApp: isLoading:", isLoading);
-    console.log("ActoApp: isAuthenticated:", isAuthenticated);
-    console.log("ActoApp: current path:", location.pathname);
-    
-    // Only check after we know if user is logged in or not
-    if (!isLoading) {
-      if (!isAuthenticated) {
-        // User is not authenticated and trying to access protected route
-        console.log("ActoApp: User not authenticated, redirecting to home");
-        navigate('/');
-      }
-    }
-  }, [isAuthenticated, isLoading, navigate, location.pathname]);
 
   // Close sidebar on route change if on mobile
   useEffect(() => {
@@ -41,20 +23,6 @@ const ActoApp: React.FC = () => {
       toggleSidebar();
     }
   }, [isMobile, location.pathname, sidebarOpen, toggleSidebar]);
-
-  // If still loading, show loading spinner
-  if (isLoading) {
-    console.log("ActoApp: Showing loading spinner");
-    return <div className="min-h-screen flex items-center justify-center">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-    </div>;
-  }
-
-  // If user is not authenticated, redirect is handled in useEffect
-  if (!isAuthenticated) {
-    console.log("ActoApp: No user but rendering anyway (redirect will happen in useEffect)");
-    return null;
-  }
 
   // Determine if we should use a narrower max-width for task cards (only in power and chronological mode)
   const isTaskCardView = isDashboardRoute && (viewMode === 'power' || viewMode === 'chronological');

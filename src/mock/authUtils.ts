@@ -5,6 +5,7 @@ import { getUserByCredentials, getUserById } from './users';
 const TOKEN_KEY = 'acto_auth_token';
 const USER_ID_KEY = 'acto_user_id';
 const IS_LOGGED_IN_KEY = 'acto_is_logged_in';
+const CONNECTION_RETRY_KEY = 'acto_connection_retry';
 
 /**
  * Simulates a login by checking credentials against the mock users
@@ -32,6 +33,9 @@ export const storeAuth = (user: User, token: string): void => {
   const expiresAt = new Date();
   expiresAt.setHours(expiresAt.getHours() + 24);
   localStorage.setItem(`${TOKEN_KEY}_expires`, expiresAt.toISOString());
+  
+  // Limpar qualquer estado de reconexão
+  localStorage.removeItem(CONNECTION_RETRY_KEY);
 };
 
 /**
@@ -63,6 +67,27 @@ export const getStoredAuth = (): { user: User | null; isValid: boolean; token: s
   }
   
   return { user: null, isValid: false, token: null };
+};
+
+/**
+ * Stores connection retry state to recover from interrupted connections
+ */
+export const storeConnectionRetry = (email: string): void => {
+  localStorage.setItem(CONNECTION_RETRY_KEY, email);
+};
+
+/**
+ * Gets connection retry state
+ */
+export const getConnectionRetry = (): string | null => {
+  return localStorage.getItem(CONNECTION_RETRY_KEY);
+};
+
+/**
+ * Clears connection retry state
+ */
+export const clearConnectionRetry = (): void => {
+  localStorage.removeItem(CONNECTION_RETRY_KEY);
 };
 
 /**

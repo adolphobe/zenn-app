@@ -13,6 +13,7 @@ import TaskHistory from "./pages/TaskHistory";
 import Landing from "./pages/Landing";
 import Dashboard from "./components/Dashboard";
 import { AuthProvider } from "./auth/AuthProvider";
+import { PrivateRoute } from "./auth/PrivateRoute";
 
 const queryClient = new QueryClient();
 
@@ -27,15 +28,20 @@ const App = () => (
             <AuthProvider>
               <Routes>
                 <Route path="/" element={<Landing />} />
-                <Route path="/dashboard" element={<ActoApp />}>
-                  <Route index element={<Dashboard />} />
+                
+                {/* Rotas protegidas usando o PrivateRoute */}
+                <Route element={<PrivateRoute />}>
+                  <Route path="/dashboard" element={<ActoApp />}>
+                    <Route index element={<Dashboard />} />
+                  </Route>
+                  <Route path="/strategic-review" element={<ActoApp />}>
+                    <Route index element={<StrategicReview />} />
+                  </Route>
+                  <Route path="/history" element={<ActoApp />}>
+                    <Route index element={<TaskHistory />} />
+                  </Route>
                 </Route>
-                <Route path="/strategic-review" element={<ActoApp />}>
-                  <Route index element={<StrategicReview />} />
-                </Route>
-                <Route path="/history" element={<ActoApp />}>
-                  <Route index element={<TaskHistory />} />
-                </Route>
+                
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </AuthProvider>
