@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
@@ -8,7 +7,7 @@ import LoginForm from '@/components/LoginForm';
 const Landing: React.FC = () => {
   const navigate = useNavigate();
   const [loaded, setLoaded] = useState(false);
-  const [showLoginForm, setShowLoginForm] = useState(false);
+  const [showLogin, setShowLogin] = useState(false);
   
   useEffect(() => {
     // Handle animation on load
@@ -19,16 +18,17 @@ const Landing: React.FC = () => {
     return () => clearTimeout(timer);
   }, []);
 
+  // Show login form with animation
+  const handleGetStarted = () => {
+    setShowLogin(true);
+  };
+
   // Navigate directly to dashboard if already logged in
   useEffect(() => {
     if (localStorage.getItem('acto_is_logged_in') === 'true') {
       navigate('/dashboard');
     }
   }, [navigate]);
-
-  const handleStartClick = () => {
-    setShowLoginForm(true);
-  };
 
   // Generate animated floating elements with blue color
   const floatingElements = Array(6).fill(null).map((_, i) => (
@@ -143,19 +143,6 @@ const Landing: React.FC = () => {
           .slide-out {
             animation: slideOut 0.6s ease-out forwards;
           }
-          
-          @keyframes fadeIn {
-            from {
-              opacity: 0;
-            }
-            to {
-              opacity: 1;
-            }
-          }
-
-          .login-fade-in {
-            animation: fadeIn 0.8s ease-out forwards;
-          }
         `}
       </style>
       
@@ -165,7 +152,11 @@ const Landing: React.FC = () => {
       {/* Main content */}
       <div className="container mx-auto min-h-screen grid grid-cols-1 lg:grid-cols-12 relative z-10">
         {/* Left column - Text content */}
-        <div className={`lg:col-span-${showLoginForm ? '6' : '12'} flex flex-col justify-center px-8 md:px-16 lg:px-20 py-16 lg:py-0 transition-all duration-500`}>
+        <div 
+          className={`lg:col-span-7 flex flex-col justify-center px-8 md:px-16 lg:px-20 py-16 lg:py-0 transition-all duration-700 ${
+            showLogin ? 'opacity-0 pointer-events-none' : 'opacity-100'
+          }`}
+        >
           {/* Logo */}
           <div className={`mb-12 opacity-0 ${loaded ? 'opacity-100 transition-opacity duration-700' : ''}`}>
             <h3 className="text-2xl font-bold tracking-tight text-blue-500">Zenn</h3>
@@ -185,9 +176,9 @@ const Landing: React.FC = () => {
           </p>
           
           {/* CTA Button using the blue color */}
-          <div className={`opacity-0 ${loaded && !showLoginForm ? 'fade-up fade-up-delay-2' : ''} ${showLoginForm ? 'hidden lg:block' : ''}`}>
+          <div className={`opacity-0 ${loaded ? 'fade-up fade-up-delay-2' : ''}`}>
             <Button 
-              onClick={handleStartClick}
+              onClick={handleGetStarted}
               className="group bg-blue-600 hover:bg-blue-700 text-white px-8 py-6 rounded-lg text-lg transition-all duration-300 hover:scale-[1.03] hover:shadow-md flex items-center gap-2"
             >
               Começar com Clareza
@@ -201,18 +192,52 @@ const Landing: React.FC = () => {
           </div>
         </div>
         
-        {/* Right column - Login Form (conditionally rendered) */}
-        {showLoginForm && (
-          <div className="lg:col-span-6 flex items-center justify-center px-4 md:px-0">
-            <div className="w-full max-w-md bg-white/80 backdrop-blur-md p-8 rounded-xl shadow-xl login-fade-in">
-              <div className="mb-6">
+        {/* Right column - Image or Login */}
+        <div className="lg:col-span-5 relative flex items-center justify-center">
+          {/* Login form that appears when CTA is clicked */}
+          <div className={`absolute inset-0 w-full h-full flex items-center justify-center transition-all duration-700 ${
+            showLogin 
+              ? 'opacity-100 z-20' 
+              : 'opacity-0 z-0 pointer-events-none'
+          }`}>
+            <div className={`w-full max-w-md bg-white/80 backdrop-blur-md p-8 rounded-xl shadow-xl ${
+              showLogin ? 'slide-in' : ''
+            }`}>
+              <div className="flex justify-between items-center mb-6">
                 <h3 className="text-xl font-semibold">Bem-vindo de volta!</h3>
-                <p className="text-sm text-gray-600 mt-1">Entre para continuar sua jornada.</p>
+                <button 
+                  onClick={() => setShowLogin(false)}
+                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  ✕
+                </button>
               </div>
               <LoginForm />
             </div>
           </div>
-        )}
+          
+          {/* 3D image that shows when login is not active */}
+          <div className={`relative w-full h-[600px] transition-all duration-1000 ease-in-out ${
+            loaded && !showLogin ? 'opacity-100' : 'opacity-0'
+          }`}>
+            {/* 3D image with glassmorphism effect */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-[350px] h-[350px] rounded-full bg-gradient-to-tr from-blue-500/20 to-blue-400/20 backdrop-blur-sm animate-pulse-slow"></div>
+              <div className="absolute w-[300px] h-[300px] rounded-full bg-gradient-to-bl from-blue-500/20 to-blue-300/20 backdrop-blur-md animate-float" style={{ animationDuration: '20s' }}></div>
+              <div className="absolute w-[250px] h-[250px] rounded-full bg-gradient-to-r from-blue-300/20 to-blue-500/20 backdrop-blur-md animate-float" style={{ animationDuration: '15s', animationDelay: '2s' }}></div>
+            </div>
+            
+            {/* Crystal/glass effect overlay with blue color */}
+            <div 
+              className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full"
+              style={{
+                background: 'radial-gradient(circle, rgba(59, 130, 246, 0.4) 0%, rgba(59, 130, 246, 0.1) 50%, rgba(235, 248, 255, 0) 100%)',
+                boxShadow: '0 0 80px rgba(59, 130, 246, 0.2)',
+                animation: loaded ? 'pulse 6s ease-in-out infinite alternate' : 'none',
+              }}
+            ></div>
+          </div>
+        </div>
       </div>
     </div>
   );
