@@ -1,28 +1,14 @@
 
 import React, { useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import LoginForm from '../components/LoginForm';
 import SignupForm from '../components/SignupForm';
-import { useAuth } from '@/context/AuthContext';
 
 const Login: React.FC = () => {
-  const location = useLocation();
   const navigate = useNavigate();
-  const { isAuthenticated, isLoading } = useAuth();
   const [isSignup, setIsSignup] = React.useState(false);
   const [loaded, setLoaded] = React.useState(false);
   
-  // Obtém o caminho para redirecionar após o login
-  const from = location.state?.from || "/dashboard";
-
-  // Debug log
-  console.log('[Login] Renderizando:', { 
-    isAuthenticated, 
-    isLoading, 
-    from, 
-    pathname: location.pathname
-  });
-
   // Controlar carregamento visual suave
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -32,40 +18,10 @@ const Login: React.FC = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  // Redirecionamento automático para o dashboard se já estiver autenticado
-  useEffect(() => {
-    if (isAuthenticated && !isLoading) {
-      console.log("[Login] Usuário autenticado, redirecionando para:", from);
-      navigate(from, { replace: true });
-    }
-  }, [isAuthenticated, isLoading, navigate, from]);
-
   // Alternar entre login e signup
   const toggleSignup = () => {
     setIsSignup(!isSignup);
   };
-
-  // Exibir estado de carregamento enquanto verifica autenticação
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-        <div className="ml-3 text-blue-500">Verificando autenticação...</div>
-      </div>
-    );
-  }
-
-  // Se o usuário já estiver autenticado, mostramos feedback visual temporário
-  // antes do redirecionamento automático
-  if (isAuthenticated) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-950">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mb-4"></div>
-        <div className="text-xl font-medium text-blue-500">Você já está autenticado!</div>
-        <div className="text-sm text-gray-500 mt-2">Redirecionando para {from}...</div>
-      </div>
-    );
-  }
 
   // Componentes visuais para o fundo com animações
   const floatingItems = Array(7).fill(null).map((_, i) => (
@@ -146,9 +102,9 @@ const Login: React.FC = () => {
           </div>
 
           {isSignup ? (
-            <SignupForm onCancel={toggleSignup} redirectPath={from} />
+            <SignupForm onCancel={toggleSignup} redirectPath="/dashboard" />
           ) : (
-            <LoginForm onSwitchToSignup={toggleSignup} redirectPath={from} />
+            <LoginForm onSwitchToSignup={toggleSignup} redirectPath="/dashboard" />
           )}
         </div>
 

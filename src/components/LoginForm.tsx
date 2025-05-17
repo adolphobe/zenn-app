@@ -1,15 +1,13 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, Mail, Lock, AlertCircle } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useAuth } from '@/context/AuthContext';
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from '@/hooks/use-toast';
 
 const loginSchema = z.object({
@@ -27,9 +25,8 @@ interface LoginFormProps {
 
 const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, redirectPath = "/dashboard", onSwitchToSignup }) => {
   const navigate = useNavigate();
-  const { login, isLoading } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
-  const [loginError, setLoginError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -40,42 +37,23 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, redirectPath = "/dashb
   });
 
   const onSubmit = async (values: LoginFormValues) => {
-    setLoginError(null);
-    try {
-      console.log("[LoginForm] Tentando login com:", values.email, "| Senha inserida com comprimento:", values.password.length);
-      const success = await login(values.email, values.password);
+    // Simulando um login para fins de demonstração
+    setIsLoading(true);
+    
+    // Simula carregamento
+    setTimeout(() => {
+      setIsLoading(false);
       
-      if (success) {
-        console.log("[LoginForm] Login bem-sucedido, preparando redirecionamento para:", redirectPath);
-        toast({
-          title: "Login bem-sucedido",
-          description: "Você foi autenticado com sucesso",
-        });
-        
-        // Pequeno atraso para garantir que estados sejam atualizados
-        setTimeout(() => {
-          if (onSuccess) {
-            onSuccess();
-          } else if (redirectPath) {
-            console.log("[LoginForm] Redirecionando para:", redirectPath);
-            navigate(redirectPath, { replace: true });
-          }
-        }, 500);
-      } else {
-        console.log("[LoginForm] Login falhou");
-        setLoginError("E-mail ou senha incorretos. Por favor, tente novamente.");
-      }
-    } catch (error: any) {
-      console.error("[LoginForm] Erro de login detalhado:", error);
+      // Mostrar toast de sucesso
+      toast({
+        title: "Login demonstrativo",
+        description: "Navegando para dashboard (sem autenticação)",
+      });
       
-      if (error.message?.includes("Email not confirmed")) {
-        setLoginError("Por favor, confirme seu e-mail antes de fazer login. Verifique sua caixa de entrada.");
-      } else if (error.message?.includes("Invalid login credentials")) {
-        setLoginError("E-mail ou senha incorretos. Por favor, tente novamente.");
-      } else {
-        setLoginError("Erro ao fazer login. Por favor, tente novamente. Detalhes: " + (error.message || "Erro desconhecido"));
-      }
-    }
+      // Redireciona para dashboard
+      navigate(redirectPath, { replace: true });
+      
+    }, 1000);
   };
 
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
@@ -87,17 +65,6 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, redirectPath = "/dashb
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        {loginError && (
-          <Alert variant="destructive" className="bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 py-2 animate-in fade-in slide-in-from-top-5 duration-300">
-            <div className="flex items-center gap-2 text-red-600 dark:text-red-400">
-              <AlertCircle size={16} />
-              <AlertDescription className="text-sm font-medium">
-                {loginError}
-              </AlertDescription>
-            </div>
-          </Alert>
-        )}
-        
         <FormField
           control={form.control}
           name="email"

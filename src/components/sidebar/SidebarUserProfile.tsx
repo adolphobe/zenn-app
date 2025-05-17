@@ -5,7 +5,6 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/context/AuthContext';
 import { toast } from '@/hooks/use-toast';
 
 interface SidebarUserProfileProps {
@@ -13,26 +12,21 @@ interface SidebarUserProfileProps {
 }
 
 const SidebarUserProfile: React.FC<SidebarUserProfileProps> = ({ sidebarOpen }) => {
-  const { currentUser, logout } = useAuth();
   const navigate = useNavigate();
+  // Mock user data for demo purposes
+  const mockUser = {
+    name: "Usuário Demo",
+    email: "usuario@exemplo.com",
+    profileImage: ""
+  };
 
-  const handleLogout = async () => {
-    try {
-      console.log("Iniciando processo de logout");
-      // Process logout
-      await logout();
-      
-      // Navigate to login after logout is complete
-      console.log("Logout concluído, navegando para login");
-      navigate('/login', { replace: true });
-    } catch (error) {
-      console.error("Erro ao fazer logout:", error);
-      toast({
-        title: "Erro ao fazer logout",
-        description: "Ocorreu um erro ao tentar desconectar",
-        variant: "destructive"
-      });
-    }
+  const handleLogout = () => {
+    // Demonstrative only - just navigate to login
+    toast({
+      title: "Logout demonstrativo",
+      description: "Esta é uma demonstração de logout (sem autenticação real)",
+    });
+    navigate('/login');
   };
 
   return (
@@ -43,7 +37,7 @@ const SidebarUserProfile: React.FC<SidebarUserProfileProps> = ({ sidebarOpen }) 
         <div className={`flex ${sidebarOpen ? 'items-start gap-3' : 'justify-center'}`}>
           <div className="relative">
             <Avatar className={`${sidebarOpen ? 'h-12 w-12' : 'h-10 w-10'} border-2 border-white shadow-sm`}>
-              <AvatarImage src={currentUser?.profileImage} />
+              <AvatarImage src={mockUser.profileImage} />
               <AvatarFallback className="bg-blue-100 text-blue-800">
                 <User size={sidebarOpen ? 24 : 18} />
               </AvatarFallback>
@@ -54,8 +48,8 @@ const SidebarUserProfile: React.FC<SidebarUserProfileProps> = ({ sidebarOpen }) 
           
           {sidebarOpen && (
             <div className="flex flex-col min-w-0">
-              <span className="font-medium text-gray-800 dark:text-gray-200 truncate">{currentUser?.name || 'Convidado'}</span>
-              <span className="text-xs text-gray-500 dark:text-gray-400 truncate">{currentUser?.email || 'Faça login'}</span>
+              <span className="font-medium text-gray-800 dark:text-gray-200 truncate">{mockUser.name}</span>
+              <span className="text-xs text-gray-500 dark:text-gray-400 truncate">{mockUser.email}</span>
             </div>
           )}
         </div>

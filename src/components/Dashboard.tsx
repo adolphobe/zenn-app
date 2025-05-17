@@ -8,11 +8,9 @@ import SortDropdown from './SortDropdown';
 import StrategicReview from '../pages/StrategicReview';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { sortTasks, isTaskOverdue } from '@/utils';
-import { Plus, Bell, ChevronDown, ChevronUp, Info, LogOut } from 'lucide-react';
+import { Plus, Bell, ChevronDown, ChevronUp } from 'lucide-react';
 import { useExpandedTask } from '@/context/hooks';
 import { Badge } from './ui/badge';
-import { useAuth } from '@/context/AuthContext';
-import { Button } from './ui/button';
 
 const Dashboard: React.FC = () => {
   const { state } = useAppContext();
@@ -22,23 +20,6 @@ const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const [isTaskFormOpen, setIsTaskFormOpen] = useState(false);
   const { isTaskExpanded, toggleTaskExpanded } = useExpandedTask();
-  const { currentUser, isAuthenticated, isLoading, session, logout } = useAuth();
-  
-  // Log detalhado do estado de autenticação
-  useEffect(() => {
-    console.log("[Dashboard] Estado de autenticação:", { 
-      isAuthenticated, 
-      isLoading,
-      sessionExists: !!session,
-      sessionUserId: session?.user?.id,
-      currentUser: currentUser ? {
-        id: currentUser.id,
-        email: currentUser.email,
-        name: currentUser.name
-      } : null,
-      timestamp: new Date().toISOString()
-    });
-  }, [isAuthenticated, isLoading, currentUser, session]);
   
   // State for showing/hiding overdue tasks, initialized from localStorage
   const [showOverdueTasks, setShowOverdueTasks] = useState(() => {
@@ -117,65 +98,8 @@ const Dashboard: React.FC = () => {
     setShowOverdueTasks(prev => !prev);
   };
   
-  // Handle logout
-  const handleLogout = async () => {
-    console.log("[Dashboard] Iniciando processo de logout");
-    try {
-      await logout();
-      console.log("[Dashboard] Logout bem-sucedido, redirecionando para login");
-      navigate('/login');
-    } catch (error) {
-      console.error("[Dashboard] Erro durante logout:", error);
-    }
-  };
-  
   return (
     <>
-      {/* Banner de depuração de autenticação - detalhado */}
-      <div className="bg-amber-100 text-amber-800 p-3 mb-4 rounded-lg border border-amber-300 text-sm">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Info size={16} />
-            <div className="flex flex-col">
-              <strong>Status de Autenticação:</strong> 
-              <div className="text-xs">
-                {isLoading ? (
-                  "Verificando autenticação..."
-                ) : isAuthenticated ? (
-                  <>
-                    <span className="text-green-600 font-medium">Autenticado</span>
-                    <span> como {currentUser?.email}</span>
-                    {currentUser?.name && <span> ({currentUser.name})</span>}
-                    <div className="mt-1 opacity-75">ID do usuário: {session?.user?.id || 'N/A'}</div>
-                    <div className="opacity-75">Sessão válida: {session ? 'Sim' : 'Não'}</div>
-                  </>
-                ) : (
-                  <span className="text-red-600 font-medium">Não autenticado</span>
-                )}
-              </div>
-              {!isAuthenticated && !isLoading && (
-                <div className="text-xs mt-1 text-red-600 font-medium">
-                  Você deveria ser redirecionado para a página de login...
-                </div>
-              )}
-            </div>
-          </div>
-          
-          {/* Botão de Logout */}
-          {isAuthenticated && (
-            <Button 
-              variant="destructive" 
-              size="sm" 
-              className="flex items-center gap-1"
-              onClick={handleLogout}
-            >
-              <LogOut size={14} /> Sair
-            </Button>
-          )}
-        </div>
-      </div>
-      
-      {/* Resto do componente permanece igual */}
       <div className="container p-4 mx-auto max-w-5xl">
         <div className="flex flex-col space-y-4">
           <div className="mb-6">

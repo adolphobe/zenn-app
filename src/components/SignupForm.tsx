@@ -1,14 +1,13 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, Mail, Lock, User, AlertCircle, CheckCircle } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, User, CheckCircle } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useAuth } from '@/context/AuthContext';
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const signupSchema = z.object({
@@ -26,9 +25,8 @@ interface SignupFormProps {
 
 const SignupForm: React.FC<SignupFormProps> = ({ onCancel, redirectPath = "/dashboard" }) => {
   const navigate = useNavigate();
-  const { signup, isLoading } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
-  const [signupError, setSignupError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const [signupSuccess, setSignupSuccess] = useState<string | null>(null);
 
   const form = useForm<SignupFormValues>({
@@ -41,27 +39,14 @@ const SignupForm: React.FC<SignupFormProps> = ({ onCancel, redirectPath = "/dash
   });
 
   const onSubmit = async (values: SignupFormValues) => {
-    setSignupError(null);
-    setSignupSuccess(null);
+    setIsLoading(true);
     
-    try {
-      console.log("Tentando cadastrar com:", values.email);
-      const success = await signup(values.email, values.password, values.name);
-      
-      if (success) {
-        console.log("Cadastro bem-sucedido");
-        setSignupSuccess("Conta criada com sucesso! Você já pode fazer login.");
-        form.reset();
-      }
-    } catch (error: any) {
-      console.error("Erro ao criar conta:", error);
-      
-      if (error.message?.includes("User already registered") || error.message?.includes("user_already_exists")) {
-        setSignupError("Este e-mail já está registrado. Por favor, tente fazer login ou use outro e-mail.");
-      } else {
-        setSignupError("Erro ao criar conta. Por favor, tente novamente.");
-      }
-    }
+    // Simula carregamento
+    setTimeout(() => {
+      setIsLoading(false);
+      setSignupSuccess("Conta criada com sucesso! Você já pode fazer login.");
+      form.reset();
+    }, 1000);
   };
 
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
@@ -73,17 +58,6 @@ const SignupForm: React.FC<SignupFormProps> = ({ onCancel, redirectPath = "/dash
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        {signupError && (
-          <Alert variant="destructive" className="bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 py-2 animate-in fade-in slide-in-from-top-5 duration-300">
-            <div className="flex items-center gap-2 text-red-600 dark:text-red-400">
-              <AlertCircle size={16} />
-              <AlertDescription className="text-sm font-medium">
-                {signupError}
-              </AlertDescription>
-            </div>
-          </Alert>
-        )}
-        
         {signupSuccess && (
           <Alert className="bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800 py-2 animate-in fade-in slide-in-from-top-5 duration-300">
             <div className="flex items-center gap-2 text-green-600 dark:text-green-400">

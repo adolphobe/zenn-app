@@ -13,9 +13,7 @@ import TaskHistory from "./pages/TaskHistory";
 import Landing from "./pages/Landing";
 import Dashboard from "./components/Dashboard";
 import Login from "./pages/Login";
-import { AuthProvider } from "./context/AuthContext";
 import { PrivateRoute } from "./components/PrivateRoute";
-import { UserProvider } from "./context/UserContext";
 
 // Create Query Client with better error handling
 const queryClient = new QueryClient({
@@ -35,31 +33,27 @@ const App = () => (
         <ToastProvider>
           <Toaster />
           <Sonner />
-          <AuthProvider>
-            <UserProvider>
-              <Routes>
-                {/* Public routes */}
-                <Route path="/" element={<Landing />} />
-                <Route path="/login" element={<Login />} />
-                
-                {/* Protected routes using PrivateRoute */}
-                <Route element={<PrivateRoute />}>
-                  <Route path="/dashboard" element={<ActoApp />}>
-                    <Route index element={<Dashboard />} />
-                    <Route path="strategic-review" element={<StrategicReview />} />
-                    <Route path="history" element={<TaskHistory />} />
-                  </Route>
-                </Route>
-                
-                {/* Legacy route redirects */}
-                <Route path="/strategic-review" element={<Navigate to="/dashboard/strategic-review" replace />} />
-                <Route path="/history" element={<Navigate to="/dashboard/history" replace />} />
-                
-                {/* Fallback route */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </UserProvider>
-          </AuthProvider>
+          <Routes>
+            {/* Public routes */}
+            <Route path="/" element={<Landing />} />
+            <Route path="/login" element={<Login />} />
+            
+            {/* Routes using simplified PrivateRoute */}
+            <Route element={<PrivateRoute />}>
+              <Route path="/dashboard" element={<ActoApp />}>
+                <Route index element={<Dashboard />} />
+                <Route path="strategic-review" element={<StrategicReview />} />
+                <Route path="history" element={<TaskHistory />} />
+              </Route>
+            </Route>
+            
+            {/* Legacy route redirects */}
+            <Route path="/strategic-review" element={<Navigate to="/dashboard/strategic-review" replace />} />
+            <Route path="/history" element={<Navigate to="/dashboard/history" replace />} />
+            
+            {/* Fallback route */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
         </ToastProvider>
       </AppProvider>
     </TooltipProvider>
