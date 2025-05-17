@@ -245,7 +245,7 @@ const Landing: React.FC = () => {
                 onClick={handleGetStarted}
                 className="group bg-blue-600 hover:bg-blue-700 text-white px-8 py-6 rounded-lg text-lg transition-all duration-300 hover:scale-[1.03] flex items-center gap-2"
               >
-                Começar com Clareza
+                Começar Agora
                 <ArrowRight className="transition-transform duration-300 group-hover:translate-x-1" />
               </Button>
             </div>
