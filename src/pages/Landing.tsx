@@ -32,16 +32,16 @@ const Landing: React.FC = () => {
 
   return (
     <div className="min-h-screen overflow-hidden relative">
-      {/* Background image with overlay */}
-      <div className="absolute inset-0 z-0">
-        <img 
-          src="https://images.unsplash.com/photo-1668853853439-923e013afff1?q=80&w=3870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
-          alt="Background" 
-          className="object-cover w-full h-full"
-        />
-        {/* Overlay with reduced opacity to keep the image subtle */}
-        <div className="absolute inset-0 bg-[#f9fbff]/50 backdrop-blur-[10px]"></div>
-      </div>
+      {/* Background image with overlay - com animação de zoom suave */}
+<div className="absolute inset-0 z-0 overflow-hidden">
+  <img 
+    src="https://images.unsplash.com/photo-1668853853439-923e013afff1?q=80&w=3870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
+    alt="Background" 
+    className="object-cover w-full h-full animate-slow-zoom"
+  />
+  {/* Overlay com efeito de brilho suave */}
+  <div className="absolute inset-0 bg-[#f9fbff]/50 backdrop-blur-[10px] animate-subtle-glow"></div>
+</div>
       
       {/* Custom animations */}
       <style>
@@ -174,6 +174,35 @@ const Landing: React.FC = () => {
             animation: slideOut 0.6s ease-out forwards;
           }
         `}
+
+        @keyframes slow-zoom {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.animate-slow-zoom {
+  animation: slow-zoom 20s ease-in-out infinite;
+}
+
+@keyframes subtle-glow {
+  0%, 100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+.animate-subtle-glow {
+  animation: subtle-glow 10s ease-in-out infinite;
+}
       </style>
       
       {/* Main content */}
