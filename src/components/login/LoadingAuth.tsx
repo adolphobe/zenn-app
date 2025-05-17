@@ -1,8 +1,15 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 
 const LoadingAuth: React.FC = () => {
-  console.log('[LOGIN] Verificando autenticação...');
+  useEffect(() => {
+    console.log('[AUTH:LOADING] Componente de carregamento de autenticação renderizado');
+    return () => {
+      console.log('[AUTH:LOADING] Componente de carregamento de autenticação desmontado');
+    };
+  }, []);
+  
+  console.log('[AUTH:LOADING] Verificando autenticação...');
   
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">

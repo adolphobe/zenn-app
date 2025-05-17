@@ -1,37 +1,42 @@
 
+import React, { useEffect } from 'react';
 import { Outlet, Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/auth';
-import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
+import LoadingAuth from './login/LoadingAuth';
 
 /**
  * PrivateRoute - Components for protecting routes that require authentication
- * Using console logs instead of visual alerts
+ * Using detailed console logs for better debugging
  */
 export const PrivateRoute = () => {
   const { isAuthenticated, isLoading } = useAuth();
   const location = useLocation();
   
-  // Log authentication status with console feedback
-  console.log(`[ROUTE] PrivateRoute check: Auth=${isAuthenticated}, Loading=${isLoading}, Path=${location.pathname}`);
+  useEffect(() => {
+    console.log(`[AUTH:ROUTE] PrivateRoute montado: Caminho=${location.pathname}`);
+    return () => {
+      console.log(`[AUTH:ROUTE] PrivateRoute desmontado: Caminho=${location.pathname}`);
+    };
+  }, [location.pathname]);
   
-  // Step 1: Let's just show the loading state properly with console feedback
+  // Log authentication status with detailed console feedback
+  console.log(`[AUTH:ROUTE] Verificação de rota privada: Auth=${isAuthenticated}, Loading=${isLoading}, Path=${location.pathname}`);
+  
+  // Step 1: Show loading state with console feedback
   if (isLoading) {
-    console.log('[ROUTE] Carregando estado de autenticação...');
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-        <div className="ml-3 text-blue-500">Verificando autenticação...</div>
-      </div>
-    );
+    console.log('[AUTH:ROUTE] Estado de autenticação em carregamento...');
+    return <LoadingAuth />;
   }
   
   // Step 2: If not authenticated, redirect to login with console feedback
   if (!isAuthenticated) {
-    console.log('[ROUTE] Não autenticado, redirecionando para login...');
+    console.log('[AUTH:ROUTE] Usuário não autenticado, redirecionando para login...');
     return <Navigate to="/login" state={{ from: location.pathname }} replace />;
   }
   
   // Step 3: If authenticated, allow access with console feedback
-  console.log('[ROUTE] Autenticado com sucesso, permitindo acesso');
+  console.log('[AUTH:ROUTE] Usuário autenticado com sucesso, permitindo acesso à rota privada');
   return <Outlet />;
 };
+
+export default PrivateRoute;

@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock, AlertCircle } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -31,6 +31,13 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, redirectPath = "/dashb
   const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
 
+  useEffect(() => {
+    console.log('[AUTH:FORM:LOGIN] Formulário de login montado');
+    return () => {
+      console.log('[AUTH:FORM:LOGIN] Formulário de login desmontado');
+    };
+  }, []);
+
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -40,29 +47,32 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, redirectPath = "/dashb
   });
 
   const onSubmit = async (values: LoginFormValues) => {
+    console.log(`[AUTH:FORM:LOGIN] Tentando login com: ${values.email}`);
     setLoginError(null);
+    
     try {
-      console.log("Tentando login com:", values.email);
       const success = await login(values.email, values.password);
       
       if (success) {
-        console.log("Login bem-sucedido");
+        console.log(`[AUTH:FORM:LOGIN] Login bem-sucedido para: ${values.email}`);
         toast({
           title: "Login bem-sucedido",
           description: "Você foi autenticado com sucesso",
         });
         
         if (onSuccess) {
+          console.log(`[AUTH:FORM:LOGIN] Executando callback onSuccess`);
           onSuccess();
         } else if (redirectPath) {
+          console.log(`[AUTH:FORM:LOGIN] Redirecionando para: ${redirectPath}`);
           navigate(redirectPath);
         }
       } else {
-        console.log("Login falhou sem erro explícito");
+        console.log(`[AUTH:FORM:LOGIN] Login falhou para: ${values.email}`);
         setLoginError("E-mail ou senha incorretos. Por favor, tente novamente.");
       }
     } catch (error: any) {
-      console.error("Erro de login:", error);
+      console.error(`[AUTH:FORM:LOGIN] Erro de login: ${error.message}`);
       
       if (error.message?.includes("Email not confirmed")) {
         setLoginError("Por favor, confirme seu e-mail antes de fazer login. Verifique sua caixa de entrada.");
@@ -74,7 +84,10 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, redirectPath = "/dashb
     }
   };
 
-  const togglePasswordVisibility = () => setShowPassword(!showPassword);
+  const togglePasswordVisibility = () => {
+    console.log('[AUTH:FORM:LOGIN] Alternando visibilidade da senha');
+    setShowPassword(!showPassword);
+  };
 
   // Cores e ícones
   const iconColor = "text-gray-800 dark:text-gray-200"; 
@@ -83,6 +96,8 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, redirectPath = "/dashb
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        {console.log('[AUTH:FORM:LOGIN] Renderizando formulário de login')}
+        
         {loginError && (
           <Alert variant="destructive" className="bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 py-2 animate-in fade-in slide-in-from-top-5 duration-300">
             <div className="flex items-center gap-2 text-red-600 dark:text-red-400">

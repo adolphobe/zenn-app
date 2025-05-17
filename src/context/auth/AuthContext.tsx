@@ -26,20 +26,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [authInitialized, setAuthInitialized] = useState(false);
 
   useEffect(() => {
-    console.log('[AUTH] Inicializando provider de autenticação');
+    console.log('[AUTH:PROVIDER] Inicializando provider de autenticação');
     let mounted = true;
     
     // Set up the auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, newSession) => {
-        console.log(`[AUTH] Evento de autenticação: ${event} para ${newSession?.user?.email || 'usuário desconhecido'}`);
+        console.log(`[AUTH:PROVIDER] Evento de autenticação: ${event} para ${newSession?.user?.email || 'usuário desconhecido'}`);
         
         if (!mounted) return;
         
         if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
           setSession(newSession);
           if (newSession?.user) {
-            console.log(`[AUTH] Usuário autenticado: ${newSession.user.email}`);
+            console.log(`[AUTH:PROVIDER] Usuário autenticado: ${newSession.user.email}`);
             
             // Fetch profile data non-blocking
             supabase
@@ -50,12 +50,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               .then(({ data: profileData }) => {
                 if (mounted) {
                   const mappedUser = mapSupabaseUser(newSession.user, profileData);
-                  console.log(`[AUTH] Perfil do usuário carregado: ${mappedUser.email}`);
+                  console.log(`[AUTH:PROVIDER] Perfil do usuário carregado: ${mappedUser.email}`);
                   setCurrentUser(mappedUser);
                 }
               })
               .catch((error) => {
-                console.error(`[AUTH] Erro ao buscar perfil: ${error.message}`);
+                console.error(`[AUTH:PROVIDER] Erro ao buscar perfil: ${error.message}`);
                 if (mounted) {
                   const mappedUser = mapSupabaseUser(newSession.user);
                   setCurrentUser(mappedUser);
@@ -63,7 +63,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               });
           }
         } else if (event === 'SIGNED_OUT') {
-          console.log('[AUTH] Usuário desconectado');
+          console.log('[AUTH:PROVIDER] Usuário desconectado');
           setSession(null);
           setCurrentUser(null);
         }
@@ -72,7 +72,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     
     // Check for an existing session
     supabase.auth.getSession().then(({ data: { session: existingSession } }) => {
-      console.log(`[AUTH] Verificação inicial de sessão: ${existingSession ? "Sessão encontrada" : "Sem sessão"}`);
+      console.log(`[AUTH:PROVIDER] Verificação inicial de sessão: ${existingSession ? "Sessão encontrada" : "Sem sessão"}`);
       
       if (!mounted) return;
       
@@ -88,32 +88,29 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           .then(({ data: profileData }) => {
             if (mounted) {
               const mappedUser = mapSupabaseUser(existingSession.user, profileData);
-              console.log(`[AUTH] Usuário inicial mapeado: ${mappedUser.email}`);
+              console.log(`[AUTH:PROVIDER] Usuário inicial mapeado: ${mappedUser.email}`);
               setCurrentUser(mappedUser);
+              setIsLoading(false);
+              setAuthInitialized(true);
             }
           })
           .catch((error) => {
-            console.error(`[AUTH] Erro ao buscar perfil inicial: ${error.message}`);
+            console.error(`[AUTH:PROVIDER] Erro ao buscar perfil inicial: ${error.message}`);
             if (mounted) {
               const mappedUser = mapSupabaseUser(existingSession.user);
               setCurrentUser(mappedUser);
-            }
-          })
-          .finally(() => {
-            if (mounted) {
               setIsLoading(false);
               setAuthInitialized(true);
-              console.log('[AUTH] Autenticação inicializada com sessão existente');
             }
           });
       } else {
         // If no session, just mark as initialized
         setIsLoading(false);
         setAuthInitialized(true);
-        console.log('[AUTH] Sem sessão inicial, autenticação inicializada');
+        console.log('[AUTH:PROVIDER] Sem sessão inicial, autenticação inicializada');
       }
     }).catch((error) => {
-      console.error(`[AUTH] Erro ao verificar sessão: ${error.message}`);
+      console.error(`[AUTH:PROVIDER] Erro ao verificar sessão: ${error.message}`);
       if (mounted) {
         setIsLoading(false);
         setAuthInitialized(true);
@@ -121,7 +118,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     });
     
     return () => {
-      console.log('[AUTH] Limpando - desinscrição de mudanças de estado de autenticação');
+      console.log('[AUTH:PROVIDER] Limpando - desinscrição de mudanças de estado de autenticação');
       mounted = false;
       subscription.unsubscribe();
     };
@@ -130,7 +127,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // Login function
   const login = async (email: string, password: string): Promise<boolean> => {
     setIsLoading(true);
-    console.log(`[AUTH] Tentando login com email: ${email}`);
+    console.log(`[AUTH:PROVIDER] Tentando login com email: ${email}`);
     
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
@@ -139,7 +136,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       });
       
       if (error) {
-        console.error(`[AUTH] Erro de login: ${error.message}`);
+        console.error(`[AUTH:PROVIDER] Erro de login: ${error.message}`);
         toast({
           title: "Erro ao fazer login",
           description: error.message,
@@ -149,7 +146,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         return false;
       }
       
-      console.log(`[AUTH] Login bem-sucedido: ${data.user?.email}`);
+      console.log(`[AUTH:PROVIDER] Login bem-sucedido: ${data.user?.email}`);
       toast({
         title: "Login bem-sucedido",
         description: "Você foi autenticado com sucesso",
@@ -157,7 +154,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       
       return true;
     } catch (error: any) {
-      console.error("[AUTH] Login error:", error);
+      console.error("[AUTH:PROVIDER] Login error:", error);
       return false;
     } finally {
       setIsLoading(false);
@@ -167,7 +164,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // Signup function
   const signup = async (email: string, password: string, name: string): Promise<boolean> => {
     setIsLoading(true);
-    console.log(`[AUTH] Tentando criar conta com email: ${email}`);
+    console.log(`[AUTH:PROVIDER] Tentando criar conta com email: ${email}`);
     
     try {
       const { data, error } = await supabase.auth.signUp({
@@ -181,7 +178,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       });
       
       if (error) {
-        console.error(`[AUTH] Erro ao criar conta: ${error.message}`);
+        console.error(`[AUTH:PROVIDER] Erro ao criar conta: ${error.message}`);
         toast({
           title: "Erro ao criar conta",
           description: error.message,
@@ -191,7 +188,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
       
       if (data?.user?.identities?.length === 0) {
-        console.error('[AUTH] Usuário já existe');
+        console.error('[AUTH:PROVIDER] Usuário já existe');
         toast({
           title: "Erro ao criar conta",
           description: "Este e-mail já está registrado.",
@@ -202,13 +199,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       
       // Check if email confirmation is required
       if (data?.user && !data.session) {
-        console.log('[AUTH] Confirmação de email necessária');
+        console.log('[AUTH:PROVIDER] Confirmação de email necessária');
         toast({
           title: "Conta criada com sucesso",
           description: "Um e-mail de confirmação foi enviado para " + email + ". Por favor, verifique sua caixa de entrada e confirme seu e-mail para fazer login.",
         });
       } else {
-        console.log('[AUTH] Conta criada e autenticada automaticamente');
+        console.log('[AUTH:PROVIDER] Conta criada e autenticada automaticamente');
         toast({
           title: "Conta criada com sucesso",
           description: "Sua conta foi criada e você foi autenticado automaticamente."
@@ -217,7 +214,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       
       return true;
     } catch (error: any) {
-      console.error("[AUTH] Signup error:", error);
+      console.error("[AUTH:PROVIDER] Signup error:", error);
       return false;
     } finally {
       setIsLoading(false);
@@ -226,32 +223,30 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   
   // Logout function
   const logout = async (): Promise<void> => {
-    console.log('[AUTH] Desconectando usuário');
+    console.log('[AUTH:PROVIDER] Desconectando usuário');
     setIsLoading(true);
     
     try {
       const { error } = await supabase.auth.signOut();
       
       if (error) {
-        console.error(`[AUTH] Erro ao fazer logout: ${error.message}`);
+        console.error(`[AUTH:PROVIDER] Erro ao fazer logout: ${error.message}`);
         toast({
           title: "Erro ao fazer logout",
           description: error.message,
           variant: "destructive"
         });
-        throw error;
       } else {
         setCurrentUser(null);
         setSession(null);
-        console.log('[AUTH] Usuário desconectado com sucesso');
+        console.log('[AUTH:PROVIDER] Usuário desconectado com sucesso');
         toast({
           title: "Logout realizado",
           description: "Você foi desconectado com sucesso",
         });
       }
     } catch (error: any) {
-      console.error("[AUTH] Error during logout:", error);
-      throw error;
+      console.error("[AUTH:PROVIDER] Error during logout:", error);
     } finally {
       setIsLoading(false);
     }
