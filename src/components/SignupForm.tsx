@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, Mail, Lock, AlertCircle } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, User, AlertCircle } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
@@ -10,52 +10,41 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAuth } from '@/context/AuthContext';
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { toast } from '@/hooks/use-toast';
 
-const loginSchema = z.object({
+const signupSchema = z.object({
+  name: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
   email: z.string().email("Digite um e-mail válido"),
   password: z.string().min(6, "A senha deve ter pelo menos 6 caracteres"),
 });
 
-type LoginFormValues = z.infer<typeof loginSchema>;
+type SignupFormValues = z.infer<typeof signupSchema>;
 
-interface LoginFormProps {
-  onSuccess?: () => void;
+interface SignupFormProps {
+  onCancel: () => void;
   redirectPath?: string;
-  onSwitchToSignup: () => void;
 }
 
-const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, redirectPath = "/dashboard", onSwitchToSignup }) => {
+const SignupForm: React.FC<SignupFormProps> = ({ onCancel, redirectPath = "/dashboard" }) => {
   const navigate = useNavigate();
-  const { login, isLoading } = useAuth();
+  const { signup, isLoading } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
-  const [loginError, setLoginError] = useState<string | null>(null);
+  const [signupError, setSignupError] = useState<string | null>(null);
 
-  const form = useForm<LoginFormValues>({
-    resolver: zodResolver(loginSchema),
+  const form = useForm<SignupFormValues>({
+    resolver: zodResolver(signupSchema),
     defaultValues: {
+      name: "",
       email: "",
       password: "",
     },
   });
 
-  const onSubmit = async (values: LoginFormValues) => {
-    setLoginError(null);
-    const success = await login(values.email, values.password);
+  const onSubmit = async (values: SignupFormValues) => {
+    setSignupError(null);
+    const success = await signup(values.email, values.password, values.name);
     
     if (success) {
-      toast({
-        title: "Login bem-sucedido",
-        description: "Você foi autenticado com sucesso",
-      });
-      
-      if (onSuccess) {
-        onSuccess();
-      } else if (redirectPath) {
-        navigate(redirectPath);
-      }
-    } else {
-      setLoginError("E-mail ou senha incorretos. Por favor, tente novamente.");
+      navigate(redirectPath);
     }
   };
 
@@ -68,16 +57,39 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, redirectPath = "/dashb
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        {loginError && (
+        {signupError && (
           <Alert variant="destructive" className="bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 py-2 animate-in fade-in slide-in-from-top-5 duration-300">
             <div className="flex items-center gap-2 text-red-600 dark:text-red-400">
               <AlertCircle size={16} />
               <AlertDescription className="text-sm font-medium">
-                {loginError}
+                {signupError}
               </AlertDescription>
             </div>
           </Alert>
         )}
+        
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem className="transition-all duration-300 ease-in-out hover:translate-x-1">
+              <div className="relative flex items-center"> 
+                <User 
+                  className={`absolute left-3 top-1/2 -translate-y-1/2 ${iconColor} opacity-100 z-20`}
+                  size={18}
+                />
+                <FormControl>
+                  <Input
+                    placeholder="Nome completo"
+                    className="pl-10 h-12 bg-white/80 dark:bg-gray-700/80 backdrop-blur-sm border-gray-200 dark:border-gray-600 transition-all duration-300 w-full" 
+                    {...field}
+                  />
+                </FormControl>
+              </div>
+              <FormMessage className="text-xs font-medium" />
+            </FormItem>
+          )}
+        />
         
         <FormField
           control={form.control}
@@ -137,35 +149,28 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, redirectPath = "/dashb
           )}
         />
 
-        <div className="flex justify-end">
-          <button 
-            type="button"
-            className="text-sm text-blue-600 hover:underline hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300 focus:outline-none transition-colors duration-300"
+        <div className="flex flex-col space-y-3">
+          <Button 
+            type="submit" 
+            className="w-full h-12 text-base transition-all duration-300 transform hover:scale-[1.02] bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
+            disabled={isLoading}
           >
-            Esqueceu a senha?
-          </button>
-        </div>
-
-        <Button 
-          type="submit" 
-          className="w-full h-12 text-base transition-all duration-300 transform hover:scale-[1.02] bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
-          disabled={isLoading}
-        >
-          {isLoading ? "Entrando..." : "Entrar"}
-        </Button>
-
-        <div className="text-center text-sm">
-          <span className="text-muted-foreground dark:text-gray-400">Não tem uma conta? </span>
-          <button 
+            {isLoading ? "Criando conta..." : "Criar conta"}
+          </Button>
+          
+          <Button 
             type="button" 
-            onClick={onSwitchToSignup}
-            className="text-blue-600 hover:underline hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors duration-300">
-            Criar conta
-          </button>
+            variant="outline"
+            className="w-full h-12 text-base transition-all duration-300"
+            onClick={onCancel}
+            disabled={isLoading}
+          >
+            Voltar para login
+          </Button>
         </div>
       </form>
     </Form>
   );
 };
 
-export default LoginForm;
+export default SignupForm;

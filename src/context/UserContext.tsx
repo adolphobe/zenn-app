@@ -8,7 +8,7 @@ interface UserContextType {
   currentUser: User | null;
   isLoading: boolean;
   isAuthenticated: boolean;
-  logout: () => void;  
+  logout: () => Promise<void>;  
 }
 
 // Criação do contexto
@@ -16,7 +16,7 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 
 // Provider do contexto
 export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Agora estamos usando nosso contexto de autenticação simplificado
+  // Agora estamos usando nosso contexto de autenticação atualizado
   const { currentUser, isLoading, isAuthenticated, logout } = useAuth();
   
   // Log para depuração

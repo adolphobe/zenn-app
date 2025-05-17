@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import LoginForm from '../components/LoginForm';
+import SignupForm from '../components/SignupForm';
 import { useAuth } from '@/context/AuthContext';
 import { toast } from '@/hooks/use-toast';
 
@@ -10,6 +11,7 @@ const Login: React.FC = () => {
   const location = useLocation();
   const { isAuthenticated, isLoading } = useAuth();
   const [loaded, setLoaded] = useState(false);
+  const [isSignup, setIsSignup] = useState(false);
   
   // Obter o caminho para onde redirecionar após o login
   const from = location.state?.from?.pathname || "/dashboard";
@@ -27,6 +29,11 @@ const Login: React.FC = () => {
     
     return () => clearTimeout(timer);
   }, [navigate, isAuthenticated, isLoading, from]);
+
+  // Alternar entre login e cadastro
+  const toggleSignup = () => {
+    setIsSignup(!isSignup);
+  };
 
   // Itens flutuantes animados para o fundo com posições aleatórias e animações contínuas
   const floatingItems = Array(7).fill(null).map((_, i) => (
@@ -88,7 +95,7 @@ const Login: React.FC = () => {
       
       {floatingItems}
       
-      {/* Left column: Login Form */}
+      {/* Left column: Login/Signup Form */}
       <div className="w-full md:w-1/2 flex flex-col justify-center px-8 sm:px-16 md:px-24 lg:px-32 z-10">
         <div className={`space-y-6 w-full max-w-md mx-auto transition-all duration-1000 ease-in-out ${loaded ? 'opacity-100' : 'opacity-0 translate-y-4'}`}>
           {/* Logo */}
@@ -101,13 +108,21 @@ const Login: React.FC = () => {
           </div>
 
           <div className="space-y-2 text-left">
-            <h1 className="text-3xl font-bold tracking-tight text-gray-800 dark:text-gray-100">Bem vindo de volta!</h1>
+            <h1 className="text-3xl font-bold tracking-tight text-gray-800 dark:text-gray-100">
+              {isSignup ? "Crie sua conta" : "Bem vindo de volta!"}
+            </h1>
             <p className="text-muted-foreground">
-              Um novo dia chegou. É hora de continuar sua jornada.
+              {isSignup 
+                ? "Cadastre-se para começar sua jornada conosco." 
+                : "Um novo dia chegou. É hora de continuar sua jornada."}
             </p>
           </div>
 
-          <LoginForm redirectPath={from} />
+          {isSignup ? (
+            <SignupForm onCancel={toggleSignup} redirectPath={from} />
+          ) : (
+            <LoginForm onSwitchToSignup={toggleSignup} redirectPath={from} />
+          )}
         </div>
 
         <div className="mt-12 text-center text-xs text-muted-foreground opacity-70">

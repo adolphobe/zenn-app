@@ -1,12 +1,13 @@
 
 import React, { useEffect } from 'react';
-import { Outlet, useLocation } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import { useAppContext } from '../context/AppContext';
 import { useSidebar } from '@/context/hooks';
 import { Menu } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/context/AuthContext';
+import UserMenu from '@/components/UserMenu';
 
 // ActoApp agora funciona como layout para rotas aninhadas
 const ActoApp: React.FC = () => {
@@ -14,15 +15,18 @@ const ActoApp: React.FC = () => {
   const { viewMode } = state;
   const { isOpen: sidebarOpen, open: openSidebar, isMobile } = useSidebar();
   const location = useLocation();
-  const { isAuthenticated } = useAuth(); // Verificamos a autenticação aqui também
+  const navigate = useNavigate();
+  const { isAuthenticated, isLoading } = useAuth();
   
   // Determine se estamos na rota do dashboard para ajuste de layout
   const isDashboardRoute = location.pathname === '/dashboard' || location.pathname === '/dashboard/';
 
-  // Logging para verificar autenticação em cada renderização
+  // Verifica autenticação e redireciona se necessário
   useEffect(() => {
-    console.log("ActoApp: Estado de autenticação =>", isAuthenticated ? "Autenticado" : "Não autenticado");
-  }, [isAuthenticated]);
+    if (!isLoading && !isAuthenticated) {
+      navigate('/login', { state: { from: location } });
+    }
+  }, [isAuthenticated, isLoading, navigate, location]);
 
   // Close sidebar on route change if on mobile
   useEffect(() => {
@@ -34,9 +38,21 @@ const ActoApp: React.FC = () => {
   // Determine if we should use a narrower max-width for task cards (only in power and chronological mode)
   const isTaskCardView = isDashboardRoute && (viewMode === 'power' || viewMode === 'chronological');
   
+  // Se estiver carregando, mostra um indicador
+  if (isLoading) {
+    return <div className="min-h-screen flex items-center justify-center">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+    </div>;
+  }
+  
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 flex">
       <Sidebar />
+      
+      {/* Adicionar UserMenu ao final do Sidebar apenas em desktop */}
+      <div className="hidden lg:block fixed bottom-4 left-4 z-50 ml-4">
+        <UserMenu />
+      </div>
       
       {/* Mobile Menu Toggle Button - Visible only when sidebar is closed on mobile */}
       {isMobile && !sidebarOpen && (
