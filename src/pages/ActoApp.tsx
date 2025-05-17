@@ -20,10 +20,11 @@ const ActoApp: React.FC = () => {
   const isLoggedIn = localStorage.getItem('acto_is_logged_in') === 'true';
 
   useEffect(() => {
-    if (!isLoggedIn) {
+    // Only redirect to login if user tries to access protected routes while not logged in
+    if (!isLoggedIn && location.pathname !== '/' && !location.pathname.includes('/login')) {
       navigate('/login');
     }
-  }, [isLoggedIn, navigate]);
+  }, [isLoggedIn, navigate, location.pathname]);
 
   // Close sidebar on route change if on mobile
   useEffect(() => {
