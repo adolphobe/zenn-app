@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { LogOut, User as UserIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 const UserMenu: React.FC = () => {
   const { currentUser, logout } = useAuth();
@@ -12,14 +13,30 @@ const UserMenu: React.FC = () => {
 
   const handleLogout = async () => {
     try {
+      // Log the logout attempt
+      console.log("[UserMenu] Iniciando processo de logout");
+      
+      // Call the AuthContext logout function
       await logout();
+      
+      // Force clear local storage for safety
+      localStorage.removeItem('sb-wbvxnapruffchikhrqrs-auth-token');
+      
       toast({
         title: "Logout realizado",
         description: "Você foi desconectado com sucesso",
       });
-      navigate('/login');
+      
+      console.log("[UserMenu] DETALHES EM PORTUGUÊS: Logout realizado com sucesso, redirecionando para página de login");
+      
+      // Navigate to login page after a small delay to ensure logout is complete
+      setTimeout(() => {
+        navigate('/login');
+      }, 100);
     } catch (error) {
-      console.error("Erro ao fazer logout:", error);
+      console.error("[UserMenu] Erro ao fazer logout:", error);
+      console.error("[UserMenu] DETALHES EM PORTUGUÊS: Ocorreu um erro ao tentar deslogar do sistema");
+      
       toast({
         title: "Erro ao sair",
         description: "Não foi possível fazer logout",

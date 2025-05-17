@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -11,9 +12,24 @@ const Login: React.FC = () => {
   const { isAuthenticated, isLoading } = useAuth();
   const [isSignup, setIsSignup] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  const [isJustLoggedOut, setIsJustLoggedOut] = useState(false);
   
   // Get redirect path from location state or default to dashboard
   const from = location.state?.from?.pathname || "/dashboard";
+  
+  // Check if user has just logged out
+  useEffect(() => {
+    // If we detect a "loggedOut" parameter in the URL or location state, set the flag
+    const params = new URLSearchParams(location.search);
+    const loggedOutFromUrl = params.get('loggedOut') === 'true';
+    const loggedOutFromState = location.state?.loggedOut === true;
+    
+    if (loggedOutFromUrl || loggedOutFromState) {
+      console.log("[Login] Usuário acabou de deslogar conforme indicado por parâmetro");
+      console.log("[Login] DETALHES EM PORTUGUÊS: Detectado logout recente, não redirecionando automaticamente");
+      setIsJustLoggedOut(true);
+    }
+  }, [location]);
   
   // Smooth visual loading
   useEffect(() => {
@@ -24,12 +40,13 @@ const Login: React.FC = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  // Redirecionar automaticamente quando autenticado
+  // Redirecionar automaticamente apenas se estiver autenticado e não tiver acabado de deslogar
   useEffect(() => {
-    if (isAuthenticated && !isLoading) {
+    if (isAuthenticated && !isLoading && !isJustLoggedOut) {
       console.log("[Login] Usuário já está autenticado - Redirecionando automaticamente");
       console.log(`[Login] DETALHES TÉCNICOS: Redirecionando para ${from}`);
       console.log("[Login] ESTADO DE AUTENTICAÇÃO:", { isAuthenticated, isLoading, redirectPath: from });
+      console.log("[Login] DETALHES EM PORTUGUÊS: Você já está logado, redirecionando para o dashboard");
       
       // Pequeno delay para garantir que os logs sejam visíveis no console
       const redirectTimer = setTimeout(() => {
@@ -38,7 +55,7 @@ const Login: React.FC = () => {
       
       return () => clearTimeout(redirectTimer);
     }
-  }, [isAuthenticated, isLoading, from, navigate]);
+  }, [isAuthenticated, isLoading, from, navigate, isJustLoggedOut]);
 
   // Toggle between login and signup
   const toggleSignup = () => {
@@ -52,8 +69,8 @@ const Login: React.FC = () => {
     </div>;
   }
 
-  // If user is authenticated, show a temporary message but will auto-redirect
-  if (isAuthenticated) {
+  // If user is authenticated and not just logged out, show a temporary message
+  if (isAuthenticated && !isJustLoggedOut) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gray-50">
         <div className="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 mb-4 max-w-lg">
