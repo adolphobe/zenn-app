@@ -1,12 +1,13 @@
 
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import LoginForm from '../components/LoginForm';
 import SignupForm from '../components/SignupForm';
 import { useAuth } from '@/context/AuthContext';
 
 const Login: React.FC = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { isAuthenticated, isLoading } = useAuth();
   const [loaded, setLoaded] = useState(false);
   const [isSignup, setIsSignup] = useState(false);
@@ -26,8 +27,13 @@ const Login: React.FC = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  // TEMPORARILY DISABLED: Automatic redirect after authentication
-  // This helps us break the redirect loop
+  // Redirecionamento automático para o dashboard se já estiver autenticado
+  useEffect(() => {
+    if (isAuthenticated && !isLoading) {
+      console.log("Login: Usuário já autenticado, redirecionando para:", from);
+      navigate(from, { replace: true });
+    }
+  }, [isAuthenticated, isLoading, navigate, from]);
 
   // Alternar entre login e signup
   const toggleSignup = () => {
@@ -149,7 +155,7 @@ const Login: React.FC = () => {
       
       {/* Login Status Debug Banner */}
       <div className="fixed bottom-0 left-0 right-0 bg-orange-100 text-orange-800 p-2 text-xs text-center">
-        Debug Mode: Authentication check temporarily disabled | Auth Status: {isAuthenticated ? 'Logged In' : 'Not Logged In'}
+        Debug Mode: Auth Status: {isAuthenticated ? 'Logado' : 'Não Logado'} | Redirecionamento: {from}
       </div>
     </div>
   );
