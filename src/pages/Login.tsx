@@ -11,6 +11,7 @@ const Login: React.FC = () => {
   const { isAuthenticated, isLoading } = useAuth();
   const [loaded, setLoaded] = useState(false);
   const [isSignup, setIsSignup] = useState(false);
+  const [redirectAttempted, setRedirectAttempted] = useState(false);
   
   // Obtém o caminho para redirecionar após o login
   const from = location.state?.from || "/dashboard";
@@ -21,7 +22,8 @@ const Login: React.FC = () => {
     isLoading, 
     from, 
     state: location.state,
-    pathname: location.pathname
+    pathname: location.pathname,
+    redirectAttempted
   });
 
   // Controlar carregamento visual suave
@@ -35,8 +37,10 @@ const Login: React.FC = () => {
 
   // Redirecionamento automático para o dashboard se já estiver autenticado
   useEffect(() => {
-    if (isAuthenticated && !isLoading) {
+    if (isAuthenticated && !isLoading && !redirectAttempted) {
       console.log("[Login] Usuário autenticado, redirecionando para:", from);
+      setRedirectAttempted(true);
+      
       // Pequeno atraso para garantir que outras partes da UI terminem de processar primeiro
       const redirectTimer = setTimeout(() => {
         navigate(from, { replace: true });
@@ -44,7 +48,7 @@ const Login: React.FC = () => {
       
       return () => clearTimeout(redirectTimer);
     }
-  }, [isAuthenticated, isLoading, navigate, from]);
+  }, [isAuthenticated, isLoading, navigate, from, redirectAttempted]);
 
   // Alternar entre login e signup
   const toggleSignup = () => {
@@ -67,7 +71,7 @@ const Login: React.FC = () => {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-950">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mb-4"></div>
-        <div className="text-blue-500">Você já está autenticado!</div>
+        <div className="text-xl font-medium text-blue-500">Você já está autenticado!</div>
         <div className="text-sm text-gray-500 mt-2">Redirecionando para {from}...</div>
       </div>
     );
@@ -174,11 +178,6 @@ const Login: React.FC = () => {
           />
           <div className="absolute inset-0 bg-gradient-to-r from-blue-500/30 to-blue-600/20 mix-blend-multiply" />
         </div>
-      </div>
-      
-      {/* Login Status Debug Banner */}
-      <div className="fixed bottom-0 left-0 right-0 bg-orange-100 text-orange-800 p-2 text-xs text-center">
-        Debug Mode: Auth Status: {isAuthenticated ? 'Logado' : 'Não Logado'} | Redirecionamento: {from}
       </div>
     </div>
   );

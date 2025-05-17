@@ -93,9 +93,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     console.log("[AuthProvider] Inicializando estado de autenticação");
     let mounted = true;
     
-    // Set up auth state listener FIRST
+    // Configurar o listener de autenticação
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, newSession) => {
+      async (event, newSession) => {
         console.log("[AuthProvider] Estado de autenticação alterado:", event, newSession?.user?.email || "Sem usuário");
         
         if (!mounted) return;
@@ -103,29 +103,29 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
           setSession(newSession);
           if (newSession?.user) {
-            // Update user synchronously to avoid race conditions
+            // Atualiza usuário sincronamente para evitar condições de corrida
             console.log("[AuthProvider] Usuário autenticado:", newSession.user.email);
             
-            // Fetch profile data non-blocking
-            supabase
-              .from('profiles')
-              .select('*')
-              .eq('id', newSession.user.id)
-              .maybeSingle()
-              .then(({ data: profileData }) => {
-                if (mounted) {
-                  const mappedUser = mapSupabaseUser(newSession.user, profileData);
-                  console.log("[AuthProvider] Perfil do usuário carregado:", mappedUser.email);
-                  setCurrentUser(mappedUser);
-                }
-              })
-              .catch(error => {
-                console.error("[AuthProvider] Erro ao buscar perfil do usuário:", error);
-                if (mounted) {
-                  const mappedUser = mapSupabaseUser(newSession.user);
-                  setCurrentUser(mappedUser);
-                }
-              });
+            try {
+              // Busca os dados do perfil de forma não bloqueante
+              const { data: profileData } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', newSession.user.id)
+                .maybeSingle();
+                
+              if (mounted) {
+                const mappedUser = mapSupabaseUser(newSession.user, profileData);
+                console.log("[AuthProvider] Perfil do usuário carregado:", mappedUser.email);
+                setCurrentUser(mappedUser);
+              }
+            } catch (error) {
+              console.error("[AuthProvider] Erro ao buscar perfil do usuário:", error);
+              if (mounted) {
+                const mappedUser = mapSupabaseUser(newSession.user);
+                setCurrentUser(mappedUser);
+              }
+            }
           }
         } else if (event === 'SIGNED_OUT') {
           console.log("[AuthProvider] Usuário desconectado");
@@ -135,56 +135,51 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
     );
     
-    // THEN check for an existing session
-    supabase.auth.getSession().then(({ data: { session: existingSession } }) => {
-      console.log("[AuthProvider] Verificação inicial de sessão:", existingSession ? "Sessão encontrada" : "Sem sessão");
-      
-      if (!mounted) return;
-      
-      setSession(existingSession);
-      
-      if (existingSession?.user) {
-        // If we have a session, get profile data
-        supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', existingSession.user.id)
-          .maybeSingle()
-          .then(({ data: profileData }) => {
+    // Verifica se já existe uma sessão
+    const checkExistingSession = async () => {
+      try {
+        const { data: { session: existingSession } } = await supabase.auth.getSession();
+        console.log("[AuthProvider] Verificação inicial de sessão:", existingSession ? "Sessão encontrada" : "Sem sessão");
+        
+        if (!mounted) return;
+        
+        setSession(existingSession);
+        
+        if (existingSession?.user) {
+          // Se tem sessão, busca dados do perfil
+          try {
+            const { data: profileData } = await supabase
+              .from('profiles')
+              .select('*')
+              .eq('id', existingSession.user.id)
+              .maybeSingle();
+              
             if (mounted) {
               const mappedUser = mapSupabaseUser(existingSession.user, profileData);
               console.log("[AuthProvider] Usuário inicial mapeado:", mappedUser.email);
               setCurrentUser(mappedUser);
             }
-          })
-          .catch(error => {
-            console.error("[AuthProvider] Erro ao buscar perfil de usuário inicial:", error);
+          } catch (error) {
+            console.error("[AuthProvider] Erro ao buscar perfil do usuário inicial:", error);
             if (mounted) {
               const mappedUser = mapSupabaseUser(existingSession.user);
               setCurrentUser(mappedUser);
             }
-          })
-          .finally(() => {
-            if (mounted) {
-              // Mark auth as initialized and not loading anymore
-              setIsLoading(false);
-              setAuthInitialized(true);
-              console.log("[AuthProvider] Autenticação inicializada, usuário logado:", !!existingSession?.user);
-            }
-          });
-      } else {
-        // If no session, just mark as initialized
-        setIsLoading(false);
-        setAuthInitialized(true);
-        console.log("[AuthProvider] Autenticação inicializada, nenhum usuário logado");
+          }
+        }
+      } catch (error) {
+        console.error("[AuthProvider] Erro ao verificar sessão:", error);
+      } finally {
+        if (mounted) {
+          // Marca autenticação como inicializada e não está mais carregando
+          setIsLoading(false);
+          setAuthInitialized(true);
+          console.log("[AuthProvider] Autenticação inicializada, usuário logado:", !!session?.user);
+        }
       }
-    }).catch(error => {
-      console.error("[AuthProvider] Erro ao verificar sessão:", error);
-      if (mounted) {
-        setIsLoading(false);
-        setAuthInitialized(true);
-      }
-    });
+    };
+    
+    checkExistingSession();
     
     return () => {
       console.log("[AuthProvider] Limpeza - cancelando inscrição de alterações de estado de autenticação");
@@ -266,7 +261,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         return false;
       }
       
-      // Check if email confirmation is required
+      // Verifica se é necessária confirmação por email
       if (data?.user && !data.session) {
         console.log("[AuthProvider] Confirmação de email necessária");
         toast({

@@ -1,7 +1,7 @@
 
 import { Outlet, Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 /**
  * PrivateRoute - Protege rotas que requerem autenticação
@@ -10,6 +10,7 @@ import { useEffect } from 'react';
 export const PrivateRoute = () => {
   const { isAuthenticated, isLoading, currentUser, session } = useAuth();
   const location = useLocation();
+  const [checkCompleted, setCheckCompleted] = useState(false);
   
   // Log detalhado do componente para depuração
   useEffect(() => {
@@ -21,11 +22,18 @@ export const PrivateRoute = () => {
       timestamp: new Date().toISOString()
     });
     
+    // Garantir que o processo de verificação sempre termine
+    const timer = setTimeout(() => {
+      setCheckCompleted(true);
+      console.log("[PrivateRoute] Verificação de tempo limite concluída");
+    }, 2000);
+    
     return () => {
       console.log("[PrivateRoute] Desmontado:", {
         path: location.pathname,
         timestamp: new Date().toISOString()
       });
+      clearTimeout(timer);
     };
   }, [location.pathname, isAuthenticated, isLoading, session]);
   
@@ -35,14 +43,15 @@ export const PrivateRoute = () => {
     isAuthenticated, 
     isLoading,
     sessionExists: !!session,
+    checkCompleted,
     currentUser: currentUser ? {
       id: currentUser.id,
       email: currentUser.email,
     } : null
   });
 
-  // Se ainda estiver carregando, mostra indicador de carregamento
-  if (isLoading) {
+  // Se ainda estiver carregando e o tempo de verificação não expirou, mostra indicador de carregamento
+  if (isLoading && !checkCompleted) {
     console.log("[PrivateRoute] Autenticação carregando...");
     return (
       <div className="flex items-center justify-center min-h-screen">
