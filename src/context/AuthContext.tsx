@@ -77,7 +77,6 @@ const mapSupabaseUser = (user: SupabaseUser, profileData?: any): User => {
         hideDate: false
       }
     },
-    // Não temos senha no objeto de usuário do Supabase
     password: ''
   };
 };
@@ -87,37 +86,49 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [authInitialized, setAuthInitialized] = useState(false);
 
   useEffect(() => {
     console.log("AuthProvider: Initializing auth state");
+    let mounted = true;
     
     // First set up the auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, newSession) => {
         console.log("Auth state changed:", event, newSession?.user?.email);
-        setSession(newSession);
         
-        if (newSession?.user) {
-          // Deferred API call to prevent blocking the auth flow
-          setTimeout(async () => {
-            try {
-              // Fetch user profile data
-              const { data: profileData } = await supabase
-                .from('profiles')
-                .select('*')
-                .eq('id', newSession.user.id)
-                .maybeSingle();
-              
-              const mappedUser = mapSupabaseUser(newSession.user, profileData);
-              console.log("User mapped:", mappedUser.email);
-              setCurrentUser(mappedUser);
-            } catch (error) {
-              console.error("Error fetching user profile:", error);
-              const mappedUser = mapSupabaseUser(newSession.user);
-              setCurrentUser(mappedUser);
-            }
-          }, 0);
-        } else {
+        if (!mounted) return;
+        
+        if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+          setSession(newSession);
+          if (newSession?.user) {
+            // Update user synchronously to avoid race conditions
+            console.log("User signed in:", newSession.user.email);
+            
+            // Fetch profile data non-blocking
+            supabase
+              .from('profiles')
+              .select('*')
+              .eq('id', newSession.user.id)
+              .maybeSingle()
+              .then(({ data: profileData }) => {
+                if (mounted) {
+                  const mappedUser = mapSupabaseUser(newSession.user, profileData);
+                  console.log("User profile loaded:", mappedUser.email);
+                  setCurrentUser(mappedUser);
+                }
+              })
+              .catch(error => {
+                console.error("Error fetching user profile:", error);
+                if (mounted) {
+                  const mappedUser = mapSupabaseUser(newSession.user);
+                  setCurrentUser(mappedUser);
+                }
+              });
+          }
+        } else if (event === 'SIGNED_OUT') {
+          console.log("User signed out");
+          setSession(null);
           setCurrentUser(null);
         }
       }
@@ -126,37 +137,48 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // Then check for an existing session
     supabase.auth.getSession().then(({ data: { session: existingSession } }) => {
       console.log("Initial session check:", existingSession ? "Session found" : "No session");
+      
+      if (!mounted) return;
+      
       setSession(existingSession);
       
       if (existingSession?.user) {
-        // Deferred API call to prevent blocking the auth flow
-        setTimeout(async () => {
-          try {
-            // Fetch user profile data
-            const { data: profileData } = await supabase
-              .from('profiles')
-              .select('*')
-              .eq('id', existingSession.user.id)
-              .maybeSingle();
-            
-            const mappedUser = mapSupabaseUser(existingSession.user, profileData);
-            console.log("Initial user mapped:", mappedUser.email);
-            setCurrentUser(mappedUser);
-          } catch (error) {
+        // If we have a session, get profile data
+        supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', existingSession.user.id)
+          .maybeSingle()
+          .then(({ data: profileData }) => {
+            if (mounted) {
+              const mappedUser = mapSupabaseUser(existingSession.user, profileData);
+              console.log("Initial user mapped:", mappedUser.email);
+              setCurrentUser(mappedUser);
+            }
+          })
+          .catch(error => {
             console.error("Error fetching initial user profile:", error);
-            const mappedUser = mapSupabaseUser(existingSession.user);
-            setCurrentUser(mappedUser);
-          } finally {
-            setIsLoading(false);
-          }
-        }, 0);
-      } else {
+            if (mounted) {
+              const mappedUser = mapSupabaseUser(existingSession.user);
+              setCurrentUser(mappedUser);
+            }
+          });
+      }
+      
+      // Mark auth as initialized and not loading anymore
+      setIsLoading(false);
+      setAuthInitialized(true);
+    }).catch(error => {
+      console.error("Error checking session:", error);
+      if (mounted) {
         setIsLoading(false);
+        setAuthInitialized(true);
       }
     });
     
     return () => {
       console.log("AuthProvider: Cleanup - unsubscribing from auth state changes");
+      mounted = false;
       subscription.unsubscribe();
     };
   }, []);
@@ -264,23 +286,32 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // Logout
   const logout = async () => {
     console.log("Logging out user");
-    const { error } = await supabase.auth.signOut();
+    setIsLoading(true);
     
-    if (error) {
-      console.error("Logout error:", error.message);
-      toast({
-        title: "Erro ao fazer logout",
-        description: error.message,
-        variant: "destructive"
-      });
-    } else {
-      setCurrentUser(null);
-      setSession(null);
-      console.log("User logged out successfully");
-      toast({
-        title: "Logout realizado",
-        description: "Você foi desconectado com sucesso",
-      });
+    try {
+      const { error } = await supabase.auth.signOut();
+      
+      if (error) {
+        console.error("Logout error:", error.message);
+        toast({
+          title: "Erro ao fazer logout",
+          description: error.message,
+          variant: "destructive"
+        });
+        throw error;
+      } else {
+        setCurrentUser(null);
+        setSession(null);
+        console.log("User logged out successfully");
+        toast({
+          title: "Logout realizado",
+          description: "Você foi desconectado com sucesso",
+        });
+      }
+    } catch (error) {
+      console.error("Error during logout:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
   
@@ -288,7 +319,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const value = {
     currentUser,
     isAuthenticated: !!session?.user,
-    isLoading,
+    isLoading: isLoading || !authInitialized,
     login,
     signup,
     logout,

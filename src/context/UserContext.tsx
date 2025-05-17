@@ -14,7 +14,7 @@ interface UserContextType {
 // Criar contexto
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
-// Provider do contexto
+// Provider do contexto - apenas um wrapper para o AuthContext
 export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // Usar o contexto de autenticação diretamente
   const auth = useAuth();
@@ -27,6 +27,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     logout: auth.logout
   };
 
+  // Apenas um wrapper - não adiciona nenhum estado ou lógica adicional
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 };
 

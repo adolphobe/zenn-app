@@ -6,30 +6,16 @@ import { useAppContext } from '../context/AppContext';
 import { useSidebar } from '@/context/hooks';
 import { Menu } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useAuth } from '@/context/AuthContext';
 
 // ActoApp funciona como um layout para rotas aninhadas
 const ActoApp: React.FC = () => {
   const { state, toggleSidebar } = useAppContext();
   const { viewMode } = state;
   const { isOpen: sidebarOpen, open: openSidebar, isMobile } = useSidebar();
-  const { isLoading } = useAuth();
   const location = useLocation();
   
   // Determinar se estamos na rota dashboard para ajuste de layout
   const isDashboardRoute = location.pathname === '/dashboard' || location.pathname === '/dashboard/';
-
-  // Mostra indicador de carregamento enquanto verifica autenticação
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
-    );
-  }
-  
-  // O redirecionamento para login agora é feito apenas pelo PrivateRoute
-  // Removido código redundante de redirecionamento
   
   // Determinar se devemos usar uma largura máxima mais estreita para cartões de tarefas
   const isTaskCardView = isDashboardRoute && (viewMode === 'power' || viewMode === 'chronological');

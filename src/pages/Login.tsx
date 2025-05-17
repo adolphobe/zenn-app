@@ -15,67 +15,63 @@ const Login: React.FC = () => {
   // Obtém o caminho para redirecionar após o login
   const from = location.state?.from || "/dashboard";
 
-  // Debug
-  useEffect(() => {
-    console.log('Login page render:', { 
-      isAuthenticated, 
-      isLoading, 
-      from, 
-      pathname: location.pathname,
-      state: location.state
-    });
-  }, [isAuthenticated, isLoading, from, location]);
+  // Debug log
+  console.log('Login page render:', { isAuthenticated, isLoading, from, state: location.state });
 
-  // Verificar se já está logado e redirecionar para dashboard com atraso
-  // para garantir que o estado esteja estável
+  // Controlar carregamento visual suave
   useEffect(() => {
-    // Definir estado carregado para animações
     const timer = setTimeout(() => {
       setLoaded(true);
     }, 100);
     
-    // Só redireciona quando temos certeza do estado de autenticação
-    if (!isLoading) {
-      if (isAuthenticated === true) {
-        const redirectTimer = setTimeout(() => {
-          console.log('Já autenticado na página Login, redirecionando para:', from);
-          navigate(from, { replace: true });
-        }, 300); // Pequeno atraso para garantir estabilidade
-        
-        return () => clearTimeout(redirectTimer);
-      } else {
-        console.log('Não autenticado na página Login, permanecendo aqui');
-      }
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Redirecionar se já estiver autenticado
+  useEffect(() => {
+    let redirectTimeout: NodeJS.Timeout;
+    
+    // Só redireciona quando não estiver carregando e estiver autenticado
+    if (!isLoading && isAuthenticated) {
+      console.log('Usuário já autenticado, redirecionando para:', from);
+      
+      // Usar setTimeout para evitar loops de renderização
+      redirectTimeout = setTimeout(() => {
+        navigate(from, { replace: true });
+      }, 50);
     }
     
-    return () => clearTimeout(timer);
-  }, [navigate, isAuthenticated, isLoading, from]);
+    return () => {
+      if (redirectTimeout) clearTimeout(redirectTimeout);
+    };
+  }, [isAuthenticated, isLoading, from, navigate]);
 
   // Alternar entre login e signup
   const toggleSignup = () => {
     setIsSignup(!isSignup);
   };
 
-  // Se verificando autenticação, exibe um loader
+  // Exibir estado de carregamento enquanto verifica autenticação
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+        <div className="ml-3 text-blue-500">Verificando autenticação...</div>
       </div>
     );
   }
 
   // Nunca mostrar página de login se já estiver autenticado
-  if (isAuthenticated === true) {
+  if (isAuthenticated) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-        <div className="ml-3">Redirecionando...</div>
+        <div className="ml-3">Redirecionando para {from}...</div>
       </div>
     ); 
   }
 
-  // Animated floating items for background with random positions
+  // Componentes visuais para o fundo com animações
   const floatingItems = Array(7).fill(null).map((_, i) => (
     <div 
       key={i}
