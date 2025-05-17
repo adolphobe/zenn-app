@@ -162,12 +162,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               const mappedUser = mapSupabaseUser(existingSession.user);
               setCurrentUser(mappedUser);
             }
+          })
+          .finally(() => {
+            if (mounted) {
+              // Mark auth as initialized and not loading anymore
+              setIsLoading(false);
+              setAuthInitialized(true);
+            }
           });
+      } else {
+        // If no session, just mark as initialized
+        setIsLoading(false);
+        setAuthInitialized(true);
       }
-      
-      // Mark auth as initialized and not loading anymore
-      setIsLoading(false);
-      setAuthInitialized(true);
     }).catch(error => {
       console.error("Error checking session:", error);
       if (mounted) {
@@ -284,7 +291,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
   
   // Logout
-  const logout = async () => {
+  const logout = async (): Promise<void> => {
     console.log("Logging out user");
     setIsLoading(true);
     
@@ -310,6 +317,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
     } catch (error) {
       console.error("Error during logout:", error);
+      throw error; // Re-throw to allow handling by the caller
     } finally {
       setIsLoading(false);
     }
