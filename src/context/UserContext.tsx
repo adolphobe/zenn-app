@@ -16,17 +16,10 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 
 // Provider do contexto
 export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Usar o contexto de autenticação diretamente ao invés de duplicar o estado
+  // Usar o contexto de autenticação diretamente
   const auth = useAuth();
   
-  // Para debug
-  console.log("UserProvider: Estado de autenticação", { 
-    isAuthenticated: auth.isAuthenticated, 
-    isLoading: auth.isLoading,
-    hasUser: !!auth.currentUser
-  });
-  
-  // Valor fornecido pelo contexto - passando direto do AuthContext
+  // Simplificar e passar diretamente do AuthContext
   const value = {
     currentUser: auth.currentUser,
     isLoading: auth.isLoading,

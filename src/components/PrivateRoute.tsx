@@ -20,7 +20,7 @@ export const PrivateRoute = () => {
     });
   }, [isAuthenticated, isLoading, location]);
   
-  // Mostra carregamento enquanto verifica autenticação
+  // Se estiver carregando, mostra um indicador de carregamento
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">
@@ -29,15 +29,13 @@ export const PrivateRoute = () => {
     );
   }
   
-  // Se autenticado, permite acesso às rotas protegidas
-  // A verificação explícita de isAuthenticated === true garante que
-  // apenas estados positivamente confirmados como autenticados passem
-  if (isAuthenticated === true) {
-    console.log('Usuário autenticado, renderizando rota protegida:', location.pathname);
-    return <Outlet />;
+  // Verificação simplificada - se não autenticado, redireciona para login
+  if (!isAuthenticated) {
+    console.log('Usuário não autenticado, redirecionando para login de:', location.pathname);
+    return <Navigate to="/login" state={{ from: location.pathname }} replace />;
   }
   
-  // Se não estiver autenticado e verificação completa, redireciona para login
-  console.log('Usuário não autenticado, redirecionando para login de:', location.pathname);
-  return <Navigate to="/login" state={{ from: location.pathname }} replace />;
+  // Se autenticado, renderiza normalmente
+  console.log('Usuário autenticado, renderizando rota protegida:', location.pathname);
+  return <Outlet />;
 };

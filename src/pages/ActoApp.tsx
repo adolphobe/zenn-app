@@ -1,6 +1,6 @@
 
-import React, { useEffect } from 'react';
-import { Outlet, Navigate, useLocation } from 'react-router-dom';
+import React from 'react';
+import { Outlet, useLocation } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import { useAppContext } from '../context/AppContext';
 import { useSidebar } from '@/context/hooks';
@@ -13,13 +13,8 @@ const ActoApp: React.FC = () => {
   const { state, toggleSidebar } = useAppContext();
   const { viewMode } = state;
   const { isOpen: sidebarOpen, open: openSidebar, isMobile } = useSidebar();
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isLoading } = useAuth();
   const location = useLocation();
-  
-  // Debug
-  useEffect(() => {
-    console.log('ActoApp render:', { isAuthenticated, isLoading, path: location.pathname });
-  }, [isAuthenticated, isLoading, location]);
   
   // Determinar se estamos na rota dashboard para ajuste de layout
   const isDashboardRoute = location.pathname === '/dashboard' || location.pathname === '/dashboard/';
@@ -33,21 +28,17 @@ const ActoApp: React.FC = () => {
     );
   }
   
-  // Não renderiza nada se não estiver autenticado
-  // Isto é um segundo nível de proteção após PrivateRoute
-  if (isAuthenticated !== true) {
-    console.log('Não autenticado em ActoApp, navegando para página de login');
-    return <Navigate to="/login" state={{ from: location.pathname }} replace />;
-  }
+  // O redirecionamento para login agora é feito apenas pelo PrivateRoute
+  // Removido código redundante de redirecionamento
   
-  // Determinar se devemos usar uma largura máxima mais estreita para cartões de tarefas (apenas no modo power e chronological)
+  // Determinar se devemos usar uma largura máxima mais estreita para cartões de tarefas
   const isTaskCardView = isDashboardRoute && (viewMode === 'power' || viewMode === 'chronological');
   
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 flex">
       <Sidebar />
       
-      {/* Botão de alternância do menu móvel - Visível apenas quando a barra lateral está fechada no celular */}
+      {/* Botão de alternância do menu móvel */}
       {isMobile && !sidebarOpen && (
         <button 
           onClick={openSidebar}
@@ -64,14 +55,14 @@ const ActoApp: React.FC = () => {
           sidebarOpen 
             ? isMobile ? "ml-0" : "md:ml-64" 
             : isMobile ? "ml-0" : "md:ml-20",
-          "flex justify-center" // Adicionar isso para centralizar o conteúdo horizontalmente
+          "flex justify-center"
         )}
       >
         <div className={cn(
           "w-full", 
           isTaskCardView ? "max-w-3xl" : "max-w-6xl"
         )}> 
-          <Outlet /> {/* Renderiza a rota aninhada atual */}
+          <Outlet />
         </div>
       </main>
     </div>

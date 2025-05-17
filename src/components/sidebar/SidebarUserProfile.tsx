@@ -19,10 +19,14 @@ const SidebarUserProfile: React.FC<SidebarUserProfileProps> = ({ sidebarOpen }) 
   const handleLogout = async () => {
     try {
       console.log("Iniciando processo de logout");
+      // Desconectar primeiro
       await logout();
-      console.log("Logout bem-sucedido, navegando para /login");
-      // Forçar navegação para o login com replace para limpar a pilha de navegação
-      navigate('/login', { replace: true });
+      
+      // Aguardar um momento antes de navegar para evitar condições de corrida
+      setTimeout(() => {
+        console.log("Logout bem-sucedido, navegando para /login");
+        navigate('/login', { replace: true });
+      }, 100);
     } catch (error) {
       console.error("Erro ao fazer logout:", error);
       toast({
