@@ -138,7 +138,11 @@ const Landing: React.FC = () => {
         <div className="lg:col-span-7 flex flex-col justify-center px-8 md:px-16 lg:px-20 py-16 lg:py-0 transition-all duration-700">
           {/* Logo */}
           <div className={`mb-12 opacity-0 ${loaded ? 'opacity-100 transition-opacity duration-700' : ''}`}>
-            <h3 className="text-2xl font-bold tracking-tight text-blue-500">Zenn</h3>
+            <img 
+              src="https://cdn.shopify.com/s/files/1/0629/1993/4061/files/loogzenn.png?v=1747447750" 
+              alt="Zenn Logo" 
+              className="h-10 w-auto" 
+            />
           </div>
           
           {/* Main headline without the circle effects */}
