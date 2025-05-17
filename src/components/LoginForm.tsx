@@ -56,7 +56,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onSwitchToSignup }) =>
         setLoginError("Usuário não encontrado ou senha incorreta. Por favor, verifique suas credenciais.");
       } else {
         console.log("[LoginForm] Login bem-sucedido para:", values.email);
-        console.log("[LoginForm] DETALHES EM PORTUGUÊS: Login realizado com sucesso, aguardando navegação manual");
+        console.log("[LoginForm] DETALHES EM PORTUGUÊS: Login realizado com sucesso, redirecionando automaticamente");
         
         toast({
           title: "Login realizado com sucesso",
@@ -67,10 +67,6 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onSwitchToSignup }) =>
           console.log("[LoginForm] Executando callback de sucesso");
           onSuccess();
         }
-        
-        // Do NOT automatically navigate - user requested manual navigation
-        console.log("[LoginForm] Aguardando navegação manual para o dashboard");
-        console.log("[LoginForm] DETALHES EM PORTUGUÊS: Autenticação concluída. Clique no botão para ir ao painel principal");
       }
     } catch (error) {
       console.error("[LoginForm] Erro de login:", error);
