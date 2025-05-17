@@ -20,7 +20,21 @@ const Dashboard: React.FC = () => {
   const location = useLocation();
   const [isTaskFormOpen, setIsTaskFormOpen] = useState(false);
   const { isTaskExpanded, toggleTaskExpanded } = useExpandedTask();
-  const { currentUser, isAuthenticated } = useAuth();
+  const { currentUser, isAuthenticated, isLoading } = useAuth();
+  
+  // Log detalhado do estado de autenticação
+  useEffect(() => {
+    console.log("[Dashboard] Estado de autenticação:", { 
+      isAuthenticated, 
+      isLoading,
+      currentUser: currentUser ? {
+        id: currentUser.id,
+        email: currentUser.email,
+        name: currentUser.name
+      } : null,
+      timestamp: new Date().toISOString()
+    });
+  }, [isAuthenticated, isLoading, currentUser]);
   
   // State for showing/hiding overdue tasks, initialized from localStorage
   const [showOverdueTasks, setShowOverdueTasks] = useState(() => {
@@ -101,13 +115,28 @@ const Dashboard: React.FC = () => {
   
   return (
     <>
-      {/* Authentication Debug Banner - temporarily added */}
+      {/* Banner de depuração de autenticação - detalhado */}
       <div className="bg-amber-100 text-amber-800 p-3 mb-4 rounded-lg border border-amber-300 text-sm">
         <div className="flex items-center gap-2">
           <Info size={16} />
-          <div>
-            <strong>Debug:</strong> Authentication check temporarily disabled | 
-            Status: {isAuthenticated ? 'Autenticado como ' + currentUser?.email : 'Não autenticado'}
+          <div className="flex flex-col">
+            <strong>Status de Autenticação:</strong> 
+            <div className="text-xs">
+              {isLoading ? (
+                "Verificando autenticação..."
+              ) : isAuthenticated ? (
+                <>
+                  <span className="text-green-600 font-medium">Autenticado</span>
+                  <span> como {currentUser?.email}</span>
+                  {currentUser?.name && <span> ({currentUser.name})</span>}
+                </>
+              ) : (
+                <span className="text-red-600 font-medium">Não autenticado</span>
+              )}
+            </div>
+            <div className="text-xs mt-1 text-amber-600">
+              PrivateRoute desabilitado: Acesso temporário sem autenticação para testes
+            </div>
           </div>
         </div>
       </div>
