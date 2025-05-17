@@ -179,7 +179,7 @@ const Landing: React.FC = () => {
               </Button>
             </div>
             <div className={`mt-32 opacity-0 ${loaded ? 'fade-up fade-up-delay-3' : ''}`}>
-              <p className="text-xs text-gray-400">Você não precisa de mais produtividade. Precisa de direção.</p>
+              <p className="text-xs text-gray-400">Aplicativo em Beta, bugs podem acontecer.</p>
             </div>
           </div>
           
