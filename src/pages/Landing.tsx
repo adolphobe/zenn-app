@@ -158,11 +158,18 @@ const Landing: React.FC = () => {
             <h3 className="text-2xl font-bold tracking-tight text-blue-500">Zenn</h3>
           </div>
           
-          {/* Main headline */}
-          <h1 className={`text-4xl md:text-5xl lg:text-6xl font-semibold leading-tight md:leading-tight lg:leading-tight text-gray-900 mb-8 opacity-0 ${loaded ? 'fade-up' : ''}`}>
-            Você não precisa de mais tarefas.<br />
-            Precisa de intenção.
-          </h1>
+          {/* Main headline with the 3 circle effects */}
+          <div className="relative">
+            <h1 className={`text-4xl md:text-5xl lg:text-6xl font-semibold leading-tight md:leading-tight lg:leading-tight text-gray-900 mb-8 opacity-0 ${loaded ? 'fade-up' : ''}`}>
+              Você não precisa de mais tarefas.<br />
+              Precisa de intenção.
+            </h1>
+            
+            {/* Keep only the 3 circular effects near the headline */}
+            <div className="absolute w-[200px] h-[200px] rounded-full bg-gradient-to-tr from-blue-500/10 to-blue-400/10 backdrop-blur-sm -z-10 -top-20 -left-10"></div>
+            <div className="absolute w-[150px] h-[150px] rounded-full bg-gradient-to-bl from-blue-500/15 to-blue-300/15 backdrop-blur-md -z-10 -top-10 left-40 animate-float" style={{ animationDuration: '20s' }}></div>
+            <div className="absolute w-[120px] h-[120px] rounded-full bg-gradient-to-r from-blue-300/15 to-blue-500/15 backdrop-blur-md -z-10 top-20 left-60 animate-float" style={{ animationDuration: '15s', animationDelay: '2s' }}></div>
+          </div>
           
           {/* Subheadline */}
           <p className={`text-lg md:text-xl text-gray-600 font-light leading-relaxed mb-10 opacity-0 ${loaded ? 'fade-up fade-up-delay-1' : ''}`}>
