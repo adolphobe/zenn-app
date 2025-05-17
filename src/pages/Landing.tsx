@@ -557,8 +557,8 @@ const Landing: React.FC = () => {
       
       {/* How It Works Section - ENHANCED */}
     <section className="pt-32 relative z-10 overflow-hidden bg-gradient-to-b from-white via-blue-100 to-white">
-        <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-blue-50 to-white z-0"></div>
-        
+
+    
         <div className="container mx-auto px-8 relative z-10">
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-24 animate-on-scroll">
@@ -672,8 +672,8 @@ const Landing: React.FC = () => {
       </section>
       
       {/* Testimonial Section - ENHANCED */}
-      <section className="py-32 relative z-10 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-white via-blue-50 to-white z-0"></div>
+      <section className="py-32 relative z-10 overflow-hidden bg-gradient-to-b from-white via-blue-100 to-white">
+        
         
         {/* Animated blobs */}
         <div className="blob-animation w-72 h-72 top-40 right-20 opacity-50" style={{ animation: 'float-around 20s infinite ease-in-out' }}></div>
