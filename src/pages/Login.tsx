@@ -16,7 +16,13 @@ const Login: React.FC = () => {
   const from = location.state?.from || "/dashboard";
 
   // Debug log
-  console.log('Login page render:', { isAuthenticated, isLoading, from, state: location.state });
+  console.log('[Login] Renderizando:', { 
+    isAuthenticated, 
+    isLoading, 
+    from, 
+    state: location.state,
+    pathname: location.pathname
+  });
 
   // Controlar carregamento visual suave
   useEffect(() => {
@@ -30,8 +36,13 @@ const Login: React.FC = () => {
   // Redirecionamento automático para o dashboard se já estiver autenticado
   useEffect(() => {
     if (isAuthenticated && !isLoading) {
-      console.log("Login: Usuário já autenticado, redirecionando para:", from);
-      navigate(from, { replace: true });
+      console.log("[Login] Usuário autenticado, redirecionando para:", from);
+      // Pequeno atraso para garantir que outras partes da UI terminem de processar primeiro
+      const redirectTimer = setTimeout(() => {
+        navigate(from, { replace: true });
+      }, 100);
+      
+      return () => clearTimeout(redirectTimer);
     }
   }, [isAuthenticated, isLoading, navigate, from]);
 
@@ -46,6 +57,18 @@ const Login: React.FC = () => {
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
         <div className="ml-3 text-blue-500">Verificando autenticação...</div>
+      </div>
+    );
+  }
+
+  // Se o usuário já estiver autenticado, mostramos feedback visual temporário
+  // antes do redirecionamento automático
+  if (isAuthenticated) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-950">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mb-4"></div>
+        <div className="text-blue-500">Você já está autenticado!</div>
+        <div className="text-sm text-gray-500 mt-2">Redirecionando para {from}...</div>
       </div>
     );
   }

@@ -4,33 +4,33 @@ import { useAuth } from '../context/AuthContext';
 import { useEffect } from 'react';
 
 /**
- * PrivateRoute - Verifica se o usuário está autenticado para acessar rotas protegidas
- * Adiciona logs detalhados para ajudar na depuração
+ * PrivateRoute - Protege rotas que requerem autenticação
+ * Implementa verificação robusta de autenticação e redirecionamento inteligente
  */
 export const PrivateRoute = () => {
   const { isAuthenticated, isLoading, currentUser, session } = useAuth();
   const location = useLocation();
   
-  // Log inicial ao montar o componente
+  // Log detalhado do componente para depuração
   useEffect(() => {
-    console.log("[PrivateRoute] Componente montado:", {
+    console.log("[PrivateRoute] Montado:", {
       path: location.pathname,
       isAuthenticated,
       isLoading,
+      sessionExists: !!session,
       timestamp: new Date().toISOString()
     });
     
-    // Log adicional ao desmontar o componente
     return () => {
-      console.log("[PrivateRoute] Componente desmontado:", {
+      console.log("[PrivateRoute] Desmontado:", {
         path: location.pathname,
         timestamp: new Date().toISOString()
       });
     };
-  }, []);
+  }, [location.pathname, isAuthenticated, isLoading, session]);
   
-  // Log em cada render para depuração
-  console.log("[PrivateRoute] Verificando autenticação:", { 
+  // Log em cada renderização para depuração
+  console.log("[PrivateRoute] Renderizando:", { 
     path: location.pathname,
     isAuthenticated, 
     isLoading,
@@ -38,14 +38,12 @@ export const PrivateRoute = () => {
     currentUser: currentUser ? {
       id: currentUser.id,
       email: currentUser.email,
-      name: currentUser.name
-    } : null,
-    timestamp: new Date().toISOString()
+    } : null
   });
 
-  // Se ainda estiver carregando, mostra um indicador de carregamento
+  // Se ainda estiver carregando, mostra indicador de carregamento
   if (isLoading) {
-    console.log("[PrivateRoute] Autenticação ainda carregando...");
+    console.log("[PrivateRoute] Autenticação carregando...");
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
@@ -54,15 +52,13 @@ export const PrivateRoute = () => {
     );
   }
   
-  // Se não estiver autenticado, redireciona para o login
+  // Se não estiver autenticado após carregamento completo, redireciona para login
   if (!isAuthenticated) {
-    console.log("[PrivateRoute] Usuário não autenticado, redirecionando para login com state:", { 
-      from: location.pathname 
-    });
+    console.log("[PrivateRoute] Usuário não autenticado, redirecionando para login com state:", { from: location.pathname });
     return <Navigate to="/login" state={{ from: location.pathname }} replace />;
   }
 
-  // Se estiver autenticado, permite acesso à rota
+  // Se chegar aqui, está autenticado e pode acessar a rota
   console.log("[PrivateRoute] Usuário autenticado, permitindo acesso à rota:", location.pathname);
   return <Outlet />;
 };

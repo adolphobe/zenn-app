@@ -42,27 +42,31 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, redirectPath = "/dashb
   const onSubmit = async (values: LoginFormValues) => {
     setLoginError(null);
     try {
-      console.log("Tentando login com:", values.email, "| Senha inserida com comprimento:", values.password.length);
+      console.log("[LoginForm] Tentando login com:", values.email, "| Senha inserida com comprimento:", values.password.length);
       const success = await login(values.email, values.password);
       
       if (success) {
-        console.log("Login bem-sucedido, redirecionando para:", redirectPath);
+        console.log("[LoginForm] Login bem-sucedido, preparando redirecionamento para:", redirectPath);
         toast({
           title: "Login bem-sucedido",
           description: "Você foi autenticado com sucesso",
         });
         
-        if (onSuccess) {
-          onSuccess();
-        } else if (redirectPath) {
-          navigate(redirectPath);
-        }
+        // Pequeno atraso para garantir que estados sejam atualizados
+        setTimeout(() => {
+          if (onSuccess) {
+            onSuccess();
+          } else if (redirectPath) {
+            console.log("[LoginForm] Redirecionando para:", redirectPath);
+            navigate(redirectPath, { replace: true });
+          }
+        }, 500);
       } else {
-        console.log("Login falhou sem erro explícito");
+        console.log("[LoginForm] Login falhou");
         setLoginError("E-mail ou senha incorretos. Por favor, tente novamente.");
       }
     } catch (error: any) {
-      console.error("Erro de login detalhado:", error);
+      console.error("[LoginForm] Erro de login detalhado:", error);
       
       if (error.message?.includes("Email not confirmed")) {
         setLoginError("Por favor, confirme seu e-mail antes de fazer login. Verifique sua caixa de entrada.");

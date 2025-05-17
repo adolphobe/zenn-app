@@ -93,7 +93,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     console.log("[AuthProvider] Inicializando estado de autenticação");
     let mounted = true;
     
-    // First set up the auth state listener
+    // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, newSession) => {
         console.log("[AuthProvider] Estado de autenticação alterado:", event, newSession?.user?.email || "Sem usuário");
@@ -119,7 +119,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                   setCurrentUser(mappedUser);
                 }
               })
-              .catch((error: Error) => {
+              .catch(error => {
                 console.error("[AuthProvider] Erro ao buscar perfil do usuário:", error);
                 if (mounted) {
                   const mappedUser = mapSupabaseUser(newSession.user);
@@ -135,7 +135,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
     );
     
-    // Then check for an existing session
+    // THEN check for an existing session
     supabase.auth.getSession().then(({ data: { session: existingSession } }) => {
       console.log("[AuthProvider] Verificação inicial de sessão:", existingSession ? "Sessão encontrada" : "Sem sessão");
       
@@ -157,7 +157,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               setCurrentUser(mappedUser);
             }
           })
-          .catch((error: Error) => {
+          .catch(error => {
             console.error("[AuthProvider] Erro ao buscar perfil de usuário inicial:", error);
             if (mounted) {
               const mappedUser = mapSupabaseUser(existingSession.user);
@@ -178,7 +178,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setAuthInitialized(true);
         console.log("[AuthProvider] Autenticação inicializada, nenhum usuário logado");
       }
-    }).catch((error: Error) => {
+    }).catch(error => {
       console.error("[AuthProvider] Erro ao verificar sessão:", error);
       if (mounted) {
         setIsLoading(false);
