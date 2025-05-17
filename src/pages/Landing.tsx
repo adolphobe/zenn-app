@@ -43,7 +43,7 @@ const Landing: React.FC = () => {
         <div className="absolute inset-0 bg-[#f9fbff]/50 backdrop-blur-[10px]"></div>
       </div>
       
-      {/* Custom animations */}
+      {/* Custom animations - Com animações melhoradas para os círculos */}
       <style>
         {`
           @keyframes floating {
@@ -69,7 +69,39 @@ const Landing: React.FC = () => {
             animation: floating 15s ease-in-out infinite;
           }
           
-          /* Animação de flutuação melhorada */
+          /* Nova animação mais intensa para os círculos */
+          /* Nova animação com deslocamento ainda maior */
+          @keyframes floating-extreme {
+            0% {
+              transform: translateY(0) translateX(0) scale(1);
+              opacity: 0.35;
+            }
+            20% {
+              transform: translateY(-50px) translateX(30px) scale(1.08);
+              opacity: 0.5;
+            }
+            40% {
+              transform: translateY(-70px) translateX(-40px) scale(0.95);
+              opacity: 0.45;
+            }
+            60% {
+              transform: translateY(-30px) translateX(-60px) scale(1.05);
+              opacity: 0.5;
+            }
+            80% {
+              transform: translateY(-55px) translateX(20px) scale(0.92);
+              opacity: 0.4;
+            }
+            100% {
+              transform: translateY(0) translateX(0) scale(1);
+              opacity: 0.35;
+            }
+          }
+          
+          .animate-floating-extreme {
+            animation: floating-extreme 15s ease-in-out infinite;
+          }
+          
           @keyframes floating-enhanced {
             0% {
               transform: translateY(0) translateX(0) scale(1);
@@ -99,36 +131,6 @@ const Landing: React.FC = () => {
           
           .animate-floating-enhanced {
             animation: floating-enhanced 12s ease-in-out infinite;
-          }
-          
-          /* Animação de brilho cristalino mais suave */
-          @keyframes crystal-glint {
-            0%, 100% {
-              opacity: 0.1;
-            }
-            50% {
-              opacity: 0.4;
-            }
-          }
-          
-          .animate-crystal-glint {
-            animation: crystal-glint 4s ease-in-out infinite;
-          }
-          
-          /* Animação de pulso mais refinada para cristais */
-          @keyframes crystal-pulse {
-            0%, 100% {
-              transform: scale(1);
-              opacity: 0.7;
-            }
-            50% {
-              transform: scale(1.03);
-              opacity: 0.9;
-            }
-          }
-          
-          .animate-crystal-pulse {
-            animation: crystal-pulse 10s ease-in-out infinite;
           }
           
           /* Animação de pulso melhorada */
@@ -272,74 +274,83 @@ const Landing: React.FC = () => {
               </div>
             </div>
           ) : (
-            /* 3D image that shows when login is not active */
+            /* 3D image that shows when login is not active - COM ANIMAÇÕES MELHORADAS */
             <div className={`relative w-full h-[600px] transition-all duration-1000 ease-in-out ${
               loaded ? 'opacity-100' : 'opacity-0'
             }`}>
-              {/* ESTILO A PARTIR DAQUI */}
-              {/* 3D image com círculos em estilo neomorfismo */}
+              {/* 3D image com círculos nas cores específicas solicitadas */}
               <div className="absolute inset-0 flex items-center justify-center">
-                {/* Primeiro círculo (maior) - estilo neomorfismo */}
+                {/* Primeiro círculo (maior) - cor específica solicitada */}
                 <div 
-                  className="w-[350px] h-[350px] rounded-full animate-crystal-pulse"
+                  className="w-[350px] h-[350px] rounded-full backdrop-blur-sm animate-pulse-enhanced"
                   style={{
-                    backgroundColor: 'rgba(236, 245, 255, 0.15)',
-                    boxShadow: '10px 10px 20px rgba(180, 200, 230, 0.15), -10px -10px 20px rgba(255, 255, 255, 0.2)',
-                    border: '1px solid rgba(255, 255, 255, 0.15)'
+                    backgroundColor: 'rgb(111 166 255 / 40%)',
+                    boxShadow: 'rgb(129 177 255 / 30%) 0px 0px 25px'
                   }}
-                >
-                  {/* Pequeno círculo simbolizando o primeiro círculo do logo */}
-                  <div 
-                    className="absolute top-[25%] left-[25%] w-[15px] h-[15px] rounded-full"
-                    style={{ 
-                      backgroundColor: 'rgba(111, 166, 255, 0.3)',
-                      boxShadow: '1px 1px 2px rgba(111, 166, 255, 0.15), -1px -1px 2px rgba(255, 255, 255, 0.25)' 
-                    }}
-                  ></div>
-                </div>
+                ></div>
                 
-                {/* Segundo círculo (médio) - estilo neomorfismo */}
+                {/* Segundo círculo (médio) - cor específica solicitada */}
                 <div 
-                  className="absolute w-[300px] h-[300px] rounded-full animate-floating-enhanced" 
+                  className="absolute w-[300px] h-[300px] rounded-full backdrop-blur-md animate-floating-enhanced" 
                   style={{ 
                     animationDuration: '10s',
-                    backgroundColor: 'rgba(236, 245, 255, 0.12)',
-                    boxShadow: '8px 8px 16px rgba(180, 200, 230, 0.15), -8px -8px 16px rgba(255, 255, 255, 0.2)',
-                    border: '1px solid rgba(255, 255, 255, 0.15)'
+                    backgroundColor: 'rgb(92 143 255 / 34%)',
+                    boxShadow: 'rgb(255 255 255 / 28%) 0px 0px 20px'
                   }}
-                >
-                  {/* Pequeno círculo simbolizando o segundo círculo do logo */}
-                  <div 
-                    className="absolute top-[35%] left-[65%] w-[12px] h-[12px] rounded-full"
-                    style={{ 
-                      backgroundColor: 'rgba(92, 143, 255, 0.25)',
-                      boxShadow: '1px 1px 2px rgba(92, 143, 255, 0.15), -1px -1px 2px rgba(255, 255, 255, 0.25)' 
-                    }}
-                  ></div>
-                </div>
+                ></div>
                 
-                {/* Terceiro círculo (menor) - estilo neomorfismo */}
+                {/* Terceiro círculo (menor) - cor específica solicitada */}
                 <div 
-                  className="absolute w-[250px] h-[250px] rounded-full animate-floating-enhanced" 
+                  className="absolute w-[250px] h-[250px] rounded-full backdrop-blur-md animate-floating-enhanced" 
                   style={{ 
                     animationDuration: '8s', 
                     animationDelay: '1s',
-                    backgroundColor: 'rgba(236, 245, 255, 0.1)',
-                    boxShadow: '6px 6px 12px rgba(180, 200, 230, 0.15), -6px -6px 12px rgba(255, 255, 255, 0.2)',
-                    border: '1px solid rgba(255, 255, 255, 0.15)'
+                    backgroundColor: 'rgb(93 156 255 / 21%)',
+                    boxShadow: 'rgb(255 255 255 / 25%) 0px 0px 20px'
                   }}
-                >
-                  {/* Pequeno círculo simbolizando o terceiro círculo do logo */}
-                  <div 
-                    className="absolute top-[60%] left-[45%] w-[10px] h-[10px] rounded-full"
-                    style={{ 
-                      backgroundColor: 'rgba(93, 156, 255, 0.2)',
-                      boxShadow: '1px 1px 2px rgba(93, 156, 255, 0.1), -1px -1px 2px rgba(255, 255, 255, 0.2)' 
-                    }}
-                  ></div>
-                </div>
+                ></div>
+              </div> mas com transparência */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                {/* Primeiro círculo (maior) - cor chapada com transparência */}
+                <div 
+                  className="w-[350px] h-[350px] rounded-full backdrop-blur-sm animate-pulse-enhanced"
+                  style={{
+                    backgroundColor: 'rgba(59, 130, 246, 0.4)', /* blue-500 com 40% de opacidade */
+                    boxShadow: '0 0 25px rgba(59, 130, 246, 0.3)'
+                  }}
+                ></div>
+                
+                {/* Segundo círculo (médio) - cor chapada com transparência */}
+                <div 
+                  className="absolute w-[300px] h-[300px] rounded-full backdrop-blur-md animate-floating-enhanced" 
+                  style={{ 
+                    animationDuration: '10s',
+                    backgroundColor: 'rgba(37, 99, 235, 0.5)', /* blue-600 com 50% de opacidade */
+                    boxShadow: '0 0 20px rgba(37, 99, 235, 0.3)'
+                  }}
+                ></div>
+                
+                {/* Terceiro círculo (menor) - cor chapada com transparência */}
+                <div 
+                  className="absolute w-[250px] h-[250px] rounded-full backdrop-blur-md animate-floating-enhanced" 
+                  style={{ 
+                    animationDuration: '8s', 
+                    animationDelay: '1s',
+                    backgroundColor: 'rgba(30, 64, 175, 0.45)', /* blue-700 com 45% de opacidade */
+                    boxShadow: '0 0 20px rgba(30, 64, 175, 0.25)'
+                  }}
+                ></div>
               </div>
-              {/* TERMINA AQUI */}
+              
+              {/* Crystal/glass effect overlay - ajustado para combinar */}
+              <div 
+                className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full"
+                style={{
+                  backgroundColor: 'rgb(111 166 255 / 20%)',
+                  boxShadow: 'rgb(129 177 255 / 25%) 0px 0px 80px',
+                  animation: loaded ? 'pulse-enhanced 6s ease-in-out infinite alternate' : 'none',
+                }}
+              ></div>
             </div>
           )}
         </div>
