@@ -7,6 +7,7 @@ import { useAuth } from '@/auth/useAuth';
 interface UserContextType {
   currentUser: User | null;
   isLoading: boolean;
+  logout: () => void;  // Adicionando método logout ao tipo
 }
 
 // Criação do contexto
@@ -14,12 +15,13 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 
 // Provider do contexto
 export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { currentUser, isLoading: authLoading } = useAuth();
+  const { currentUser, isLoading: authLoading, logout } = useAuth();
   
   // Valor fornecido pelo contexto
   const value = {
-    currentUser, // Usa o usuário do AuthContext
-    isLoading: authLoading
+    currentUser,
+    isLoading: authLoading,
+    logout     // Passando o método logout do AuthContext
   };
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
