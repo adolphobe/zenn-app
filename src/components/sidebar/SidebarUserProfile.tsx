@@ -5,14 +5,14 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { useNavigate } from 'react-router-dom';
-import { useUser } from '@/context/UserContext';
+import { useAuth } from '@/context/AuthContext';
 
 interface SidebarUserProfileProps {
   sidebarOpen: boolean;
 }
 
 const SidebarUserProfile: React.FC<SidebarUserProfileProps> = ({ sidebarOpen }) => {
-  const { currentUser, logout } = useUser();
+  const { currentUser, logout } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = () => {

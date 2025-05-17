@@ -19,10 +19,6 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Agora estamos usando nosso contexto de autenticação atualizado
   const { currentUser, isLoading, isAuthenticated, logout } = useAuth();
   
-  // Log para depuração
-  console.log("UserContext: Estado de autenticação =>", 
-    isAuthenticated ? "Autenticado" : "Não autenticado");
-  
   // Valor fornecido pelo contexto
   const value = {
     currentUser,

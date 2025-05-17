@@ -16,9 +16,15 @@ import Login from "./pages/Login";
 import { AuthProvider } from "./context/AuthContext";
 import { PrivateRoute } from "./components/PrivateRoute";
 import { UserProvider } from "./context/UserContext";
-import UserMenu from "./components/UserMenu";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -50,11 +56,6 @@ const App = () => (
                 {/* Fallback para qualquer outra rota */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
-              
-              {/* Componente flutuante de UserMenu para o Sidebar */}
-              <div className="fixed bottom-4 left-4 z-50 lg:hidden">
-                <UserMenu />
-              </div>
             </UserProvider>
           </AuthProvider>
         </ToastProvider>
