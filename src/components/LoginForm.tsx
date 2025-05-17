@@ -47,6 +47,11 @@ const LoginForm: React.FC = () => {
 
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
 
+  // Definindo uma cor escura para os ícones
+  const iconColor = "text-gray-800 dark:text-gray-300"; // Um cinza bem escuro, quase preto. Ajuste o dark mode se necessário.
+  const eyeIconColor = "text-gray-700 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200";
+
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -57,8 +62,10 @@ const LoginForm: React.FC = () => {
             <FormItem className="transition-all duration-300 ease-in-out hover:translate-x-1">
               <div className="relative">
                 <Mail 
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400" // COR ALTERADA
+                  className={`absolute left-3 top-1/2 -translate-y-1/2 ${iconColor} opacity-100`} // COR FORTE E OPACIDADE 100%
                   size={18}
+                  // Tente também a prop color diretamente se a classe não for suficiente:
+                  // color={document.documentElement.classList.contains('dark') ? '#D1D5DB' : '#1F2937'} // Exemplo de cores hex
                 />
                 <FormControl>
                   <Input
@@ -80,8 +87,9 @@ const LoginForm: React.FC = () => {
             <FormItem className="transition-all duration-300 ease-in-out hover:translate-x-1">
               <div className="relative">
                 <Lock
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400" // COR ALTERADA
+                  className={`absolute left-3 top-1/2 -translate-y-1/2 ${iconColor} opacity-100`} // COR FORTE E OPACIDADE 100%
                   size={18}
+                  // color={document.documentElement.classList.contains('dark') ? '#D1D5DB' : '#1F2937'}
                 />
                 <FormControl>
                   <Input
@@ -93,7 +101,7 @@ const LoginForm: React.FC = () => {
                 </FormControl>
                 <button
                   type="button"
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300 focus:outline-none" // COR ALTERADA
+                  className={`absolute right-3 top-1/2 -translate-y-1/2 ${eyeIconColor} opacity-100 focus:outline-none`} // COR FORTE E OPACIDADE 100%
                   onClick={togglePasswordVisibility}
                 >
                   {showPassword ? (
