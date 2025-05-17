@@ -276,74 +276,69 @@ const Landing: React.FC = () => {
             <div className={`relative w-full h-[600px] transition-all duration-1000 ease-in-out ${
               loaded ? 'opacity-100' : 'opacity-0'
             }`}>
-              {/* 3D image com círculos em formato perfeitamente circular com efeito de cristal aprimorado */}
+              {/* 3D image com círculos chapados e bordas mais definidas, mantendo o efeito de cristal */}
               <div className="absolute inset-0 flex items-center justify-center">
-                {/* Primeiro círculo (maior) - cristal circular com efeitos refinados */}
+                {/* Primeiro círculo (maior) - cristal chapado com borda mais definida */}
                 <div 
                   className="w-[350px] h-[350px] rounded-full backdrop-blur-md animate-crystal-pulse"
                   style={{
                     background: 'radial-gradient(circle, rgba(255, 255, 255, 0.45) 0%, rgba(111, 166, 255, 0.3) 50%, rgba(111, 166, 255, 0.4) 100%)',
-                    boxShadow: 'inset 0 0 30px rgba(255, 255, 255, 0.4), 0 0 25px rgba(129, 177, 255, 0.3)',
-                    border: '1px solid rgba(255, 255, 255, 0.25)'
+                    border: '2px solid rgba(255, 255, 255, 0.4)'
                   }}
                 >
                   {/* Pequeno círculo brilhante simbolizando o primeiro círculo do logo */}
                   <div 
                     className="absolute top-[25%] left-[25%] w-[15px] h-[15px] rounded-full bg-white/70 animate-crystal-glint"
-                    style={{ boxShadow: '0 0 15px rgba(255, 255, 255, 0.7)' }}
                   ></div>
                 </div>
                 
-                {/* Segundo círculo (médio) - cristal circular perfeito */}
+                {/* Segundo círculo (médio) - cristal chapado com borda mais definida */}
                 <div 
                   className="absolute w-[300px] h-[300px] rounded-full backdrop-blur-md animate-floating-enhanced" 
                   style={{ 
                     animationDuration: '10s',
                     background: 'radial-gradient(circle, rgba(255, 255, 255, 0.5) 0%, rgba(92, 143, 255, 0.3) 50%, rgba(92, 143, 255, 0.34) 100%)',
-                    boxShadow: 'inset 0 0 25px rgba(255, 255, 255, 0.5), 0 0 20px rgba(255, 255, 255, 0.28)',
-                    border: '1px solid rgba(255, 255, 255, 0.3)'
+                    border: '2px solid rgba(255, 255, 255, 0.45)'
                   }}
                 >
                   {/* Pequeno círculo brilhante simbolizando o segundo círculo do logo */}
                   <div 
                     className="absolute top-[35%] left-[65%] w-[12px] h-[12px] rounded-full bg-white/70 animate-crystal-glint"
-                    style={{ animationDelay: '1s', boxShadow: '0 0 15px rgba(255, 255, 255, 0.7)' }}
+                    style={{ animationDelay: '1s' }}
                   ></div>
                 </div>
                 
-                {/* Terceiro círculo (menor) - cristal circular perfeito */}
+                {/* Terceiro círculo (menor) - cristal chapado com borda mais definida */}
                 <div 
                   className="absolute w-[250px] h-[250px] rounded-full backdrop-blur-lg animate-floating-enhanced" 
                   style={{ 
                     animationDuration: '8s', 
                     animationDelay: '1s',
                     background: 'radial-gradient(circle, rgba(255, 255, 255, 0.6) 0%, rgba(93, 156, 255, 0.25) 60%, rgba(93, 156, 255, 0.21) 100%)',
-                    boxShadow: 'inset 0 0 20px rgba(255, 255, 255, 0.6), 0 0 20px rgba(255, 255, 255, 0.25)',
-                    border: '1px solid rgba(255, 255, 255, 0.35)'
+                    border: '2px solid rgba(255, 255, 255, 0.5)'
                   }}
                 >
                   {/* Pequeno círculo brilhante simbolizando o terceiro círculo do logo */}
                   <div 
                     className="absolute top-[60%] left-[45%] w-[10px] h-[10px] rounded-full bg-white/70 animate-crystal-glint"
-                    style={{ animationDelay: '2s', boxShadow: '0 0 15px rgba(255, 255, 255, 0.7)' }}
+                    style={{ animationDelay: '2s' }}
                   ></div>
                 </div>
               </div>
               
-              {/* Crystal/glass effect overlay - efeito cristal MUITO mais enfatizado */}
+              {/* Crystal/glass effect overlay - chapado com bordas definidas */}
               <div 
                 className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full overflow-hidden"
                 style={{
                   background: 'radial-gradient(circle, rgba(255, 255, 255, 0.5) 0%, rgba(111, 166, 255, 0.35) 40%, rgba(59, 130, 246, 0.25) 100%)',
-                  boxShadow: 'inset 0 0 60px rgba(255, 255, 255, 0.5), 0 0 100px rgba(111, 166, 255, 0.4)',
-                  border: '1.5px solid rgba(255, 255, 255, 0.4)',
+                  border: '2.5px solid rgba(255, 255, 255, 0.6)',
                   backdropFilter: 'blur(6px)',
                   animation: loaded ? 'pulse-enhanced 6s ease-in-out infinite alternate' : 'none',
                 }}
               >
-                {/* Reflexos de cristal internos */}
-                <div className="absolute top-[10%] left-[10%] w-[50px] h-[120px] bg-white/30 rounded-full rotate-45 blur-sm"></div>
-                <div className="absolute bottom-[20%] right-[15%] w-[40px] h-[90px] bg-white/25 rounded-full -rotate-30 blur-sm"></div>
+                {/* Reflexos de cristal internos simplificados */}
+                <div className="absolute top-[10%] left-[10%] w-[50px] h-[120px] bg-white/20 rounded-full rotate-45"></div>
+                <div className="absolute bottom-[20%] right-[15%] w-[40px] h-[90px] bg-white/15 rounded-full -rotate-30"></div>
               </div>
             </div>
           )}
