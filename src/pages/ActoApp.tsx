@@ -20,8 +20,7 @@ const ActoApp: React.FC = () => {
   const isLoggedIn = localStorage.getItem('acto_is_logged_in') === 'true';
 
   useEffect(() => {
-    // Only redirect to login if user tries to access protected routes while not logged in
-    // Do not redirect if the user is already on the home page or login page
+    // Only redirect to login if user tries to access protected routes
     if (!isLoggedIn && 
         location.pathname !== '/' && 
         location.pathname !== '/login') {
