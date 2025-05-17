@@ -7,6 +7,7 @@ const USER_ID_KEY = 'acto_user_id';
 const IS_LOGGED_IN_KEY = 'acto_is_logged_in';
 const CONNECTION_RETRY_KEY = 'acto_connection_retry';
 const TOKEN_LAST_VERIFIED_KEY = 'acto_token_last_verified';
+const USER_PREFERENCES_KEY = 'acto_user_preferences_';
 
 /**
  * Simulates a login by checking credentials against the mock users
@@ -142,4 +143,51 @@ export const wasTokenRecentlyVerified = (maxAgeSeconds = 10): boolean => {
   console.log(`Auth: Última verificação há ${secondsSinceVerification.toFixed(1)} segundos`);
   
   return secondsSinceVerification <= maxAgeSeconds;
-}
+};
+
+/**
+ * Updates user preferences in localStorage
+ * @param userId User ID
+ * @param preferences User preferences object
+ */
+export const updateUserPreferences = (userId: string, preferences: Record<string, any>): void => {
+  try {
+    const key = `${USER_PREFERENCES_KEY}${userId}`;
+    const existingPrefs = localStorage.getItem(key);
+    const currentPrefs = existingPrefs ? JSON.parse(existingPrefs) : {};
+    
+    // Merge new preferences with existing ones
+    const updatedPrefs = { ...currentPrefs, ...preferences };
+    localStorage.setItem(key, JSON.stringify(updatedPrefs));
+    console.log(`Auth: Preferências atualizadas para usuário ${userId}`, updatedPrefs);
+  } catch (error) {
+    console.error(`Auth: Erro ao atualizar preferências para usuário ${userId}`, error);
+  }
+};
+
+/**
+ * Applies user preferences to the application
+ * @param preferences User preferences object
+ */
+export const applyUserPreferences = (preferences: Record<string, any>): void => {
+  try {
+    console.log("Auth: Aplicando preferências do usuário:", preferences);
+    
+    // Apply theme if present
+    if (preferences.theme) {
+      document.documentElement.setAttribute('data-theme', preferences.theme);
+      console.log(`Auth: Tema aplicado: ${preferences.theme}`);
+    }
+    
+    // Apply language if present
+    if (preferences.language) {
+      document.documentElement.setAttribute('lang', preferences.language);
+      console.log(`Auth: Idioma aplicado: ${preferences.language}`);
+    }
+    
+    // Apply other preferences as needed
+    // This is a placeholder for any additional preferences that might be implemented
+  } catch (error) {
+    console.error("Auth: Erro ao aplicar preferências do usuário", error);
+  }
+};
