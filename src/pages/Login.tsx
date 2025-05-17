@@ -1,29 +1,46 @@
 
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import LoginForm from '../components/LoginForm';
 import { useUser } from '@/context/UserContext';
+import { toast } from '@/hooks/use-toast';
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
-  const { currentUser } = useUser();
+  const location = useLocation();
+  const { currentUser, isLoading } = useUser();
   const [loaded, setLoaded] = useState(false);
+  
+  // Obter o caminho para onde redirecionar após o login
+  const from = location.state?.from?.pathname || "/dashboard";
+  const authError = location.state?.authError;
 
-  // Check if already logged in
+  // Mostrar mensagem se a sessão expirou
   useEffect(() => {
-    if (currentUser) {
-      navigate('/dashboard');
+    if (authError === 'session_expired') {
+      toast({
+        title: "Sessão expirada",
+        description: "Sua sessão expirou. Por favor, faça login novamente.",
+        variant: "destructive"
+      });
+    }
+  }, [authError]);
+
+  // Verificar se já está logado
+  useEffect(() => {
+    if (!isLoading && currentUser) {
+      navigate(from, { replace: true });
     }
     
-    // Set loaded state for animations
+    // Definir estado carregado para animações
     const timer = setTimeout(() => {
       setLoaded(true);
     }, 100);
     
     return () => clearTimeout(timer);
-  }, [navigate, currentUser]);
+  }, [navigate, currentUser, isLoading, from]);
 
-  // Animated floating items for the background with random positions and continuous animations
+  // Itens flutuantes animados para o fundo com posições aleatórias e animações contínuas
   const floatingItems = Array(7).fill(null).map((_, i) => (
     <div 
       key={i}
@@ -96,7 +113,7 @@ const Login: React.FC = () => {
             </p>
           </div>
 
-          <LoginForm />
+          <LoginForm redirectPath={from} />
         </div>
 
         <div className="mt-12 text-center text-xs text-muted-foreground opacity-70">

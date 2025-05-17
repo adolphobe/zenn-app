@@ -11,9 +11,9 @@ interface PrivateRouteProps {
  * Componente que protege rotas, permitindo acesso apenas a usuários autenticados
  */
 export const PrivateRoute: React.FC<PrivateRouteProps> = ({ 
-  redirectPath = '/' 
+  redirectPath = '/login'  // Mudamos para '/login' para ser mais específico
 }) => {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, authError } = useAuth();
   const location = useLocation();
 
   // Mostra um loader enquanto verifica a autenticação
@@ -25,9 +25,26 @@ export const PrivateRoute: React.FC<PrivateRouteProps> = ({
     );
   }
 
+  // Se a sessão expirou, redireciona para login com mensagem específica
+  if (authError === 'session_expired') {
+    return <Navigate 
+      to={redirectPath} 
+      state={{ 
+        from: location,
+        authError: 'session_expired' 
+      }} 
+      replace 
+    />;
+  }
+
   // Se não estiver autenticado, redireciona para a rota especificada
+  // Armazena a localização atual para redirecionar de volta após login
   if (!isAuthenticated) {
-    return <Navigate to={redirectPath} state={{ from: location }} replace />;
+    return <Navigate 
+      to={redirectPath} 
+      state={{ from: location }} 
+      replace 
+    />;
   }
 
   // Se estiver autenticado, renderiza as rotas filhas

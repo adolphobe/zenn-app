@@ -2,20 +2,20 @@
 import React, { useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
-import Dashboard from '../components/Dashboard';
 import { useAppContext } from '../context/AppContext';
 import { useSidebar } from '@/context/hooks';
 import { Menu } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useAuth } from '@/auth/useAuth';
 
-const ActoApp: React.FC = () => {
+// ActoApp agora é apenas um layout, sem lógica de autenticação
+const ActoApp: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
   const { state, toggleSidebar } = useAppContext();
   const { viewMode } = state;
   const { isOpen: sidebarOpen, open: openSidebar, isMobile } = useSidebar();
   const location = useLocation();
-  const { currentUser } = useAuth();
-  const isDashboardRoute = location.pathname === '/dashboard';
+  
+  // Determine se estamos na rota do dashboard para ajuste de layout
+  const isDashboardRoute = location.pathname === '/dashboard' || location.pathname === '/dashboard/';
 
   // Close sidebar on route change if on mobile
   useEffect(() => {
@@ -55,11 +55,7 @@ const ActoApp: React.FC = () => {
           "w-full", 
           isTaskCardView ? "max-w-3xl" : "max-w-6xl"
         )}> 
-          {isDashboardRoute ? (
-            <Dashboard />
-          ) : (
-            <Outlet />
-          )}
+          {children || <Outlet />}
         </div>
       </main>
     </div>

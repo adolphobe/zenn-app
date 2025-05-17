@@ -67,6 +67,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     checkAuth();
   }, []);
   
+  // Verificar periodicamente a validade do token (a cada 5 minutos)
+  useEffect(() => {
+    if (!currentUser) return;
+    
+    const checkTokenValidity = () => {
+      const { isValid } = getStoredAuth();
+      if (!isValid) {
+        console.log("AuthProvider: Token expired during session");
+        setAuthError('session_expired');
+        setCurrentUser(null);
+      }
+    };
+    
+    const intervalId = setInterval(checkTokenValidity, 5 * 60 * 1000);
+    return () => clearInterval(intervalId);
+  }, [currentUser]);
+  
   const login = async (email: string, password: string): Promise<boolean> => {
     setIsLoading(true);
     clearAuthError();
