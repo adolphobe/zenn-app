@@ -299,38 +299,128 @@ const Landing: React.FC = () => {
       </section>
       
     {/* How It Works Section */}
+        {/* How It Works Section - ENHANCED */}
     <section className="relative z-10 overflow-hidden bg-gradient-to-b from-white via-blue-100 to-white">
-        {/* ... (conteúdo da seção How It Works, sem alterações das sombras) ... */}
+    
         <div className="container mx-auto px-8 relative z-10">
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-24 animate-on-scroll">
               <span className="inline-block px-4 py-2 rounded-full bg-blue-100 text-blue-600 text-sm font-medium mb-4">Fluxo Simples</span>
-              <h2 className="text-4xl md:text-5xl font-semibold mb-8 text-gray-900">Como o <span className="text-blue-600">Zenn</span> funciona</h2>
+              <h2 className="text-4xl md:text-5xl font-semibold mb-8 text-gray-900">
+                Como o <span className="text-blue-600">Zenn</span> funciona
+              </h2>
             </div>
+            
             <div className="relative">
+              {/* Vertical line connecting steps */}
               <div className="absolute left-16 top-4 bottom-4 w-0.5 bg-gradient-to-b from-blue-200 via-blue-400 to-blue-200 hidden md:block"></div>
+              
               <div className="space-y-20">
+                {/* Step 1 */}
                 <div className="flex flex-col md:flex-row gap-8 md:gap-12 items-start animate-on-scroll">
-                  <div className="flex-shrink-0 relative"><div className="w-32 h-32 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-400 flex items-center justify-center text-white text-4xl font-bold">1</div><div className="absolute -bottom-2 -right-2 w-10 h-10 rounded-full bg-blue-100 opacity-70"></div></div>
-                  <div className="md:pt-3"><h3 className="text-2xl font-semibold mb-4">Defina suas tarefas</h3><p className="text-gray-600 text-lg mb-6">Adicione suas tarefas no Zenn e as classifique usando os três pilares fundamentais: importância real para seus objetivos, orgulho que sentirá após concluí-la, e contribuição para seu crescimento pessoal.</p><div className="p-5 bg-blue-50 rounded-xl"><div className="flex items-start gap-3"><CheckCircle2 className="text-blue-500 mt-1 flex-shrink-0" size={20} /><p className="text-blue-700">Interface intuitiva que torna simples a classificação de cada tarefa</p></div></div></div>
+                  <div className="flex-shrink-0 relative">
+                    <div className="w-32 h-32 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-400 flex items-center justify-center text-white text-4xl font-bold">
+                      1
+                    </div>
+                    <div className="absolute -bottom-2 -right-2 w-10 h-10 rounded-full bg-blue-100 opacity-70"></div>
+                  </div>
+                  <div className="md:pt-3">
+                    <h3 className="text-2xl font-semibold mb-4">Defina suas tarefas</h3>
+                    <p className="text-gray-600 text-lg mb-6">
+                      Adicione suas tarefas no Zenn e as classifique usando os três pilares fundamentais: importância real para seus objetivos, orgulho que sentirá após concluí-la, e contribuição para seu crescimento pessoal.
+                    </p>
+                    {/* CORREÇÃO: Adicionada a borda aqui */}
+                    <div 
+                      className="p-5 bg-blue-50 rounded-xl"
+                      style={{ border: '1px solid #bddbff' }}
+                    >
+                      <div className="flex items-start gap-3">
+                        <CheckCircle2 className="text-blue-500 mt-1 flex-shrink-0" size={20} />
+                        <p className="text-blue-700">Interface intuitiva que torna simples a classificação de cada tarefa</p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
+                
+                {/* Step 2 */}
                 <div className="flex flex-col md:flex-row gap-8 md:gap-12 items-start animate-on-scroll">
-                  <div className="flex-shrink-0 relative"><div className="w-32 h-32 rounded-2xl bg-gradient-to-br from-blue-600 to-blue-500 flex items-center justify-center text-white text-4xl font-bold">2</div><div className="absolute -bottom-2 -right-2 w-10 h-10 rounded-full bg-blue-100 opacity-70"></div></div>
-                  <div className="md:pt-3"><h3 className="text-2xl font-semibold mb-4">Priorize o que importa</h3><p className="text-gray-600 text-lg mb-6">A análise de pilares gera um score que te ajuda a distinguir o essencial do acessório. Foque nas tarefas com maior impacto e significado para seus objetivos de longo prazo.</p><div className="p-5 bg-blue-50 rounded-xl"><div className="flex items-start gap-3"><CheckCircle2 className="text-blue-500 mt-1 flex-shrink-0" size={20} /><p className="text-blue-700">Sistema de score visual que permite identificar imediatamente o que merece sua atenção</p></div></div></div>
+                  <div className="flex-shrink-0 relative">
+                    <div className="w-32 h-32 rounded-2xl bg-gradient-to-br from-blue-600 to-blue-500 flex items-center justify-center text-white text-4xl font-bold">
+                      2
+                    </div>
+                    <div className="absolute -bottom-2 -right-2 w-10 h-10 rounded-full bg-blue-100 opacity-70"></div>
+                  </div>
+                  <div className="md:pt-3">
+                    <h3 className="text-2xl font-semibold mb-4">Priorize o que importa</h3>
+                    <p className="text-gray-600 text-lg mb-6">
+                     A análise de pilares gera um score que te ajuda a distinguir o essencial do acessório. Foque nas tarefas com maior impacto e significado para seus objetivos de longo prazo.
+                    </p>
+                    {/* CORREÇÃO: Adicionada a borda aqui */}
+                    <div 
+                      className="p-5 bg-blue-50 rounded-xl"
+                      style={{ border: '1px solid #bddbff' }}
+                    >
+                      <div className="flex items-start gap-3">
+                        <CheckCircle2 className="text-blue-500 mt-1 flex-shrink-0" size={20} />
+                        <p className="text-blue-700">Sistema de score visual que permite identificar imediatamente o que merece sua atenção</p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
+                
+                {/* Step 3 */}
                 <div className="flex flex-col md:flex-row gap-8 md:gap-12 items-start animate-on-scroll">
-                  <div className="flex-shrink-0 relative"><div className="w-32 h-32 rounded-2xl bg-gradient-to-br from-blue-700 to-blue-600 flex items-center justify-center text-white text-4xl font-bold">3</div><div className="absolute -bottom-2 -right-2 w-10 h-10 rounded-full bg-blue-100 opacity-70"></div></div>
-                  <div className="md:pt-3"><h3 className="text-2xl font-semibold mb-4">Revise e aprenda</h3><p className="text-gray-600 text-lg mb-6">Acompanhe seu progresso através de insights estratégicos que revelam padrões em suas escolhas. Refine sua abordagem ao longo do tempo para maximizar seu impacto e satisfação pessoal.</p><div className="p-5 bg-blue-50 rounded-xl"><div className="flex items-start gap-3"><CheckCircle2 className="text-blue-500 mt-1 flex-shrink-0" size={20} /><p className="text-blue-700">Relatórios semanais personalizados para aprimorar constantemente suas decisões</p></div></div></div>
+                  <div className="flex-shrink-0 relative">
+                    <div className="w-32 h-32 rounded-2xl bg-gradient-to-br from-blue-700 to-blue-600 flex items-center justify-center text-white text-4xl font-bold">
+                      3
+                    </div>
+                    <div className="absolute -bottom-2 -right-2 w-10 h-10 rounded-full bg-blue-100 opacity-70"></div>
+                  </div>
+                  <div className="md:pt-3">
+                    <h3 className="text-2xl font-semibold mb-4">Revise e aprenda</h3>
+                    <p className="text-gray-600 text-lg mb-6">
+                      Acompanhe seu progresso através de insights estratégicos que revelam padrões em suas escolhas. Refine sua abordagem ao longo do tempo para maximizar seu impacto e satisfação pessoal.
+                    </p>
+                    {/* CORREÇÃO: Adicionada a borda aqui */}
+                    <div 
+                      className="p-5 bg-blue-50 rounded-xl"
+                      style={{ border: '1px solid #bddbff' }}
+                    >
+                      <div className="flex items-start gap-3">
+                        <CheckCircle2 className="text-blue-500 mt-1 flex-shrink-0" size={20} />
+                        <p className="text-blue-700">Relatórios semanais personalizados para aprimorar constantemente suas decisões</p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
+          
+          {/* App Screenshot */}
           <div className="mt-32 animate-on-scroll">
             <div className="relative mx-auto max-w-4xl">
-              <div className="absolute -top-8 -left-8 w-64 h-64 bg-blue-100 rounded-full opacity-70 blur-3xl"></div><div className="absolute -bottom-8 -right-8 w-64 h-64 bg-blue-200 rounded-full opacity-70 blur-3xl"></div>
-              <div className="relative overflow-hidden rounded-2xl border border-white/30"><img src="https://images.unsplash.com/photo-1555421689-3f034debb7a6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Dashboard" className="w-full h-auto"/><div className="absolute inset-0 bg-gradient-to-tr from-blue-600/20 via-blue-400/10 to-transparent"></div></div>
-              <div className="absolute top-10 right-10 max-w-xs bg-white/90 backdrop-blur-sm p-4 rounded-lg border border-blue-100"><h4 className="font-medium text-blue-700 mb-1">Visão por Pilares</h4><p className="text-sm text-gray-600">Visualize rapidamente suas tarefas organizadas de acordo com os três pilares fundamentais.</p></div>
-              <div className="absolute bottom-10 left-10 max-w-xs bg-white/90 backdrop-blur-sm p-4 rounded-lg border border-blue-100"><h4 className="font-medium text-blue-700 mb-1">Score Intuitivo</h4><p className="text-sm text-gray-600">Identifique facilmente quais tarefas merecem sua atenção prioritária através dos scores visuais.</p></div>
+              <div className="absolute -top-8 -left-8 w-64 h-64 bg-blue-100 rounded-full opacity-70 blur-3xl"></div>
+              <div className="absolute -bottom-8 -right-8 w-64 h-64 bg-blue-200 rounded-full opacity-70 blur-3xl"></div>
+              <div className="relative overflow-hidden rounded-2xl border border-white/30">
+                <img 
+                  src="https://images.unsplash.com/photo-1555421689-3f034debb7a6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" 
+                  alt="Dashboard" 
+                  className="w-full h-auto"
+                />
+                <div className="absolute inset-0 bg-gradient-to-tr from-blue-600/20 via-blue-400/10 to-transparent"></div>
+              </div>
+              
+              {/* Features callouts overlayed on screenshot */}
+              <div className="absolute top-10 right-10 max-w-xs bg-white/90 backdrop-blur-sm p-4 rounded-lg border border-blue-100">
+                <h4 className="font-medium text-blue-700 mb-1">Visão por Pilares</h4>
+                <p className="text-sm text-gray-600">Visualize rapidamente suas tarefas organizadas de acordo com os três pilares fundamentais.</p>
+              </div>
+              
+              <div className="absolute bottom-10 left-10 max-w-xs bg-white/90 backdrop-blur-sm p-4 rounded-lg border border-blue-100">
+                <h4 className="font-medium text-blue-700 mb-1">Score Intuitivo</h4>
+                <p className="text-sm text-gray-600">Identifique facilmente quais tarefas merecem sua atenção prioritária através dos scores visuais.</p>
+              </div>
             </div>
           </div>
         </div>
