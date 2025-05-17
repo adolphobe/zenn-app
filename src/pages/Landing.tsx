@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, ArrowUpRight, CheckCircle2 } from 'lucide-react'; // Removido X se não for usado em outro lugar
+import { ArrowRight, ArrowUpRight, CheckCircle2 } from 'lucide-react'; // X não é necessário para este modal simples
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import LoginForm from '@/components/LoginForm';
@@ -13,6 +13,9 @@ const Landing: React.FC = () => {
   const [circlesKey, setCirclesKey] = useState(Date.now());
   
   const isLoggedIn = localStorage.getItem('acto_is_logged_in') === 'true';
+
+  // PASSO 2.1: Estado Mínimo para o Modal Simples
+  const [showSimpleModal, setShowSimpleModal] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -35,6 +38,17 @@ const Landing: React.FC = () => {
       setCirclesKey(Date.now());
     }
   }, [showLogin]);
+
+  // PASSO 2.2: Funções Mínimas para o Modal Simples
+  const openSimpleModal = () => {
+    setShowSimpleModal(true);
+    // Deixe comentado por enquanto: document.body.style.overflow = 'hidden'; 
+  };
+
+  const closeSimpleModal = () => {
+    setShowSimpleModal(false);
+    // Deixe comentado por enquanto: document.body.style.overflow = 'auto'; 
+  };
 
   useEffect(() => {
     const observerOptions = {
@@ -70,36 +84,13 @@ const Landing: React.FC = () => {
     <div className="min-h-screen overflow-x-hidden">
       <style>
         {`
-          @keyframes floating {
-            0%, 100% { transform: translateY(0) translateX(0); opacity: 0.3; }
-            25% { transform: translateY(-15px) translateX(10px); opacity: 0.5; }
-            50% { transform: translateY(-25px) translateX(-10px); opacity: 0.4; }
-            75% { transform: translateY(-10px) translateX(-5px); opacity: 0.3; }
-          }
+          /* Seu CSS existente ... */
+          @keyframes floating { 0%, 100% { transform: translateY(0) translateX(0); opacity: 0.3; } 25% { transform: translateY(-15px) translateX(10px); opacity: 0.5; } 50% { transform: translateY(-25px) translateX(-10px); opacity: 0.4; } 75% { transform: translateY(-10px) translateX(-5px); opacity: 0.3; } }
           .animate-floating { animation: floating 15s ease-in-out infinite; }
-          
-          @keyframes floating-enhanced { 
-            0% { transform: translateY(0) translateX(0) scale(1); opacity: 0.2; }
-            20% { transform: translateY(-25px) translateX(20px) scale(1.05); opacity: 0.4; }
-            40% { transform: translateY(-35px) translateX(-15px) scale(0.95); opacity: 0.5; }
-            60% { transform: translateY(-15px) translateX(-30px) scale(1.02); opacity: 0.4; }
-            80% { transform: translateY(-30px) translateX(10px) scale(0.98); opacity: 0.3; }
-            100% { transform: translateY(0) translateX(0) scale(1); opacity: 0.2; }
-          }
-          .animate-floating-enhanced { 
-            animation: floating-enhanced 12s ease-in-out infinite;
-            will-change: transform, opacity;
-           }
-          
-          @keyframes pulse-enhanced {
-            0%, 100% { transform: scale(1); opacity: 0.3; }
-            50% { transform: scale(1.1); opacity: 0.5; }
-          }
-          .animate-pulse-enhanced { 
-            animation: pulse-enhanced 8s ease-in-out infinite; 
-            will-change: transform, opacity;
-          }
-
+          @keyframes floating-enhanced {  0% { transform: translateY(0) translateX(0) scale(1); opacity: 0.2; } 20% { transform: translateY(-25px) translateX(20px) scale(1.05); opacity: 0.4; } 40% { transform: translateY(-35px) translateX(-15px) scale(0.95); opacity: 0.5; } 60% { transform: translateY(-15px) translateX(-30px) scale(1.02); opacity: 0.4; } 80% { transform: translateY(-30px) translateX(10px) scale(0.98); opacity: 0.3; } 100% { transform: translateY(0) translateX(0) scale(1); opacity: 0.2; } }
+          .animate-floating-enhanced { animation: floating-enhanced 12s ease-in-out infinite; will-change: transform, opacity; }
+          @keyframes pulse-enhanced { 0%, 100% { transform: scale(1); opacity: 0.3; }  50% { transform: scale(1.1); opacity: 0.5; } }
+          .animate-pulse-enhanced { animation: pulse-enhanced 8s ease-in-out infinite;  will-change: transform, opacity; }
           @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
           .fade-up { animation: fadeUp 1.2s ease-out forwards; }
           .fade-up-delay-1 { animation-delay: 0.2s; }
@@ -235,8 +226,10 @@ const Landing: React.FC = () => {
                   <h3 className="text-2xl font-semibold mb-5 text-gray-800 dark:text-white">Análise por pilares</h3>
                   <p className="text-gray-600 dark:text-gray-300 text-lg flex-grow">Avalie cada tarefa pelos três pilares fundamentais: importância real, orgulho pós-execução e contribuição para seu crescimento pessoal.</p>
                   <div className="mt-8">
-                    <Button variant="ghost" className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/70 p-0 flex items-center gap-2 group" /*onClick={() => openExplanationModal('pilares')}*/>
-                        Saiba mais <ArrowUpRight size={18} className="transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
+                    {/* PASSO 2.3: Botão de teste para o modal simples */}
+                    <Button variant="ghost" className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/70 p-0 flex items-center gap-2 group" onClick={openSimpleModal}>
+                        Saiba mais (Teste Modal)
+                        <ArrowUpRight size={18} className="transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
                     </Button>
                   </div>
                 </CardContent>
@@ -278,7 +271,8 @@ const Landing: React.FC = () => {
         </div>
       </section>
       
-      {/* SEÇÃO HOW IT WORKS */}
+      {/* ... RESTANTE DAS SEÇÕES (How It Works, Testimonials, CTA Final, Footer) ... */}
+      {/* COLE O RESTANTE DO SEU CÓDIGO A PARTIR DAQUI, SEM MODIFICAÇÕES DE MODAL AINDA */}
       <section className="relative z-10 overflow-hidden bg-gradient-to-b from-white via-blue-100 to-white dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
           <div className="container mx-auto px-8 relative z-10">
             <div className="max-w-4xl mx-auto">
@@ -328,8 +322,6 @@ const Landing: React.FC = () => {
             </div>
           </div>
         </section>
-
-      {/* SEÇÃO TESTIMONIALS */}
       <section className="py-32 relative z-10 overflow-hidden bg-gradient-to-b from-white via-blue-100 to-white dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
         <div className="blob-animation w-72 h-72 top-40 right-20 opacity-50" style={{ animation: 'float-around 20s infinite ease-in-out' }}></div>
         <div className="blob-animation w-80 h-80 bottom-40 left-10 opacity-40" style={{ animation: 'float-around 25s infinite ease-in-out reverse' }}></div>
@@ -349,8 +341,6 @@ const Landing: React.FC = () => {
           </div>
         </div>
       </section>
-
-      {/* SEÇÃO FINAL CTA */}
       <section className="py-32 relative z-10 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-blue-500 dark:from-blue-800 dark:to-blue-700 z-0"></div>
         <div className="absolute inset-0 overflow-hidden"> <div className="absolute -top-40 -left-40 w-80 h-80 bg-white/10 rounded-full blur-xl"></div> <div className="absolute top-20 right-20 w-60 h-60 bg-white/10 rounded-full blur-xl"></div> <div className="absolute bottom-20 left-1/3 w-40 h-40 bg-white/10 rounded-full blur-xl"></div> <svg className="absolute bottom-0 left-0 w-full" viewBox="0 0 1440 320" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0,256L80,261.3C160,267,320,277,480,250.7C640,224,800,160,960,138.7C1120,117,1280,139,1360,149.3L1440,160L1440,320L1360,320C1280,320,1120,320,960,320C800,320,640,320,480,320C320,320,160,320,80,320L0,320Z" fill="rgba(255,255,255,0.05)"></path></svg> <svg className="absolute bottom-0 left-0 w-full" viewBox="0 0 1440 200" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0,128L48,117.3C96,107,192,85,288,90.7C384,96,480,128,576,144C672,160,768,160,864,138.7C960,117,1056,75,1152,58.7C1248,43,1344,53,1392,58.7L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z" fill="rgba(255,255,255,0.1)"></path></svg> </div>
@@ -367,8 +357,6 @@ const Landing: React.FC = () => {
           </div>
         </div>
       </section>
-
-      {/* FOOTER */}
       <footer className="py-16 bg-gray-900 text-gray-400 relative z-10 dark:bg-gray-950">
         <div className="container mx-auto px-8">
           <div className="flex flex-col items-center text-center">
@@ -379,6 +367,42 @@ const Landing: React.FC = () => {
           </div>
         </div>
       </footer>
+
+      {/* PASSO 2.3: JSX do Modal Simples */}
+      {showSimpleModal && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)', // Overlay simples
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 10000, 
+          }}
+          onClick={closeSimpleModal} 
+        >
+          <div
+            style={{
+              backgroundColor: 'white',
+              padding: '20px',
+              borderRadius: '8px',
+              maxWidth: '500px',
+              width: '90%',
+            }}
+            onClick={(e) => e.stopPropagation()} 
+          >
+            <h2>Título do Modal Simples</h2>
+            <p>Este é um conteúdo de teste para o modal.</p>
+            <button onClick={closeSimpleModal} style={{ marginTop: '10px', padding: '8px 12px', cursor: 'pointer', border: '1px solid black' }}>
+              Fechar Simples
+            </button>
+          </div>
+        </div>
+      )}
 
     </div>
   );
