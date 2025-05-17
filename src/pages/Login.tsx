@@ -1,12 +1,14 @@
 
 import React, { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import LoginForm from '../components/LoginForm';
 import SignupForm from '../components/SignupForm';
+import { Button } from '@/components/ui/button';
 
 const Login: React.FC = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { isAuthenticated, isLoading } = useAuth();
   const [isSignup, setIsSignup] = useState(false);
   const [loaded, setLoaded] = useState(false);
@@ -32,6 +34,12 @@ const Login: React.FC = () => {
     }
   }, [isAuthenticated, isLoading, from]);
 
+  // Navigate to dashboard manually
+  const handleGoToDashboard = () => {
+    console.log("[Login] User manually navigating to dashboard");
+    navigate('/dashboard');
+  };
+
   // Toggle between login and signup
   const toggleSignup = () => {
     setIsSignup(!isSignup);
@@ -52,6 +60,13 @@ const Login: React.FC = () => {
           <p className="font-bold">Already Authenticated</p>
           <p>You are already logged in. Check console for technical details.</p>
         </div>
+        
+        <Button 
+          onClick={handleGoToDashboard}
+          className="mt-6 bg-blue-600 hover:bg-blue-700"
+        >
+          Go to Dashboard
+        </Button>
       </div>
     );
   }

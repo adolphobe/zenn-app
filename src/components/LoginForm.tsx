@@ -11,6 +11,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 import { toast } from '@/hooks/use-toast';
 import { useAuth } from '@/context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const loginSchema = z.object({
   email: z.string().email("Digite um e-mail válido"),
@@ -26,6 +27,7 @@ interface LoginFormProps {
 
 const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onSwitchToSignup }) => {
   const { login } = useAuth();
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
@@ -59,6 +61,9 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onSwitchToSignup }) =>
           console.log("[LoginForm] Running onSuccess callback");
           onSuccess();
         }
+        
+        // We'll add a button to navigate to dashboard instead of auto-redirecting
+        console.log("[LoginForm] User can now navigate to dashboard manually");
       }
     } catch (error) {
       console.error("[LoginForm] Login error:", error);
@@ -69,6 +74,11 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onSwitchToSignup }) =>
   };
 
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
+  
+  const handleGoToDashboard = () => {
+    console.log("[LoginForm] User manually navigating to dashboard");
+    navigate('/dashboard');
+  };
 
   // Colors and icons
   const iconColor = "text-gray-800 dark:text-gray-200"; 
