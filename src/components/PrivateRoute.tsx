@@ -6,14 +6,6 @@ import { useEffect, useState } from 'react';
 export const PrivateRoute = () => {
   const { isAuthenticated, isLoading } = useAuth();
   const location = useLocation();
-  const [authChecked, setAuthChecked] = useState(false);
-  
-  // Mark authChecked as true once the initial authentication check is complete
-  useEffect(() => {
-    if (!isLoading) {
-      setAuthChecked(true);
-    }
-  }, [isLoading]);
   
   // Show loading indicator if authentication state is still being determined
   if (isLoading) {

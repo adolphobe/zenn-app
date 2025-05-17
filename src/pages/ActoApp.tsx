@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Outlet, Navigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import { useAppContext } from '../context/AppContext';
 import { useSidebar } from '@/context/hooks';
@@ -13,26 +13,28 @@ const ActoApp: React.FC = () => {
   const { state, toggleSidebar } = useAppContext();
   const { viewMode } = state;
   const { isOpen: sidebarOpen, open: openSidebar, isMobile } = useSidebar();
-  const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
   
   // Determine if we're on the dashboard route for layout adjustment
   const isDashboardRoute = location.pathname === '/dashboard' || location.pathname === '/dashboard/';
 
-  // If not authenticated, redirect to login
-  React.useEffect(() => {
-    if (!isAuthenticated) {
-      console.log('Not authenticated in ActoApp, redirecting to login');
-      navigate('/login', { replace: true });
-    }
-  }, [isAuthenticated, navigate]);
-
+  // Show loading indicator while checking authentication
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+  
+  // Don't render anything if not authenticated
+  if (!isAuthenticated) {
+    console.log('Not authenticated in ActoApp, navigating to login page');
+    return <Navigate to="/login" replace />;
+  }
+  
   // Determine if we should use a narrower max-width for task cards (only in power and chronological mode)
   const isTaskCardView = isDashboardRoute && (viewMode === 'power' || viewMode === 'chronological');
-  
-  if (!isAuthenticated) {
-    return null; // Don't render anything if not authenticated
-  }
   
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 flex">

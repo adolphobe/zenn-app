@@ -17,11 +17,14 @@ const Login: React.FC = () => {
 
   // Check if already logged in and redirect to dashboard
   useEffect(() => {
-    if (!isLoading && isAuthenticated) {
-      console.log('Already authenticated, redirecting to:', from);
-      navigate(from, { replace: true });
-    } else {
-      console.log('Auth state in Login:', { isLoading, isAuthenticated });
+    // Only redirect when we're sure of the authentication state
+    if (!isLoading) {
+      if (isAuthenticated) {
+        console.log('Already authenticated in Login page, redirecting to:', from);
+        navigate(from, { replace: true });
+      } else {
+        console.log('Not authenticated in Login page, staying here');
+      }
     }
     
     // Set loaded state for animations
@@ -44,6 +47,11 @@ const Login: React.FC = () => {
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
       </div>
     );
+  }
+
+  // Never show login page if already authenticated
+  if (isAuthenticated) {
+    return null; // Will be redirected by useEffect
   }
 
   // Animated floating items for background with random positions and continuous animations

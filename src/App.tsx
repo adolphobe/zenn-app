@@ -17,11 +17,13 @@ import { AuthProvider } from "./context/AuthContext";
 import { PrivateRoute } from "./components/PrivateRoute";
 import { UserProvider } from "./context/UserContext";
 
+// Create Query Client with better error handling
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry: 1,
       refetchOnWindowFocus: false,
+      staleTime: 60000, // 1 minute
     },
   },
 });
@@ -36,11 +38,11 @@ const App = () => (
           <AuthProvider>
             <UserProvider>
               <Routes>
-                {/* Rotas públicas */}
+                {/* Public routes */}
                 <Route path="/" element={<Landing />} />
                 <Route path="/login" element={<Login />} />
                 
-                {/* Rotas protegidas usando o PrivateRoute - estrutura unificada */}
+                {/* Protected routes using PrivateRoute */}
                 <Route element={<PrivateRoute />}>
                   <Route path="/dashboard" element={<ActoApp />}>
                     <Route index element={<Dashboard />} />
@@ -49,11 +51,11 @@ const App = () => (
                   </Route>
                 </Route>
                 
-                {/* Redirecionamentos de rotas legadas para o novo padrão */}
+                {/* Legacy route redirects */}
                 <Route path="/strategic-review" element={<Navigate to="/dashboard/strategic-review" replace />} />
                 <Route path="/history" element={<Navigate to="/dashboard/history" replace />} />
                 
-                {/* Fallback para qualquer outra rota */}
+                {/* Fallback route */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </UserProvider>

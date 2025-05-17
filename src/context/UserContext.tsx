@@ -16,21 +16,21 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 
 // Context provider
 export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Using our updated authentication context
-  const { currentUser, isLoading, isAuthenticated, logout } = useAuth();
+  // Use authentication context directly instead of duplicating state
+  const auth = useAuth();
   
-  console.log("UserProvider: Received auth state", { 
-    isAuthenticated, 
-    isLoading,
-    hasUser: !!currentUser
+  console.log("UserProvider: Using auth state", { 
+    isAuthenticated: auth.isAuthenticated, 
+    isLoading: auth.isLoading,
+    hasUser: !!auth.currentUser
   });
   
-  // Value provided by the context
+  // Value provided by the context - directly passing through from AuthContext
   const value = {
-    currentUser,
-    isLoading,
-    isAuthenticated,
-    logout
+    currentUser: auth.currentUser,
+    isLoading: auth.isLoading,
+    isAuthenticated: auth.isAuthenticated,
+    logout: auth.logout
   };
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
