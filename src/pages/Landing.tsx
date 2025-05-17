@@ -30,23 +30,7 @@ const Landing: React.FC = () => {
     }
   }, [navigate]);
 
-  // Generate animated floating elements with blue color
-  const floatingElements = Array(6).fill(null).map((_, i) => (
-    <div 
-      key={i}
-      className="absolute rounded-full animate-floating opacity-30"
-      style={{
-        backgroundColor: i % 2 === 0 ? 'rgba(59, 130, 246, 0.4)' : 'rgba(59, 130, 246, 0.2)',
-        width: `${Math.random() * 100 + 50}px`,
-        height: `${Math.random() * 100 + 50}px`,
-        left: `${Math.random() * 70}%`,
-        top: `${Math.random() * 100}%`,
-        animationDelay: `${Math.random() * 5}s`,
-        animationDuration: `${Math.random() * 10 + 10}s`,
-        filter: 'blur(4px)',
-      }}
-    />
-  ));
+  // Removido o código de floatingElements aqui
 
   return (
     <div className="min-h-screen overflow-hidden relative">
@@ -146,8 +130,7 @@ const Landing: React.FC = () => {
         `}
       </style>
       
-      {/* Floating elements background */}
-      
+      {/* Removida a linha com floatingElements aqui */}
       
       {/* Main content */}
       <div className="container mx-auto min-h-screen grid grid-cols-1 lg:grid-cols-12 relative z-10">
@@ -158,17 +141,14 @@ const Landing: React.FC = () => {
             <h3 className="text-2xl font-bold tracking-tight text-blue-500">Zenn</h3>
           </div>
           
-          {/* Main headline with the 3 circle effects */}
+          {/* Main headline without the circle effects */}
           <div className="relative">
             <h1 className={`text-4xl md:text-5xl lg:text-6xl font-semibold leading-tight md:leading-tight lg:leading-tight text-gray-900 mb-8 opacity-0 ${loaded ? 'fade-up' : ''}`}>
               Você não precisa de mais tarefas.<br />
               Precisa de intenção.
             </h1>
             
-            {/* Keep only the 3 circular effects near the headline */}
-            <div className="absolute w-[200px] h-[200px] rounded-full bg-gradient-to-tr from-blue-500/10 to-blue-400/10 backdrop-blur-sm -z-10 -top-20 -left-10"></div>
-            <div className="absolute w-[150px] h-[150px] rounded-full bg-gradient-to-bl from-blue-500/15 to-blue-300/15 backdrop-blur-md -z-10 -top-10 left-40 animate-float" style={{ animationDuration: '20s' }}></div>
-            <div className="absolute w-[120px] h-[120px] rounded-full bg-gradient-to-r from-blue-300/15 to-blue-500/15 backdrop-blur-md -z-10 top-20 left-60 animate-float" style={{ animationDuration: '15s', animationDelay: '2s' }}></div>
+            {/* Removed the 3 circular effects near the headline */}
           </div>
           
           {/* Subheadline */}
