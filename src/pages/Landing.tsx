@@ -188,7 +188,7 @@ const Landing: React.FC = () => {
               <div className="w-full h-full flex items-center justify-center">
                 <div className={`w-full max-w-md bg-white/80 backdrop-blur-md p-8 rounded-xl ${showLogin ? 'slide-in' : ''}`}>
                   <div className="flex justify-between items-center mb-6">
-                    <h3 className="text-xl font-semibold">Bem-vindo de volta!</h3>
+                    <h3 className="text-xl font-semibold">Faça seu login</h3>
                     <button onClick={() => { setShowLogin(false); }} className="text-gray-400 hover:text-gray-600 transition-colors">✕</button>
                   </div>
                   <LoginForm />
