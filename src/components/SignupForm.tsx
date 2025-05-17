@@ -57,9 +57,9 @@ const SignupForm: React.FC<SignupFormProps> = ({ onCancel }) => {
         setSignupSuccess("Conta criada com sucesso!");
         form.reset();
         
-        // Redirect to dashboard after successful signup
+        // Redirect to dashboard2 after successful signup
         setTimeout(() => {
-          navigate('/dashboard');
+          navigate('/dashboard2');
         }, 1500);
       }
     } catch (error) {

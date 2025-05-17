@@ -15,8 +15,11 @@ export const PrivateRoute = () => {
   const location = useLocation();
   const { isOpen: sidebarOpen, open: openSidebar, isMobile } = useSidebar();
 
+  console.log(`[PrivateRoute] Checking auth at ${location.pathname}, isAuthenticated: ${isAuthenticated}, isLoading: ${isLoading}`);
+
   // Show loading state while checking authentication
   if (isLoading) {
+    console.log("[PrivateRoute] Still loading auth state...");
     return <div className="flex items-center justify-center min-h-screen">
       <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
     </div>;
@@ -24,17 +27,17 @@ export const PrivateRoute = () => {
 
   // Redirect to login if not authenticated
   if (!isAuthenticated) {
-    console.log("PrivateRoute: User not authenticated, redirecting to login");
+    console.log(`[PrivateRoute] User not authenticated, redirecting to login from ${location.pathname}`);
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
   // User is authenticated, render the protected layout with sidebar
-  console.log("PrivateRoute: User is authenticated, rendering protected content");
+  console.log(`[PrivateRoute] User is authenticated, rendering protected content at ${location.pathname}`);
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 flex">
       <Sidebar />
       
-      {/* Botão de alternância do menu móvel */}
+      {/* Mobile menu toggle button */}
       {isMobile && !sidebarOpen && (
         <button 
           onClick={openSidebar}

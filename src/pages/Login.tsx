@@ -12,8 +12,8 @@ const Login: React.FC = () => {
   const [isSignup, setIsSignup] = useState(false);
   const [loaded, setLoaded] = useState(false);
   
-  // Get redirect path from location state or default to dashboard
-  const from = location.state?.from?.pathname || "/dashboard";
+  // Get redirect path from location state or default to dashboard2
+  const from = location.state?.from?.pathname || "/dashboard2";
   
   // Smooth visual loading
   useEffect(() => {
@@ -131,7 +131,7 @@ const Login: React.FC = () => {
           {isSignup ? (
             <SignupForm onCancel={toggleSignup} />
           ) : (
-            <LoginForm onSwitchToSignup={toggleSignup} onSuccess={() => navigate('/dashboard', { replace: true })} />
+            <LoginForm onSwitchToSignup={toggleSignup} onSuccess={() => navigate('/dashboard2', { replace: true })} />
           )}
         </div>
 
