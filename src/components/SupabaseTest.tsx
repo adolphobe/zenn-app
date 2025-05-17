@@ -9,16 +9,9 @@ export function SupabaseTest() {
   useEffect(() => {
     async function testConnection() {
       try {
-        // Try to get the current time from Supabase
-        const { data, error } = await supabase.from('_validate_connection_').select('*').limit(1).single();
+        // Use a simple RPC call to check if connection is working
+        const { error } = await supabase.rpc('version');
         
-        // Specific error when the table doesn't exist, but the connection is ok
-        if (error && error.code === 'PGRST116') {
-          setStatus('success');
-          setMessage('Conexão com Supabase estabelecida com sucesso!');
-          return;
-        }
-
         if (error) {
           throw error;
         }
