@@ -11,12 +11,21 @@ const UserMenu: React.FC = () => {
   const navigate = useNavigate();
 
   const handleLogout = async () => {
-    await logout();
-    toast({
-      title: "Logout realizado",
-      description: "Você foi desconectado com sucesso",
-    });
-    navigate('/login');
+    try {
+      await logout();
+      toast({
+        title: "Logout realizado",
+        description: "Você foi desconectado com sucesso",
+      });
+      navigate('/login');
+    } catch (error) {
+      console.error("Erro ao fazer logout:", error);
+      toast({
+        title: "Erro ao sair",
+        description: "Não foi possível fazer logout",
+        variant: "destructive",
+      });
+    }
   };
 
   if (!currentUser) return null;
@@ -37,8 +46,8 @@ const UserMenu: React.FC = () => {
             </div>
           )}
           <div>
-            <p className="text-sm font-medium">{currentUser.name}</p>
-            <p className="text-xs text-gray-500 dark:text-gray-400">{currentUser.email}</p>
+            <p className="text-sm font-medium">{currentUser?.name || "Usuário"}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">{currentUser?.email || "usuario@exemplo.com"}</p>
           </div>
         </div>
         <Button
