@@ -1,20 +1,40 @@
 
 import { Outlet, Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useEffect } from 'react';
 
 /**
  * PrivateRoute - Verifica se o usuário está autenticado para acessar rotas protegidas
  * Adiciona logs detalhados para ajudar na depuração
  */
 export const PrivateRoute = () => {
-  const { isAuthenticated, isLoading, currentUser } = useAuth();
+  const { isAuthenticated, isLoading, currentUser, session } = useAuth();
   const location = useLocation();
   
-  // Adiciona logs detalhados para depuração
+  // Log inicial ao montar o componente
+  useEffect(() => {
+    console.log("[PrivateRoute] Componente montado:", {
+      path: location.pathname,
+      isAuthenticated,
+      isLoading,
+      timestamp: new Date().toISOString()
+    });
+    
+    // Log adicional ao desmontar o componente
+    return () => {
+      console.log("[PrivateRoute] Componente desmontado:", {
+        path: location.pathname,
+        timestamp: new Date().toISOString()
+      });
+    };
+  }, []);
+  
+  // Log em cada render para depuração
   console.log("[PrivateRoute] Verificando autenticação:", { 
     path: location.pathname,
     isAuthenticated, 
     isLoading,
+    sessionExists: !!session,
     currentUser: currentUser ? {
       id: currentUser.id,
       email: currentUser.email,
@@ -36,7 +56,9 @@ export const PrivateRoute = () => {
   
   // Se não estiver autenticado, redireciona para o login
   if (!isAuthenticated) {
-    console.log("[PrivateRoute] Usuário não autenticado, redirecionando para login");
+    console.log("[PrivateRoute] Usuário não autenticado, redirecionando para login com state:", { 
+      from: location.pathname 
+    });
     return <Navigate to="/login" state={{ from: location.pathname }} replace />;
   }
 
