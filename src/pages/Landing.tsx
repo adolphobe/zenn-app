@@ -276,61 +276,58 @@ const Landing: React.FC = () => {
             <div className={`relative w-full h-[600px] transition-all duration-1000 ease-in-out ${
               loaded ? 'opacity-100' : 'opacity-0'
             }`}>
-              {/* 3D image com círculos chapados e bordas mais definidas, com os reflexos internos */}
+              {/* 3D image com círculos totalmente chapados - estilo minimalista */}
               <div className="absolute inset-0 flex items-center justify-center">
-                {/* Primeiro círculo (maior) - cristal chapado com borda mais definida e reflexos */}
+                {/* Primeiro círculo (maior) - estilo chapado minimalista */}
                 <div 
                   className="w-[350px] h-[350px] rounded-full backdrop-blur-md animate-crystal-pulse overflow-hidden relative"
                   style={{
-                    background: 'radial-gradient(circle, rgba(255, 255, 255, 0.45) 0%, rgba(111, 166, 255, 0.3) 50%, rgba(111, 166, 255, 0.4) 100%)',
+                    backgroundColor: 'rgba(111, 166, 255, 0.3)',
                     border: '2px solid rgba(255, 255, 255, 0.4)'
                   }}
                 >
-                  {/* Reflexos de cristal interno */}
-                  <div className="absolute top-[10%] left-[10%] w-[40px] h-[100px] bg-white/20 rounded-full rotate-45"></div>
-                  <div className="absolute bottom-[20%] right-[15%] w-[30px] h-[70px] bg-white/15 rounded-full -rotate-30"></div>
+                  {/* Reflexo sutil na parte superior */}
+                  <div className="absolute top-0 left-0 right-0 h-[30%] bg-gradient-to-b from-white/20 to-transparent"></div>
                   
-                  {/* Pequeno círculo brilhante simbolizando o primeiro círculo do logo */}
+                  {/* Pequeno círculo simbolizando o primeiro círculo do logo */}
                   <div 
                     className="absolute top-[25%] left-[25%] w-[15px] h-[15px] rounded-full bg-white/70 animate-crystal-glint"
                   ></div>
                 </div>
                 
-                {/* Segundo círculo (médio) - cristal chapado com borda mais definida e reflexos */}
+                {/* Segundo círculo (médio) - estilo chapado minimalista */}
                 <div 
                   className="absolute w-[300px] h-[300px] rounded-full backdrop-blur-md animate-floating-enhanced overflow-hidden" 
                   style={{ 
                     animationDuration: '10s',
-                    background: 'radial-gradient(circle, rgba(255, 255, 255, 0.5) 0%, rgba(92, 143, 255, 0.3) 50%, rgba(92, 143, 255, 0.34) 100%)',
+                    backgroundColor: 'rgba(92, 143, 255, 0.25)',
                     border: '2px solid rgba(255, 255, 255, 0.45)'
                   }}
                 >
-                  {/* Reflexos de cristal interno */}
-                  <div className="absolute top-[15%] left-[15%] w-[35px] h-[85px] bg-white/20 rounded-full rotate-45"></div>
-                  <div className="absolute bottom-[25%] right-[20%] w-[25px] h-[60px] bg-white/15 rounded-full -rotate-30"></div>
+                  {/* Reflexo sutil na parte superior */}
+                  <div className="absolute top-0 left-0 right-0 h-[30%] bg-gradient-to-b from-white/20 to-transparent"></div>
                   
-                  {/* Pequeno círculo brilhante simbolizando o segundo círculo do logo */}
+                  {/* Pequeno círculo simbolizando o segundo círculo do logo */}
                   <div 
                     className="absolute top-[35%] left-[65%] w-[12px] h-[12px] rounded-full bg-white/70 animate-crystal-glint"
                     style={{ animationDelay: '1s' }}
                   ></div>
                 </div>
                 
-                {/* Terceiro círculo (menor) - cristal chapado com borda mais definida e reflexos */}
+                {/* Terceiro círculo (menor) - estilo chapado minimalista */}
                 <div 
                   className="absolute w-[250px] h-[250px] rounded-full backdrop-blur-lg animate-floating-enhanced overflow-hidden" 
                   style={{ 
                     animationDuration: '8s', 
                     animationDelay: '1s',
-                    background: 'radial-gradient(circle, rgba(255, 255, 255, 0.6) 0%, rgba(93, 156, 255, 0.25) 60%, rgba(93, 156, 255, 0.21) 100%)',
+                    backgroundColor: 'rgba(93, 156, 255, 0.2)',
                     border: '2px solid rgba(255, 255, 255, 0.5)'
                   }}
                 >
-                  {/* Reflexos de cristal interno */}
-                  <div className="absolute top-[20%] left-[20%] w-[30px] h-[70px] bg-white/20 rounded-full rotate-45"></div>
-                  <div className="absolute bottom-[30%] right-[25%] w-[20px] h-[50px] bg-white/15 rounded-full -rotate-30"></div>
+                  {/* Reflexo sutil na parte superior */}
+                  <div className="absolute top-0 left-0 right-0 h-[30%] bg-gradient-to-b from-white/20 to-transparent"></div>
                   
-                  {/* Pequeno círculo brilhante simbolizando o terceiro círculo do logo */}
+                  {/* Pequeno círculo simbolizando o terceiro círculo do logo */}
                   <div 
                     className="absolute top-[60%] left-[45%] w-[10px] h-[10px] rounded-full bg-white/70 animate-crystal-glint"
                     style={{ animationDelay: '2s' }}
