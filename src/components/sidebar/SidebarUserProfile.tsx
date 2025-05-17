@@ -49,7 +49,7 @@ const SidebarUserProfile: React.FC<SidebarUserProfileProps> = ({ sidebarOpen }) 
           {sidebarOpen && (
             <div className="flex flex-col min-w-0">
               <span className="font-medium text-gray-800 dark:text-gray-200 truncate">Adolpho</span>
-              <span className="text-xs text-gray-500 dark:text-gray-400 truncate">adolpho@acto.app</span>
+              <span className="text-xs text-gray-500 dark:text-gray-400 truncate">adolpho@zenn.app</span>
             </div>
           )}
         </div>
