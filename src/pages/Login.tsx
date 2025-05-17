@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import LoginForm from '../components/LoginForm';
@@ -9,8 +9,8 @@ const Login: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { isAuthenticated, isLoading } = useAuth();
-  const [isSignup, setIsSignup] = React.useState(false);
-  const [loaded, setLoaded] = React.useState(false);
+  const [isSignup, setIsSignup] = useState(false);
+  const [loaded, setLoaded] = useState(false);
   
   // Get redirect path from location state or default to dashboard
   const from = location.state?.from?.pathname || "/dashboard";
@@ -24,10 +24,17 @@ const Login: React.FC = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  // Redirect if already authenticated
+  // Redirect if already authenticated, but only after initial load
   useEffect(() => {
+    // Avoid immediate redirect to prevent loops
     if (isAuthenticated && !isLoading) {
-      navigate(from, { replace: true });
+      console.log("Login page: User already authenticated, redirecting to", from);
+      // Add a small delay to avoid potential redirect loops
+      const redirectTimer = setTimeout(() => {
+        navigate(from, { replace: true });
+      }, 100);
+      
+      return () => clearTimeout(redirectTimer);
     }
   }, [isAuthenticated, isLoading, navigate, from]);
 
@@ -35,6 +42,13 @@ const Login: React.FC = () => {
   const toggleSignup = () => {
     setIsSignup(!isSignup);
   };
+
+  // Prevent rendering content during loading or if already authenticated
+  if (isLoading) {
+    return <div className="flex items-center justify-center min-h-screen">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+    </div>;
+  }
 
   // Background animation elements
   const floatingItems = Array(7).fill(null).map((_, i) => (
@@ -117,7 +131,7 @@ const Login: React.FC = () => {
           {isSignup ? (
             <SignupForm onCancel={toggleSignup} />
           ) : (
-            <LoginForm onSwitchToSignup={toggleSignup} />
+            <LoginForm onSwitchToSignup={toggleSignup} onSuccess={() => navigate('/dashboard', { replace: true })} />
           )}
         </div>
 
