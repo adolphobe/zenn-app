@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from './ui/button';
 import { useAppContext } from '@/context/AppContext';
@@ -16,7 +17,6 @@ const CommentForm: React.FC<CommentFormProps> = ({ taskId, onCommentAdded }) => 
   const handleSubmit = (e: React.MouseEvent<HTMLButtonElement> | React.FormEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    console.log('Comment submit clicked');
     
     if (commentText.trim() && addComment) {
       addComment(taskId, commentText);
@@ -31,7 +31,6 @@ const CommentForm: React.FC<CommentFormProps> = ({ taskId, onCommentAdded }) => 
         title: "Comentário adicionado",
         description: "Seu comentário foi adicionado com sucesso."
       });
-      console.log('Comment added successfully');
     }
   };
   
@@ -62,7 +61,6 @@ const CommentForm: React.FC<CommentFormProps> = ({ taskId, onCommentAdded }) => 
           title: "Comentário adicionado",
           description: "Seu comentário foi adicionado com sucesso."
         });
-        console.log('Comment added successfully via Enter key');
       }
     }
   };
@@ -71,13 +69,11 @@ const CommentForm: React.FC<CommentFormProps> = ({ taskId, onCommentAdded }) => 
   const handleContainerClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    console.log('Comment form container clicked, propagation stopped');
   };
   
   // Prevent mousedown in the comment form from bubbling up
   const handleContainerMouseDown = (e: React.MouseEvent) => {
     e.stopPropagation();
-    console.log('Comment form container mousedown, propagation stopped');
   };
   
   return (
@@ -100,11 +96,9 @@ const CommentForm: React.FC<CommentFormProps> = ({ taskId, onCommentAdded }) => 
           onKeyDown={handleKeyDown} // Adicionar o evento de tecla
           onClick={(e) => {
             e.stopPropagation();
-            console.log('Comment textarea clicked');
           }}
           onMouseDown={(e) => {
             e.stopPropagation();
-            console.log('Comment textarea mousedown');
           }}
           className="w-full p-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all resize-none"
           placeholder="Escreva seu comentário e pressione Enter para enviar..."
@@ -118,7 +112,6 @@ const CommentForm: React.FC<CommentFormProps> = ({ taskId, onCommentAdded }) => 
           onClick={handleSubmit}
           onMouseDown={(e) => {
             e.stopPropagation();
-            console.log('Comment submit button mousedown');
           }}
         >
           <MessageSquare size={16} />

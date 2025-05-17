@@ -104,7 +104,6 @@ const TaskComments: React.FC<TaskCommentsProps> = ({ taskId, comments }) => {
   // Impedir a propagação do evento de clique
   const handleContainerClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    console.log('Comment container clicked, stopped propagation');
   };
   
   return (
@@ -137,7 +136,6 @@ const TaskComments: React.FC<TaskCommentsProps> = ({ taskId, comments }) => {
                       title="Remover comentário"
                       onClick={(e) => {
                         e.stopPropagation();
-                        console.log('Delete button clicked, stopped propagation');
                       }}
                     >
                       <X size={14} />
@@ -147,7 +145,6 @@ const TaskComments: React.FC<TaskCommentsProps> = ({ taskId, comments }) => {
                     className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700"
                     onClick={(e) => {
                       e.stopPropagation();
-                      console.log('Dialog content clicked, stopped propagation');
                     }}
                   >
                     <AlertDialogHeader>

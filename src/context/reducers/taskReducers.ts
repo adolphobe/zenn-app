@@ -159,8 +159,6 @@ export const completeTaskByTitle = (state: AppState, action: Action): AppState =
 // Nova ação para definir uma data específica de conclusão
 export const completeTaskWithDate = (state: AppState, action: Action): AppState => {
   if (action.type !== 'COMPLETE_TASK_WITH_DATE') return state;
-
-  console.log(`Completing task "${action.payload.title}" with specific date: ${action.payload.completedAt}`);
   
   return {
     ...state,

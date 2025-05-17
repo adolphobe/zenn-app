@@ -38,8 +38,6 @@ import {
 
 // Main reducer
 export const appReducer = (state: AppState, action: Action): AppState => {
-  console.log('Action:', action.type, action);
-  
   // Task reducers
   if (action.type === 'ADD_TASK') return addTask(state, action);
   if (action.type === 'DELETE_TASK') return deleteTask(state, action);
