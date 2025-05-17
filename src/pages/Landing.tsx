@@ -435,7 +435,7 @@ const Landing: React.FC = () => {
               <h2 className="text-4xl md:text-5xl lg:text-6xl font-semibold mb-6 text-white">Pronto para encontrar clareza?</h2>
               <p className="text-xl text-blue-100 dark:text-blue-200 mb-10 max-w-2xl mx-auto">Comece hoje a jornada para uma execução pessoal com propósito e direção.</p>
               <Button onClick={handleGetStarted} className="bg-white text-blue-600 dark:text-blue-700 hover:text-blue-700 dark:hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-100 px-10 py-6 rounded-xl text-lg font-medium transition-all duration-300 hover:scale-105 flex items-center gap-3 mx-auto group">
-                Começar com Clareza <ArrowRight className="transition-transform duration-300 group-hover:translate-x-1" />
+                Começar Agora <ArrowRight className="transition-transform duration-300 group-hover:translate-x-1" />
               </Button>
               <p className="text-blue-100/80 dark:text-blue-200/80 mt-10">Experimente gratuitamente por 14 dias. Sem compromisso.</p>
             </div>
