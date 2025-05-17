@@ -30,8 +30,6 @@ const Landing: React.FC = () => {
     }
   }, [navigate]);
 
-  // Removido o código de floatingElements aqui
-
   return (
     <div className="min-h-screen overflow-hidden relative">
       {/* Background image with overlay */}
@@ -45,7 +43,7 @@ const Landing: React.FC = () => {
         <div className="absolute inset-0 bg-[#f9fbff]/50 backdrop-blur-[10px]"></div>
       </div>
       
-      {/* Custom animations */}
+      {/* Custom animations - Com animações melhoradas para os círculos */}
       <style>
         {`
           @keyframes floating {
@@ -69,6 +67,54 @@ const Landing: React.FC = () => {
           
           .animate-floating {
             animation: floating 15s ease-in-out infinite;
+          }
+          
+          /* Nova animação mais intensa para os círculos */
+          @keyframes floating-enhanced {
+            0% {
+              transform: translateY(0) translateX(0) scale(1);
+              opacity: 0.2;
+            }
+            20% {
+              transform: translateY(-25px) translateX(20px) scale(1.05);
+              opacity: 0.4;
+            }
+            40% {
+              transform: translateY(-35px) translateX(-15px) scale(0.95);
+              opacity: 0.5;
+            }
+            60% {
+              transform: translateY(-15px) translateX(-30px) scale(1.02);
+              opacity: 0.4;
+            }
+            80% {
+              transform: translateY(-30px) translateX(10px) scale(0.98);
+              opacity: 0.3;
+            }
+            100% {
+              transform: translateY(0) translateX(0) scale(1);
+              opacity: 0.2;
+            }
+          }
+          
+          .animate-floating-enhanced {
+            animation: floating-enhanced 12s ease-in-out infinite;
+          }
+          
+          /* Animação de pulso melhorada */
+          @keyframes pulse-enhanced {
+            0%, 100% {
+              transform: scale(1);
+              opacity: 0.3;
+            }
+            50% {
+              transform: scale(1.1);
+              opacity: 0.5;
+            }
+          }
+          
+          .animate-pulse-enhanced {
+            animation: pulse-enhanced 8s ease-in-out infinite;
           }
           
           @keyframes fadeUp {
@@ -130,8 +176,6 @@ const Landing: React.FC = () => {
         `}
       </style>
       
-      {/* Removida a linha com floatingElements aqui */}
-      
       {/* Main content */}
       <div className="container mx-auto min-h-screen grid grid-cols-1 lg:grid-cols-12 relative z-10">
         {/* Left column - Text content - Always visible */}
@@ -151,8 +195,6 @@ const Landing: React.FC = () => {
               Você não precisa de mais tarefas.<br />
               Precisa de intenção.
             </h1>
-            
-            {/* Removed the 3 circular effects near the headline */}
           </div>
           
           {/* Subheadline */}
@@ -200,24 +242,24 @@ const Landing: React.FC = () => {
               </div>
             </div>
           ) : (
-            /* 3D image that shows when login is not active */
+            /* 3D image that shows when login is not active - COM ANIMAÇÕES MELHORADAS */
             <div className={`relative w-full h-[600px] transition-all duration-1000 ease-in-out ${
               loaded ? 'opacity-100' : 'opacity-0'
             }`}>
-              {/* 3D image with glassmorphism effect */}
+              {/* 3D image with glassmorphism effect - Com animações mais intensas */}
               <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-[350px] h-[350px] rounded-full bg-gradient-to-tr from-blue-500/20 to-blue-400/20 backdrop-blur-sm animate-pulse-slow"></div>
-                <div className="absolute w-[300px] h-[300px] rounded-full bg-gradient-to-bl from-blue-500/20 to-blue-300/20 backdrop-blur-md animate-float" style={{ animationDuration: '20s' }}></div>
-                <div className="absolute w-[250px] h-[250px] rounded-full bg-gradient-to-r from-blue-300/20 to-blue-500/20 backdrop-blur-md animate-float" style={{ animationDuration: '15s', animationDelay: '2s' }}></div>
+                <div className="w-[350px] h-[350px] rounded-full bg-gradient-to-tr from-blue-500/20 to-blue-400/20 backdrop-blur-sm animate-pulse-enhanced"></div>
+                <div className="absolute w-[300px] h-[300px] rounded-full bg-gradient-to-bl from-blue-500/20 to-blue-300/20 backdrop-blur-md animate-floating-enhanced" style={{ animationDuration: '10s' }}></div>
+                <div className="absolute w-[250px] h-[250px] rounded-full bg-gradient-to-r from-blue-300/20 to-blue-500/20 backdrop-blur-md animate-floating-enhanced" style={{ animationDuration: '8s', animationDelay: '1s' }}></div>
               </div>
               
-              {/* Crystal/glass effect overlay with blue color */}
+              {/* Crystal/glass effect overlay with blue color - COM ANIMAÇÃO MELHORADA */}
               <div 
                 className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full"
                 style={{
                   background: 'radial-gradient(circle, rgba(59, 130, 246, 0.4) 0%, rgba(59, 130, 246, 0.1) 50%, rgba(235, 248, 255, 0) 100%)',
                   boxShadow: '0 0 80px rgba(59, 130, 246, 0.2)',
-                  animation: loaded ? 'pulse 6s ease-in-out infinite alternate' : 'none',
+                  animation: loaded ? 'pulse-enhanced 6s ease-in-out infinite alternate' : 'none',
                 }}
               ></div>
             </div>
