@@ -23,11 +23,11 @@ const Landing: React.FC = () => {
     const handleMouseMove = (e) => {
       const parallaxBg = document.getElementById('parallax-bg');
       if (parallaxBg) {
-        // Valores maiores para movimento mais pronunciado
-        const x = (window.innerWidth - e.pageX * 3) / 50;
-        const y = (window.innerHeight - e.pageY * 3) / 50;
+        // Ajustado para um movimento um pouco mais suave mas ainda perceptível
+        const x = (window.innerWidth - e.pageX * 2.5) / 60;
+        const y = (window.innerHeight - e.pageY * 2.5) / 60;
         
-        parallaxBg.style.transform = `scale(1.15) translate(${x}px, ${y}px)`;
+        parallaxBg.style.transform = `scale(1.12) translate(${x}px, ${y}px)`;
       }
     };
     
@@ -59,7 +59,7 @@ const Landing: React.FC = () => {
             src="https://images.unsplash.com/photo-1668853853439-923e013afff1?q=80&w=3870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
             alt="Background" 
             className="object-cover w-full h-full transition-transform duration-300 ease-out"
-            style={{ transform: 'scale(1.15)' }}
+            style={{ transform: 'scale(1.12)' }}
             id="parallax-bg"
           />
           {/* Overlay com blur */}
@@ -270,48 +270,38 @@ const Landing: React.FC = () => {
             <div className={`relative w-full h-[600px] transition-all duration-1000 ease-in-out ${
               loaded ? 'opacity-100' : 'opacity-0'
             }`}>
-              {/* 3D image com os 3 círculos originais e as cores específicas solicitadas */}
+              {/* 3D image com os 3 círculos com as cores atualizadas */}
               <div className="absolute inset-0 flex items-center justify-center">
-                {/* Primeiro círculo (maior) - cor específica solicitada */}
+                {/* Primeiro círculo (maior) - cor atualizada */}
                 <div 
                   className="w-[350px] h-[350px] rounded-full backdrop-blur-sm animate-pulse-enhanced"
                   style={{
-                    backgroundColor: 'rgb(111 166 255 / 40%)',
-                    boxShadow: 'rgb(129 177 255 / 30%) 0px 0px 25px'
+                    backgroundColor: 'rgb(159 215 255)',
+                    boxShadow: 'rgba(129, 177, 255, 0.3) 0px 0px 25px'
                   }}
                 ></div>
                 
-                {/* Segundo círculo (médio) - cor específica solicitada */}
+                {/* Segundo círculo (médio) - cor atualizada */}
                 <div 
                   className="absolute w-[300px] h-[300px] rounded-full backdrop-blur-md animate-floating-enhanced" 
                   style={{ 
                     animationDuration: '10s',
-                    backgroundColor: 'rgb(92 143 255 / 34%)',
-                    boxShadow: 'rgb(255 255 255 / 28%) 0px 0px 20px'
+                    backgroundColor: 'rgb(164 211 245)',
+                    boxShadow: 'rgba(255, 255, 255, 0.28) 0px 0px 20px'
                   }}
                 ></div>
                 
-                {/* Terceiro círculo (menor) - cor específica solicitada */}
+                {/* Terceiro círculo (menor) - cor atualizada */}
                 <div 
                   className="absolute w-[250px] h-[250px] rounded-full backdrop-blur-md animate-floating-enhanced" 
                   style={{ 
                     animationDuration: '8s', 
                     animationDelay: '1s',
-                    backgroundColor: 'rgb(93 156 255 / 21%)',
-                    boxShadow: 'rgb(255 255 255 / 25%) 0px 0px 20px'
+                    backgroundColor: 'rgb(159 209 243)',
+                    boxShadow: 'rgba(255, 255, 255, 0.25) 0px 0px 20px'
                   }}
                 ></div>
               </div>
-              
-              {/* Crystal/glass effect overlay - ajustado para combinar */}
-              <div 
-                className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full"
-                style={{
-                  backgroundColor: 'rgb(111 166 255 / 20%)',
-                  boxShadow: 'rgb(129 177 255 / 25%) 0px 0px 80px',
-                  animation: loaded ? 'pulse-enhanced 6s ease-in-out infinite alternate' : 'none',
-                }}
-              ></div>
             </div>
           )}
         </div>
