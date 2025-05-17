@@ -246,42 +246,45 @@ const Landing: React.FC = () => {
             <div className={`relative w-full h-[600px] transition-all duration-1000 ease-in-out ${
               loaded ? 'opacity-100' : 'opacity-0'
             }`}>
-              {/* 3D image with glassmorphism effect - Com animações mais intensas e gradientes radiais personalizados */}
+              {/* 3D image with glassmorphism effect - MUITO MAIS VISÍVEL E INTENSO */}
               <div className="absolute inset-0 flex items-center justify-center">
-                {/* Primeiro círculo com gradiente radial */}
+                {/* Primeiro círculo com gradiente radial MUITO MAIS VISÍVEL */}
                 <div 
                   className="w-[350px] h-[350px] rounded-full backdrop-blur-sm animate-pulse-enhanced"
                   style={{
-                    background: 'radial-gradient(circle, rgba(191, 219, 254, 0.5) 0%, rgba(147, 197, 253, 0.3) 40%, rgba(96, 165, 250, 0.1) 100%)'
+                    background: 'radial-gradient(circle, rgba(147, 197, 253, 0.85) 0%, rgba(96, 165, 250, 0.7) 40%, rgba(59, 130, 246, 0.4) 100%)',
+                    boxShadow: '0 0 25px rgba(147, 197, 253, 0.8)'
                   }}
                 ></div>
                 
-                {/* Segundo círculo com gradiente radial diferente */}
+                {/* Segundo círculo com gradiente radial MUITO MAIS VISÍVEL */}
                 <div 
                   className="absolute w-[300px] h-[300px] rounded-full backdrop-blur-md animate-floating-enhanced" 
                   style={{ 
                     animationDuration: '10s',
-                    background: 'radial-gradient(circle, rgba(219, 234, 254, 0.4) 0%, rgba(165, 208, 249, 0.25) 50%, rgba(125, 174, 245, 0.1) 100%)'
+                    background: 'radial-gradient(circle, rgba(191, 219, 254, 0.8) 0%, rgba(147, 197, 253, 0.65) 50%, rgba(96, 165, 250, 0.35) 100%)',
+                    boxShadow: '0 0 20px rgba(191, 219, 254, 0.7)'
                   }}
                 ></div>
                 
-                {/* Terceiro círculo com outro gradiente radial */}
+                {/* Terceiro círculo com outro gradiente radial MUITO MAIS VISÍVEL */}
                 <div 
                   className="absolute w-[250px] h-[250px] rounded-full backdrop-blur-md animate-floating-enhanced" 
                   style={{ 
                     animationDuration: '8s', 
                     animationDelay: '1s',
-                    background: 'radial-gradient(circle, rgba(224, 242, 254, 0.45) 0%, rgba(186, 230, 253, 0.3) 40%, rgba(125, 211, 252, 0.1) 100%)'
+                    background: 'radial-gradient(circle, rgba(219, 234, 254, 0.85) 0%, rgba(191, 219, 254, 0.7) 40%, rgba(147, 197, 253, 0.45) 100%)',
+                    boxShadow: '0 0 20px rgba(219, 234, 254, 0.75)'
                   }}
                 ></div>
               </div>
               
-              {/* Crystal/glass effect overlay com gradiente radial melhorado */}
+              {/* Crystal/glass effect overlay MUITO MAIS INTENSO */}
               <div 
                 className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full"
                 style={{
-                  background: 'radial-gradient(circle, rgba(147, 197, 253, 0.35) 0%, rgba(191, 219, 254, 0.2) 30%, rgba(219, 234, 254, 0.1) 60%, rgba(235, 248, 255, 0) 100%)',
-                  boxShadow: '0 0 80px rgba(96, 165, 250, 0.15)',
+                  background: 'radial-gradient(circle, rgba(96, 165, 250, 0.7) 0%, rgba(147, 197, 253, 0.5) 30%, rgba(191, 219, 254, 0.3) 60%, rgba(219, 234, 254, 0.1) 90%)',
+                  boxShadow: '0 0 100px rgba(96, 165, 250, 0.6)',
                   animation: loaded ? 'pulse-enhanced 6s ease-in-out infinite alternate' : 'none',
                 }}
               ></div>
