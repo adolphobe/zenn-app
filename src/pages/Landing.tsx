@@ -18,6 +18,26 @@ const Landing: React.FC = () => {
     return () => clearTimeout(timer);
   }, []);
 
+  // Parallax effect for background
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      const parallaxBg = document.getElementById('parallax-bg');
+      if (parallaxBg) {
+        // Valores maiores para movimento mais pronunciado
+        const x = (window.innerWidth - e.pageX * 3) / 50;
+        const y = (window.innerHeight - e.pageY * 3) / 50;
+        
+        parallaxBg.style.transform = `scale(1.15) translate(${x}px, ${y}px)`;
+      }
+    };
+    
+    window.addEventListener('mousemove', handleMouseMove);
+    
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, []);
+
   // Show login form with animation
   const handleGetStarted = () => {
     setShowLogin(true);
@@ -32,49 +52,24 @@ const Landing: React.FC = () => {
 
   return (
     <div className="min-h-screen overflow-hidden relative">
-      {/* Background image with overlay - com animação de zoom suave */}
+      {/* Background image with parallax effect */}
       <div className="absolute inset-0 z-0 overflow-hidden">
-        <img 
-          src="https://images.unsplash.com/photo-1668853853439-923e013afff1?q=80&w=3870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
-          alt="Background" 
-          className="object-cover w-full h-full animate-slow-zoom"
-        />
-        {/* Overlay com efeito de brilho suave */}
-        <div className="absolute inset-0 bg-[#f9fbff]/50 backdrop-blur-[10px] animate-subtle-glow"></div>
+        <div className="parallax-container w-full h-full">
+          <img 
+            src="https://images.unsplash.com/photo-1668853853439-923e013afff1?q=80&w=3870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
+            alt="Background" 
+            className="object-cover w-full h-full transition-transform duration-300 ease-out"
+            style={{ transform: 'scale(1.15)' }}
+            id="parallax-bg"
+          />
+          {/* Overlay com blur */}
+          <div className="absolute inset-0 bg-[#f9fbff]/50 backdrop-blur-[10px]"></div>
+        </div>
       </div>
       
       {/* Custom animations */}
       <style>
         {`
-          @keyframes slow-zoom {
-            0% {
-              transform: scale(1);
-            }
-            50% {
-              transform: scale(1.05);
-            }
-            100% {
-              transform: scale(1);
-            }
-          }
-          
-          .animate-slow-zoom {
-            animation: slow-zoom 20s ease-in-out infinite;
-          }
-          
-          @keyframes subtle-glow {
-            0%, 100% {
-              opacity: 0.5;
-            }
-            50% {
-              opacity: 0.6;
-            }
-          }
-          
-          .animate-subtle-glow {
-            animation: subtle-glow 10s ease-in-out infinite;
-          }
-
           @keyframes floating {
             0%, 100% {
               transform: translateY(0) translateX(0);
