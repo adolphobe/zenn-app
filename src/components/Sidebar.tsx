@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { useIsMobile } from '@/hooks/use-mobile';
 import SidebarHeader from './sidebar/SidebarHeader';
@@ -16,7 +16,6 @@ const Sidebar: React.FC = () => {
   } = useAppContext();
   
   const isMobile = useIsMobile();
-  const [isDarkMode, setIsDarkMode] = useState(false);
   
   // Auto-close sidebar on mobile when it's initially loaded
   useEffect(() => {
@@ -24,12 +23,6 @@ const Sidebar: React.FC = () => {
       toggleSidebar();
     }
   }, [isMobile]);
-
-  // Check initial dark mode preference
-  useEffect(() => {
-    const isDark = document.documentElement.classList.contains('dark');
-    setIsDarkMode(isDark);
-  }, []);
 
   // Add animation styles to the document head
   useEffect(() => {
@@ -54,12 +47,6 @@ const Sidebar: React.FC = () => {
       document.head.removeChild(styleElement);
     };
   }, []);
-
-  const toggleTheme = () => {
-    const newDarkMode = !isDarkMode;
-    setIsDarkMode(newDarkMode);
-    document.documentElement.classList.toggle('dark', newDarkMode);
-  };
 
   if (!sidebarOpen && isMobile) {
     return null; // Don't render sidebar at all on mobile when closed
@@ -86,11 +73,7 @@ const Sidebar: React.FC = () => {
           <SidebarSettingsSection sidebarOpen={sidebarOpen} />
         </div>
         
-        <SidebarUserProfile 
-          sidebarOpen={sidebarOpen} 
-          toggleTheme={toggleTheme}
-          isDarkMode={isDarkMode}
-        />
+        <SidebarUserProfile sidebarOpen={sidebarOpen} />
       </div>
     </>
   );

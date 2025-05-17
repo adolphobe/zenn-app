@@ -1,6 +1,6 @@
 
-import React, { useEffect } from 'react';
-import { useAuth } from '@/context/auth';
+import React from 'react';
+import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 import { LogOut, User as UserIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -10,35 +10,17 @@ const UserMenu: React.FC = () => {
   const { currentUser, logout } = useAuth();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    console.log('[AUTH:MENU] UserMenu montado');
-    return () => {
-      console.log('[AUTH:MENU] UserMenu desmontado');
-    };
-  }, []);
-
   const handleLogout = async () => {
-    console.log('[AUTH:MENU] Iniciando logout');
-    try {
-      await logout();
-      console.log('[AUTH:MENU] Logout bem-sucedido');
-      toast({
-        title: "Logout realizado",
-        description: "Você foi desconectado com sucesso",
-      });
-      navigate('/login');
-    } catch (error) {
-      console.error('[AUTH:MENU] Erro durante logout:', error);
-    }
+    await logout();
+    toast({
+      title: "Logout realizado",
+      description: "Você foi desconectado com sucesso",
+    });
+    navigate('/login');
   };
 
-  if (!currentUser) {
-    console.log('[AUTH:MENU] UserMenu não renderizado - usuário não autenticado');
-    return null;
-  }
+  if (!currentUser) return null;
 
-  console.log(`[AUTH:MENU] Renderizando menu para usuário: ${currentUser.email}`);
-  
   return (
     <div className="p-4 border-t border-gray-200 dark:border-gray-700 mt-auto">
       <div className="flex items-center justify-between mb-2">

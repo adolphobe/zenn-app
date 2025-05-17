@@ -1,92 +1,127 @@
 
 import React, { useState, useEffect } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
-import { useAuth } from '@/context/auth';
+import { useAppContext } from '@/context/AppContext';
+import { useAuth } from '@/context/AuthContext';
+
+// Import refactored hooks
+import { useCompletedTasks } from '@/components/task-history/hooks/useCompletedTasks';
+import { useTaskFilters } from '@/components/task-history/hooks/useTaskFilters';
+import { useTaskPagination } from '@/components/task-history/hooks/useTaskPagination';
+
+// Import refactored components
 import { TaskHistoryStats } from '@/components/task-history/TaskHistoryStats';
-import TaskFilters from '@/components/task-history/TaskFilters';
+import { TaskSearchBar, TaskFiltersToggle, AdvancedFilters } from '@/components/task-history/TaskFilters';
 import { ViewToggle } from '@/components/task-history/ViewToggle';
-import { CompletedTaskCard, TaskGroupGrid } from '@/components/task-history/task-cards';
+import { TaskGroupGrid } from '@/components/task-history/task-cards';
 import { TasksTable } from '@/components/task-history/TaskTable';
+import { NoTasksMessage } from '@/components/task-history/NoTasksMessage';
+import { TaskPagination } from '@/components/task-history/TaskPagination';
 
-const TaskHistory: React.FC = () => {
-  const { currentUser } = useAuth();
-  const [tasks, setTasks] = useState([]);
-  const [filteredTasks, setFilteredTasks] = useState([]);
-  const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards');
-  const [sortBy, setSortBy] = useState('recent');
-  const [filters, setFilters] = useState({
-    pillar: 'all',
-    dateRange: 'all',
-    status: 'all',
-  });
-
+const TaskHistory = () => {
+  const { state } = useAppContext();
+  const { isAuthenticated } = useAuth();
+  const [viewMode, setViewMode] = useState<'list' | 'grid'>('grid');
+  
+  // Verificação simples de autenticação
   useEffect(() => {
-    // Mock task data (replace with actual data fetching)
-    const mockTasks = [
-      { id: 1, title: 'Task 1', pillar: 'Pillar A', dueDate: '2024-01-20', status: 'completed', score: 85 },
-      { id: 2, title: 'Task 2', pillar: 'Pillar B', dueDate: '2024-01-25', status: 'pending', score: 60 },
-      { id: 3, title: 'Task 3', pillar: 'Pillar A', dueDate: '2024-01-30', status: 'in progress', score: 75 },
-      { id: 4, title: 'Task 4', pillar: 'Pillar C', dueDate: '2024-02-05', status: 'completed', score: 90 },
-    ];
-    setTasks(mockTasks);
-    setFilteredTasks(mockTasks);
-  }, []);
-
-  const handleFilterChange = (newFilters: any) => {
-    setFilters(newFilters);
-    applyFilters(newFilters);
-  };
-
-  const applyFilters = (currentFilters: any) => {
-    let newFilteredTasks = [...tasks];
-
-    if (currentFilters.pillar !== 'all') {
-      newFilteredTasks = newFilteredTasks.filter(task => task.pillar === currentFilters.pillar);
-    }
-
-    if (currentFilters.status !== 'all') {
-      newFilteredTasks = newFilteredTasks.filter(task => task.status === currentFilters.status);
-    }
-
-    // Date range filtering logic (mock)
-    if (currentFilters.dateRange === 'last7Days') {
-      newFilteredTasks = newFilteredTasks.filter(task => {
-        const taskDate = new Date(task.dueDate);
-        const sevenDaysAgo = new Date();
-        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-        return taskDate >= sevenDaysAgo;
-      });
-    }
-
-    setFilteredTasks(newFilteredTasks);
-  };
-
-  const handleViewToggle = (newViewMode: 'cards' | 'table') => {
-    setViewMode(newViewMode);
-  };
+    const timestamp = new Date().toISOString();
+    console.log(`[${timestamp}] TaskHistory: Estado de autenticação => ${isAuthenticated ? "Autenticado" : "Não autenticado"}`);
+  }, [isAuthenticated]);
+  
+  // Use our custom hooks to manage the task data, filtering and pagination
+  const { completedTasks } = useCompletedTasks(state.tasks);
+  
+  const { 
+    searchQuery, setSearchQuery,
+    periodFilter, setPeriodFilter,
+    scoreFilter, setScoreFilter,
+    feedbackFilter, setFeedbackFilter, 
+    pillarFilter, setPillarFilter,
+    startDate, setStartDate,
+    endDate, setEndDate,
+    sortBy, setSortBy,
+    showFilters, setShowFilters,
+    filteredTasks,
+    sortedTasks
+  } = useTaskFilters(completedTasks);
+  
+  // Pass periodFilter to useTaskPagination
+  const {
+    currentPage,
+    totalPages,
+    paginatedTasks,
+    groupedTasks,
+    handlePageChange,
+    getPageNumbers
+  } = useTaskPagination(sortedTasks, periodFilter);
 
   return (
-    <div className="container mx-auto py-8">
-      <h1 className="text-2xl font-bold mb-4">Task History</h1>
+    <div className="container p-4 mx-auto">
+      <div className="flex flex-col space-y-4">
+        {/* Pass filtered tasks to TaskHistoryStats instead of all completed tasks */}
+        <TaskHistoryStats filteredTasks={sortedTasks} />
+        
+        {/* Search and filter bar */}
+        <div className="flex flex-col md:flex-row justify-between gap-4">
+          <TaskSearchBar 
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            showFilters={showFilters}
+            setShowFilters={setShowFilters}
+          />
+          
+          <div className="flex gap-2">
+            <TaskFiltersToggle 
+              showFilters={showFilters}
+              setShowFilters={setShowFilters}
+            />
+            
+            <ViewToggle 
+              viewMode={viewMode}
+              setViewMode={setViewMode}
+              sortBy={sortBy}
+              setSortBy={setSortBy}
+            />
+          </div>
+        </div>
+        
+        {/* Advanced filters */}
+        {showFilters && (
+          <AdvancedFilters
+            periodFilter={periodFilter}
+            setPeriodFilter={setPeriodFilter}
+            scoreFilter={scoreFilter}
+            setScoreFilter={setScoreFilter}
+            feedbackFilter={feedbackFilter}
+            setFeedbackFilter={setFeedbackFilter}
+            pillarFilter={pillarFilter}
+            setPillarFilter={setPillarFilter}
+            startDate={startDate}
+            setStartDate={setStartDate}
+            endDate={endDate}
+            setEndDate={setEndDate}
+          />
+        )}
 
-      <div className="flex justify-between items-center mb-4">
-        <TaskFilters onFilterChange={handleFilterChange} />
-        <ViewToggle 
-          viewMode={viewMode} 
-          setViewMode={setViewMode}
-          sortBy={sortBy}
-          setSortBy={setSortBy}
-        />
+        {/* No results message */}
+        {sortedTasks.length === 0 && <NoTasksMessage />}
+        
+        {/* Task list view */}
+        {viewMode === 'list' && paginatedTasks.length > 0 && <TasksTable tasks={paginatedTasks} />}
+        
+        {/* Grid view with timeline grouping */}
+        {viewMode === 'grid' && paginatedTasks.length > 0 && <TaskGroupGrid groups={groupedTasks} />}
+        
+        {/* Pagination */}
+        {sortedTasks.length > 0 && (
+          <TaskPagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            handlePageChange={handlePageChange}
+            pageNumbers={getPageNumbers()}
+          />
+        )}
       </div>
-
-      <TaskHistoryStats filteredTasks={filteredTasks} />
-
-      {viewMode === 'cards' ? (
-        <TaskGroupGrid tasks={filteredTasks} />
-      ) : (
-        <TasksTable tasks={filteredTasks} />
-      )}
     </div>
   );
 };

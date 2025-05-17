@@ -11,7 +11,7 @@ import { sortTasks, isTaskOverdue } from '@/utils';
 import { Plus, Bell, ChevronDown, ChevronUp, Info } from 'lucide-react';
 import { useExpandedTask } from '@/context/hooks';
 import { Badge } from './ui/badge';
-import { useAuth } from '@/context/auth';
+import { useAuth } from '@/context/AuthContext';
 
 const Dashboard: React.FC = () => {
   const { state } = useAppContext();
@@ -21,9 +21,6 @@ const Dashboard: React.FC = () => {
   const [isTaskFormOpen, setIsTaskFormOpen] = useState(false);
   const { isTaskExpanded, toggleTaskExpanded } = useExpandedTask();
   const { currentUser, isAuthenticated } = useAuth();
-  
-  // Log Dashboard component mounting and authentication status
-  console.log(`[DASHBOARD] Renderizando dashboard: Auth=${isAuthenticated}, User=${currentUser?.email || 'nenhum'}`);
   
   // State for showing/hiding overdue tasks, initialized from localStorage
   const [showOverdueTasks, setShowOverdueTasks] = useState(() => {
@@ -101,9 +98,6 @@ const Dashboard: React.FC = () => {
   const toggleOverdueTasks = () => {
     setShowOverdueTasks(prev => !prev);
   };
-  
-  // Log authentication state for debugging
-  console.log(`[DASHBOARD] Estado de autenticação: Autenticado=${isAuthenticated}, Carregando=${false}, Usuário=${currentUser?.email || 'nenhum'}`);
   
   return (
     <>
