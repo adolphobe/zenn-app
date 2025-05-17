@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock, AlertCircle, AlertTriangle, WifiOff } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -20,9 +21,11 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 
 interface LoginFormProps {
   onSuccess?: () => void;
+  redirectPath?: string; // Adicionada a propriedade redirectPath
 }
 
-const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
+const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, redirectPath = "/dashboard" }) => {
+  const navigate = useNavigate();
   const { login, isLoading, authError, clearAuthError, pendingLoginState, resumePendingLogin } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
@@ -63,6 +66,9 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
     if (success) {
       if (onSuccess) {
         onSuccess();
+      } else if (redirectPath) {
+        // Se não houver onSuccess mas tiver redirectPath, navegue para o caminho especificado
+        navigate(redirectPath);
       }
     }
     // Não precisamos definir erro aqui pois o AuthProvider já cuida disso
@@ -71,8 +77,13 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
   // Função para retomar um login pendente
   const handleResumePendingLogin = async () => {
     const success = await resumePendingLogin();
-    if (success && onSuccess) {
-      onSuccess();
+    if (success) {
+      if (onSuccess) {
+        onSuccess();
+      } else if (redirectPath) {
+        // Se não houver onSuccess mas tiver redirectPath, navegue para o caminho especificado
+        navigate(redirectPath);
+      }
     }
   };
 
