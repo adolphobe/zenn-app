@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import LoginForm from '../components/LoginForm';
 import SignupForm from '../components/SignupForm';
@@ -9,9 +9,8 @@ const Login: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { isAuthenticated, isLoading } = useAuth();
-  const [loaded, setLoaded] = useState(false);
-  const [isSignup, setIsSignup] = useState(false);
-  const [redirectAttempted, setRedirectAttempted] = useState(false);
+  const [isSignup, setIsSignup] = React.useState(false);
+  const [loaded, setLoaded] = React.useState(false);
   
   // Obtém o caminho para redirecionar após o login
   const from = location.state?.from || "/dashboard";
@@ -21,9 +20,7 @@ const Login: React.FC = () => {
     isAuthenticated, 
     isLoading, 
     from, 
-    state: location.state,
-    pathname: location.pathname,
-    redirectAttempted
+    pathname: location.pathname
   });
 
   // Controlar carregamento visual suave
@@ -37,18 +34,11 @@ const Login: React.FC = () => {
 
   // Redirecionamento automático para o dashboard se já estiver autenticado
   useEffect(() => {
-    if (isAuthenticated && !isLoading && !redirectAttempted) {
+    if (isAuthenticated && !isLoading) {
       console.log("[Login] Usuário autenticado, redirecionando para:", from);
-      setRedirectAttempted(true);
-      
-      // Pequeno atraso para garantir que outras partes da UI terminem de processar primeiro
-      const redirectTimer = setTimeout(() => {
-        navigate(from, { replace: true });
-      }, 100);
-      
-      return () => clearTimeout(redirectTimer);
+      navigate(from, { replace: true });
     }
-  }, [isAuthenticated, isLoading, navigate, from, redirectAttempted]);
+  }, [isAuthenticated, isLoading, navigate, from]);
 
   // Alternar entre login e signup
   const toggleSignup = () => {

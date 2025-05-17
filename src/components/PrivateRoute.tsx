@@ -5,54 +5,20 @@ import { useEffect, useState } from 'react';
 
 /**
  * PrivateRoute - Protege rotas que requerem autenticação
- * Implementa verificação robusta de autenticação e redirecionamento inteligente
  */
 export const PrivateRoute = () => {
-  const { isAuthenticated, isLoading, currentUser, session } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
   const location = useLocation();
-  const [checkCompleted, setCheckCompleted] = useState(false);
   
-  // Log detalhado do componente para depuração
-  useEffect(() => {
-    console.log("[PrivateRoute] Montado:", {
-      path: location.pathname,
-      isAuthenticated,
-      isLoading,
-      sessionExists: !!session,
-      timestamp: new Date().toISOString()
-    });
-    
-    // Garantir que o processo de verificação sempre termine
-    const timer = setTimeout(() => {
-      setCheckCompleted(true);
-      console.log("[PrivateRoute] Verificação de tempo limite concluída");
-    }, 2000);
-    
-    return () => {
-      console.log("[PrivateRoute] Desmontado:", {
-        path: location.pathname,
-        timestamp: new Date().toISOString()
-      });
-      clearTimeout(timer);
-    };
-  }, [location.pathname, isAuthenticated, isLoading, session]);
-  
-  // Log em cada renderização para depuração
+  // Log simplificado para depuração
   console.log("[PrivateRoute] Renderizando:", { 
     path: location.pathname,
     isAuthenticated, 
-    isLoading,
-    sessionExists: !!session,
-    checkCompleted,
-    currentUser: currentUser ? {
-      id: currentUser.id,
-      email: currentUser.email,
-    } : null
+    isLoading
   });
 
-  // Se ainda estiver carregando e o tempo de verificação não expirou, mostra indicador de carregamento
-  if (isLoading && !checkCompleted) {
-    console.log("[PrivateRoute] Autenticação carregando...");
+  // Se estiver carregando, mostra indicador de carregamento
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
@@ -63,7 +29,7 @@ export const PrivateRoute = () => {
   
   // Se não estiver autenticado após carregamento completo, redireciona para login
   if (!isAuthenticated) {
-    console.log("[PrivateRoute] Usuário não autenticado, redirecionando para login com state:", { from: location.pathname });
+    console.log("[PrivateRoute] Usuário não autenticado, redirecionando para login");
     return <Navigate to="/login" state={{ from: location.pathname }} replace />;
   }
 
