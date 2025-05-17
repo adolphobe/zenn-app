@@ -11,7 +11,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 import { toast } from '@/hooks/use-toast';
 import { useAuth } from '@/context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const loginSchema = z.object({
   email: z.string().email("Digite um e-mail válido"),
@@ -28,9 +28,13 @@ interface LoginFormProps {
 const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onSwitchToSignup }) => {
   const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
+
+  // Get redirect path from location state or default to dashboard
+  const from = location.state?.from?.pathname || "/dashboard";
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -57,6 +61,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onSwitchToSignup }) =>
       } else {
         console.log("[LoginForm] Login bem-sucedido para:", values.email);
         console.log("[LoginForm] DETALHES EM PORTUGUÊS: Login realizado com sucesso, redirecionando automaticamente");
+        console.log("[LoginForm] Redirecionando para:", from);
         
         toast({
           title: "Login realizado com sucesso",
@@ -67,6 +72,9 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onSwitchToSignup }) =>
           console.log("[LoginForm] Executando callback de sucesso");
           onSuccess();
         }
+        
+        // Redirect to the page the user was trying to access or dashboard
+        navigate(from, { replace: true });
       }
     } catch (error) {
       console.error("[LoginForm] Erro de login:", error);
