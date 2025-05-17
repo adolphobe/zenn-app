@@ -1,6 +1,8 @@
+
 import { User } from '../types/user';
 import { getUserByCredentials } from './users';
 import { storeAuthSecurely, checkAuthSecurely, clearAuthSecurely } from '../auth/authFix';
+import { throttledLog } from '../utils/logUtils';
 
 const CONNECTION_RETRY_KEY = 'acto_connection_retry';
 const TOKEN_LAST_VERIFIED_KEY = 'acto_token_last_verified';
@@ -11,7 +13,7 @@ const USER_PREFERENCES_KEY = 'acto_user_preferences_';
  */
 export const authLog = (message: string, ...data: any[]) => {
   const timestamp = new Date().toISOString();
-  console.log(`[AUTH ${timestamp}] ${message}`, ...data);
+  throttledLog("AUTH", `${timestamp} ${message}`, ...data);
 };
 
 /**

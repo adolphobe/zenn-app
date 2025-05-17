@@ -3,6 +3,7 @@ import React, { useEffect } from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from './useAuth';
 import { checkAuthSecurely } from './authFix';
+import { throttledLog } from '../utils/logUtils';
 
 interface PrivateRouteProps {
   redirectPath?: string;
@@ -23,7 +24,7 @@ export const PrivateRoute: React.FC<PrivateRouteProps> = ({
     const { isAuth } = checkAuthSecurely();
     
     if (!isAuth && isAuthenticated) {
-      console.log("[ROUTE-FIX] Inconsistência detectada: tokens inválidos mas estado autenticado");
+      throttledLog("ROUTE-FIX", "Inconsistência detectada: tokens inválidos mas estado autenticado");
       // Forçar logout para corrigir estado
       logout();
     }
@@ -40,7 +41,7 @@ export const PrivateRoute: React.FC<PrivateRouteProps> = ({
   
   // Se não estiver autenticado, redireciona para login
   if (!isAuthenticated) {
-    console.log("[ROUTE-FIX] Não autenticado, redirecionando para login");
+    throttledLog("ROUTE-FIX", "Não autenticado, redirecionando para login");
     return <Navigate 
       to={redirectPath} 
       state={{ from: location }} 
@@ -49,6 +50,6 @@ export const PrivateRoute: React.FC<PrivateRouteProps> = ({
   }
   
   // Se estiver autenticado, renderiza as rotas filhas
-  console.log("[ROUTE-FIX] Autenticado, renderizando rota protegida:", location.pathname);
+  throttledLog("ROUTE-FIX", "Autenticado, renderizando rota protegida:", location.pathname);
   return <Outlet />;
 };
