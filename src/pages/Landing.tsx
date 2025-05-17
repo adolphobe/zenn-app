@@ -49,7 +49,7 @@ const finalModalDataContent = {
             <li>Isso me faz crescer?</li>
           </ul>
           <p>Você começa a abandonar o excesso, a rasura, o “checklist automático”. No lugar disso, você executa com peso emocional e propósito estratégico.</p>
-          <p className="font-semibold pt-2">Resultado? Menos culpa. Mais direção.</p>
+          <p className="font-semibold pt-2">E isso te leva longe!</p>
         </div>
       )
     },
