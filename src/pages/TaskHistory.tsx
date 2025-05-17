@@ -11,7 +11,7 @@ import { useTaskPagination } from '@/components/task-history/hooks/useTaskPagina
 import { TaskHistoryStats } from '@/components/task-history/TaskHistoryStats';
 import { TaskSearchBar, TaskFiltersToggle, AdvancedFilters } from '@/components/task-history/TaskFilters';
 import { ViewToggle } from '@/components/task-history/ViewToggle';
-import { TaskGroupGrid } from '@/components/task-history/TaskCards';
+import { TaskGroupGrid } from '@/components/task-history/task-cards';
 import { TasksTable } from '@/components/task-history/TaskTable';
 import { NoTasksMessage } from '@/components/task-history/NoTasksMessage';
 import { TaskPagination } from '@/components/task-history/TaskPagination';
