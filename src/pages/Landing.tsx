@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
@@ -7,6 +8,7 @@ import LoginForm from '@/components/LoginForm';
 const Landing: React.FC = () => {
   const navigate = useNavigate();
   const [loaded, setLoaded] = useState(false);
+  const [showLoginForm, setShowLoginForm] = useState(false);
   
   useEffect(() => {
     // Handle animation on load
@@ -23,6 +25,10 @@ const Landing: React.FC = () => {
       navigate('/dashboard');
     }
   }, [navigate]);
+
+  const handleStartClick = () => {
+    setShowLoginForm(true);
+  };
 
   // Generate animated floating elements with blue color
   const floatingElements = Array(6).fill(null).map((_, i) => (
@@ -137,6 +143,19 @@ const Landing: React.FC = () => {
           .slide-out {
             animation: slideOut 0.6s ease-out forwards;
           }
+          
+          @keyframes fadeIn {
+            from {
+              opacity: 0;
+            }
+            to {
+              opacity: 1;
+            }
+          }
+
+          .login-fade-in {
+            animation: fadeIn 0.8s ease-out forwards;
+          }
         `}
       </style>
       
@@ -146,7 +165,7 @@ const Landing: React.FC = () => {
       {/* Main content */}
       <div className="container mx-auto min-h-screen grid grid-cols-1 lg:grid-cols-12 relative z-10">
         {/* Left column - Text content */}
-        <div className="lg:col-span-6 flex flex-col justify-center px-8 md:px-16 lg:px-20 py-16 lg:py-0">
+        <div className={`lg:col-span-${showLoginForm ? '6' : '12'} flex flex-col justify-center px-8 md:px-16 lg:px-20 py-16 lg:py-0 transition-all duration-500`}>
           {/* Logo */}
           <div className={`mb-12 opacity-0 ${loaded ? 'opacity-100 transition-opacity duration-700' : ''}`}>
             <h3 className="text-2xl font-bold tracking-tight text-blue-500">Zenn</h3>
@@ -166,9 +185,9 @@ const Landing: React.FC = () => {
           </p>
           
           {/* CTA Button using the blue color */}
-          <div className={`opacity-0 ${loaded ? 'fade-up fade-up-delay-2' : ''}`}>
+          <div className={`opacity-0 ${loaded && !showLoginForm ? 'fade-up fade-up-delay-2' : ''} ${showLoginForm ? 'hidden lg:block' : ''}`}>
             <Button 
-              onClick={() => navigate('/dashboard')}
+              onClick={handleStartClick}
               className="group bg-blue-600 hover:bg-blue-700 text-white px-8 py-6 rounded-lg text-lg transition-all duration-300 hover:scale-[1.03] hover:shadow-md flex items-center gap-2"
             >
               Começar com Clareza
@@ -182,18 +201,18 @@ const Landing: React.FC = () => {
           </div>
         </div>
         
-        {/* Right column - Login Form */}
-        <div className="lg:col-span-6 flex items-center justify-center px-4 md:px-0">
-          <div className={`w-full max-w-md bg-white/80 backdrop-blur-md p-8 rounded-xl shadow-xl opacity-0 ${
-            loaded ? 'fade-up fade-up-delay-1' : ''
-          }`}>
-            <div className="mb-6">
-              <h3 className="text-xl font-semibold">Bem-vindo de volta!</h3>
-              <p className="text-sm text-gray-600 mt-1">Entre para continuar sua jornada.</p>
+        {/* Right column - Login Form (conditionally rendered) */}
+        {showLoginForm && (
+          <div className="lg:col-span-6 flex items-center justify-center px-4 md:px-0">
+            <div className="w-full max-w-md bg-white/80 backdrop-blur-md p-8 rounded-xl shadow-xl login-fade-in">
+              <div className="mb-6">
+                <h3 className="text-xl font-semibold">Bem-vindo de volta!</h3>
+                <p className="text-sm text-gray-600 mt-1">Entre para continuar sua jornada.</p>
+              </div>
+              <LoginForm />
             </div>
-            <LoginForm />
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
