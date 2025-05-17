@@ -1,16 +1,16 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, Mail, Lock, AlertCircle, AlertTriangle, WifiOff } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, AlertCircle } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useAuth } from '@/auth/useAuth';
+import { useAuth } from '@/auth/AuthContext';
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AuthErrorType } from '@/auth/AuthContext';
+import { toast } from '@/hooks/use-toast';
 
 const loginSchema = z.object({
   email: z.string().email("Digite um e-mail válido"),
@@ -21,12 +21,12 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 
 interface LoginFormProps {
   onSuccess?: () => void;
-  redirectPath?: string; // Adicionada a propriedade redirectPath
+  redirectPath?: string;
 }
 
 const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, redirectPath = "/dashboard" }) => {
   const navigate = useNavigate();
-  const { login, isLoading, authError, clearAuthError, pendingLoginState, resumePendingLogin } = useAuth();
+  const { login, isLoading } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
 
@@ -38,100 +38,43 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, redirectPath = "/dashb
     },
   });
 
-  // Exibe mensagens de erro com base no tipo de erro de autenticação
-  useEffect(() => {
-    if (authError) {
-      switch (authError) {
-        case 'invalid_credentials':
-          setLoginError("E-mail ou senha incorretos. Por favor, tente novamente.");
-          break;
-        case 'connection_lost':
-          setLoginError("Conexão perdida durante o login. Tente novamente.");
-          break;
-        case 'session_expired':
-          setLoginError("Sua sessão expirou. Por favor, faça login novamente.");
-          break;
-        default:
-          setLoginError("Ocorreu um erro durante o login. Por favor, tente novamente.");
-      }
-    } else {
-      setLoginError(null);
-    }
-  }, [authError]);
-
   const onSubmit = async (values: LoginFormValues) => {
-    clearAuthError(); // Limpa erros anteriores
+    setLoginError(null);
     const success = await login(values.email, values.password);
     
     if (success) {
+      toast({
+        title: "Login bem-sucedido",
+        description: "Você foi autenticado com sucesso",
+      });
+      
       if (onSuccess) {
         onSuccess();
       } else if (redirectPath) {
-        // Se não houver onSuccess mas tiver redirectPath, navegue para o caminho especificado
         navigate(redirectPath);
       }
-    }
-    // Não precisamos definir erro aqui pois o AuthProvider já cuida disso
-  };
-
-  // Função para retomar um login pendente
-  const handleResumePendingLogin = async () => {
-    const success = await resumePendingLogin();
-    if (success) {
-      if (onSuccess) {
-        onSuccess();
-      } else if (redirectPath) {
-        // Se não houver onSuccess mas tiver redirectPath, navegue para o caminho especificado
-        navigate(redirectPath);
-      }
+    } else {
+      setLoginError("E-mail ou senha incorretos. Por favor, tente novamente.");
     }
   };
 
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
 
-  // Obtém o ícone e cor com base no tipo de erro
-  const getErrorIconAndColor = () => {
-    switch (authError) {
-      case 'connection_lost':
-        return { icon: <WifiOff size={16} />, colorClass: 'text-amber-600 dark:text-amber-400' };
-      case 'session_expired':
-        return { icon: <AlertTriangle size={16} />, colorClass: 'text-amber-600 dark:text-amber-400' };
-      default:
-        return { icon: <AlertCircle size={16} />, colorClass: 'text-red-600 dark:text-red-400' };
-    }
-  };
-
-  // Vamos usar uma cor bem contrastante para garantir que, uma vez visível, ele seja notado.
+  // Cores e ícones
   const iconColor = "text-gray-800 dark:text-gray-200"; 
   const eyeIconColor = "text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-100";
-  
-  const { icon: errorIcon, colorClass: errorColorClass } = getErrorIconAndColor();
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         {loginError && (
           <Alert variant="destructive" className="bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 py-2 animate-in fade-in slide-in-from-top-5 duration-300">
-            <div className={`flex items-center gap-2 ${errorColorClass}`}>
-              {errorIcon}
+            <div className="flex items-center gap-2 text-red-600 dark:text-red-400">
+              <AlertCircle size={16} />
               <AlertDescription className="text-sm font-medium">
                 {loginError}
               </AlertDescription>
             </div>
-            
-            {authError === 'connection_lost' && pendingLoginState && (
-              <div className="mt-2">
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  size="sm"
-                  className="w-full text-sm"
-                  onClick={handleResumePendingLogin}
-                >
-                  Tentar recuperar sessão
-                </Button>
-              </div>
-            )}
           </Alert>
         )}
         

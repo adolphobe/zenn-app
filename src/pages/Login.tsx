@@ -2,33 +2,21 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import LoginForm from '../components/LoginForm';
-import { useUser } from '@/context/UserContext';
+import { useAuth } from '@/auth/AuthContext';
 import { toast } from '@/hooks/use-toast';
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { currentUser, isLoading } = useUser();
+  const { isAuthenticated, isLoading } = useAuth();
   const [loaded, setLoaded] = useState(false);
   
   // Obter o caminho para onde redirecionar após o login
   const from = location.state?.from?.pathname || "/dashboard";
-  const authError = location.state?.authError;
-
-  // Mostrar mensagem se a sessão expirou
-  useEffect(() => {
-    if (authError === 'session_expired') {
-      toast({
-        title: "Sessão expirada",
-        description: "Sua sessão expirou. Por favor, faça login novamente.",
-        variant: "destructive"
-      });
-    }
-  }, [authError]);
 
   // Verificar se já está logado
   useEffect(() => {
-    if (!isLoading && currentUser) {
+    if (!isLoading && isAuthenticated) {
       navigate(from, { replace: true });
     }
     
@@ -38,7 +26,7 @@ const Login: React.FC = () => {
     }, 100);
     
     return () => clearTimeout(timer);
-  }, [navigate, currentUser, isLoading, from]);
+  }, [navigate, isAuthenticated, isLoading, from]);
 
   // Itens flutuantes animados para o fundo com posições aleatórias e animações contínuas
   const floatingItems = Array(7).fill(null).map((_, i) => (

@@ -1,14 +1,13 @@
 
-import React, { createContext, useContext, useEffect } from 'react';
+import React, { createContext, useContext } from 'react';
 import { User } from '../types/user';
-import { useAuth } from '@/auth/useAuth';
+import { useAuth } from '@/auth/AuthContext';
 
 // Tipo do contexto do usuário
 interface UserContextType {
   currentUser: User | null;
   isLoading: boolean;
-  isAuthenticated: boolean; // Adicionando propriedade para consistência com AuthContext
-  authError: string | null; // Adicionando propriedade para consistência com AuthContext
+  isAuthenticated: boolean;
   logout: () => void;  
 }
 
@@ -17,21 +16,18 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 
 // Provider do contexto
 export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { currentUser, isLoading, isAuthenticated, authError, logout } = useAuth();
+  // Agora estamos usando o nosso sistema de autenticação simplificado
+  const { currentUser, isLoading, isAuthenticated, logout } = useAuth();
   
-  // Log para depuração da sincronia entre contextos
-  useEffect(() => {
-    console.log("UserContext: Estado de autenticação atualizado =>", 
-      isAuthenticated ? "Autenticado" : "Não autenticado", 
-      authError ? `(Erro: ${authError})` : "");
-  }, [isAuthenticated, authError]);
+  // Log para depuração
+  console.log("UserContext: Estado de autenticação =>", 
+    isAuthenticated ? "Autenticado" : "Não autenticado");
   
   // Valor fornecido pelo contexto
   const value = {
     currentUser,
     isLoading,
-    isAuthenticated, // Sincronizando com AuthContext
-    authError,       // Sincronizando com AuthContext
+    isAuthenticated,
     logout
   };
 

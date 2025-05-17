@@ -1,55 +1,22 @@
 
-import React, { useEffect } from 'react';
-import { Navigate, Outlet, useLocation } from 'react-router-dom';
-import { useAuth } from './useAuth';
-import { checkAuthSecurely } from './authFix';
-import { throttledLog } from '../utils/logUtils';
-
-interface PrivateRouteProps {
-  redirectPath?: string;
-}
+import { Outlet, Navigate } from 'react-router-dom';
+import { useAuth } from './AuthContext';
 
 /**
- * Componente que protege rotas, permitindo acesso apenas a usuários autenticados
+ * Componente simplificado que protege rotas, permitindo acesso apenas a usuários autenticados
+ * ou deixando passar qualquer requisição se estivermos em modo de desenvolvimento
  */
-export const PrivateRoute: React.FC<PrivateRouteProps> = ({ 
-  redirectPath = '/login'  
-}) => {
-  const { isAuthenticated, isLoading, logout } = useAuth();
-  const location = useLocation();
+export const PrivateRoute = () => {
+  const { isAuthenticated } = useAuth();
   
-  // Verificação de segurança adicional em cada renderização
-  useEffect(() => {
-    // Verifica diretamente os tokens sem contar com o estado do AuthContext
-    const { isAuth } = checkAuthSecurely();
-    
-    if (!isAuth && isAuthenticated) {
-      throttledLog("ROUTE-FIX", "Inconsistência detectada: tokens inválidos mas estado autenticado");
-      // Forçar logout para corrigir estado
-      logout();
-    }
-  }, [location.pathname, isAuthenticated, logout]);
+  // Em desenvolvimento, permitir acesso independentemente da autenticação
+  const isDevelopment = import.meta.env.DEV;
   
-  // Mostra um loader enquanto verifica a autenticação
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
-    );
+  // Se estiver autenticado ou em ambiente de desenvolvimento, permite o acesso
+  if (isAuthenticated || isDevelopment) {
+    return <Outlet />;
   }
   
-  // Se não estiver autenticado, redireciona para login
-  if (!isAuthenticated) {
-    throttledLog("ROUTE-FIX", "Não autenticado, redirecionando para login");
-    return <Navigate 
-      to={redirectPath} 
-      state={{ from: location }} 
-      replace 
-    />;
-  }
-  
-  // Se estiver autenticado, renderiza as rotas filhas
-  throttledLog("ROUTE-FIX", "Autenticado, renderizando rota protegida:", location.pathname);
-  return <Outlet />;
+  // Caso contrário, redireciona para login
+  return <Navigate to="/login" replace />;
 };
