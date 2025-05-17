@@ -1,9 +1,18 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, ArrowUpRight, CheckCircle2 } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, CheckCircle2, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import LoginForm from '@/components/LoginForm';
+
+type ModalContentType = 'pilares' | 'clareza' | 'estrategia';
+
+// PASSO 5 CORREÇÃO: Mover modalTestData para fora do componente
+const modalTestData = {
+  pilares: { title: "🌟 Análise por Pilares", text: "Texto simples sobre Análise por Pilares..." },
+  clareza: { title: "🎯 Clareza nas Escolhas", text: "Texto simples sobre Clareza nas Escolhas..." },
+  estrategia: { title: "📊 Análise Estratégica", text: "Texto simples sobre Análise Estratégica..." }
+};
 
 const Landing: React.FC = () => {
   const navigate = useNavigate();
@@ -14,7 +23,8 @@ const Landing: React.FC = () => {
   
   const isLoggedIn = localStorage.getItem('acto_is_logged_in') === 'true';
 
-  const [showSimpleModal, setShowSimpleModal] = useState(false);
+  const [isExplanationModalOpen, setIsExplanationModalOpen] = useState(false);
+  const [currentModalData, setCurrentModalData] = useState<{ title: string; text: string } | null>(null);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -38,36 +48,41 @@ const Landing: React.FC = () => {
     }
   }, [showLogin]);
 
-  const openSimpleModal = () => {
-    setShowSimpleModal(true);
+  const openExplanationModal = useCallback((type: ModalContentType) => {
+    setCurrentModalData(modalTestData[type]); 
+    setIsExplanationModalOpen(true);
     document.body.style.overflow = 'hidden'; 
-  };
+  }, []); // modalTestData agora é estável (definido fora), então não precisa ser dependência
 
-  const closeSimpleModal = () => {
-    setShowSimpleModal(false);
+  const closeExplanationModal = useCallback(() => {
+    setIsExplanationModalOpen(false);
+    setCurrentModalData(null);
     document.body.style.overflow = 'auto'; 
-  };
+  }, []);
 
   useEffect(() => {
+    const handleEsc = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        closeExplanationModal();
+      }
+    };
+    if (isExplanationModalOpen) {
+        window.addEventListener('keydown', handleEsc);
+    }
     return () => {
-      if (document.body.style.overflow === 'hidden') {
+      window.removeEventListener('keydown', handleEsc);
+      if (document.body.style.overflow === 'hidden' && !isExplanationModalOpen) { 
         document.body.style.overflow = 'auto';
       }
     };
-  }, []); 
+  }, [isExplanationModalOpen, closeExplanationModal]); 
 
 
   useEffect(() => {
-    const observerOptions = {
-      root: null,
-      rootMargin: '0px',
-      threshold: 0.1
-    };
+    const observerOptions = { root: null, rootMargin: '0px', threshold: 0.1 };
     const observerCallback = (entries: IntersectionObserverEntry[]) => {
       entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('animate-in');
-        }
+        if (entry.isIntersecting) entry.target.classList.add('animate-in');
       });
     };
     const observer = new IntersectionObserver(observerCallback, observerOptions);
@@ -75,9 +90,7 @@ const Landing: React.FC = () => {
     elements.forEach(section => observer.observe(section));
     return () => {
       elements.forEach(section => {
-        if (section) { 
-          observer.unobserve(section);
-        }
+        if (section) observer.unobserve(section);
       });
     };
   }, []);
@@ -233,8 +246,8 @@ const Landing: React.FC = () => {
                   <h3 className="text-2xl font-semibold mb-5 text-gray-800 dark:text-white">Análise por pilares</h3>
                   <p className="text-gray-600 dark:text-gray-300 text-lg flex-grow">Avalie cada tarefa pelos três pilares fundamentais: importância real, orgulho pós-execução e contribuição para seu crescimento pessoal.</p>
                   <div className="mt-8">
-                    <Button variant="ghost" className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/70 p-0 flex items-center gap-2 group" onClick={openSimpleModal}>
-                        Saiba mais (Teste Modal)
+                    <Button variant="ghost" className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/70 p-0 flex items-center gap-2 group" onClick={() => openExplanationModal('pilares')}>
+                        Saiba mais
                         <ArrowUpRight size={18} className="transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
                     </Button>
                   </div>
@@ -250,8 +263,9 @@ const Landing: React.FC = () => {
                   <h3 className="text-2xl font-semibold mb-5 text-gray-800 dark:text-white">Clareza nas escolhas</h3>
                   <p className="text-gray-600 dark:text-gray-300 text-lg flex-grow">Abandone o ruído das tarefas sem propósito. Foque apenas no que realmente vai te levar aonde você quer chegar.</p>
                   <div className="mt-8">
-                    <Button variant="ghost" className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/70 p-0 flex items-center gap-2 group" /*onClick={() => openExplanationModal('clareza')}*/>
-                        Saiba mais <ArrowUpRight size={18} className="transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
+                    <Button variant="ghost" className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/70 p-0 flex items-center gap-2 group" onClick={() => openExplanationModal('clareza')}>
+                        Saiba mais 
+                        <ArrowUpRight size={18} className="transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
                     </Button>
                   </div>
                 </CardContent>
@@ -266,8 +280,9 @@ const Landing: React.FC = () => {
                   <h3 className="text-2xl font-semibold mb-5 text-gray-800 dark:text-white">Análise estratégica</h3>
                   <p className="text-gray-600 dark:text-gray-300 text-lg flex-grow">Entenda padrões e tendências nas suas escolhas para refinar continuamente sua abordagem e melhorar sua execução.</p>
                   <div className="mt-8">
-                    <Button variant="ghost" className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/70 p-0 flex items-center gap-2 group" /*onClick={() => openExplanationModal('estrategia')}*/>
-                        Saiba mais <ArrowUpRight size={18} className="transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
+                    <Button variant="ghost" className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/70 p-0 flex items-center gap-2 group" onClick={() => openExplanationModal('estrategia')}>
+                        Saiba mais 
+                        <ArrowUpRight size={18} className="transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
                     </Button>
                   </div>
                 </CardContent>
@@ -375,21 +390,37 @@ const Landing: React.FC = () => {
       </footer>
 
 
-      {/* PASSO 4: JSX do Modal Simples ESTILIZADO com Tailwind */}
-      {showSimpleModal && (
+      {/* PASSO 5: Modal com Header e Footer, e título dinâmico */}
+      {isExplanationModalOpen && currentModalData && (
         <div
-          className="fixed inset-0 bg-black/60 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center z-[9999] p-4" // Estilizado
-          onClick={closeSimpleModal} 
+          className="fixed inset-0 bg-black/60 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center z-[9999] p-4"
+          onClick={closeExplanationModal} 
         >
           <div
-            className="bg-white dark:bg-gray-800 rounded-xl w-full max-w-lg shadow-xl p-6 md:p-8" // Estilizado
+            className="bg-white dark:bg-gray-800 rounded-xl w-full max-w-2xl max-h-[85vh] shadow-2xl p-6 md:p-8 relative flex flex-col animate-in zoom-in-90 duration-300"
             onClick={(e) => e.stopPropagation()} 
           >
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Título do Modal Simples</h2>
-            <p className="text-gray-600 dark:text-gray-300 mb-6">Este é um conteúdo de teste para o modal.</p>
-            <Button onClick={closeSimpleModal} className="bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-500 dark:hover:bg-blue-600">
-              Fechar
-            </Button>
+            {/* Header do Modal */}
+            <div className="flex justify-between items-center mb-4 pb-4 border-b border-gray-200 dark:border-gray-700">
+              <h3 className="text-xl sm:text-2xl font-semibold text-gray-800 dark:text-gray-100">
+                {currentModalData.title} {/* Título Dinâmico */}
+              </h3>
+              <Button variant="ghost" size="icon" onClick={closeExplanationModal} className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300">
+                <X size={20} />
+              </Button>
+            </div>
+
+            {/* Corpo do Modal (ainda com texto simples) */}
+            <div className="overflow-y-auto flex-grow pr-2 text-gray-600 dark:text-gray-300 leading-relaxed modal-content-area">
+              <p>{currentModalData.text}</p> {/* Conteúdo de texto simples */}
+            </div>
+
+            {/* Footer do Modal */}
+            <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700 text-right">
+              <Button onClick={closeExplanationModal} className="bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-500 dark:hover:bg-blue-600 px-6 py-2">
+                Entendido
+              </Button>
+            </div>
           </div>
         </div>
       )}
