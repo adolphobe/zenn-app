@@ -93,6 +93,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // Primeiro configurar o listener para mudanças no estado de autenticação
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        console.log("Event from Supabase auth:", event);
         setSession(session);
         
         if (session?.user) {
@@ -121,6 +122,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     // Em seguida, verificar se já existe uma sessão ativa
     supabase.auth.getSession().then(async ({ data: { session } }) => {
+      console.log("Initial session check:", session ? "Session found" : "No session");
       setSession(session);
       
       if (session?.user) {
@@ -156,6 +158,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setIsLoading(true);
     
     try {
+      console.log("Tentando fazer login com email:", email);
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password
@@ -172,12 +175,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         // Propagar o erro para o componente de login tratar adequadamente
         if (error.message.includes("Email not confirmed")) {
           throw new Error("Email not confirmed");
+        } else if (error.message.includes("Invalid login credentials")) {
+          throw new Error("Invalid login credentials");
         }
         
         return false;
       }
       
-      // O listener onAuthStateChange irá atualizar o estado do usuário
+      console.log("Login bem-sucedido:", data.user?.email);
       return true;
     } catch (error: any) {
       console.error("Erro ao fazer login:", error);
@@ -192,6 +197,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setIsLoading(true);
     
     try {
+      console.log("Tentando criar conta com email:", email);
       // Criar usuário no Supabase Auth
       const { data, error } = await supabase.auth.signUp({
         email,
@@ -204,30 +210,34 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       });
       
       if (error) {
+        console.error("Erro ao criar conta:", error);
         toast({
           title: "Erro ao criar conta",
           description: error.message,
           variant: "destructive"
         });
-        return false;
+        throw error;
       }
       
       if (data?.user?.identities?.length === 0) {
+        console.error("Usuário já existente");
         toast({
           title: "Erro ao criar conta",
           description: "Este e-mail já está registrado.",
           variant: "destructive"
         });
-        return false;
+        throw new Error("user_already_exists");
       }
       
       // Verificar se a confirmação de e-mail está ativada
       if (data?.user && !data.session) {
+        console.log("Confirmação de email necessária");
         toast({
           title: "Conta criada com sucesso",
           description: "Um e-mail de confirmação foi enviado para " + email + ". Por favor, verifique sua caixa de entrada e confirme seu e-mail para fazer login.",
         });
       } else {
+        console.log("Conta criada e autenticada automaticamente");
         toast({
           title: "Conta criada com sucesso",
           description: "Sua conta foi criada e você foi autenticado automaticamente."
@@ -238,12 +248,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       return true;
     } catch (error: any) {
       console.error("Erro ao criar conta:", error);
-      toast({
-        title: "Erro ao criar conta",
-        description: error.message || "Ocorreu um erro ao criar sua conta",
-        variant: "destructive"
-      });
-      return false;
+      if (!error.message) {
+        error.message = "Ocorreu um erro ao criar sua conta";
+      }
+      throw error;
     } finally {
       setIsLoading(false);
     }

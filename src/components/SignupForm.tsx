@@ -44,11 +44,23 @@ const SignupForm: React.FC<SignupFormProps> = ({ onCancel, redirectPath = "/dash
     setSignupError(null);
     setSignupSuccess(null);
     
-    const success = await signup(values.email, values.password, values.name);
-    
-    if (success) {
-      setSignupSuccess("Conta criada com sucesso! Por favor, verifique seu e-mail para confirmar seu cadastro antes de fazer login.");
-      form.reset();
+    try {
+      console.log("Tentando cadastrar com:", values.email);
+      const success = await signup(values.email, values.password, values.name);
+      
+      if (success) {
+        console.log("Cadastro bem-sucedido");
+        setSignupSuccess("Conta criada com sucesso! Você já pode fazer login.");
+        form.reset();
+      }
+    } catch (error: any) {
+      console.error("Erro ao criar conta:", error);
+      
+      if (error.message?.includes("User already registered") || error.message?.includes("user_already_exists")) {
+        setSignupError("Este e-mail já está registrado. Por favor, tente fazer login ou use outro e-mail.");
+      } else {
+        setSignupError("Erro ao criar conta. Por favor, tente novamente.");
+      }
     }
   };
 
