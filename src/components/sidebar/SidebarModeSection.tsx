@@ -16,8 +16,8 @@ const SidebarModeSection: React.FC<{ sidebarOpen: boolean }> = ({ sidebarOpen })
   const navigate = useNavigate();
   
   // Check if user is on specific routes by checking if the path contains these segments
-  const isStrategicReview = location.pathname.includes('/dashboard/strategic-review');
-  const isHistory = location.pathname.includes('/dashboard/history');
+  const isStrategicReview = location.pathname === '/strategic-review';
+  const isHistory = location.pathname === '/history';
   
   // Check if user is logged in
   const isLoggedIn = localStorage.getItem('acto_is_logged_in') === 'true';
@@ -58,14 +58,14 @@ const SidebarModeSection: React.FC<{ sidebarOpen: boolean }> = ({ sidebarOpen })
       <SidebarNavItem 
         icon={BarChart} 
         label="Insights"
-        path="/dashboard/strategic-review"
+        path="/strategic-review"
         isActive={isStrategicReview}
       />
 
       <SidebarNavItem 
         icon={History}
         label="Histórico"
-        path="/dashboard/history"
+        path="/history"
         isActive={isHistory}
       />
     </SidebarSection>

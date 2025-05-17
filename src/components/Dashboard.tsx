@@ -5,7 +5,6 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import TaskForm from './TaskForm';
 import TaskCard from './TaskCard';
 import SortDropdown from './SortDropdown';
-import StrategicReview from '../pages/StrategicReview';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { sortTasks, isTaskOverdue } from '@/utils';
 import { Plus, Bell, ChevronDown, ChevronUp } from 'lucide-react';
@@ -44,13 +43,7 @@ const Dashboard: React.FC = () => {
     localStorage.setItem('showOverdueTasks', JSON.stringify(showOverdueTasks));
   }, [showOverdueTasks]);
   
-  // Check if we're on strategic review route
-  const isStrategicReview = location.pathname === '/strategic-review';
-
-  // If on strategic review route, render that component
-  if (isStrategicReview) {
-    return <StrategicReview />;
-  }
+  // No more checks for strategic review route since it's handled by routing
   
   // In chronological mode, always show hidden tasks
   const shouldShowHiddenTasks = viewMode === 'chronological' || showHiddenTasks;
