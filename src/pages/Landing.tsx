@@ -101,6 +101,27 @@ const Landing: React.FC = () => {
             animation: floating-enhanced 12s ease-in-out infinite;
           }
           
+          /* Animação de brilho de cristal */
+          @keyframes crystal-shine {
+            0%, 100% {
+              background-position: 0% 0%;
+            }
+            25% {
+              background-position: 100% 0%;
+            }
+            50% {
+              background-position: 100% 100%;
+            }
+            75% {
+              background-position: 0% 100%;
+            }
+          }
+          
+          .animate-crystal-shine {
+            animation: crystal-shine 15s linear infinite;
+            background-size: 200% 200%;
+          }
+          
           /* Animação de pulso melhorada */
           @keyframes pulse-enhanced {
             0%, 100% {
@@ -246,45 +267,66 @@ const Landing: React.FC = () => {
             <div className={`relative w-full h-[600px] transition-all duration-1000 ease-in-out ${
               loaded ? 'opacity-100' : 'opacity-0'
             }`}>
-              {/* 3D image com os 3 círculos originais e as cores específicas solicitadas */}
+              {/* 3D image com círculos estilo cristal */}
               <div className="absolute inset-0 flex items-center justify-center">
-                {/* Primeiro círculo (maior) - cor específica solicitada */}
+                {/* Primeiro círculo (maior) - estilo cristal com bordas reflexivas */}
                 <div 
-                  className="w-[350px] h-[350px] rounded-full backdrop-blur-sm animate-pulse-enhanced"
+                  className="w-[350px] h-[350px] rounded-full backdrop-blur-md animate-pulse-enhanced animate-crystal-shine"
                   style={{
-                    backgroundColor: 'rgb(111 166 255 / 40%)',
-                    boxShadow: 'rgb(129 177 255 / 30%) 0px 0px 25px'
+                    background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, rgba(111, 166, 255, 0.25) 50%, rgba(111, 166, 255, 0.4) 100%)',
+                    boxShadow: 'inset 0 0 20px rgba(255, 255, 255, 0.5), 0 0 25px rgba(129, 177, 255, 0.3)',
+                    border: '1px solid rgba(255, 255, 255, 0.2)'
                   }}
                 ></div>
                 
-                {/* Segundo círculo (médio) - cor específica solicitada */}
+                {/* Segundo círculo (médio) - estilo cristal facetado */}
                 <div 
                   className="absolute w-[300px] h-[300px] rounded-full backdrop-blur-md animate-floating-enhanced" 
                   style={{ 
                     animationDuration: '10s',
-                    backgroundColor: 'rgb(92 143 255 / 34%)',
-                    boxShadow: 'rgb(255 255 255 / 28%) 0px 0px 20px'
+                    background: 'radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.5) 0%, rgba(92, 143, 255, 0.25) 40%, rgba(92, 143, 255, 0.34) 100%)',
+                    boxShadow: 'inset 0 0 15px rgba(255, 255, 255, 0.6), 0 0 20px rgba(255, 255, 255, 0.28)',
+                    border: '1.5px solid rgba(255, 255, 255, 0.3)',
+                    backdropFilter: 'blur(4px)',
+                    position: 'relative',
+                    overflow: 'hidden'
                   }}
-                ></div>
+                >
+                  {/* Brilho interno do cristal */}
+                  <div 
+                    className="absolute top-[10%] left-[10%] w-[30px] h-[30px] rounded-full bg-white/50 blur-sm animate-pulse-enhanced"
+                    style={{ animationDuration: '4s' }}
+                  ></div>
+                </div>
                 
-                {/* Terceiro círculo (menor) - cor específica solicitada */}
+                {/* Terceiro círculo (menor) - estilo bolha de cristal */}
                 <div 
-                  className="absolute w-[250px] h-[250px] rounded-full backdrop-blur-md animate-floating-enhanced" 
+                  className="absolute w-[250px] h-[250px] rounded-full backdrop-blur-lg animate-floating-enhanced" 
                   style={{ 
                     animationDuration: '8s', 
                     animationDelay: '1s',
-                    backgroundColor: 'rgb(93 156 255 / 21%)',
-                    boxShadow: 'rgb(255 255 255 / 25%) 0px 0px 20px'
+                    background: 'radial-gradient(circle at 70% 70%, rgba(255, 255, 255, 0.6) 0%, rgba(93, 156, 255, 0.15) 50%, rgba(93, 156, 255, 0.21) 100%)',
+                    boxShadow: 'inset 0 0 10px rgba(255, 255, 255, 0.7), 0 0 20px rgba(255, 255, 255, 0.25)',
+                    border: '1px solid rgba(255, 255, 255, 0.35)',
+                    position: 'relative',
+                    overflow: 'hidden'
                   }}
-                ></div>
+                >
+                  {/* Reflexo de luz em forma de meia-lua */}
+                  <div 
+                    className="absolute -top-[25%] -right-[25%] w-[50%] h-[50%] rounded-full bg-white/40 blur-sm"
+                  ></div>
+                </div>
               </div>
               
-              {/* Crystal/glass effect overlay - ajustado para combinar */}
+              {/* Crystal/glass effect overlay - efeito cristal avançado */}
               <div 
                 className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full"
                 style={{
-                  backgroundColor: 'rgb(111 166 255 / 20%)',
-                  boxShadow: 'rgb(129 177 255 / 25%) 0px 0px 80px',
+                  background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(111, 166, 255, 0.15) 50%, rgba(59, 130, 246, 0.2) 100%)',
+                  boxShadow: 'inset 0 0 30px rgba(255, 255, 255, 0.3), 0 0 80px rgba(111, 166, 255, 0.25)',
+                  border: '1px solid rgba(255, 255, 255, 0.15)',
+                  backdropFilter: 'blur(5px)',
                   animation: loaded ? 'pulse-enhanced 6s ease-in-out infinite alternate' : 'none',
                 }}
               ></div>
