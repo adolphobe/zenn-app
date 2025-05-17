@@ -37,9 +37,6 @@ export const groupTasksByTimeline = (tasks: Task[], periodFilter: string = 'all'
     try {
       const completedDate = parseISO(task.completedAt);
       
-      // Debug info
-      console.log(`Task ${task.title}: Completed at ${task.completedAt}, Parsed as ${completedDate}`);
-      
       if (isToday(completedDate)) {
         groups.today.tasks.push(task);
       } else if (isYesterday(completedDate)) {
@@ -60,8 +57,6 @@ export const groupTasksByTimeline = (tasks: Task[], periodFilter: string = 'all'
         }
       }
     } catch (error) {
-      console.error(`Error processing completedDate for task "${task.title}":`, error);
-      console.error(`Invalid completedAt value: ${task.completedAt}`);
       groups.older.tasks.push(task); // Fallback to "older" if date parsing fails
     }
   });

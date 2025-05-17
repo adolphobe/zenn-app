@@ -22,12 +22,6 @@ const TaskHistory = () => {
   const { isAuthenticated } = useAuth();
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('grid');
   
-  // Verificação simples de autenticação
-  useEffect(() => {
-    const timestamp = new Date().toISOString();
-    console.log(`[${timestamp}] TaskHistory: Estado de autenticação => ${isAuthenticated ? "Autenticado" : "Não autenticado"}`);
-  }, [isAuthenticated]);
-  
   // Use our custom hooks to manage the task data, filtering and pagination
   const { completedTasks } = useCompletedTasks(state.tasks);
   

@@ -9,9 +9,6 @@ import { useAuth } from '../context/AuthContext';
 export const PrivateRoute = () => {
   const { isAuthenticated, isLoading } = useAuth();
   
-  // Debug log for monitoring
-  console.log('PrivateRoute check:', { isAuthenticated, isLoading, authDisabled: true });
-  
   // Temporarily allow all access regardless of authentication status
   return <Outlet />;
 };

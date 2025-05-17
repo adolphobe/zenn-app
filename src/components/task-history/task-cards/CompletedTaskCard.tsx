@@ -75,11 +75,8 @@ export const CompletedTaskCard: React.FC<CompletedTaskCardProps> = ({ task }) =>
     if (!dateString) return '-';
     try {
       const date = parseISO(dateString);
-      console.log(`[TaskCards] Formatting date for "${task.title}": ${dateString} -> parsed as ${date}`);
       return format(date, 'dd/MM/yyyy HH:mm', { locale: ptBR });
     } catch (e) {
-      console.error("Error formatting date:", e);
-      console.error("Invalid date string:", dateString);
       return '-';
     }
   };
