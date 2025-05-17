@@ -45,28 +45,40 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onSwitchToSignup }) =>
     setLoginError(null);
     
     try {
-      console.log("[LoginForm] Attempting login with:", values.email);
+      console.log("[LoginForm] Tentando login com:", values.email);
+      console.log("[LoginForm] DETALHES EM PORTUGUÊS: Iniciando processo de autenticação para o usuário");
+      
       const success = await login(values.email, values.password);
       
       if (!success) {
-        console.error("[LoginForm] Login failed for:", values.email);
+        console.error("[LoginForm] Falha no login para:", values.email);
+        console.error("[LoginForm] DETALHES EM PORTUGUÊS: O login falhou. Verifique se o email e senha estão corretos e se a conta existe.");
         setLoginError("Usuário não encontrado ou senha incorreta. Por favor, verifique suas credenciais.");
       } else {
-        console.log("[LoginForm] Login successful for:", values.email);
+        console.log("[LoginForm] Login bem-sucedido para:", values.email);
+        console.log("[LoginForm] DETALHES EM PORTUGUÊS: Login realizado com sucesso, redirecionando para o dashboard");
+        
         toast({
           title: "Login realizado com sucesso",
           description: "Você foi autenticado com sucesso",
         });
+        
         if (onSuccess) {
-          console.log("[LoginForm] Running onSuccess callback");
+          console.log("[LoginForm] Executando callback de sucesso");
           onSuccess();
         }
         
-        // We'll add a button to navigate to dashboard instead of auto-redirecting
-        console.log("[LoginForm] User can now navigate to dashboard manually");
+        console.log("[LoginForm] Redirecionando para o dashboard");
+        console.log("[LoginForm] DETALHES EM PORTUGUÊS: Usuário autenticado com sucesso. Redirecionando para o painel principal");
+        
+        // Pequeno delay para garantir que os logs sejam visíveis no console
+        setTimeout(() => {
+          navigate('/dashboard');
+        }, 100);
       }
     } catch (error) {
-      console.error("[LoginForm] Login error:", error);
+      console.error("[LoginForm] Erro de login:", error);
+      console.error("[LoginForm] DETALHES EM PORTUGUÊS: Ocorreu um erro técnico durante o processo de login. Verifique a conexão com o servidor.");
       setLoginError("Ocorreu um erro ao processar sua solicitação. Por favor, tente novamente.");
     } finally {
       setIsLoading(false);
@@ -74,11 +86,6 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onSwitchToSignup }) =>
   };
 
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
-  
-  const handleGoToDashboard = () => {
-    console.log("[LoginForm] User manually navigating to dashboard");
-    navigate('/dashboard');
-  };
 
   // Colors and icons
   const iconColor = "text-gray-800 dark:text-gray-200"; 

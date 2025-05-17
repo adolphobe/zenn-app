@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -25,20 +24,21 @@ const Login: React.FC = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  // Log authentication status but don't redirect
+  // Redirecionar automaticamente quando autenticado
   useEffect(() => {
     if (isAuthenticated && !isLoading) {
-      console.log("[Login] User is already authenticated");
-      console.log(`[Login] TECHNICAL DETAILS: Would normally redirect to ${from} but redirection is disabled`);
-      console.log("[Login] AUTH STATE:", { isAuthenticated, isLoading, redirectPath: from });
+      console.log("[Login] Usuário já está autenticado - Redirecionando automaticamente");
+      console.log(`[Login] DETALHES TÉCNICOS: Redirecionando para ${from}`);
+      console.log("[Login] ESTADO DE AUTENTICAÇÃO:", { isAuthenticated, isLoading, redirectPath: from });
+      
+      // Pequeno delay para garantir que os logs sejam visíveis no console
+      const redirectTimer = setTimeout(() => {
+        navigate('/dashboard');
+      }, 100);
+      
+      return () => clearTimeout(redirectTimer);
     }
-  }, [isAuthenticated, isLoading, from]);
-
-  // Navigate to dashboard manually
-  const handleGoToDashboard = () => {
-    console.log("[Login] User manually navigating to dashboard");
-    navigate('/dashboard');
-  };
+  }, [isAuthenticated, isLoading, from, navigate]);
 
   // Toggle between login and signup
   const toggleSignup = () => {
@@ -52,21 +52,15 @@ const Login: React.FC = () => {
     </div>;
   }
 
-  // If user is authenticated, show message instead of redirecting
+  // If user is authenticated, show a temporary message but will auto-redirect
   if (isAuthenticated) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gray-50">
         <div className="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 mb-4 max-w-lg">
-          <p className="font-bold">Already Authenticated</p>
-          <p>You are already logged in. Check console for technical details.</p>
+          <p className="font-bold">Já Autenticado</p>
+          <p>Você já está logado. Redirecionando para o dashboard...</p>
+          <p className="mt-2 text-sm">Verifique o console para detalhes técnicos.</p>
         </div>
-        
-        <Button 
-          onClick={handleGoToDashboard}
-          className="mt-6 bg-blue-600 hover:bg-blue-700"
-        >
-          Go to Dashboard
-        </Button>
       </div>
     );
   }
