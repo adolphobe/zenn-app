@@ -147,7 +147,7 @@ const Landing: React.FC = () => {
       </style>
       
       {/* Floating elements background */}
-      {floatingElements}
+      
       
       {/* Main content */}
       <div className="container mx-auto min-h-screen grid grid-cols-1 lg:grid-cols-12 relative z-10">
