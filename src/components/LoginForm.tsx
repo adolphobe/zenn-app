@@ -57,7 +57,7 @@ const LoginForm: React.FC = () => {
             <FormItem className="transition-all duration-300 ease-in-out hover:translate-x-1">
               <div className="relative">
                 <Mail 
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-600" // ALTERADO AQUI
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-700" // TENTANDO text-gray-700
                   size={18}
                 />
                 <FormControl>
@@ -80,7 +80,7 @@ const LoginForm: React.FC = () => {
             <FormItem className="transition-all duration-300 ease-in-out hover:translate-x-1">
               <div className="relative">
                 <Lock
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-600" // ALTERADO AQUI
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-700" // TENTANDO text-gray-700
                   size={18}
                 />
                 <FormControl>
