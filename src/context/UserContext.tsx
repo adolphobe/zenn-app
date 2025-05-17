@@ -28,30 +28,39 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const toastContext = useContext(ToastContext);
   const addToast = toastContext?.addToast;
 
-  // Initialize user from localStorage on component mount
+  // Initialize user from localStorage on component mount with improved handling
   useEffect(() => {
     const checkLoggedInUser = async () => {
       try {
+        console.log("UserContext: Checking logged in user state...");
         const userId = localStorage.getItem('acto_user_id');
         const isLoggedIn = localStorage.getItem('acto_is_logged_in') === 'true';
+        
+        console.log("UserContext: userId from localStorage:", userId);
+        console.log("UserContext: isLoggedIn from localStorage:", isLoggedIn);
         
         if (userId && isLoggedIn) {
           const user = getUserById(userId);
           
           if (user) {
+            console.log("UserContext: Found valid user, setting as current user");
             setCurrentUser(user);
             
             // Apply user preferences
             applyUserPreferences(user.preferences);
           } else {
+            console.log("UserContext: Invalid user ID stored, clearing localStorage");
             // Invalid user ID stored, clear it
             localStorage.removeItem('acto_user_id');
             localStorage.removeItem('acto_is_logged_in');
           }
+        } else {
+          console.log("UserContext: No user logged in");
         }
       } catch (error) {
         console.error('Error checking logged in user:', error);
       } finally {
+        console.log("UserContext: Finished loading, setting isLoading to false");
         setIsLoading(false);
       }
     };
@@ -83,6 +92,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const user = getUserByCredentials(email, password);
       
       if (user) {
+        console.log("UserContext: Login successful, setting user and localStorage");
         setCurrentUser(user);
         localStorage.setItem('acto_user_id', user.id);
         localStorage.setItem('acto_is_logged_in', 'true');

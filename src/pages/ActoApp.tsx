@@ -18,12 +18,27 @@ const ActoApp: React.FC = () => {
   const { currentUser, isLoading } = useUser(); // Get current user from context
   const isDashboardRoute = location.pathname === '/dashboard';
 
+  // Authentication check and redirect logic
   useEffect(() => {
-    // Only redirect to login if user is not logged in and not loading
-    if (!isLoading && !currentUser && 
-        location.pathname !== '/' && 
-        location.pathname !== '/login') {
-      navigate('/login');
+    console.log("ActoApp: Checking authentication state...");
+    console.log("ActoApp: isLoading:", isLoading);
+    console.log("ActoApp: currentUser:", currentUser ? 'exists' : 'null');
+    console.log("ActoApp: current path:", location.pathname);
+    
+    // Only check after we know if user is logged in or not
+    if (!isLoading) {
+      if (!currentUser && 
+          location.pathname !== '/' && 
+          location.pathname !== '/login') {
+        // User is not authenticated and trying to access protected route
+        console.log("ActoApp: User not authenticated, redirecting to login");
+        navigate('/login');
+      } else if (currentUser && 
+                (location.pathname === '/login' || location.pathname === '/')) {
+        // User is authenticated and trying to access public route
+        console.log("ActoApp: User already authenticated, redirecting to dashboard");
+        navigate('/dashboard');
+      }
     }
   }, [currentUser, isLoading, navigate, location.pathname]);
 
@@ -34,11 +49,18 @@ const ActoApp: React.FC = () => {
     }
   }, [isMobile, location.pathname, sidebarOpen, toggleSidebar]);
 
-  // If still loading, show nothing
+  // If still loading, show loading spinner
   if (isLoading) {
+    console.log("ActoApp: Showing loading spinner");
     return <div className="min-h-screen flex items-center justify-center">
       <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
     </div>;
+  }
+
+  // If user is not authenticated and not on public route, redirect is handled in useEffect
+  if (!currentUser && location.pathname !== '/' && location.pathname !== '/login') {
+    console.log("ActoApp: No user but rendering anyway (redirect will happen in useEffect)");
+    return null;
   }
 
   // Determine if we should use a narrower max-width for task cards (only in power and chronological mode)
