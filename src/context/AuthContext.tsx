@@ -162,11 +162,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       });
       
       if (error) {
+        console.error("Erro ao fazer login:", error);
         toast({
           title: "Erro ao fazer login",
           description: error.message,
           variant: "destructive"
         });
+        
+        // Propagar o erro para o componente de login tratar adequadamente
+        if (error.message.includes("Email not confirmed")) {
+          throw new Error("Email not confirmed");
+        }
+        
         return false;
       }
       
@@ -174,12 +181,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       return true;
     } catch (error: any) {
       console.error("Erro ao fazer login:", error);
-      toast({
-        title: "Erro ao fazer login",
-        description: error.message || "Ocorreu um erro ao fazer login",
-        variant: "destructive"
-      });
-      return false;
+      throw error; // Propagar o erro para o componente de login
     } finally {
       setIsLoading(false);
     }
@@ -210,11 +212,27 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         return false;
       }
       
-      // O perfil será criado automaticamente pelo trigger SQL
-      toast({
-        title: "Conta criada com sucesso",
-        description: "Sua conta foi criada e você foi autenticado automaticamente."
-      });
+      if (data?.user?.identities?.length === 0) {
+        toast({
+          title: "Erro ao criar conta",
+          description: "Este e-mail já está registrado.",
+          variant: "destructive"
+        });
+        return false;
+      }
+      
+      // Verificar se a confirmação de e-mail está ativada
+      if (data?.user && !data.session) {
+        toast({
+          title: "Conta criada com sucesso",
+          description: "Um e-mail de confirmação foi enviado para " + email + ". Por favor, verifique sua caixa de entrada e confirme seu e-mail para fazer login.",
+        });
+      } else {
+        toast({
+          title: "Conta criada com sucesso",
+          description: "Sua conta foi criada e você foi autenticado automaticamente."
+        });
+      }
       
       // O listener onAuthStateChange irá atualizar o estado do usuário
       return true;

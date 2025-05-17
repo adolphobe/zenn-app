@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, Mail, Lock, User, AlertCircle } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, User, AlertCircle, CheckCircle } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
@@ -29,6 +29,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ onCancel, redirectPath = "/dash
   const { signup, isLoading } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [signupError, setSignupError] = useState<string | null>(null);
+  const [signupSuccess, setSignupSuccess] = useState<string | null>(null);
 
   const form = useForm<SignupFormValues>({
     resolver: zodResolver(signupSchema),
@@ -41,10 +42,13 @@ const SignupForm: React.FC<SignupFormProps> = ({ onCancel, redirectPath = "/dash
 
   const onSubmit = async (values: SignupFormValues) => {
     setSignupError(null);
+    setSignupSuccess(null);
+    
     const success = await signup(values.email, values.password, values.name);
     
     if (success) {
-      navigate(redirectPath);
+      setSignupSuccess("Conta criada com sucesso! Por favor, verifique seu e-mail para confirmar seu cadastro antes de fazer login.");
+      form.reset();
     }
   };
 
@@ -63,6 +67,17 @@ const SignupForm: React.FC<SignupFormProps> = ({ onCancel, redirectPath = "/dash
               <AlertCircle size={16} />
               <AlertDescription className="text-sm font-medium">
                 {signupError}
+              </AlertDescription>
+            </div>
+          </Alert>
+        )}
+        
+        {signupSuccess && (
+          <Alert className="bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800 py-2 animate-in fade-in slide-in-from-top-5 duration-300">
+            <div className="flex items-center gap-2 text-green-600 dark:text-green-400">
+              <CheckCircle size={16} />
+              <AlertDescription className="text-sm font-medium">
+                {signupSuccess}
               </AlertDescription>
             </div>
           </Alert>
@@ -153,7 +168,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ onCancel, redirectPath = "/dash
           <Button 
             type="submit" 
             className="w-full h-12 text-base transition-all duration-300 transform hover:scale-[1.02] bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
-            disabled={isLoading}
+            disabled={isLoading || !!signupSuccess}
           >
             {isLoading ? "Criando conta..." : "Criar conta"}
           </Button>

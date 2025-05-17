@@ -41,21 +41,29 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, redirectPath = "/dashb
 
   const onSubmit = async (values: LoginFormValues) => {
     setLoginError(null);
-    const success = await login(values.email, values.password);
-    
-    if (success) {
-      toast({
-        title: "Login bem-sucedido",
-        description: "Você foi autenticado com sucesso",
-      });
+    try {
+      const success = await login(values.email, values.password);
       
-      if (onSuccess) {
-        onSuccess();
-      } else if (redirectPath) {
-        navigate(redirectPath);
+      if (success) {
+        toast({
+          title: "Login bem-sucedido",
+          description: "Você foi autenticado com sucesso",
+        });
+        
+        if (onSuccess) {
+          onSuccess();
+        } else if (redirectPath) {
+          navigate(redirectPath);
+        }
       }
-    } else {
-      setLoginError("E-mail ou senha incorretos. Por favor, tente novamente.");
+    } catch (error: any) {
+      console.error("Erro de login:", error);
+      
+      if (error.message?.includes("Email not confirmed")) {
+        setLoginError("Por favor, confirme seu e-mail antes de fazer login. Verifique sua caixa de entrada.");
+      } else {
+        setLoginError("E-mail ou senha incorretos. Por favor, tente novamente.");
+      }
     }
   };
 
@@ -169,3 +177,4 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, redirectPath = "/dashb
 };
 
 export default LoginForm;
+
