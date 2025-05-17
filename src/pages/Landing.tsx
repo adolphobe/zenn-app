@@ -20,28 +20,22 @@ const Landing: React.FC = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  // OTIMIZADO: Efeito Parallax com throttling para melhor performance e menos conflitos
+  // Parallax effect for background
   useEffect(() => {
-    let ticking = false;
-    const parallaxBg = document.getElementById('parallax-bg');
+   const handleMouseMove = (e) => {
+  const parallaxBg = document.getElementById('parallax-bg');
+  if (parallaxBg) {
+    // Ajustado para um movimento mais suave e com melhor performance
+    const x = (window.innerWidth - e.pageX * 2) / 80;
+    const y = (window.innerHeight - e.pageY * 2) / 80;
     
-    const handleMouseMove = (e) => {
-      if (!ticking && parallaxBg) {
-        window.requestAnimationFrame(() => {
-          // Movimento mais suave, valores reduzidos para minimizar o impacto visual
-          const x = (window.innerWidth - e.pageX * 2) / 120;
-          const y = (window.innerHeight - e.pageY * 2) / 120;
-          
-          parallaxBg.style.transform = `scale(1.08) translate(${x}px, ${y}px)`;
-          ticking = false;
-        });
-        
-        ticking = true;
-      }
-    };
+    requestAnimationFrame(() => {
+      parallaxBg.style.transform = `scale(1.12) translate(${x}px, ${y}px)`;
+    });
+  }
+};
     
-    // Aplicamos throttling aos eventos de mouse para evitar sobrecarga
-    window.addEventListener('mousemove', handleMouseMove, { passive: true });
+    window.addEventListener('mousemove', handleMouseMove);
     
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
@@ -60,20 +54,18 @@ const Landing: React.FC = () => {
     }
   }, [navigate]);
 
-  // OTIMIZADO: Animation for sections on scroll com IntersectionObserver otimizado
+  // Animation for sections on scroll
   useEffect(() => {
     const observerOptions = {
       root: null,
       rootMargin: '0px',
-      threshold: 0.15 // Aumentado ligeiramente para evitar triggers prematuros
+      threshold: 0.1
     };
 
     const observerCallback = (entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           entry.target.classList.add('animate-in');
-          // Desconecta o observer após animar para economizar recursos
-          observer.unobserve(entry.target);
         }
       });
     };
@@ -84,10 +76,14 @@ const Landing: React.FC = () => {
       observer.observe(section);
     });
 
-    return () => observer.disconnect();
+    return () => {
+      document.querySelectorAll('.animate-on-scroll').forEach(section => {
+        observer.unobserve(section);
+      });
+    };
   }, []);
 
-  // Auto rotate testimonials - Mantido como está
+  // Auto rotate testimonials
   useEffect(() => {
     const interval = setInterval(() => {
       setActiveTestimonial(prev => (prev + 1) % 3);
@@ -98,39 +94,142 @@ const Landing: React.FC = () => {
 
   return (
     <div className="min-h-screen overflow-x-hidden">
-      {/* Custom animations - ORGANIZADO E OTIMIZADO */}
+      {/* Custom animations */}
       <style>
         {`
-          /* Animações básicas - mantidas simples */
           @keyframes floating {
-            0%, 100% { transform: translateY(0); opacity: 0.3; }
-            50% { transform: translateY(-15px); opacity: 0.5; }
+            0%, 100% {
+              transform: translateY(0) translateX(0);
+              opacity: 0.3;
+            }
+            25% {
+              transform: translateY(-15px) translateX(10px);
+              opacity: 0.5;
+            }
+            50% {
+              transform: translateY(-25px) translateX(-10px);
+              opacity: 0.4;
+            }
+            75% {
+              transform: translateY(-10px) translateX(-5px);
+              opacity: 0.3;
+            }
           }
           
           .animate-floating {
             animation: floating 15s ease-in-out infinite;
           }
           
-          /* Animação de fade simplificada */
+          /* Animação de flutuação melhorada */
+          @keyframes floating-enhanced {
+            0% {
+              transform: translateY(0) translateX(0) scale(1);
+              opacity: 0.2;
+            }
+            20% {
+              transform: translateY(-25px) translateX(20px) scale(1.05);
+              opacity: 0.4;
+            }
+            40% {
+              transform: translateY(-35px) translateX(-15px) scale(0.95);
+              opacity: 0.5;
+            }
+            60% {
+              transform: translateY(-15px) translateX(-30px) scale(1.02);
+              opacity: 0.4;
+            }
+            80% {
+              transform: translateY(-30px) translateX(10px) scale(0.98);
+              opacity: 0.3;
+            }
+            100% {
+              transform: translateY(0) translateX(0) scale(1);
+              opacity: 0.2;
+            }
+          }
+          
+          .animate-floating-enhanced {
+            animation: floating-enhanced 12s ease-in-out infinite;
+          }
+          
+          /* Animação de pulso melhorada */
+          @keyframes pulse-enhanced {
+            0%, 100% {
+              transform: scale(1);
+              opacity: 0.3;
+            }
+            50% {
+              transform: scale(1.1);
+              opacity: 0.5;
+            }
+          }
+          
+          .animate-pulse-enhanced {
+            animation: pulse-enhanced 8s ease-in-out infinite;
+          }
+          
           @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+              opacity: 0;
+              transform: translateY(20px);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
+            }
           }
           
           .fade-up {
             animation: fadeUp 1.2s ease-out forwards;
           }
           
-          .fade-up-delay-1 { animation-delay: 0.2s; }
-          .fade-up-delay-2 { animation-delay: 0.4s; }
-          .fade-up-delay-3 { animation-delay: 0.6s; }
+          .fade-up-delay-1 {
+            animation-delay: 0.2s;
+          }
           
-          /* Animações para elementos na tela */
+          .fade-up-delay-2 {
+            animation-delay: 0.4s;
+          }
+          
+          .fade-up-delay-3 {
+            animation-delay: 0.6s;
+          }
+          
+          @keyframes slideIn {
+            from {
+              opacity: 0;
+              transform: translateY(30px);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+          
+          .slide-in {
+            animation: slideIn 0.6s ease-out forwards;
+          }
+          
+          @keyframes slideOut {
+            from {
+              opacity: 1;
+              transform: translateY(0);
+            }
+            to {
+              opacity: 0;
+              transform: translateY(-30px);
+            }
+          }
+          
+          .slide-out {
+            animation: slideOut 0.6s ease-out forwards;
+          }
+          
+          /* Novas animações */
           .animate-on-scroll {
             opacity: 0;
             transform: translateY(30px);
             transition: opacity 0.8s ease-out, transform 0.8s ease-out;
-            will-change: opacity, transform;
           }
           
           .animate-in {
@@ -138,19 +237,24 @@ const Landing: React.FC = () => {
             transform: translateY(0);
           }
           
-          /* Gradiente com animação simplificada e otimizada */
           @keyframes gradientFlow {
-            0% { background-position: 0% 50%; }
-            100% { background-position: 100% 50%; }
+            0% {
+              background-position: 0% 50%;
+            }
+            50% {
+              background-position: 100% 50%;
+            }
+            100% {
+              background-position: 0% 50%;
+            }
           }
           
           .gradient-flow-bg {
-            background: linear-gradient(120deg, #e0f2fe, #bfdbfe);
-            background-size: 200% 200%;
-            animation: gradientFlow 15s alternate infinite;
+            background: linear-gradient(120deg, #e0f2fe, #bfdbfe, #dbeafe, #eff6ff);
+            background-size: 300% 300%;
+            animation: gradientFlow 15s ease infinite;
           }
           
-          /* Card hover effect */
           .gradient-card-hover {
             position: relative;
             overflow: hidden;
@@ -158,71 +262,86 @@ const Landing: React.FC = () => {
             transition: transform 0.3s ease, box-shadow 0.3s ease;
           }
           
+          .gradient-card-hover::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(120deg, #dbeafe, #bfdbfe, #93c5fd);
+            background-size: 300% 300%;
+            animation: gradientFlow 8s ease infinite;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            border-radius: 0.5rem;
+          }
+          
           .gradient-card-hover:hover {
             transform: translateY(-5px);
             box-shadow: 0 15px 30px rgba(124, 179, 248, 0.15);
           }
           
-          /* Animações de testemunhos simplificadas */
+          .gradient-card-hover:hover::before {
+            opacity: 0.07;
+          }
+          
+          .blob-animation {
+            position: absolute;
+            border-radius: 50%;
+            background: linear-gradient(45deg, rgba(191, 219, 254, 0.4), rgba(96, 165, 250, 0.2));
+            filter: blur(40px);
+          }
+          
+          @keyframes float-around {
+            0% {
+              transform: translate(0, 0) scale(1);
+            }
+            33% {
+              transform: translate(60px, -40px) scale(1.1);
+            }
+            66% {
+              transform: translate(-30px, 40px) scale(0.9);
+            }
+            100% {
+              transform: translate(0, 0) scale(1);
+            }
+          }
+          
           .testimonial-card {
-            transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
+            transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out, filter 0.5s ease-in-out;
+            will-change: transform, opacity;
           }
           
           .testimonial-active {
             transform: scale(1);
             opacity: 1;
+            filter: grayscale(0%);
           }
           
           .testimonial-inactive {
-            transform: scale(0.95);
+            transform: scale(0.9);
             opacity: 0.6;
-          }
-          
-          /* Definição de z-index para evitar conflitos de renderização */
-          .section-hero { z-index: 10; }
-          .section-features { z-index: 9; }
-          .section-how-it-works { z-index: 8; }
-          .section-testimonials { z-index: 7; }
-          .section-cta { z-index: 6; }
-          .section-footer { z-index: 5; }
-          
-          /* Otimização para a transição entre seções - IMPORTANTE */
-          .section-divider {
-            position: relative;
-            height: 100px;
-            margin-top: -50px;
-            z-index: 15;
-            pointer-events: none;
-          }
-          
-          /* Limita o backdrop-blur para melhorar a performance */
-          .optimized-blur {
-            backdrop-filter: blur(6px);
-            -webkit-backdrop-filter: blur(6px);
-          }
-          
-          @supports not (backdrop-filter: blur(6px)) {
-            .optimized-blur {
-              background-color: rgba(249, 251, 255, 0.8) !important;
-            }
+            filter: grayscale(50%);
           }
         `}
       </style>
       
-      {/* Hero Section with full height - Com correções de z-index e transições */}
-      <section className="relative h-screen overflow-hidden section-hero">
-        {/* Background image com parallax effect OTIMIZADO */}
+      {/* Hero Section with full height - UNCHANGED as requested */}
+      <section className="relative h-screen overflow-hidden">
+        {/* Background image with parallax effect */}
         <div className="absolute inset-0 z-0 overflow-hidden">
           <div className="parallax-container w-full h-full">
             <img 
               src="https://images.unsplash.com/photo-1668853853439-923e013afff1?q=80&w=3870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
               alt="Background" 
               className="object-cover w-full h-full transition-transform duration-300 ease-out"
-              style={{ transform: 'scale(1.08)', willChange: 'transform' }}
+              style={{ transform: 'scale(1.12)' }}
               id="parallax-bg"
             />
-            {/* Overlay com blur OTIMIZADO - com menor intensidade e melhor performance */}
-            <div className="absolute inset-0 bg-[#f9fbff]/50 optimized-blur"></div>
+            {/* Overlay com blur */}
+            <div className="absolute inset-0 bg-[#f9fbff]/50 backdrop-blur-[6px]" style={{willChange: 'auto'}}></div>
           </div>
         </div>
         
@@ -239,7 +358,7 @@ const Landing: React.FC = () => {
               />
             </div>
             
-            {/* Main headline without the circle effects */}
+             {/* Main headline without the circle effects */}
             <div className="relative">
               <h1 className={`text-4xl md:text-5xl lg:text-6xl font-semibold leading-tight md:leading-tight lg:leading-tight text-gray-900 mb-8 opacity-0 ${loaded ? 'fade-up' : ''}`}>
                 Você não precisa de mais tarefas.<br />
@@ -292,39 +411,39 @@ const Landing: React.FC = () => {
                 </div>
               </div>
             ) : (
-              /* 3D image that shows when login is not active - SIMPLIFICADO */
+              /* 3D image that shows when login is not active */
               <div className={`relative w-full h-[600px] transition-all duration-1000 ease-in-out ${
                 loaded ? 'opacity-100' : 'opacity-0'
               }`}>
-                {/* 3D image com os 3 círculos com as cores atualizadas - SIMPLIFICADO */}
+                {/* 3D image com os 3 círculos com as cores atualizadas */}
                 <div className="absolute inset-0 flex items-center justify-center">
-                  {/* Primeiro círculo (maior) */}
+                  {/* Primeiro círculo (maior) - cor atualizada */}
                   <div 
-                    className="w-[350px] h-[350px] rounded-full"
+                    className="w-[350px] h-[350px] rounded-full backdrop-blur-sm animate-pulse-enhanced"
                     style={{
-                      backgroundColor: 'rgba(159, 215, 255, 0.5)',
-                      boxShadow: 'rgba(129, 177, 255, 0.2) 0px 0px 25px'
+                      backgroundColor: 'rgb(159 215 255)',
+                      boxShadow: 'rgba(129, 177, 255, 0.3) 0px 0px 25px'
                     }}
                   ></div>
                   
-                  {/* Segundo círculo (médio) */}
+                  {/* Segundo círculo (médio) - cor atualizada */}
                   <div 
-                    className="absolute w-[300px] h-[300px] rounded-full animate-floating" 
+                    className="absolute w-[300px] h-[300px] rounded-full backdrop-blur-md animate-floating-enhanced" 
                     style={{ 
-                      animationDuration: '8s',
-                      backgroundColor: 'rgba(164, 211, 245, 0.6)',
-                      boxShadow: 'rgba(255, 255, 255, 0.2) 0px 0px 20px'
+                      animationDuration: '10s',
+                      backgroundColor: 'rgb(164 211 245)',
+                      boxShadow: 'rgba(255, 255, 255, 0.28) 0px 0px 20px'
                     }}
                   ></div>
                   
-                  {/* Terceiro círculo (menor) */}
+                  {/* Terceiro círculo (menor) - cor atualizada */}
                   <div 
-                    className="absolute w-[250px] h-[250px] rounded-full animate-floating" 
+                    className="absolute w-[250px] h-[250px] rounded-full backdrop-blur-md animate-floating-enhanced" 
                     style={{ 
-                      animationDuration: '6s', 
+                      animationDuration: '8s', 
                       animationDelay: '1s',
-                      backgroundColor: 'rgba(159, 209, 243, 0.7)',
-                      boxShadow: 'rgba(255, 255, 255, 0.2) 0px 0px 20px'
+                      backgroundColor: 'rgb(159 209 243)',
+                      boxShadow: 'rgba(255, 255, 255, 0.25) 0px 0px 20px'
                     }}
                   ></div>
                 </div>
@@ -334,25 +453,21 @@ const Landing: React.FC = () => {
         </div>
         
         {/* Scroll indicator */}
-        <div className="absolute bottom-10 left-0 right-0 mx-auto w-max flex flex-col items-center opacity-0 animate-pulse" style={{ animation: 'fadeUp 2s ease-out 2s forwards, pulse 2s infinite' }}>
-          <p className="text-gray-600 mb-2 text-sm">Conheça mais</p>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M7 13L12 18L17 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            <path d="M7 7L12 12L17 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        </div>
+      <div className="absolute bottom-10 left-0 right-0 mx-auto w-max flex flex-col items-center opacity-0 animate-pulse" style={{ animation: 'fadeUp 2s ease-out 2s forwards, pulse 2s infinite' }}>
+        <p className="text-gray-600 mb-2 text-sm">Conheça mais</p>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M7 13L12 18L17 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          <path d="M7 7L12 12L17 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      </div>
       </section>
-      
-      {/* NOVA SEÇÃO: Divisor otimizado para evitar problemas de transição */}
-      <div className="section-divider bg-gradient-to-b from-white/0 to-white"></div>
 
-      {/* Features Section - ENHANCED com ajustes para melhorar performance */}
-      <section className="py-32 relative z-10 overflow-hidden bg-gradient-to-b from-white via-blue-50 to-white section-features">
-        {/* Animações de blobs simplificadas para evitar sobrecarga */}
-        <div className="blob-animation w-64 h-64 top-20 left-10 opacity-30 rounded-full bg-blue-100" 
-             style={{ position: 'absolute', animation: 'floating 20s infinite ease-in-out' }}></div>
-        <div className="blob-animation w-96 h-96 bottom-40 right-20 opacity-20 rounded-full bg-blue-100" 
-             style={{ position: 'absolute', animation: 'floating 25s infinite ease-in-out reverse' }}></div>
+      {/* Features Section - ENHANCED */}
+     <section className="py-32 relative z-10 overflow-hidden bg-gradient-to-b from-white via-blue-100 to-white" style={{backfaceVisibility: 'hidden', transform: 'translateZ(0)'}}>
+
+        {/* Animated blobs background */}
+        <div className="blob-animation w-64 h-64 top-20 left-10" style={{ animation: 'float-around 25s infinite ease-in-out' }}></div>
+        <div className="blob-animation w-96 h-96 bottom-40 right-20" style={{ animation: 'float-around 30s infinite ease-in-out reverse' }}></div>
         
         <div className="container mx-auto px-8 relative">
           <div className="text-center mb-24 animate-on-scroll">
@@ -369,7 +484,7 @@ const Landing: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
             {/* Feature 1 */}
             <div className="animate-on-scroll" style={{ transitionDelay: '0.1s' }}>
-              <Card className="gradient-card-hover bg-white/90 border-none shadow-lg h-full rounded-xl overflow-hidden transition-all duration-300">
+              <Card className="gradient-card-hover bg-white/90 backdrop-blur-sm border-none shadow-lg h-full rounded-xl overflow-hidden transition-all duration-300">
                 <CardContent className="p-10 flex flex-col h-full">
                   <div className="rounded-full bg-blue-50 w-16 h-16 flex items-center justify-center mb-8 transition-transform duration-300 group-hover:scale-110">
                     <svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -393,7 +508,7 @@ const Landing: React.FC = () => {
             
             {/* Feature 2 */}
             <div className="animate-on-scroll" style={{ transitionDelay: '0.3s' }}>
-              <Card className="gradient-card-hover bg-white/90 border-none shadow-lg h-full rounded-xl overflow-hidden transition-all duration-300">
+              <Card className="gradient-card-hover bg-white/90 backdrop-blur-sm border-none shadow-lg h-full rounded-xl overflow-hidden transition-all duration-300">
                 <CardContent className="p-10 flex flex-col h-full">
                   <div className="rounded-full bg-blue-50 w-16 h-16 flex items-center justify-center mb-8">
                     <svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -417,7 +532,7 @@ const Landing: React.FC = () => {
             
             {/* Feature 3 */}
             <div className="animate-on-scroll" style={{ transitionDelay: '0.5s' }}>
-              <Card className="gradient-card-hover bg-white/90 border-none shadow-lg h-full rounded-xl overflow-hidden transition-all duration-300">
+              <Card className="gradient-card-hover bg-white/90 backdrop-blur-sm border-none shadow-lg h-full rounded-xl overflow-hidden transition-all duration-300">
                 <CardContent className="p-10 flex flex-col h-full">
                   <div className="rounded-full bg-blue-50 w-16 h-16 flex items-center justify-center mb-8">
                     <svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -442,12 +557,10 @@ const Landing: React.FC = () => {
         </div>
       </section>
       
-      {/* How It Works Section - ENHANCED com performance otimizada */}
-      <section className="relative z-9 overflow-hidden bg-white section-how-it-works">
-        {/* Divisor otimizado para evitar problemas de transição */}
-        <div className="section-divider bg-gradient-to-b from-white/0 to-blue-50/50"></div>
-        
-        <div className="container mx-auto px-8 relative z-10 py-32">
+      {/* How It Works Section - ENHANCED */}
+    <section className="relative z-10 overflow-hidden bg-gradient-to-b from-white via-blue-100 to-white">
+    
+        <div className="container mx-auto px-8 relative z-10">
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-24 animate-on-scroll">
               <span className="inline-block px-4 py-2 rounded-full bg-blue-100 text-blue-600 text-sm font-medium mb-4">Fluxo Simples</span>
@@ -530,29 +643,27 @@ const Landing: React.FC = () => {
             </div>
           </div>
           
-          {/* App Screenshot - Com otimização visual */}
+          {/* App Screenshot */}
           <div className="mt-32 animate-on-scroll">
             <div className="relative mx-auto max-w-4xl">
-              {/* Reduzido número de blobs e efeitos para melhorar performance */}
-              <div className="absolute -top-8 -left-8 w-64 h-64 bg-blue-100 rounded-full opacity-50 blur-xl"></div>
-              <div className="absolute -bottom-8 -right-8 w-64 h-64 bg-blue-200 rounded-full opacity-50 blur-xl"></div>
+              <div className="absolute -top-8 -left-8 w-64 h-64 bg-blue-100 rounded-full opacity-70 blur-3xl"></div>
+              <div className="absolute -bottom-8 -right-8 w-64 h-64 bg-blue-200 rounded-full opacity-70 blur-3xl"></div>
               <div className="relative overflow-hidden rounded-2xl shadow-2xl border border-white/30">
                 <img 
                   src="https://images.unsplash.com/photo-1555421689-3f034debb7a6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" 
                   alt="Dashboard" 
                   className="w-full h-auto"
                 />
-                {/* Gradiente simplificado */}
-                <div className="absolute inset-0 bg-gradient-to-tr from-blue-600/10 to-transparent"></div>
+                <div className="absolute inset-0 bg-gradient-to-tr from-blue-600/20 via-blue-400/10 to-transparent"></div>
               </div>
               
-              {/* Features callouts overlayed on screenshot - Mantidos como estão */}
-              <div className="absolute top-10 right-10 max-w-xs bg-white/90 p-4 rounded-lg shadow-lg border border-blue-100">
+              {/* Features callouts overlayed on screenshot */}
+              <div className="absolute top-10 right-10 max-w-xs bg-white/90 backdrop-blur-sm p-4 rounded-lg shadow-lg border border-blue-100">
                 <h4 className="font-medium text-blue-700 mb-1">Visão por Pilares</h4>
                 <p className="text-sm text-gray-600">Visualize rapidamente suas tarefas organizadas de acordo com os três pilares fundamentais.</p>
               </div>
               
-              <div className="absolute bottom-10 left-10 max-w-xs bg-white/90 p-4 rounded-lg shadow-lg border border-blue-100">
+              <div className="absolute bottom-10 left-10 max-w-xs bg-white/90 backdrop-blur-sm p-4 rounded-lg shadow-lg border border-blue-100">
                 <h4 className="font-medium text-blue-700 mb-1">Score Intuitivo</h4>
                 <p className="text-sm text-gray-600">Identifique facilmente quais tarefas merecem sua atenção prioritária através dos scores visuais.</p>
               </div>
@@ -561,14 +672,13 @@ const Landing: React.FC = () => {
         </div>
       </section>
       
-      {/* Divisor otimizado para evitar problemas de transição */}
-      <div className="section-divider bg-gradient-to-b from-white to-blue-50/50"></div>
-      
-      {/* Testimonial Section - ENHANCED e OTIMIZADO */}
-      <section className="py-32 relative z-8 overflow-hidden bg-gradient-to-b from-blue-50/50 to-white section-testimonials">        
-        {/* Reduzido o número e complexidade das animações de blobs */}
-        <div className="absolute w-72 h-72 top-40 right-20 opacity-30 rounded-full bg-blue-100" 
-             style={{ animation: 'floating 20s infinite ease-in-out' }}></div>
+      {/* Testimonial Section - ENHANCED */}
+      <section className="py-32 relative z-10 overflow-hidden bg-gradient-to-b from-white via-blue-100 to-white">
+        
+        
+        {/* Animated blobs */}
+        <div className="blob-animation w-72 h-72 top-40 right-20 opacity-50" style={{ animation: 'float-around 20s infinite ease-in-out' }}></div>
+        <div className="blob-animation w-80 h-80 bottom-40 left-10 opacity-40" style={{ animation: 'float-around 25s infinite ease-in-out reverse' }}></div>
         
         <div className="container mx-auto px-8 relative z-10">
           <div className="text-center mb-20 animate-on-scroll">
@@ -582,16 +692,16 @@ const Landing: React.FC = () => {
           </div>
           
           <div className="max-w-6xl mx-auto">
-            {/* Testimonials Carousel - Simplificado para melhor performance */}
+            {/* Testimonials Carousel */}
             <div className="relative">
               <div className="flex flex-col lg:flex-row gap-6 justify-center items-center">
                 {/* Testimonial 1 */}
                 <div 
-                  className={`testimonial-card w-full lg:w-1/3 ${activeTestimonial === 0 ? 'testimonial-active' : 'testimonial-inactive'}`}
-                  onClick={() => setActiveTestimonial(0)}
-                  onMouseEnter={() => setActiveTestimonial(0)}
-                >
-                  <Card className="bg-white border-none shadow-lg transition-all duration-300 overflow-hidden rounded-2xl h-full">
+                    className={`testimonial-card w-full lg:w-1/3 ${activeTestimonial === 0 ? 'testimonial-active' : 'testimonial-inactive'}`}
+                    onClick={() => setActiveTestimonial(0)}
+                    onMouseEnter={() => setActiveTestimonial(0)}
+                  >
+                  <Card className="bg-white border-none shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden rounded-2xl h-full">
                     <CardContent className="p-8">
                       <div className="mb-8">
                         {/* 5 stars */}
@@ -618,12 +728,12 @@ const Landing: React.FC = () => {
                 </div>
                 
                 {/* Testimonial 2 */}
-                <div 
-                  className={`testimonial-card w-full lg:w-1/3 ${activeTestimonial === 1 ? 'testimonial-active' : 'testimonial-inactive'}`}
-                  onClick={() => setActiveTestimonial(1)}
-                  onMouseEnter={() => setActiveTestimonial(1)}
-                >
-                  <Card className="bg-white border-none shadow-lg transition-all duration-300 overflow-hidden rounded-2xl h-full">
+               <div 
+  className={`testimonial-card w-full lg:w-1/3 ${activeTestimonial === 1 ? 'testimonial-active' : 'testimonial-inactive'}`}
+  onClick={() => setActiveTestimonial(1)}
+  onMouseEnter={() => setActiveTestimonial(1)}
+>
+                  <Card className="bg-white border-none shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden rounded-2xl h-full">
                     <CardContent className="p-8">
                       <div className="mb-8">
                         {/* 5 stars */}
@@ -651,11 +761,11 @@ const Landing: React.FC = () => {
                 
                 {/* Testimonial 3 */}
                 <div 
-                  className={`testimonial-card w-full lg:w-1/3 ${activeTestimonial === 2 ? 'testimonial-active' : 'testimonial-inactive'}`}
-                  onClick={() => setActiveTestimonial(2)}
-                  onMouseEnter={() => setActiveTestimonial(2)}
-                >
-                  <Card className="bg-white border-none shadow-lg transition-all duration-300 overflow-hidden rounded-2xl h-full">
+  className={`testimonial-card w-full lg:w-1/3 ${activeTestimonial === 2 ? 'testimonial-active' : 'testimonial-inactive'}`}
+  onClick={() => setActiveTestimonial(2)}
+  onMouseEnter={() => setActiveTestimonial(2)}
+>
+                  <Card className="bg-white border-none shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden rounded-2xl h-full">
                     <CardContent className="p-8">
                       <div className="mb-8">
                         {/* 5 stars */}
@@ -699,18 +809,21 @@ const Landing: React.FC = () => {
         </div>
       </section>
       
-      {/* Divisor otimizado para evitar problemas de transição */}
-      <div className="section-divider bg-gradient-to-b from-white to-blue-500/20"></div>
-      
-      {/* Final CTA Section - ENHANCED e OTIMIZADO */}
-      <section className="py-32 relative z-7 overflow-hidden section-cta">
+      {/* Final CTA Section - ENHANCED */}
+      <section className="py-32 relative z-10 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-blue-500 z-0"></div>
         
-        {/* Reduzido número de elementos decorativos */}
+        {/* Animated decorative elements */}
         <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute -top-40 -left-40 w-80 h-80 bg-white/10 rounded-full blur-xl"></div>
           <div className="absolute top-20 right-20 w-60 h-60 bg-white/10 rounded-full blur-xl"></div>
+          <div className="absolute bottom-20 left-1/3 w-40 h-40 bg-white/10 rounded-full blur-xl"></div>
           
-          {/* Curved shapes - Reduzido para um único SVG */}
+          {/* Curved shapes */}
+          <svg className="absolute bottom-0 left-0 w-full" viewBox="0 0 1440 320" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M0,256L80,261.3C160,267,320,277,480,250.7C640,224,800,160,960,138.7C1120,117,1280,139,1360,149.3L1440,160L1440,320L1360,320C1280,320,1120,320,960,320C800,320,640,320,480,320C320,320,160,320,80,320L0,320Z" fill="rgba(255,255,255,0.05)"></path>
+          </svg>
+          
           <svg className="absolute bottom-0 left-0 w-full" viewBox="0 0 1440 200" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M0,128L48,117.3C96,107,192,85,288,90.7C384,96,480,128,576,144C672,160,768,160,864,138.7C960,117,1056,75,1152,58.7C1248,43,1344,53,1392,58.7L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z" fill="rgba(255,255,255,0.1)"></path>
           </svg>
@@ -727,10 +840,10 @@ const Landing: React.FC = () => {
               </p>
               
               <div className="relative inline-block group">
-                <div className="absolute inset-0 bg-white/20 rounded-lg blur-md transform scale-110 group-hover:scale-125 transition-all duration-300"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-white/10 rounded-lg blur-md transform scale-110 group-hover:scale-125 transition-all duration-300"></div>
                 <Button 
                   onClick={handleGetStarted}
-                  className="relative bg-white text-blue-600 hover:text-blue-700 hover:bg-blue-50 px-10 py-6 rounded-xl text-lg font-medium transition-all duration-300 hover:scale-105 flex items-center gap-3 mx-auto"
+                  className="relative bg-white text-blue-600 hover:text-blue-700 hover:bg-blue-50 px-10 py-6 rounded-xl text-lg font-medium transition-all duration-300 hover:scale-105 hover:shadow-xl flex items-center gap-3 mx-auto"
                 >
                   Começar com Clareza
                   <ArrowRight className="transition-transform duration-300 group-hover:translate-x-1" />
@@ -746,48 +859,48 @@ const Landing: React.FC = () => {
       </section>
       
       {/* Footer - SIMPLIFICADO */}
-      <footer className="py-16 bg-gray-900 text-gray-400 relative z-6 section-footer">
-        <div className="container mx-auto px-8">
-          <div className="flex flex-col items-center text-center">
-            {/* Logo */}
-            <img 
-              src="https://cdn.shopify.com/s/files/1/0629/1993/4061/files/loogzenn.png?v=1747447750" 
-              alt="Zenn Logo" 
-              className="w-28 h-auto filter brightness-0 invert opacity-70 mb-6"
-            />
-            
-            {/* App description */}
-            <p className="text-gray-500 mb-8 max-w-lg">
-              Zenn é um app de execução pessoal que te ajuda a focar no que realmente importa,
-              avaliando cada tarefa por três pilares: importância real, orgulho pós-execução e crescimento pessoal.
-            </p>
-            
-            {/* Social icons */}
-            <div className="flex gap-6 mb-12">
-              <a href="#" className="text-gray-500 hover:text-blue-400 transition-colors">
-                <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z" />
-                </svg>
-              </a>
-              <a href="#" className="text-gray-500 hover:text-blue-400 transition-colors">
-                <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M22.675 0h-21.35c-.732 0-1.325.593-1.325 1.325v21.351c0 .731.593 1.324 1.325 1.324h11.495v-9.294h-3.128v-3.622h3.128v-2.671c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.622h-3.12v9.293h6.116c.73 0 1.323-.593 1.323-1.325v-21.35c0-.732-.593-1.325-1.325-1.325z" />
-                </svg>
-              </a>
-              <a href="#" className="text-gray-500 hover:text-blue-400 transition-colors">
-                <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
-                </svg>
-              </a>
-            </div>
-            
-            {/* Copyright */}
-            <div className="border-t border-gray-800 pt-8 w-full text-center">
-              <p className="text-sm text-gray-600">© 2023 Zenn. Todos os direitos reservados.</p>
-            </div>
-          </div>
-        </div>
-      </footer>
+<footer className="py-16 bg-gray-900 text-gray-400 relative z-10">
+  <div className="container mx-auto px-8">
+    <div className="flex flex-col items-center text-center">
+      {/* Logo */}
+      <img 
+        src="https://cdn.shopify.com/s/files/1/0629/1993/4061/files/loogzenn.png?v=1747447750" 
+        alt="Zenn Logo" 
+        className="w-28 h-auto filter brightness-0 invert opacity-70 mb-6"
+      />
+      
+      {/* App description */}
+      <p className="text-gray-500 mb-8 max-w-lg">
+        Zenn é um app de execução pessoal que te ajuda a focar no que realmente importa,
+        avaliando cada tarefa por três pilares: importância real, orgulho pós-execução e crescimento pessoal.
+      </p>
+      
+      {/* Social icons */}
+      <div className="flex gap-6 mb-12">
+        <a href="#" className="text-gray-500 hover:text-blue-400 transition-colors">
+          <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z" />
+          </svg>
+        </a>
+        <a href="#" className="text-gray-500 hover:text-blue-400 transition-colors">
+          <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M22.675 0h-21.35c-.732 0-1.325.593-1.325 1.325v21.351c0 .731.593 1.324 1.325 1.324h11.495v-9.294h-3.128v-3.622h3.128v-2.671c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.622h-3.12v9.293h6.116c.73 0 1.323-.593 1.323-1.325v-21.35c0-.732-.593-1.325-1.325-1.325z" />
+          </svg>
+        </a>
+        <a href="#" className="text-gray-500 hover:text-blue-400 transition-colors">
+          <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+          </svg>
+        </a>
+      </div>
+      
+      {/* Copyright */}
+      <div className="border-t border-gray-800 pt-8 w-full text-center">
+        <p className="text-sm text-gray-600">© 2023 Zenn. Todos os direitos reservados.</p>
+      </div>
+    </div>
+  </div>
+</footer>
     </div>
   );
 };
