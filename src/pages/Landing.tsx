@@ -12,34 +12,12 @@ const Landing: React.FC = () => {
   const [activeTestimonial, setActiveTestimonial] = useState(0);
   
   useEffect(() => {
-    // Handle animation on load
     const timer = setTimeout(() => {
       setLoaded(true);
     }, 100);
     
     return () => clearTimeout(timer);
   }, []);
-
-  // REMOVIDO: Efeito Parallax
-  // useEffect(() => {
-  //  const handleMouseMove = (e: MouseEvent) => { 
-  // const parallaxBg = document.getElementById('parallax-bg');
-  // if (parallaxBg) {
-  //   const x = (window.innerWidth - e.pageX * 2) / 80;
-  //   const y = (window.innerHeight - e.pageY * 2) / 80;
-  //   
-  //   requestAnimationFrame(() => {
-  //     parallaxBg.style.transform = `scale(1.12) translate(${x}px, ${y}px)`;
-  //   });
-  // }
-  // };
-  //   
-  //   window.addEventListener('mousemove', handleMouseMove);
-  //   
-  //   return () => {
-  //     window.removeEventListener('mousemove', handleMouseMove);
-  //   };
-  // }, []);
 
   const handleGetStarted = () => {
     setShowLogin(true);
@@ -106,12 +84,20 @@ const Landing: React.FC = () => {
             80% { transform: translateY(-30px) translateX(10px) scale(0.98); opacity: 0.3; }
             100% { transform: translateY(0) translateX(0) scale(1); opacity: 0.2; }
           }
-          .animate-floating-enhanced { animation: floating-enhanced 12s ease-in-out infinite; }
+          .animate-floating-enhanced { 
+            animation: floating-enhanced 12s ease-in-out infinite;
+            /* Adicionar will-change para os círculos que animam transform e opacity */
+            will-change: transform, opacity;
+           }
           @keyframes pulse-enhanced {
             0%, 100% { transform: scale(1); opacity: 0.3; }
             50% { transform: scale(1.1); opacity: 0.5; }
           }
-          .animate-pulse-enhanced { animation: pulse-enhanced 8s ease-in-out infinite; }
+          .animate-pulse-enhanced { 
+            animation: pulse-enhanced 8s ease-in-out infinite; 
+            /* Adicionar will-change para os círculos que animam transform e opacity */
+            will-change: transform, opacity;
+          }
           @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
           .fade-up { animation: fadeUp 1.2s ease-out forwards; }
           .fade-up-delay-1 { animation-delay: 0.2s; }
@@ -125,9 +111,9 @@ const Landing: React.FC = () => {
           .animate-in { opacity: 1; transform: translateY(0); }
           @keyframes gradientFlow { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
           .gradient-flow-bg { background: linear-gradient(120deg, #e0f2fe, #bfdbfe, #dbeafe, #eff6ff); background-size: 300% 300%; animation: gradientFlow 15s ease infinite; }
-          .gradient-card-hover { position: relative; overflow: hidden; z-index: 1; transition: transform 0.3s ease /* REMOVIDO: , box-shadow 0.3s ease */; }
+          .gradient-card-hover { position: relative; overflow: hidden; z-index: 1; transition: transform 0.3s ease; }
           .gradient-card-hover::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(120deg, #dbeafe, #bfdbfe, #93c5fd); background-size: 300% 300%; animation: gradientFlow 8s ease infinite; z-index: -1; opacity: 0; transition: opacity 0.3s ease; border-radius: 0.5rem; }
-          .gradient-card-hover:hover { transform: translateY(-5px); /* REMOVIDO: box-shadow: 0 15px 30px rgba(124, 179, 248, 0.15); */ }
+          .gradient-card-hover:hover { transform: translateY(-5px); }
           .gradient-card-hover:hover::before { opacity: 0.07; }
           .blob-animation { position: absolute; border-radius: 50%; background: linear-gradient(45deg, rgba(191, 219, 254, 0.4), rgba(96, 165, 250, 0.2)); filter: blur(40px); }
           @keyframes float-around { 0% { transform: translate(0, 0) scale(1); } 33% { transform: translate(60px, -40px) scale(1.1); } 66% { transform: translate(-30px, 40px) scale(0.9); } 100% { transform: translate(0, 0) scale(1); } }
@@ -146,8 +132,8 @@ const Landing: React.FC = () => {
             <img 
               src="https://images.unsplash.com/photo-1668853853439-923e013afff1?q=80&w=3870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
               alt="Background" 
-              className="object-cover w-full h-full" // Removido: transition-transform duration-300 ease-out
-              style={{ transform: 'scale(1.12)' }} // Removido: id="parallax-bg" e willChange: 'transform'
+              className="object-cover w-full h-full"
+              style={{ transform: 'scale(1.12)' }}
             />
             <div className="absolute inset-0 bg-[#f9fbff]/50 backdrop-blur-[6px]"></div>
           </div>
@@ -176,7 +162,7 @@ const Landing: React.FC = () => {
             <div className={`opacity-0 ${loaded ? 'fade-up fade-up-delay-2' : ''} ${showLogin ? 'hidden lg:block' : 'block'}`}>
               <Button 
                 onClick={handleGetStarted}
-                className="group bg-blue-600 hover:bg-blue-700 text-white px-8 py-6 rounded-lg text-lg transition-all duration-300 hover:scale-[1.03] flex items-center gap-2" // Removido hover:shadow-md
+                className="group bg-blue-600 hover:bg-blue-700 text-white px-8 py-6 rounded-lg text-lg transition-all duration-300 hover:scale-[1.03] flex items-center gap-2"
               >
                 Começar com Clareza
                 <ArrowRight className="transition-transform duration-300 group-hover:translate-x-1" />
@@ -190,7 +176,7 @@ const Landing: React.FC = () => {
           <div className="lg:col-span-5 relative flex items-center justify-center">
             {showLogin ? (
               <div className="w-full h-full flex items-center justify-center">
-                <div className={`w-full max-w-md bg-white/80 backdrop-blur-md p-8 rounded-xl ${showLogin ? 'slide-in' : ''}`}> {/* Removido shadow-xl */}
+                <div className={`w-full max-w-md bg-white/80 backdrop-blur-md p-8 rounded-xl ${showLogin ? 'slide-in' : ''}`}>
                   <div className="flex justify-between items-center mb-6">
                     <h3 className="text-xl font-semibold">Bem-vindo de volta!</h3>
                     <button onClick={() => setShowLogin(false)} className="text-gray-400 hover:text-gray-600 transition-colors">✕</button>
@@ -199,11 +185,16 @@ const Landing: React.FC = () => {
                 </div>
               </div>
             ) : (
-              <div className={`relative w-full h-[600px] transition-all duration-1000 ease-in-out ${loaded ? 'opacity-100' : 'opacity-0'}`}>
+              /* CORREÇÃO: Adicionar key ao container dos círculos e isolamento */
+              <div 
+                key={showLogin ? 'login-inactive' : 'login-active-circles'} // Key muda quando showLogin muda
+                className={`relative w-full h-[600px] transition-all duration-1000 ease-in-out ${loaded ? 'opacity-100' : 'opacity-0'}`}
+                style={{ isolation: 'isolate', transform: 'translateZ(0)' }} // Adiciona isolamento e promove a camada
+              >
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-[350px] h-[350px] rounded-full backdrop-blur-sm animate-pulse-enhanced" style={{ backgroundColor: 'rgb(159 215 255)' /* REMOVIDO boxShadow */ }}></div>
-                  <div className="absolute w-[300px] h-[300px] rounded-full backdrop-blur-md animate-floating-enhanced" style={{ animationDuration: '10s', backgroundColor: 'rgb(164 211 245)' /* REMOVIDO boxShadow */ }}></div>
-                  <div className="absolute w-[250px] h-[250px] rounded-full backdrop-blur-md animate-floating-enhanced" style={{ animationDuration: '8s', animationDelay: '1s', backgroundColor: 'rgb(159 209 243)' /* REMOVIDO boxShadow */ }}></div>
+                  <div className="w-[350px] h-[350px] rounded-full backdrop-blur-sm animate-pulse-enhanced" style={{ backgroundColor: 'rgb(159 215 255)'}}></div>
+                  <div className="absolute w-[300px] h-[300px] rounded-full backdrop-blur-md animate-floating-enhanced" style={{ animationDuration: '10s', backgroundColor: 'rgb(164 211 245)'}}></div>
+                  <div className="absolute w-[250px] h-[250px] rounded-full backdrop-blur-md animate-floating-enhanced" style={{ animationDuration: '8s', animationDelay: '1s', backgroundColor: 'rgb(159 209 243)'}}></div>
                 </div>
               </div>
             )}
@@ -237,7 +228,7 @@ const Landing: React.FC = () => {
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
             <div className="animate-on-scroll" style={{ transitionDelay: '0.1s' }}>
-              <Card className="gradient-card-hover bg-white/90 backdrop-blur-sm border-none h-full rounded-xl overflow-hidden transition-all duration-300"> {/* Removido shadow-lg */}
+              <Card className="gradient-card-hover bg-white/90 backdrop-blur-sm border-none h-full rounded-xl overflow-hidden transition-all duration-300">
                 <CardContent className="p-10 flex flex-col h-full">
                   <div className="rounded-full bg-blue-50 w-16 h-16 flex items-center justify-center mb-8 transition-transform duration-300 group-hover:scale-110"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 12L11 14L15 10M12 3L4.5 10.5L4.5 20.5H19.5V10.5L12 3Z" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg></div>
                   <h3 className="text-2xl font-semibold mb-5 text-gray-800">Análise por pilares</h3>
@@ -247,7 +238,7 @@ const Landing: React.FC = () => {
               </Card>
             </div>
             <div className="animate-on-scroll" style={{ transitionDelay: '0.3s' }}>
-              <Card className="gradient-card-hover bg-white/90 backdrop-blur-sm border-none h-full rounded-xl overflow-hidden transition-all duration-300"> {/* Removido shadow-lg */}
+              <Card className="gradient-card-hover bg-white/90 backdrop-blur-sm border-none h-full rounded-xl overflow-hidden transition-all duration-300">
                 <CardContent className="p-10 flex flex-col h-full">
                   <div className="rounded-full bg-blue-50 w-16 h-16 flex items-center justify-center mb-8"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 16.5V14M7 10.5H17M7 7.5H17M9 19.5H15C16.1046 19.5 17 18.6046 17 17.5V6.5C17 5.39543 16.1046 4.5 15 4.5H9C7.89543 4.5 7 5.39543 7 6.5V17.5C7 18.6046 7.89543 19.5 9 19.5Z" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg></div>
                   <h3 className="text-2xl font-semibold mb-5 text-gray-800">Clareza nas escolhas</h3>
@@ -257,7 +248,7 @@ const Landing: React.FC = () => {
               </Card>
             </div>
             <div className="animate-on-scroll" style={{ transitionDelay: '0.5s' }}>
-              <Card className="gradient-card-hover bg-white/90 backdrop-blur-sm border-none h-full rounded-xl overflow-hidden transition-all duration-300"> {/* Removido shadow-lg */}
+              <Card className="gradient-card-hover bg-white/90 backdrop-blur-sm border-none h-full rounded-xl overflow-hidden transition-all duration-300">
                 <CardContent className="p-10 flex flex-col h-full">
                   <div className="rounded-full bg-blue-50 w-16 h-16 flex items-center justify-center mb-8"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 17L15 17M12 13L12 7M12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21Z" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg></div>
                   <h3 className="text-2xl font-semibold mb-5 text-gray-800">Análise estratégica</h3>
@@ -281,15 +272,15 @@ const Landing: React.FC = () => {
               <div className="absolute left-16 top-4 bottom-4 w-0.5 bg-gradient-to-b from-blue-200 via-blue-400 to-blue-200 hidden md:block"></div>
               <div className="space-y-20">
                 <div className="flex flex-col md:flex-row gap-8 md:gap-12 items-start animate-on-scroll">
-                  <div className="flex-shrink-0 relative"><div className="w-32 h-32 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-400 flex items-center justify-center text-white text-4xl font-bold">1</div><div className="absolute -bottom-2 -right-2 w-10 h-10 rounded-full bg-blue-100 opacity-70"></div></div> {/* Removido shadow-lg do número */}
+                  <div className="flex-shrink-0 relative"><div className="w-32 h-32 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-400 flex items-center justify-center text-white text-4xl font-bold">1</div><div className="absolute -bottom-2 -right-2 w-10 h-10 rounded-full bg-blue-100 opacity-70"></div></div>
                   <div className="md:pt-3"><h3 className="text-2xl font-semibold mb-4">Defina suas tarefas</h3><p className="text-gray-600 text-lg mb-6">Adicione suas tarefas no Zenn e as classifique usando os três pilares fundamentais: importância real para seus objetivos, orgulho que sentirá após concluí-la, e contribuição para seu crescimento pessoal.</p><div className="p-5 bg-blue-50 rounded-xl"><div className="flex items-start gap-3"><CheckCircle2 className="text-blue-500 mt-1 flex-shrink-0" size={20} /><p className="text-blue-700">Interface intuitiva que torna simples a classificação de cada tarefa</p></div></div></div>
                 </div>
                 <div className="flex flex-col md:flex-row gap-8 md:gap-12 items-start animate-on-scroll">
-                  <div className="flex-shrink-0 relative"><div className="w-32 h-32 rounded-2xl bg-gradient-to-br from-blue-600 to-blue-500 flex items-center justify-center text-white text-4xl font-bold">2</div><div className="absolute -bottom-2 -right-2 w-10 h-10 rounded-full bg-blue-100 opacity-70"></div></div> {/* Removido shadow-lg do número */}
+                  <div className="flex-shrink-0 relative"><div className="w-32 h-32 rounded-2xl bg-gradient-to-br from-blue-600 to-blue-500 flex items-center justify-center text-white text-4xl font-bold">2</div><div className="absolute -bottom-2 -right-2 w-10 h-10 rounded-full bg-blue-100 opacity-70"></div></div>
                   <div className="md:pt-3"><h3 className="text-2xl font-semibold mb-4">Priorize o que importa</h3><p className="text-gray-600 text-lg mb-6">A análise de pilares gera um score que te ajuda a distinguir o essencial do acessório. Foque nas tarefas com maior impacto e significado para seus objetivos de longo prazo.</p><div className="p-5 bg-blue-50 rounded-xl"><div className="flex items-start gap-3"><CheckCircle2 className="text-blue-500 mt-1 flex-shrink-0" size={20} /><p className="text-blue-700">Sistema de score visual que permite identificar imediatamente o que merece sua atenção</p></div></div></div>
                 </div>
                 <div className="flex flex-col md:flex-row gap-8 md:gap-12 items-start animate-on-scroll">
-                  <div className="flex-shrink-0 relative"><div className="w-32 h-32 rounded-2xl bg-gradient-to-br from-blue-700 to-blue-600 flex items-center justify-center text-white text-4xl font-bold">3</div><div className="absolute -bottom-2 -right-2 w-10 h-10 rounded-full bg-blue-100 opacity-70"></div></div> {/* Removido shadow-lg do número */}
+                  <div className="flex-shrink-0 relative"><div className="w-32 h-32 rounded-2xl bg-gradient-to-br from-blue-700 to-blue-600 flex items-center justify-center text-white text-4xl font-bold">3</div><div className="absolute -bottom-2 -right-2 w-10 h-10 rounded-full bg-blue-100 opacity-70"></div></div>
                   <div className="md:pt-3"><h3 className="text-2xl font-semibold mb-4">Revise e aprenda</h3><p className="text-gray-600 text-lg mb-6">Acompanhe seu progresso através de insights estratégicos que revelam padrões em suas escolhas. Refine sua abordagem ao longo do tempo para maximizar seu impacto e satisfação pessoal.</p><div className="p-5 bg-blue-50 rounded-xl"><div className="flex items-start gap-3"><CheckCircle2 className="text-blue-500 mt-1 flex-shrink-0" size={20} /><p className="text-blue-700">Relatórios semanais personalizados para aprimorar constantemente suas decisões</p></div></div></div>
                 </div>
               </div>
@@ -298,9 +289,9 @@ const Landing: React.FC = () => {
           <div className="mt-32 animate-on-scroll">
             <div className="relative mx-auto max-w-4xl">
               <div className="absolute -top-8 -left-8 w-64 h-64 bg-blue-100 rounded-full opacity-70 blur-3xl"></div><div className="absolute -bottom-8 -right-8 w-64 h-64 bg-blue-200 rounded-full opacity-70 blur-3xl"></div>
-              <div className="relative overflow-hidden rounded-2xl border border-white/30"><img src="https://images.unsplash.com/photo-1555421689-3f034debb7a6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Dashboard" className="w-full h-auto"/><div className="absolute inset-0 bg-gradient-to-tr from-blue-600/20 via-blue-400/10 to-transparent"></div></div> {/* Removido shadow-2xl */}
-              <div className="absolute top-10 right-10 max-w-xs bg-white/90 backdrop-blur-sm p-4 rounded-lg border border-blue-100"><h4 className="font-medium text-blue-700 mb-1">Visão por Pilares</h4><p className="text-sm text-gray-600">Visualize rapidamente suas tarefas organizadas de acordo com os três pilares fundamentais.</p></div> {/* Removido shadow-lg */}
-              <div className="absolute bottom-10 left-10 max-w-xs bg-white/90 backdrop-blur-sm p-4 rounded-lg border border-blue-100"><h4 className="font-medium text-blue-700 mb-1">Score Intuitivo</h4><p className="text-sm text-gray-600">Identifique facilmente quais tarefas merecem sua atenção prioritária através dos scores visuais.</p></div> {/* Removido shadow-lg */}
+              <div className="relative overflow-hidden rounded-2xl border border-white/30"><img src="https://images.unsplash.com/photo-1555421689-3f034debb7a6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Dashboard" className="w-full h-auto"/><div className="absolute inset-0 bg-gradient-to-tr from-blue-600/20 via-blue-400/10 to-transparent"></div></div>
+              <div className="absolute top-10 right-10 max-w-xs bg-white/90 backdrop-blur-sm p-4 rounded-lg border border-blue-100"><h4 className="font-medium text-blue-700 mb-1">Visão por Pilares</h4><p className="text-sm text-gray-600">Visualize rapidamente suas tarefas organizadas de acordo com os três pilares fundamentais.</p></div>
+              <div className="absolute bottom-10 left-10 max-w-xs bg-white/90 backdrop-blur-sm p-4 rounded-lg border border-blue-100"><h4 className="font-medium text-blue-700 mb-1">Score Intuitivo</h4><p className="text-sm text-gray-600">Identifique facilmente quais tarefas merecem sua atenção prioritária através dos scores visuais.</p></div>
             </div>
           </div>
         </div>
@@ -324,7 +315,7 @@ const Landing: React.FC = () => {
                   { name: "Juliana Costa", role: "Desenvolvedora", initials: "JC", quote: "\"Eu estava sobrecarregada com milhares de tarefas. O Zenn me ajudou a simplificar e focar apenas no que vai realmente me fazer crescer profissionalmente.\"" }
                 ].map((testimonial, index) => (
                   <div key={index} className={`testimonial-card w-full lg:w-1/3 ${activeTestimonial === index ? 'testimonial-active' : 'testimonial-inactive'}`} onClick={() => setActiveTestimonial(index)} onMouseEnter={() => setActiveTestimonial(index)}>
-                    <Card className="bg-white border-none transition-all duration-300 overflow-hidden rounded-2xl h-full"> {/* Removido shadow-lg hover:shadow-xl */}
+                    <Card className="bg-white border-none transition-all duration-300 overflow-hidden rounded-2xl h-full">
                       <CardContent className="p-8">
                         <div className="mb-8">
                           <div className="flex gap-1 mb-4">{[...Array(5)].map((_, i) => (<svg key={i} className="text-yellow-400" width="20" height="20" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>))}</div>
@@ -361,7 +352,7 @@ const Landing: React.FC = () => {
               <p className="text-xl text-blue-100 mb-10 max-w-2xl mx-auto">Comece hoje a jornada para uma execução pessoal com propósito e direção.</p>
               <div className="relative inline-block group">
                 <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-white/10 rounded-lg blur-md transform scale-110 group-hover:scale-125 transition-all duration-300"></div>
-                <Button onClick={handleGetStarted} className="relative bg-white text-blue-600 hover:text-blue-700 hover:bg-blue-50 px-10 py-6 rounded-xl text-lg font-medium transition-all duration-300 hover:scale-105 flex items-center gap-3 mx-auto"> {/* Removido hover:shadow-xl */}
+                <Button onClick={handleGetStarted} className="relative bg-white text-blue-600 hover:text-blue-700 hover:bg-blue-50 px-10 py-6 rounded-xl text-lg font-medium transition-all duration-300 hover:scale-105 flex items-center gap-3 mx-auto">
                   Começar com Clareza <ArrowRight className="transition-transform duration-300 group-hover:translate-x-1" />
                 </Button>
               </div>
