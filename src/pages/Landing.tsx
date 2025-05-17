@@ -43,7 +43,7 @@ const Landing: React.FC = () => {
         <div className="absolute inset-0 bg-[#f9fbff]/50 backdrop-blur-[10px]"></div>
       </div>
       
-      {/* Custom animations - Com animações melhoradas para os círculos */}
+      {/* Custom animations */}
       <style>
         {`
           @keyframes floating {
@@ -69,39 +69,7 @@ const Landing: React.FC = () => {
             animation: floating 15s ease-in-out infinite;
           }
           
-          /* Nova animação mais intensa para os círculos */
-          /* Nova animação com deslocamento ainda maior */
-          @keyframes floating-extreme {
-            0% {
-              transform: translateY(0) translateX(0) scale(1);
-              opacity: 0.35;
-            }
-            20% {
-              transform: translateY(-50px) translateX(30px) scale(1.08);
-              opacity: 0.5;
-            }
-            40% {
-              transform: translateY(-70px) translateX(-40px) scale(0.95);
-              opacity: 0.45;
-            }
-            60% {
-              transform: translateY(-30px) translateX(-60px) scale(1.05);
-              opacity: 0.5;
-            }
-            80% {
-              transform: translateY(-55px) translateX(20px) scale(0.92);
-              opacity: 0.4;
-            }
-            100% {
-              transform: translateY(0) translateX(0) scale(1);
-              opacity: 0.35;
-            }
-          }
-          
-          .animate-floating-extreme {
-            animation: floating-extreme 15s ease-in-out infinite;
-          }
-          
+          /* Animação de flutuação melhorada */
           @keyframes floating-enhanced {
             0% {
               transform: translateY(0) translateX(0) scale(1);
@@ -274,11 +242,11 @@ const Landing: React.FC = () => {
               </div>
             </div>
           ) : (
-            /* 3D image that shows when login is not active - COM ANIMAÇÕES MELHORADAS */
+            /* 3D image that shows when login is not active */
             <div className={`relative w-full h-[600px] transition-all duration-1000 ease-in-out ${
               loaded ? 'opacity-100' : 'opacity-0'
             }`}>
-              {/* 3D image com círculos nas cores específicas solicitadas */}
+              {/* 3D image com os 3 círculos originais e as cores específicas solicitadas */}
               <div className="absolute inset-0 flex items-center justify-center">
                 {/* Primeiro círculo (maior) - cor específica solicitada */}
                 <div 
@@ -307,37 +275,6 @@ const Landing: React.FC = () => {
                     animationDelay: '1s',
                     backgroundColor: 'rgb(93 156 255 / 21%)',
                     boxShadow: 'rgb(255 255 255 / 25%) 0px 0px 20px'
-                  }}
-                ></div>
-              </div> mas com transparência */}
-              <div className="absolute inset-0 flex items-center justify-center">
-                {/* Primeiro círculo (maior) - cor chapada com transparência */}
-                <div 
-                  className="w-[350px] h-[350px] rounded-full backdrop-blur-sm animate-pulse-enhanced"
-                  style={{
-                    backgroundColor: 'rgba(59, 130, 246, 0.4)', /* blue-500 com 40% de opacidade */
-                    boxShadow: '0 0 25px rgba(59, 130, 246, 0.3)'
-                  }}
-                ></div>
-                
-                {/* Segundo círculo (médio) - cor chapada com transparência */}
-                <div 
-                  className="absolute w-[300px] h-[300px] rounded-full backdrop-blur-md animate-floating-enhanced" 
-                  style={{ 
-                    animationDuration: '10s',
-                    backgroundColor: 'rgba(37, 99, 235, 0.5)', /* blue-600 com 50% de opacidade */
-                    boxShadow: '0 0 20px rgba(37, 99, 235, 0.3)'
-                  }}
-                ></div>
-                
-                {/* Terceiro círculo (menor) - cor chapada com transparência */}
-                <div 
-                  className="absolute w-[250px] h-[250px] rounded-full backdrop-blur-md animate-floating-enhanced" 
-                  style={{ 
-                    animationDuration: '8s', 
-                    animationDelay: '1s',
-                    backgroundColor: 'rgba(30, 64, 175, 0.45)', /* blue-700 com 45% de opacidade */
-                    boxShadow: '0 0 20px rgba(30, 64, 175, 0.25)'
                   }}
                 ></div>
               </div>
