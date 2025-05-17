@@ -22,10 +22,9 @@ const Landing: React.FC = () => {
 
   // Parallax effect for background
   useEffect(() => {
-   const handleMouseMove = (e: MouseEvent) => { // Adicionado tipo para 'e'
+   const handleMouseMove = (e: MouseEvent) => {
   const parallaxBg = document.getElementById('parallax-bg');
   if (parallaxBg) {
-    // Ajustado para um movimento mais suave e com melhor performance
     const x = (window.innerWidth - e.pageX * 2) / 80;
     const y = (window.innerHeight - e.pageY * 2) / 80;
     
@@ -62,7 +61,7 @@ const Landing: React.FC = () => {
       threshold: 0.1
     };
 
-    const observerCallback = (entries: IntersectionObserverEntry[]) => { // Adicionado tipo para 'entries'
+    const observerCallback = (entries: IntersectionObserverEntry[]) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           entry.target.classList.add('animate-in');
@@ -311,7 +310,6 @@ const Landing: React.FC = () => {
           
           .testimonial-card {
             transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out, filter 0.5s ease-in-out;
-            /* CORREÇÃO: Adicionar 'filter' a will-change */
             will-change: transform, opacity, filter; 
           }
           
@@ -330,10 +328,10 @@ const Landing: React.FC = () => {
       </style>
       
       {/* Hero Section with full height */}
-      {/* CORREÇÃO: Adicionar style para promover a seção Hero para sua própria camada de renderização */}
       <section 
         className="relative h-screen overflow-hidden"
-        style={{transform: 'translateZ(0)'}} 
+        // CORREÇÃO: Adicionado isolation: 'isolate' para tentar conter melhor os efeitos de renderização
+        style={{transform: 'translateZ(0)', isolation: 'isolate'}} 
       >
         {/* Background image with parallax effect */}
         <div className="absolute inset-0 z-0 overflow-hidden">
@@ -342,12 +340,10 @@ const Landing: React.FC = () => {
               src="https://images.unsplash.com/photo-1668853853439-923e013afff1?q=80&w=3870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
               alt="Background" 
               className="object-cover w-full h-full transition-transform duration-300 ease-out"
-              /* CORREÇÃO: Adicionar will-change: transform para a imagem de parallax */
               style={{ transform: 'scale(1.12)', willChange: 'transform' }}
               id="parallax-bg"
             />
             {/* Overlay com blur */}
-            {/* CORREÇÃO: Removido willChange: 'auto' pois é desnecessário e a estabilização do pai é mais importante */}
             <div className="absolute inset-0 bg-[#f9fbff]/50 backdrop-blur-[6px]"></div>
           </div>
         </div>
