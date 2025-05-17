@@ -7,6 +7,7 @@ import { modalDataContent } from '@/components/landing/ExplanationModal';
 import useImagePreloader from '@/hooks/useImagePreloader';
 import useAnimationObserver from '@/hooks/useAnimationObserver';
 import '../styles/animations.css';
+import { SupabaseTest } from '@/components/SupabaseTest';
 
 // Componentes
 import HeroSection from '@/components/landing/HeroSection';
@@ -136,6 +137,11 @@ const Landing: React.FC = () => {
 
   return (
     <div className="min-h-screen overflow-x-hidden">
+      {/* Add Supabase test component at the top */}
+      <div className="container mx-auto px-4 pt-4">
+        <SupabaseTest />
+      </div>
+      
       <HeroSection 
         loaded={loaded}
         showLogin={showLogin}
