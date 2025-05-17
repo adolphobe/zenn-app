@@ -690,7 +690,7 @@ const Landing: React.FC = () => {
           
           <div className="max-w-6xl mx-auto">
             {/* Testimonials Carousel */}
-            <div className="relative pb-16">
+            <div className="relative">
               <div className="flex flex-col lg:flex-row gap-6 justify-center items-center">
                 {/* Testimonial 1 */}
                 <div 
