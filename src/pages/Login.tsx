@@ -13,6 +13,7 @@ const Login: React.FC = () => {
   const [isSignup, setIsSignup] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [isJustLoggedOut, setIsJustLoggedOut] = useState(false);
+  const [loginSuccessful, setLoginSuccessful] = useState(false);
   
   // Get redirect path from location state or default to dashboard
   const from = location.state?.from?.pathname || "/dashboard";
@@ -40,22 +41,13 @@ const Login: React.FC = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  // Redirecionar automaticamente apenas se estiver autenticado e não tiver acabado de deslogar
+  // DO NOT redirect automatically even if authenticated - user requested manual control
   useEffect(() => {
-    if (isAuthenticated && !isLoading && !isJustLoggedOut) {
-      console.log("[Login] Usuário já está autenticado - Redirecionando automaticamente");
-      console.log(`[Login] DETALHES TÉCNICOS: Redirecionando para ${from}`);
-      console.log("[Login] ESTADO DE AUTENTICAÇÃO:", { isAuthenticated, isLoading, redirectPath: from });
-      console.log("[Login] DETALHES EM PORTUGUÊS: Você já está logado, redirecionando para o dashboard");
-      
-      // Pequeno delay para garantir que os logs sejam visíveis no console
-      const redirectTimer = setTimeout(() => {
-        navigate('/dashboard');
-      }, 100);
-      
-      return () => clearTimeout(redirectTimer);
+    if (isAuthenticated && !isLoading && !isJustLoggedOut && loginSuccessful) {
+      console.log("[Login] Usuário autenticado com sucesso, mas aguardando navegação manual");
+      console.log("[Login] DETALHES EM PORTUGUÊS: Autenticação bem-sucedida. Aguardando ação do usuário.");
     }
-  }, [isAuthenticated, isLoading, from, navigate, isJustLoggedOut]);
+  }, [isAuthenticated, isLoading, from, navigate, isJustLoggedOut, loginSuccessful]);
 
   // Toggle between login and signup
   const toggleSignup = () => {
@@ -69,15 +61,22 @@ const Login: React.FC = () => {
     </div>;
   }
 
-  // If user is authenticated and not just logged out, show a temporary message
+  // If user is authenticated and not just logged out, show a temporary message with manual button
   if (isAuthenticated && !isJustLoggedOut) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gray-50">
         <div className="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 mb-4 max-w-lg">
           <p className="font-bold">Já Autenticado</p>
-          <p>Você já está logado. Redirecionando para o dashboard...</p>
+          <p>Você já está logado. Clique no botão para ir para o dashboard.</p>
           <p className="mt-2 text-sm">Verifique o console para detalhes técnicos.</p>
         </div>
+        
+        <Button 
+          className="mt-4 bg-blue-500 hover:bg-blue-600"
+          onClick={() => navigate('/dashboard')}
+        >
+          Ir para Dashboard
+        </Button>
       </div>
     );
   }
@@ -163,9 +162,25 @@ const Login: React.FC = () => {
           {isSignup ? (
             <SignupForm onCancel={toggleSignup} />
           ) : (
-            <LoginForm onSwitchToSignup={toggleSignup} onSuccess={() => {
-              console.log("[Login] Login successful, would redirect to", from);
-            }} />
+            <LoginForm 
+              onSwitchToSignup={toggleSignup} 
+              onSuccess={() => {
+                console.log("[Login] Login successful, waiting for manual navigation");
+                setLoginSuccessful(true);
+              }} 
+            />
+          )}
+
+          {/* Show manual navigation button if login was successful */}
+          {loginSuccessful && (
+            <div className="mt-4 flex justify-center">
+              <Button 
+                className="bg-green-600 hover:bg-green-700 text-white"
+                onClick={() => navigate('/dashboard')}
+              >
+                Ir para Dashboard
+              </Button>
+            </div>
           )}
         </div>
 

@@ -1,4 +1,3 @@
-
 import { createContext, useState, useContext, useEffect, ReactNode } from 'react';
 import { User } from '../types/user';
 import { supabase } from '@/integrations/supabase/client';
@@ -321,20 +320,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
   
-  // Logout function
+  // Logout function - Enhanced to ensure complete session removal
   const logout = async (): Promise<void> => {
-    console.log("[AuthProvider] Iniciando logout do usuário");
-    console.log("[AuthProvider] DETALHES EM PORTUGUÊS: Iniciando processo de logout no sistema");
+    console.log("[AuthProvider] Iniciando processo completo de logout do usuário");
+    console.log("[AuthProvider] DETALHES EM PORTUGUÊS: Iniciando processo completo de logout no sistema");
     
     setIsLoading(true);
     
     try {
-      // Primeiro limpar estados e dados locais
+      // First clear local states 
       setCurrentUser(null);
       setSession(null);
       
-      // Chamar o método de signOut do Supabase
-      const { error } = await supabase.auth.signOut();
+      // Remove any locally stored auth data
+      localStorage.removeItem('sb-wbvxnapruffchikhrqrs-auth-token');
+      localStorage.removeItem('supabase.auth.token');
+      
+      // Call Supabase signOut and wait for it to complete
+      const { error } = await supabase.auth.signOut({ scope: 'global' });
       
       if (error) {
         console.error("[AuthProvider] Erro no logout:", error.message);
@@ -349,9 +352,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         console.log("[AuthProvider] Usuário deslogado com sucesso");
         console.log("[AuthProvider] DETALHES EM PORTUGUÊS: Sessão encerrada com sucesso");
         
-        // Limpar explicitamente dados de autenticação do localStorage
-        localStorage.removeItem('sb-wbvxnapruffchikhrqrs-auth-token');
-        
         toast({
           title: "Logout realizado",
           description: "Você saiu com sucesso",
@@ -361,7 +361,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       console.error("[AuthProvider] Erro durante logout:", error);
       console.error("[AuthProvider] DETALHES EM PORTUGUÊS: Ocorreu um erro inesperado ao tentar encerrar a sessão");
     } finally {
-      // Sempre limpar os estados do usuário e da sessão 
+      // Always clear user states and session when logging out
       setCurrentUser(null);
       setSession(null);
       setIsLoading(false);

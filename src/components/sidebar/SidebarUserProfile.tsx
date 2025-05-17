@@ -7,7 +7,6 @@ import { Separator } from '@/components/ui/separator';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/hooks/use-toast';
 import { useAuth } from '@/context/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
 
 interface SidebarUserProfileProps {
   sidebarOpen: boolean;
@@ -19,14 +18,14 @@ const SidebarUserProfile: React.FC<SidebarUserProfileProps> = ({ sidebarOpen }) 
 
   const handleLogout = async () => {
     try {
-      // Log the logout attempt
-      console.log("[SidebarUserProfile] Iniciando processo de logout");
+      console.log("[SidebarUserProfile] Iniciando processo completo de logout");
+      
+      // Force clear local storage first
+      localStorage.removeItem('sb-wbvxnapruffchikhrqrs-auth-token');
+      localStorage.removeItem('supabase.auth.token');
       
       // Call the AuthContext logout function
       await logout();
-      
-      // Force clear local storage for safety
-      localStorage.removeItem('sb-wbvxnapruffchikhrqrs-auth-token');
       
       toast({
         title: "Logout realizado",
@@ -37,8 +36,10 @@ const SidebarUserProfile: React.FC<SidebarUserProfileProps> = ({ sidebarOpen }) 
       
       // Navigate to login page after a small delay to ensure logout is complete
       setTimeout(() => {
-        navigate('/login');
-      }, 100);
+        navigate('/login', { 
+          state: { loggedOut: true } 
+        });
+      }, 300);
     } catch (error) {
       console.error("[SidebarUserProfile] Erro durante logout:", error);
       console.error("[SidebarUserProfile] DETALHES EM PORTUGUÊS: Ocorreu um erro ao tentar deslogar do sistema");
