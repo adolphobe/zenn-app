@@ -556,8 +556,7 @@ const Landing: React.FC = () => {
       </section>
       
       {/* How It Works Section - ENHANCED */}
-    <section className="pt-32 relative z-10 overflow-hidden bg-gradient-to-b from-white via-blue-100 to-white">
-
+    <section className="relative z-10 overflow-hidden bg-gradient-to-b from-white via-blue-100 to-white">
     
         <div className="container mx-auto px-8 relative z-10">
           <div className="max-w-4xl mx-auto">
