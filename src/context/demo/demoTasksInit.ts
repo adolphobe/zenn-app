@@ -5,15 +5,11 @@ import { pendingTasksData, completedTasksData } from '@/mock/database';
 // Função para inicializar tarefas de demonstração a partir dos dados fixos
 export const initializeDemoTasks = (dispatch: AppDispatch, tasksLength: number) => {
   if (tasksLength === 0) {
-    console.log('Inicializando tarefas de demonstração a partir da fonte de dados simulada...');
-    
     // Limpa o array de tarefas existentes para evitar duplicação
     dispatch({ type: 'CLEAR_TASKS' });
     
     // Adiciona primeiro as tarefas pendentes
     pendingTasksData.forEach(task => {
-      console.log(`Adicionando tarefa pendente: "${task.title}"`);
-      
       dispatch({
         type: 'ADD_TASK',
         payload: {
@@ -43,8 +39,6 @@ export const initializeDemoTasks = (dispatch: AppDispatch, tasksLength: number) 
     
     // Adiciona as tarefas concluídas
     completedTasksData.forEach(task => {
-      console.log(`Adicionando tarefa concluída: "${task.title}" (concluída em ${task.completedAt})`);
-      
       // Adicionamos primeiro a tarefa
       dispatch({
         type: 'ADD_TASK',
@@ -91,7 +85,5 @@ export const initializeDemoTasks = (dispatch: AppDispatch, tasksLength: number) 
         });
       }
     });
-    
-    console.log('Inicialização de tarefas concluída!');
   }
 };
