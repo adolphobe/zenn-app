@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, ArrowUpRight, CheckCircle2 } from 'lucide-react'; // X não é necessário para este modal simples
+import { ArrowRight, ArrowUpRight, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import LoginForm from '@/components/LoginForm';
@@ -14,7 +14,6 @@ const Landing: React.FC = () => {
   
   const isLoggedIn = localStorage.getItem('acto_is_logged_in') === 'true';
 
-  // PASSO 2.1: Estado Mínimo para o Modal Simples
   const [showSimpleModal, setShowSimpleModal] = useState(false);
 
   useEffect(() => {
@@ -39,16 +38,27 @@ const Landing: React.FC = () => {
     }
   }, [showLogin]);
 
-  // PASSO 2.2: Funções Mínimas para o Modal Simples
   const openSimpleModal = () => {
     setShowSimpleModal(true);
-    // Deixe comentado por enquanto: document.body.style.overflow = 'hidden'; 
+    document.body.style.overflow = 'hidden'; // PASSO 3: Reintroduzido
   };
 
   const closeSimpleModal = () => {
     setShowSimpleModal(false);
-    // Deixe comentado por enquanto: document.body.style.overflow = 'auto'; 
+    document.body.style.overflow = 'auto'; // PASSO 3: Reintroduzido
   };
+
+  // PASSO 3: useEffect para restaurar o scroll do body no unmount, se necessário
+  useEffect(() => {
+    // Este efeito só precisa rodar uma vez para adicionar o listener de cleanup
+    return () => {
+      // Se o componente for desmontado e o modal estava aberto, restaura o scroll
+      if (document.body.style.overflow === 'hidden') {
+        document.body.style.overflow = 'auto';
+      }
+    };
+  }, []); // Array de dependências vazio para rodar apenas no mount/unmount
+
 
   useEffect(() => {
     const observerOptions = {
@@ -226,7 +236,6 @@ const Landing: React.FC = () => {
                   <h3 className="text-2xl font-semibold mb-5 text-gray-800 dark:text-white">Análise por pilares</h3>
                   <p className="text-gray-600 dark:text-gray-300 text-lg flex-grow">Avalie cada tarefa pelos três pilares fundamentais: importância real, orgulho pós-execução e contribuição para seu crescimento pessoal.</p>
                   <div className="mt-8">
-                    {/* PASSO 2.3: Botão de teste para o modal simples */}
                     <Button variant="ghost" className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/70 p-0 flex items-center gap-2 group" onClick={openSimpleModal}>
                         Saiba mais (Teste Modal)
                         <ArrowUpRight size={18} className="transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
@@ -377,7 +386,7 @@ const Landing: React.FC = () => {
             left: 0,
             right: 0,
             bottom: 0,
-            backgroundColor: 'rgba(0, 0, 0, 0.5)', // Overlay simples
+            backgroundColor: 'rgba(0, 0, 0, 0.5)', 
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
