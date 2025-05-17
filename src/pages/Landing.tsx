@@ -70,6 +70,38 @@ const Landing: React.FC = () => {
           }
           
           /* Nova animação mais intensa para os círculos */
+          /* Nova animação com deslocamento ainda maior */
+          @keyframes floating-extreme {
+            0% {
+              transform: translateY(0) translateX(0) scale(1);
+              opacity: 0.35;
+            }
+            20% {
+              transform: translateY(-50px) translateX(30px) scale(1.08);
+              opacity: 0.5;
+            }
+            40% {
+              transform: translateY(-70px) translateX(-40px) scale(0.95);
+              opacity: 0.45;
+            }
+            60% {
+              transform: translateY(-30px) translateX(-60px) scale(1.05);
+              opacity: 0.5;
+            }
+            80% {
+              transform: translateY(-55px) translateX(20px) scale(0.92);
+              opacity: 0.4;
+            }
+            100% {
+              transform: translateY(0) translateX(0) scale(1);
+              opacity: 0.35;
+            }
+          }
+          
+          .animate-floating-extreme {
+            animation: floating-extreme 15s ease-in-out infinite;
+          }
+          
           @keyframes floating-enhanced {
             0% {
               transform: translateY(0) translateX(0) scale(1);
@@ -246,7 +278,38 @@ const Landing: React.FC = () => {
             <div className={`relative w-full h-[600px] transition-all duration-1000 ease-in-out ${
               loaded ? 'opacity-100' : 'opacity-0'
             }`}>
-              {/* 3D image com círculos chapados e mais escuros, mas com transparência */}
+              {/* 3D image com círculos nas cores específicas solicitadas */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                {/* Primeiro círculo (maior) - cor específica solicitada */}
+                <div 
+                  className="w-[350px] h-[350px] rounded-full backdrop-blur-sm animate-pulse-enhanced"
+                  style={{
+                    backgroundColor: 'rgb(111 166 255 / 40%)',
+                    boxShadow: 'rgb(129 177 255 / 30%) 0px 0px 25px'
+                  }}
+                ></div>
+                
+                {/* Segundo círculo (médio) - cor específica solicitada */}
+                <div 
+                  className="absolute w-[300px] h-[300px] rounded-full backdrop-blur-md animate-floating-enhanced" 
+                  style={{ 
+                    animationDuration: '10s',
+                    backgroundColor: 'rgb(92 143 255 / 34%)',
+                    boxShadow: 'rgb(255 255 255 / 28%) 0px 0px 20px'
+                  }}
+                ></div>
+                
+                {/* Terceiro círculo (menor) - cor específica solicitada */}
+                <div 
+                  className="absolute w-[250px] h-[250px] rounded-full backdrop-blur-md animate-floating-enhanced" 
+                  style={{ 
+                    animationDuration: '8s', 
+                    animationDelay: '1s',
+                    backgroundColor: 'rgb(93 156 255 / 21%)',
+                    boxShadow: 'rgb(255 255 255 / 25%) 0px 0px 20px'
+                  }}
+                ></div>
+              </div> mas com transparência */}
               <div className="absolute inset-0 flex items-center justify-center">
                 {/* Primeiro círculo (maior) - cor chapada com transparência */}
                 <div 
@@ -279,12 +342,12 @@ const Landing: React.FC = () => {
                 ></div>
               </div>
               
-              {/* Crystal/glass effect overlay - simplificado e mais transparente */}
+              {/* Crystal/glass effect overlay - ajustado para combinar */}
               <div 
-                className=" hidden absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full"
+                className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full"
                 style={{
-                  backgroundColor: 'rgba(37, 99, 235, 0.25)', /* blue-600 com 25% de opacidade */
-                  boxShadow: '0 0 100px rgba(37, 99, 235, 0.3)',
+                  backgroundColor: 'rgb(111 166 255 / 20%)',
+                  boxShadow: 'rgb(129 177 255 / 25%) 0px 0px 80px',
                   animation: loaded ? 'pulse-enhanced 6s ease-in-out infinite alternate' : 'none',
                 }}
               ></div>
