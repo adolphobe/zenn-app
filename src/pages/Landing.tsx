@@ -375,7 +375,7 @@ const Landing: React.FC = () => {
                     <div className="md:pt-3">
                       <h3 className="text-2xl font-semibold mb-4 text-gray-800 dark:text-white">Defina suas tarefas</h3>
                       <p className="text-gray-600 dark:text-gray-300 text-lg mb-6">Adicione suas tarefas no Zenn e as classifique usando os três pilares fundamentais: importância real para seus objetivos, orgulho que sentirá após concluí-la, e contribuição para seu crescimento pessoal.</p>
-                      <div className="p-5 bg-blue-50 dark:bg-gray-800 rounded-xl" style={{ border: '1px solid #bddbff' }} ><div className="flex items-start gap-3"><CheckCircle2 className="text-blue-500 dark:text-blue-400 mt-1 flex-shrink-0" size={20} /><p className="text-blue-700 dark:text-blue-300">Interface intuitiva que torna simples a classificação de cada tarefa</p></div></div>
+                      <div className="p-5 bg-blue-50 dark:bg-gray-800 rounded-xl" style={{ border: '1px solid #bddbff', backgroundColor: '#f5f9ff' }} ><div className="flex items-start gap-3"><CheckCircle2 className="text-blue-500 dark:text-blue-400 mt-1 flex-shrink-0" size={20} /><p className="text-blue-700 dark:text-blue-300">Interface intuitiva que torna simples a classificação de cada tarefa</p></div></div>
                     </div>
                   </div>
                   <div className="flex flex-col md:flex-row gap-8 md:gap-12 items-start animate-on-scroll">
@@ -383,7 +383,7 @@ const Landing: React.FC = () => {
                     <div className="md:pt-3">
                       <h3 className="text-2xl font-semibold mb-4 text-gray-800 dark:text-white">Priorize o que importa</h3>
                       <p className="text-gray-600 dark:text-gray-300 text-lg mb-6">A análise de pilares gera um score que te ajuda a distinguir o essencial do acessório. Foque nas tarefas com maior impacto e significado para seus objetivos de longo prazo.</p>
-                      <div className="p-5 bg-blue-50 dark:bg-gray-800 rounded-xl" style={{ border: '1px solid #bddbff' }} ><div className="flex items-start gap-3"><CheckCircle2 className="text-blue-500 dark:text-blue-400 mt-1 flex-shrink-0" size={20} /><p className="text-blue-700 dark:text-blue-300">Sistema de score visual que permite identificar imediatamente o que merece sua atenção</p></div></div>
+                      <div className="p-5 bg-blue-50 dark:bg-gray-800 rounded-xl" style={{ border: '1px solid #bddbff', backgroundColor: '#f5f9ff' }} ><div className="flex items-start gap-3"><CheckCircle2 className="text-blue-500 dark:text-blue-400 mt-1 flex-shrink-0" size={20} /><p className="text-blue-700 dark:text-blue-300">Sistema de score visual que permite identificar imediatamente o que merece sua atenção</p></div></div>
                     </div>
                   </div>
                   <div className="flex flex-col md:flex-row gap-8 md:gap-12 items-start animate-on-scroll">
@@ -391,7 +391,7 @@ const Landing: React.FC = () => {
                     <div className="md:pt-3">
                       <h3 className="text-2xl font-semibold mb-4 text-gray-800 dark:text-white">Revise e aprenda</h3>
                       <p className="text-gray-600 dark:text-gray-300 text-lg mb-6">Acompanhe seu progresso através de insights estratégicos que revelam padrões em suas escolhas. Refine sua abordagem ao longo do tempo para maximizar seu impacto e satisfação pessoal.</p>
-                      <div className="p-5 bg-blue-50 dark:bg-gray-800 rounded-xl" style={{ border: '1px solid #bddbff' }} ><div className="flex items-start gap-3"><CheckCircle2 className="text-blue-500 dark:text-blue-400 mt-1 flex-shrink-0" size={20} /><p className="text-blue-700 dark:text-blue-300">Relatórios semanais personalizados para aprimorar constantemente suas decisões</p></div></div>
+                      <div className="p-5 bg-blue-50 dark:bg-gray-800 rounded-xl" style={{ border: '1px solid #bddbff', backgroundColor: '#f5f9ff' }} ><div className="flex items-start gap-3"><CheckCircle2 className="text-blue-500 dark:text-blue-400 mt-1 flex-shrink-0" size={20} /><p className="text-blue-700 dark:text-blue-300">Relatórios semanais personalizados para aprimorar constantemente suas decisões</p></div></div>
                     </div>
                   </div>
                 </div>
