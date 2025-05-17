@@ -14,6 +14,7 @@ import Landing from "./pages/Landing";
 import Dashboard from "./components/Dashboard";
 import { AuthProvider } from "./auth/AuthProvider";
 import { PrivateRoute } from "./auth/PrivateRoute";
+import { UserProvider } from "./context/UserContext";
 
 const queryClient = new QueryClient();
 
@@ -26,24 +27,26 @@ const App = () => (
           <Sonner />
           <BrowserRouter>
             <AuthProvider>
-              <Routes>
-                <Route path="/" element={<Landing />} />
-                
-                {/* Rotas protegidas usando o PrivateRoute */}
-                <Route element={<PrivateRoute />}>
-                  <Route path="/dashboard" element={<ActoApp />}>
-                    <Route index element={<Dashboard />} />
+              <UserProvider>
+                <Routes>
+                  <Route path="/" element={<Landing />} />
+                  
+                  {/* Rotas protegidas usando o PrivateRoute */}
+                  <Route element={<PrivateRoute />}>
+                    <Route path="/dashboard" element={<ActoApp />}>
+                      <Route index element={<Dashboard />} />
+                    </Route>
+                    <Route path="/strategic-review" element={<ActoApp />}>
+                      <Route index element={<StrategicReview />} />
+                    </Route>
+                    <Route path="/history" element={<ActoApp />}>
+                      <Route index element={<TaskHistory />} />
+                    </Route>
                   </Route>
-                  <Route path="/strategic-review" element={<ActoApp />}>
-                    <Route index element={<StrategicReview />} />
-                  </Route>
-                  <Route path="/history" element={<ActoApp />}>
-                    <Route index element={<TaskHistory />} />
-                  </Route>
-                </Route>
-                
-                <Route path="*" element={<NotFound />} />
-              </Routes>
+                  
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </UserProvider>
             </AuthProvider>
           </BrowserRouter>
         </ToastProvider>
