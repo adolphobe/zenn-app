@@ -1,12 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, ArrowUpRight, CheckCircle2, X } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, CheckCircle2 } from 'lucide-react'; // Removido X se não for usado em outro lugar
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import LoginForm from '@/components/LoginForm';
-
-// Definição de tipo para o conteúdo do modal
-type ModalContentType = 'pilares' | 'clareza' | 'estrategia';
 
 const Landing: React.FC = () => {
   const navigate = useNavigate();
@@ -16,74 +13,6 @@ const Landing: React.FC = () => {
   const [circlesKey, setCirclesKey] = useState(Date.now());
   
   const isLoggedIn = localStorage.getItem('acto_is_logged_in') === 'true';
-
-  // Estado para o modal de explicação
-  const [isExplanationModalOpen, setIsExplanationModalOpen] = useState(false);
-  const [currentModalData, setCurrentModalData] = useState<{ title: string; content: JSX.Element } | null>(null);
-
-  // CORREÇÃO: modalDataContent agora está dentro do componente ou acessível de forma estável
-  const modalDataContent = {
-    pilares: {
-      title: "🌟 Análise por Pilares",
-      content: (
-        <div className="space-y-4 text-gray-700 dark:text-gray-300 leading-relaxed">
-          <p className="font-semibold">No Zenn, você não adiciona uma tarefa apenas com um título e uma data. Você adiciona consciência.</p>
-          <p>Cada tarefa é avaliada com base em três pilares:</p>
-          <div className="pl-4 space-y-3">
-            <div>
-              <h4 className="font-semibold text-blue-600 dark:text-blue-400">Importância real (Risco de não fazer)</h4>
-              <p className="italic text-sm">“Se eu ignorar isso, vai ter consequência?”</p>
-              <p>É o que te faz priorizar o que realmente não pode ser adiado.</p>
-            </div>
-            <div>
-              <h4 className="font-semibold text-blue-600 dark:text-blue-400">Orgulho pós-execução</h4>
-              <p className="italic text-sm">“Quando eu terminar, vou me sentir mais alinhado com quem quero ser?”</p>
-              <p>É o pilar que mede sua conexão com o que você faz. Não é só cumprir — é se respeitar por ter feito.</p>
-            </div>
-            <div>
-              <h4 className="font-semibold text-blue-600 dark:text-blue-400">Crescimento pessoal</h4>
-              <p className="italic text-sm">“Fazer isso me torna alguém melhor?”</p>
-              <p>É o que separa tarefas operacionais de tarefas que constroem a sua evolução real.</p>
-            </div>
-          </div>
-          <p className="font-semibold pt-2">Esses três pilares não são para julgar produtividade. Eles te ajudam a escolher com consciência o que realmente merece seu tempo.</p>
-        </div>
-      )
-    },
-    clareza: {
-      title: "🎯 Clareza nas Escolhas",
-      content: (
-        <div className="space-y-4 text-gray-700 dark:text-gray-300 leading-relaxed">
-          <p className="font-semibold">Todo mundo tem uma lista de tarefas. O Zenn não é mais uma. Ele é o primeiro sistema que organiza a intenção por trás de cada escolha.</p>
-          <p>Não basta fazer. Você precisa sentir que valeu a pena.</p>
-          <p>É por isso que, no momento em que você cria uma tarefa no Zenn, você é convidado a refletir:</p>
-          <ul className="list-disc list-inside space-y-1 text-blue-600 dark:text-blue-400 font-medium pl-2">
-            <li>Isso é importante mesmo?</li>
-            <li>Isso vai me deixar orgulhoso?</li>
-            <li>Isso me faz crescer?</li>
-          </ul>
-          <p>Você começa a abandonar o excesso, a rasura, o “checklist automático”. No lugar disso, você executa com peso emocional e propósito estratégico.</p>
-          <p className="font-semibold pt-2">Resultado? Menos culpa. Mais direção.</p>
-        </div>
-      )
-    },
-    estrategia: {
-      title: "📊 Análise Estratégica",
-      content: (
-        <div className="space-y-4 text-gray-700 dark:text-gray-300 leading-relaxed">
-          <p className="font-semibold">Você não precisa esperar uma crise para perceber que está vivendo no automático. O Zenn analisa, em tempo real, o que suas tarefas estão dizendo sobre você.</p>
-          <p>A cada tarefa concluída, o sistema registra e organiza:</p>
-          <ul className="list-disc list-inside space-y-1 text-blue-600 dark:text-blue-400 font-medium pl-2">
-            <li>Qual pilar você mais fortaleceu?</li>
-            <li>Quais tarefas te transformaram de verdade?</li>
-            <li>O que você concluiu por obrigação?</li>
-          </ul>
-          <p>Esses dados geram um relatório estratégico semanal com frases claras e insights práticos. Você começa a enxergar padrões de comportamento — e pode ajustar seu foco antes de cair em ciclos improdutivos.</p>
-          <p className="font-semibold pt-2">Não é só um app de tarefas. É um sistema de leitura da sua própria execução.</p>
-        </div>
-      )
-    }
-  };
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -107,41 +36,17 @@ const Landing: React.FC = () => {
     }
   }, [showLogin]);
 
-  const openExplanationModal = useCallback((type: ModalContentType) => {
-    setCurrentModalData(modalDataContent[type]);
-    setIsExplanationModalOpen(true);
-    document.body.style.overflow = 'hidden'; 
-  }, [modalDataContent]); // Adicionada dependência
-
-  const closeExplanationModal = useCallback(() => { 
-    setIsExplanationModalOpen(false);
-    setCurrentModalData(null);
-    document.body.style.overflow = 'auto'; 
-  }, []);
-
   useEffect(() => {
-    const handleEsc = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        closeExplanationModal();
-      }
+    const observerOptions = {
+      root: null,
+      rootMargin: '0px',
+      threshold: 0.1
     };
-    if (isExplanationModalOpen) {
-        window.addEventListener('keydown', handleEsc);
-    }
-    return () => {
-      window.removeEventListener('keydown', handleEsc);
-      if (isExplanationModalOpen) { 
-        document.body.style.overflow = 'auto';
-      }
-    };
-  }, [isExplanationModalOpen, closeExplanationModal]);
-
-
-  useEffect(() => {
-    const observerOptions = { root: null, rootMargin: '0px', threshold: 0.1 };
     const observerCallback = (entries: IntersectionObserverEntry[]) => {
       entries.forEach(entry => {
-        if (entry.isIntersecting) entry.target.classList.add('animate-in');
+        if (entry.isIntersecting) {
+          entry.target.classList.add('animate-in');
+        }
       });
     };
     const observer = new IntersectionObserver(observerCallback, observerOptions);
@@ -149,7 +54,9 @@ const Landing: React.FC = () => {
     elements.forEach(section => observer.observe(section));
     return () => {
       elements.forEach(section => {
-        if (section) observer.unobserve(section);
+        if (section) { 
+          observer.unobserve(section);
+        }
       });
     };
   }, []);
@@ -163,17 +70,58 @@ const Landing: React.FC = () => {
     <div className="min-h-screen overflow-x-hidden">
       <style>
         {`
-          /* ... Seu CSS existente ... */
-          .modal-enter { opacity: 0; transform: scale(0.95); }
-          .modal-enter-active { opacity: 1; transform: scale(1); transition: opacity 300ms, transform 300ms; }
-          .modal-exit { opacity: 1; transform: scale(1); }
-          .modal-exit-active { opacity: 0; transform: scale(0.95); transition: opacity 300ms, transform 300ms; }
-          .modal-content-area::-webkit-scrollbar { width: 8px; }
-          .modal-content-area::-webkit-scrollbar-track { background: transparent; }
-          .modal-content-area::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-          .modal-content-area::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-          .dark .modal-content-area::-webkit-scrollbar-thumb { background: #4b5563; }
-          .dark .modal-content-area::-webkit-scrollbar-thumb:hover { background: #6b7280; }
+          @keyframes floating {
+            0%, 100% { transform: translateY(0) translateX(0); opacity: 0.3; }
+            25% { transform: translateY(-15px) translateX(10px); opacity: 0.5; }
+            50% { transform: translateY(-25px) translateX(-10px); opacity: 0.4; }
+            75% { transform: translateY(-10px) translateX(-5px); opacity: 0.3; }
+          }
+          .animate-floating { animation: floating 15s ease-in-out infinite; }
+          
+          @keyframes floating-enhanced { 
+            0% { transform: translateY(0) translateX(0) scale(1); opacity: 0.2; }
+            20% { transform: translateY(-25px) translateX(20px) scale(1.05); opacity: 0.4; }
+            40% { transform: translateY(-35px) translateX(-15px) scale(0.95); opacity: 0.5; }
+            60% { transform: translateY(-15px) translateX(-30px) scale(1.02); opacity: 0.4; }
+            80% { transform: translateY(-30px) translateX(10px) scale(0.98); opacity: 0.3; }
+            100% { transform: translateY(0) translateX(0) scale(1); opacity: 0.2; }
+          }
+          .animate-floating-enhanced { 
+            animation: floating-enhanced 12s ease-in-out infinite;
+            will-change: transform, opacity;
+           }
+          
+          @keyframes pulse-enhanced {
+            0%, 100% { transform: scale(1); opacity: 0.3; }
+            50% { transform: scale(1.1); opacity: 0.5; }
+          }
+          .animate-pulse-enhanced { 
+            animation: pulse-enhanced 8s ease-in-out infinite; 
+            will-change: transform, opacity;
+          }
+
+          @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+          .fade-up { animation: fadeUp 1.2s ease-out forwards; }
+          .fade-up-delay-1 { animation-delay: 0.2s; }
+          .fade-up-delay-2 { animation-delay: 0.4s; }
+          .fade-up-delay-3 { animation-delay: 0.6s; }
+          @keyframes slideIn { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+          .slide-in { animation: slideIn 0.6s ease-out forwards; }
+          @keyframes slideOut { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-30px); } }
+          .slide-out { animation: slideOut 0.6s ease-out forwards; }
+          .animate-on-scroll { opacity: 0; transform: translateY(30px); transition: opacity 0.8s ease-out, transform 0.8s ease-out; }
+          .animate-in { opacity: 1; transform: translateY(0); }
+          @keyframes gradientFlow { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+          .gradient-flow-bg { background: linear-gradient(120deg, #e0f2fe, #bfdbfe, #dbeafe, #eff6ff); background-size: 300% 300%; animation: gradientFlow 15s ease infinite; }
+          .gradient-card-hover { position: relative; overflow: hidden; z-index: 1; transition: transform 0.3s ease; }
+          .gradient-card-hover::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(120deg, #dbeafe, #bfdbfe, #93c5fd); background-size: 300% 300%; animation: gradientFlow 8s ease infinite; z-index: -1; opacity: 0; transition: opacity 0.3s ease; border-radius: 0.5rem; }
+          .gradient-card-hover:hover { transform: translateY(-5px); }
+          .gradient-card-hover:hover::before { opacity: 0.07; }
+          .blob-animation { position: absolute; border-radius: 50%; background: linear-gradient(45deg, rgba(191, 219, 254, 0.4), rgba(96, 165, 250, 0.2)); filter: blur(40px); }
+          @keyframes float-around { 0% { transform: translate(0, 0) scale(1); } 33% { transform: translate(60px, -40px) scale(1.1); } 66% { transform: translate(-30px, 40px) scale(0.9); } 100% { transform: translate(0, 0) scale(1); } }
+          .testimonial-card { transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out, filter 0.5s ease-in-out; will-change: transform, opacity, filter; }
+          .testimonial-active { transform: scale(1); opacity: 1; filter: grayscale(0%); }
+          .testimonial-inactive { transform: scale(0.9); opacity: 0.6; filter: grayscale(50%); }
         `}
       </style>
       
@@ -287,7 +235,7 @@ const Landing: React.FC = () => {
                   <h3 className="text-2xl font-semibold mb-5 text-gray-800 dark:text-white">Análise por pilares</h3>
                   <p className="text-gray-600 dark:text-gray-300 text-lg flex-grow">Avalie cada tarefa pelos três pilares fundamentais: importância real, orgulho pós-execução e contribuição para seu crescimento pessoal.</p>
                   <div className="mt-8">
-                    <Button variant="ghost" className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/70 p-0 flex items-center gap-2 group" onClick={() => openExplanationModal('pilares')}>
+                    <Button variant="ghost" className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/70 p-0 flex items-center gap-2 group" /*onClick={() => openExplanationModal('pilares')}*/>
                         Saiba mais <ArrowUpRight size={18} className="transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
                     </Button>
                   </div>
@@ -303,7 +251,7 @@ const Landing: React.FC = () => {
                   <h3 className="text-2xl font-semibold mb-5 text-gray-800 dark:text-white">Clareza nas escolhas</h3>
                   <p className="text-gray-600 dark:text-gray-300 text-lg flex-grow">Abandone o ruído das tarefas sem propósito. Foque apenas no que realmente vai te levar aonde você quer chegar.</p>
                   <div className="mt-8">
-                    <Button variant="ghost" className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/70 p-0 flex items-center gap-2 group" onClick={() => openExplanationModal('clareza')}>
+                    <Button variant="ghost" className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/70 p-0 flex items-center gap-2 group" /*onClick={() => openExplanationModal('clareza')}*/>
                         Saiba mais <ArrowUpRight size={18} className="transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
                     </Button>
                   </div>
@@ -319,7 +267,7 @@ const Landing: React.FC = () => {
                   <h3 className="text-2xl font-semibold mb-5 text-gray-800 dark:text-white">Análise estratégica</h3>
                   <p className="text-gray-600 dark:text-gray-300 text-lg flex-grow">Entenda padrões e tendências nas suas escolhas para refinar continuamente sua abordagem e melhorar sua execução.</p>
                   <div className="mt-8">
-                    <Button variant="ghost" className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/70 p-0 flex items-center gap-2 group" onClick={() => openExplanationModal('estrategia')}>
+                    <Button variant="ghost" className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/70 p-0 flex items-center gap-2 group" /*onClick={() => openExplanationModal('estrategia')}*/>
                         Saiba mais <ArrowUpRight size={18} className="transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
                     </Button>
                   </div>
@@ -431,34 +379,6 @@ const Landing: React.FC = () => {
           </div>
         </div>
       </footer>
-
-      {/* MODAL DE EXPLICAÇÃO */}
-      {isExplanationModalOpen && currentModalData && (
-        <div
-          className="fixed inset-0 bg-black/60 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center z-[9999] p-4 modal-enter-active"
-          onClick={closeExplanationModal}
-        >
-          <div
-            className="bg-white dark:bg-gray-800 rounded-xl w-full max-w-2xl max-h-[85vh] shadow-2xl p-6 md:p-8 relative flex flex-col animate-in zoom-in-90 duration-300"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex justify-between items-center mb-4 pb-4 border-b border-gray-200 dark:border-gray-700">
-              <h3 className="text-xl sm:text-2xl font-semibold text-gray-800 dark:text-gray-100">{currentModalData.title}</h3>
-              <Button variant="ghost" size="icon" onClick={closeExplanationModal} className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300">
-                <X size={20} />
-              </Button>
-            </div>
-            <div className="overflow-y-auto flex-grow pr-2 modal-content-area">
-              {currentModalData.content}
-            </div>
-            <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700 text-right">
-              <Button onClick={closeExplanationModal} className="bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-500 dark:hover:bg-blue-600 px-6 py-2">
-                Entendido
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
 
     </div>
   );
