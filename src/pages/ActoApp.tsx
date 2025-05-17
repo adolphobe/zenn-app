@@ -21,7 +21,10 @@ const ActoApp: React.FC = () => {
 
   useEffect(() => {
     // Only redirect to login if user tries to access protected routes while not logged in
-    if (!isLoggedIn && location.pathname !== '/' && !location.pathname.includes('/login')) {
+    // Do not redirect if the user is already on the home page or login page
+    if (!isLoggedIn && 
+        location.pathname !== '/' && 
+        location.pathname !== '/login') {
       navigate('/login');
     }
   }, [isLoggedIn, navigate, location.pathname]);

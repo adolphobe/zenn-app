@@ -24,7 +24,7 @@ const SidebarUserProfile: React.FC<SidebarUserProfileProps> = ({ sidebarOpen }) 
       description: "Você foi desconectado com sucesso."
     });
     
-    // Redirect to home page instead of login
+    // Redirect to home page 
     navigate('/');
   };
 
