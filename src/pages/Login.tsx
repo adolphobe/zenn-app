@@ -16,10 +16,13 @@ const Login: React.FC = () => {
   // Obter o caminho para onde redirecionar após o login
   const from = location.state?.from?.pathname || "/dashboard";
 
-  // Verificar se já está logado
+  // Verificar se já está logado e redirecionar para dashboard
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
+      console.log('Já autenticado, redirecionando para:', from);
       navigate(from, { replace: true });
+    } else {
+      console.log('Estado de autenticação:', { isLoading, isAuthenticated });
     }
     
     // Definir estado carregado para animações
@@ -34,6 +37,15 @@ const Login: React.FC = () => {
   const toggleSignup = () => {
     setIsSignup(!isSignup);
   };
+
+  // Se estiver verificando a autenticação, exibe um loader
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
 
   // Itens flutuantes animados para o fundo com posições aleatórias e animações contínuas
   const floatingItems = Array(7).fill(null).map((_, i) => (
@@ -52,12 +64,6 @@ const Login: React.FC = () => {
       }}
     />
   ));
-
-  if (isLoading) {
-    return <div className="min-h-screen flex items-center justify-center">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-    </div>;
-  }
 
   return (
     <div className="flex min-h-screen bg-gradient-to-b from-white to-blue-50 dark:from-gray-950 dark:to-gray-900 overflow-hidden relative">

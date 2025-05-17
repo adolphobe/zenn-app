@@ -16,7 +16,7 @@ export const PrivateRoute = () => {
   }, [isLoading]);
   
   // Se ainda estiver carregando, mostra um indicador de carregamento
-  if (isLoading || !authChecked) {
+  if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
@@ -25,10 +25,11 @@ export const PrivateRoute = () => {
   }
   
   // Em desenvolvimento, permitir acesso independentemente da autenticação
-  const isDevelopment = import.meta.env.DEV;
+  // Remova esta condição para exigir autenticação mesmo em desenvolvimento
+  // const isDevelopment = import.meta.env.DEV;
   
-  // Se estiver autenticado ou em ambiente de desenvolvimento, permite o acesso
-  if (isAuthenticated || isDevelopment) {
+  // Se estiver autenticado, permite o acesso
+  if (isAuthenticated) {
     return <Outlet />;
   }
   
