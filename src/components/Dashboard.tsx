@@ -22,6 +22,9 @@ const Dashboard: React.FC = () => {
   const { isTaskExpanded, toggleTaskExpanded } = useExpandedTask();
   const { currentUser, isAuthenticated } = useAuth();
   
+  // Log Dashboard component mounting and authentication status
+  console.log(`[DASHBOARD] Renderizando dashboard: Auth=${isAuthenticated}, User=${currentUser?.email || 'nenhum'}`);
+  
   // State for showing/hiding overdue tasks, initialized from localStorage
   const [showOverdueTasks, setShowOverdueTasks] = useState(() => {
     const stored = localStorage.getItem('showOverdueTasks');
@@ -98,6 +101,9 @@ const Dashboard: React.FC = () => {
   const toggleOverdueTasks = () => {
     setShowOverdueTasks(prev => !prev);
   };
+  
+  // Log authentication state for debugging
+  console.log(`[DASHBOARD] Estado de autenticação: Autenticado=${isAuthenticated}, Carregando=${false}, Usuário=${currentUser?.email || 'nenhum'}`);
   
   return (
     <>
