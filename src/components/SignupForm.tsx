@@ -10,11 +10,17 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useAuth } from '@/context/AuthContext';
 import { toast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
 
+// Schema with password confirmation
 const signupSchema = z.object({
   name: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
   email: z.string().email("Digite um e-mail válido"),
   password: z.string().min(6, "A senha deve ter pelo menos 6 caracteres"),
+  confirmPassword: z.string().min(6, "A confirmação de senha deve ter pelo menos 6 caracteres"),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "As senhas não correspondem",
+  path: ["confirmPassword"],
 });
 
 type SignupFormValues = z.infer<typeof signupSchema>;
@@ -25,7 +31,9 @@ interface SignupFormProps {
 
 const SignupForm: React.FC<SignupFormProps> = ({ onCancel }) => {
   const { signup } = useAuth();
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [signupSuccess, setSignupSuccess] = useState<string | null>(null);
 
@@ -35,6 +43,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ onCancel }) => {
       name: "",
       email: "",
       password: "",
+      confirmPassword: "",
     },
   });
 
@@ -45,8 +54,13 @@ const SignupForm: React.FC<SignupFormProps> = ({ onCancel }) => {
       const success = await signup(values.email, values.password, values.name);
       
       if (success) {
-        setSignupSuccess("Conta criada com sucesso! Você já pode fazer login.");
+        setSignupSuccess("Conta criada com sucesso!");
         form.reset();
+        
+        // Redirect to dashboard after successful signup
+        setTimeout(() => {
+          navigate('/dashboard');
+        }, 1500);
       }
     } catch (error) {
       toast({
@@ -61,6 +75,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ onCancel }) => {
   };
 
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
+  const toggleConfirmPasswordVisibility = () => setShowConfirmPassword(!showConfirmPassword);
 
   // Colors and icons
   const iconColor = "text-gray-800 dark:text-gray-200"; 
@@ -150,6 +165,41 @@ const SignupForm: React.FC<SignupFormProps> = ({ onCancel }) => {
                   onClick={togglePasswordVisibility}
                 >
                   {showPassword ? (
+                    <EyeOff size={18} />
+                  ) : (
+                    <Eye size={18} />
+                  )}
+                </button>
+              </div>
+              <FormMessage className="text-xs font-medium" />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="confirmPassword"
+          render={({ field }) => (
+            <FormItem className="transition-all duration-300 ease-in-out hover:translate-x-1">
+              <div className="relative flex items-center"> 
+                <Lock
+                  className={`absolute left-3 top-1/2 -translate-y-1/2 ${iconColor} opacity-100 z-20`}
+                  size={18}
+                />
+                <FormControl>
+                  <Input
+                    type={showConfirmPassword ? "text" : "password"}
+                    placeholder="Confirme sua senha"
+                    className="pl-10 pr-10 h-12 bg-white/80 dark:bg-gray-700/80 backdrop-blur-sm border-gray-200 dark:border-gray-600 transition-all duration-300 w-full"
+                    {...field}
+                  />
+                </FormControl>
+                <button
+                  type="button"
+                  className={`absolute right-3 top-1/2 -translate-y-1/2 ${eyeIconColor} opacity-100 focus:outline-none z-20`}
+                  onClick={toggleConfirmPasswordVisibility}
+                >
+                  {showConfirmPassword ? (
                     <EyeOff size={18} />
                   ) : (
                     <Eye size={18} />

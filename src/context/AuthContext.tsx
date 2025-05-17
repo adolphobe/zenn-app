@@ -1,10 +1,11 @@
+
 import { createContext, useState, useContext, useEffect, ReactNode } from 'react';
 import { User } from '../types/user';
 import { supabase } from '@/integrations/supabase/client';
 import { Session } from '@supabase/supabase-js';
 import { toast } from '@/hooks/use-toast';
 
-// Tipo para o contexto de autenticação
+// Type definitions for the auth context
 interface AuthContextType {
   currentUser: User | null;
   isAuthenticated: boolean;
@@ -15,7 +16,7 @@ interface AuthContextType {
   session: Session | null;
 }
 
-// Criar contexto
+// Create context with default values
 export const AuthContext = createContext<AuthContextType>({
   currentUser: null,
   isAuthenticated: false,
@@ -26,16 +27,16 @@ export const AuthContext = createContext<AuthContextType>({
   session: null,
 });
 
-// Hook para usar o contexto
+// Hook to use the auth context
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useAuth deve ser usado dentro de um AuthProvider');
+    throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
 };
 
-// Função para converter usuário do Supabase para o formato do nosso app
+// Map Supabase user to our app's user format
 const mapSupabaseUser = (user: any, profileData?: any): User => {
   return {
     id: user.id,
@@ -80,25 +81,26 @@ const mapSupabaseUser = (user: any, profileData?: any): User => {
   };
 };
 
-// Provider
+// Auth Provider component
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Set up auth state listener and check for existing session
   useEffect(() => {
-    console.log("[AuthProvider] Inicializando estado de autenticação");
+    console.log("[AuthProvider] Initializing auth state");
     
-    // Configurar o listener de autenticação que será executado quando o status mudar 
+    // Set up auth state change listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, newSession) => {
-        console.log("[AuthProvider] Estado de autenticação alterado:", event, newSession?.user?.email || "Sem usuário");
+        console.log("[AuthProvider] Auth state changed:", event);
         
         setSession(newSession);
         
         if (newSession?.user) {
-          // Carregar dados do usuário da tabela profiles (não bloqueia)
-          const loadUserProfile = async () => {
+          // Load user profile data asynchronously
+          setTimeout(async () => {
             try {
               const { data: profileData } = await supabase
                 .from('profiles')
@@ -107,61 +109,66 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 .maybeSingle();
                 
               const mappedUser = mapSupabaseUser(newSession.user, profileData);
-              console.log("[AuthProvider] Perfil do usuário carregado:", mappedUser.email);
+              console.log("[AuthProvider] User profile loaded:", mappedUser.email);
               setCurrentUser(mappedUser);
             } catch (error) {
-              console.error("[AuthProvider] Erro ao buscar perfil do usuário:", error);
+              console.error("[AuthProvider] Error fetching user profile:", error);
               const mappedUser = mapSupabaseUser(newSession.user);
               setCurrentUser(mappedUser);
+            } finally {
+              setIsLoading(false);
             }
-          };
-          
-          // Desacoplar operações assíncronas 
-          setTimeout(loadUserProfile, 0);
-          
-        } else if (event === 'SIGNED_OUT') {
-          console.log("[AuthProvider] Usuário desconectado");
+          }, 0);
+        } else {
           setCurrentUser(null);
+          setIsLoading(false);
         }
-        
-        setIsLoading(false);
       }
     );
     
-    // Verificar sessão ativa imediatamente
+    // Check for existing session on component mount
     const checkSession = async () => {
       try {
         const { data } = await supabase.auth.getSession();
-        console.log("[AuthProvider] Verificação inicial de sessão:", data.session ? "Sessão encontrada" : "Sem sessão");
+        console.log("[AuthProvider] Initial session check:", data.session ? "Session found" : "No session");
       } catch (error) {
-        console.error("[AuthProvider] Erro ao verificar sessão:", error);
+        console.error("[AuthProvider] Error checking session:", error);
+        setIsLoading(false);
       }
     };
     
     checkSession();
     
+    // Clean up subscription on unmount
     return () => {
-      console.log("[AuthProvider] Limpeza - cancelando inscrição");
+      console.log("[AuthProvider] Cleaning up - unsubscribing from auth events");
       subscription.unsubscribe();
     };
   }, []);
 
-  // Login
+  // Login function
   const login = async (email: string, password: string): Promise<boolean> => {
     setIsLoading(true);
     
     try {
-      console.log("[AuthProvider] Tentando login com email:", email);
+      console.log("[AuthProvider] Attempting login with email:", email);
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password
       });
       
       if (error) {
-        console.error("[AuthProvider] Erro de login:", error.message);
+        console.error("[AuthProvider] Login error:", error.message);
+        
+        // Show more user-friendly error messages
+        let errorMessage = "Failed to log in. Please check your credentials.";
+        if (error.message.includes("Invalid login credentials")) {
+          errorMessage = "User not found or incorrect password. Please try again.";
+        }
+        
         toast({
-          title: "Erro ao fazer login",
-          description: error.message,
+          title: "Login failed",
+          description: errorMessage,
           variant: "destructive"
         });
         
@@ -169,26 +176,31 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         return false;
       }
       
-      console.log("[AuthProvider] Login bem-sucedido:", data.user?.email);
+      console.log("[AuthProvider] Login successful:", data.user?.email);
       toast({
-        title: "Login bem-sucedido",
-        description: "Você foi autenticado com sucesso",
+        title: "Login successful",
+        description: "Welcome back!",
       });
       
       return true;
     } catch (error: any) {
-      console.error("[AuthProvider] Erro de login:", error);
+      console.error("[AuthProvider] Login error:", error);
+      toast({
+        title: "Login error",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive"
+      });
       setIsLoading(false);
       return false;
     }
   };
 
-  // Cadastro
+  // Signup function
   const signup = async (email: string, password: string, name: string): Promise<boolean> => {
     setIsLoading(true);
     
     try {
-      console.log("[AuthProvider] Tentando criar conta com email:", email);
+      console.log("[AuthProvider] Attempting to create account with email:", email);
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -200,9 +212,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       });
       
       if (error) {
-        console.error("[AuthProvider] Erro de cadastro:", error.message);
+        console.error("[AuthProvider] Signup error:", error.message);
         toast({
-          title: "Erro ao criar conta",
+          title: "Account creation failed",
           description: error.message,
           variant: "destructive"
         });
@@ -210,74 +222,76 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
       
       if (data?.user?.identities?.length === 0) {
-        console.error("[AuthProvider] Usuário já existe");
+        console.error("[AuthProvider] User already exists");
         toast({
-          title: "Erro ao criar conta",
-          description: "Este e-mail já está registrado.",
+          title: "Account creation failed",
+          description: "This email is already registered.",
           variant: "destructive"
         });
         return false;
       }
       
-      // Verifica se é necessária confirmação por email
-      if (data?.user && !data.session) {
-        console.log("[AuthProvider] Confirmação de email necessária");
+      // Check if email confirmation is required
+      if (data?.user && data.session) {
+        console.log("[AuthProvider] Account created and authenticated automatically");
         toast({
-          title: "Conta criada com sucesso",
-          description: "Um e-mail de confirmação foi enviado para " + email + ". Por favor, verifique sua caixa de entrada e confirme seu e-mail para fazer login.",
+          title: "Account created successfully",
+          description: "Your account has been created and you've been logged in automatically."
         });
-      } else {
-        console.log("[AuthProvider] Conta criada e autenticada automaticamente");
+      } else if (data?.user) {
+        console.log("[AuthProvider] Email confirmation required");
         toast({
-          title: "Conta criada com sucesso",
-          description: "Sua conta foi criada e você foi autenticado automaticamente."
+          title: "Account created successfully",
+          description: "A confirmation email has been sent to " + email + ". Please check your inbox and confirm your email to log in.",
         });
       }
       
       return true;
     } catch (error: any) {
-      console.error("[AuthProvider] Erro de cadastro:", error);
-      if (!error.message) {
-        error.message = "Ocorreu um erro ao criar sua conta";
-      }
+      console.error("[AuthProvider] Signup error:", error);
+      toast({
+        title: "Account creation failed",
+        description: error.message || "An unexpected error occurred while creating your account",
+        variant: "destructive"
+      });
       return false;
     } finally {
       setIsLoading(false);
     }
   };
   
-  // Logout
+  // Logout function
   const logout = async (): Promise<void> => {
-    console.log("[AuthProvider] Desconectando usuário");
+    console.log("[AuthProvider] Logging out user");
     setIsLoading(true);
     
     try {
       const { error } = await supabase.auth.signOut();
       
       if (error) {
-        console.error("[AuthProvider] Erro ao desconectar:", error.message);
+        console.error("[AuthProvider] Logout error:", error.message);
         toast({
-          title: "Erro ao fazer logout",
+          title: "Logout failed",
           description: error.message,
           variant: "destructive"
         });
       } else {
         setCurrentUser(null);
         setSession(null);
-        console.log("[AuthProvider] Usuário desconectado com sucesso");
+        console.log("[AuthProvider] User logged out successfully");
         toast({
-          title: "Logout realizado",
-          description: "Você foi desconectado com sucesso",
+          title: "Logged out",
+          description: "You have been successfully logged out",
         });
       }
     } catch (error) {
-      console.error("[AuthProvider] Erro durante logout:", error);
+      console.error("[AuthProvider] Error during logout:", error);
     } finally {
       setIsLoading(false);
     }
   };
   
-  // Value provided by the context - simplificado e mais direto
+  // Context value
   const value = {
     currentUser,
     isAuthenticated: !!session?.user,
