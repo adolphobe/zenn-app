@@ -17,19 +17,6 @@ import { AuthProvider } from "./auth/AuthProvider";
 import { PrivateRoute } from "./auth/PrivateRoute";
 import { UserProvider } from "./context/UserContext";
 
-// Criando um wrapper para proteger todas as rotas do ActoApp
-const ProtectedLayout = () => {
-  return (
-    <ActoApp>
-      <Routes>
-        <Route index element={<Dashboard />} />
-        <Route path="strategic-review" element={<StrategicReview />} />
-        <Route path="history" element={<TaskHistory />} />
-      </Routes>
-    </ActoApp>
-  );
-};
-
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -47,13 +34,18 @@ const App = () => (
                   <Route path="/" element={<Landing />} />
                   <Route path="/login" element={<Login />} />
                   
-                  {/* Rotas protegidas usando o PrivateRoute com layout compartilhado */}
+                  {/* Rotas protegidas usando o PrivateRoute */}
                   <Route element={<PrivateRoute />}>
-                    {/* Redirect de / para /dashboard para consistência com o fluxo */}
-                    <Route path="/dashboard/*" element={<ProtectedLayout />} />
-                    <Route path="/strategic-review" element={<ProtectedLayout />} />
-                    <Route path="/history" element={<ProtectedLayout />} />
+                    <Route path="/dashboard/*" element={<ActoApp />}>
+                      <Route index element={<Dashboard />} />
+                      <Route path="strategic-review" element={<StrategicReview />} />
+                      <Route path="history" element={<TaskHistory />} />
+                    </Route>
                   </Route>
+                  
+                  {/* Rotas legadas com redirecionamento para o novo padrão */}
+                  <Route path="/strategic-review" element={<Navigate to="/dashboard/strategic-review" replace />} />
+                  <Route path="/history" element={<Navigate to="/dashboard/history" replace />} />
                   
                   {/* Fallback para qualquer outra rota */}
                   <Route path="*" element={<NotFound />} />

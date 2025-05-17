@@ -1,6 +1,7 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAppContext } from '@/context/AppContext';
+import { useAuth } from '@/auth/useAuth'; // Adicionando import direto do useAuth
 
 // Import refactored hooks
 import { useCompletedTasks } from '@/components/task-history/hooks/useCompletedTasks';
@@ -18,7 +19,13 @@ import { TaskPagination } from '@/components/task-history/TaskPagination';
 
 const TaskHistory = () => {
   const { state } = useAppContext();
+  const { isAuthenticated } = useAuth();
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('grid');
+  
+  // Verificação de autenticação em cada renderização
+  useEffect(() => {
+    console.log("TaskHistory: Estado de autenticação =>", isAuthenticated ? "Autenticado" : "Não autenticado");
+  }, [isAuthenticated]);
   
   // Use our custom hooks to manage the task data, filtering and pagination
   const { completedTasks } = useCompletedTasks(state.tasks);

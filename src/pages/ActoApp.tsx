@@ -6,16 +6,23 @@ import { useAppContext } from '../context/AppContext';
 import { useSidebar } from '@/context/hooks';
 import { Menu } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/auth/useAuth';
 
-// ActoApp agora é apenas um layout, sem lógica de autenticação
-const ActoApp: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
+// ActoApp agora funciona como layout para rotas aninhadas
+const ActoApp: React.FC = () => {
   const { state, toggleSidebar } = useAppContext();
   const { viewMode } = state;
   const { isOpen: sidebarOpen, open: openSidebar, isMobile } = useSidebar();
   const location = useLocation();
+  const { isAuthenticated } = useAuth(); // Verificamos a autenticação aqui também
   
   // Determine se estamos na rota do dashboard para ajuste de layout
   const isDashboardRoute = location.pathname === '/dashboard' || location.pathname === '/dashboard/';
+
+  // Logging para verificar autenticação em cada renderização
+  useEffect(() => {
+    console.log("ActoApp: Estado de autenticação =>", isAuthenticated ? "Autenticado" : "Não autenticado");
+  }, [isAuthenticated]);
 
   // Close sidebar on route change if on mobile
   useEffect(() => {
@@ -55,7 +62,7 @@ const ActoApp: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
           "w-full", 
           isTaskCardView ? "max-w-3xl" : "max-w-6xl"
         )}> 
-          {children || <Outlet />}
+          <Outlet /> {/* Renderiza a rota aninhada atual */}
         </div>
       </main>
     </div>

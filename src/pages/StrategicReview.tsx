@@ -1,6 +1,6 @@
-
 import React, { useState, useMemo, useEffect } from 'react';
 import { useAppContext } from '@/context/AppContext';
+import { useAuth } from '@/auth/useAuth';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Calendar } from '@/components/ui/calendar';
 import { format, isSameDay, startOfDay, endOfDay } from 'date-fns';
@@ -20,10 +20,16 @@ import { cn } from '@/lib/utils';
 // Main Strategic Review Page Component
 const StrategicReview: React.FC = () => {
   const { state } = useAppContext();
+  const { isAuthenticated } = useAuth();
   const [period, setPeriod] = useState<PeriodType>('week');
   const [customStartDate, setCustomStartDate] = useState<Date | undefined>(undefined);
   const [customEndDate, setCustomEndDate] = useState<Date | undefined>(undefined);
   const [showCustomDatePicker, setShowCustomDatePicker] = useState(false);
+  
+  // Verificação de autenticação em cada renderização
+  useEffect(() => {
+    console.log("StrategicReview: Estado de autenticação =>", isAuthenticated ? "Autenticado" : "Não autenticado");
+  }, [isAuthenticated]);
   
   // Use the task pillars hook to ensure all tasks have pillars assigned
   const { assignMissingPillars } = useTaskPillars();

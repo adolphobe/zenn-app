@@ -1,9 +1,10 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { AuthContext, AuthErrorType } from './AuthContext';
-import { simulateLogin, getStoredAuth, clearAuth, storeAuth } from '../mock/authUtils';
+import { simulateLogin, getStoredAuth, clearAuth, storeAuth, isAuthValid, wasTokenRecentlyVerified } from '../mock/authUtils';
 import { updateUserPreferences, applyUserPreferences } from '../mock/users';
 import { User } from '../types/user';
+import { useLocation } from 'react-router-dom';
 
 const PENDING_LOGIN_KEY = 'acto_pending_login';
 
@@ -12,6 +13,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isLoading, setIsLoading] = useState(true);
   const [authError, setAuthError] = useState<AuthErrorType>(null);
   const [pendingLoginState, setPendingLoginState] = useState<boolean>(false);
+  const location = useLocation();
   
   // Verifica se há um login pendente armazenado
   const checkPendingLogin = () => {
@@ -29,60 +31,83 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setPendingLoginState(false);
   };
   
+  // Verificar a autenticação - agora como uma função que pode ser chamada de vários pontos
+  const checkAuth = useCallback(async () => {
+    console.log("AuthProvider: Verificando autenticação...");
+    try {
+      const { user, isValid } = getStoredAuth();
+      
+      if (isValid && user) {
+        console.log("AuthProvider: Autenticação válida encontrada");
+        setCurrentUser(user);
+        setAuthError(null);
+        
+        // Apply user preferences
+        if (user.preferences) {
+          applyUserPreferences(user.preferences);
+        }
+      } else {
+        console.log("AuthProvider: Autenticação inválida ou não encontrada");
+        // Verifica se há um login pendente
+        if (checkPendingLogin()) {
+          setAuthError('connection_lost');
+        } else if (isValid === false) {
+          setAuthError('session_expired');
+        }
+        setCurrentUser(null);
+      }
+    } catch (error) {
+      console.error("AuthProvider: Erro ao verificar autenticação", error);
+      setCurrentUser(null);
+      setAuthError('connection_lost');
+    } finally {
+      console.log("AuthProvider: Verificação de autenticação concluída");
+      setIsLoading(false);
+    }
+  }, []);
+  
   // Check for existing authentication on mount
   useEffect(() => {
-    const checkAuth = async () => {
-      console.log("AuthProvider: Checking authentication...");
-      try {
-        const { user, isValid } = getStoredAuth();
-        
-        if (isValid && user) {
-          console.log("AuthProvider: Found valid authentication");
-          setCurrentUser(user);
-          
-          // Apply user preferences
-          if (user.preferences) {
-            applyUserPreferences(user.preferences);
-          }
-        } else {
-          console.log("AuthProvider: No valid authentication found");
-          // Verifica se há um login pendente
-          if (checkPendingLogin()) {
-            setAuthError('connection_lost');
-          } else if (isValid === false) {
-            setAuthError('session_expired');
-          }
-          setCurrentUser(null);
-        }
-      } catch (error) {
-        console.error("AuthProvider: Error checking authentication", error);
-        setCurrentUser(null);
-        setAuthError('connection_lost');
-      } finally {
-        console.log("AuthProvider: Authentication check complete");
-        setIsLoading(false);
-      }
-    };
-    
     checkAuth();
-  }, []);
+  }, [checkAuth]);
   
   // Verificar periodicamente a validade do token (a cada 5 minutos)
   useEffect(() => {
     if (!currentUser) return;
     
     const checkTokenValidity = () => {
-      const { isValid } = getStoredAuth();
-      if (!isValid) {
-        console.log("AuthProvider: Token expired during session");
-        setAuthError('session_expired');
-        setCurrentUser(null);
+      if (!wasTokenRecentlyVerified(30)) {  // Só verifica se não foi verificado nos últimos 30 segundos
+        const { isValid } = getStoredAuth();
+        if (!isValid) {
+          console.log("AuthProvider: Token expirou durante a sessão");
+          setAuthError('session_expired');
+          setCurrentUser(null);
+        }
       }
     };
     
-    const intervalId = setInterval(checkTokenValidity, 5 * 60 * 1000);
+    const intervalId = setInterval(checkTokenValidity, 60 * 1000); // Verificar a cada 1 minuto
     return () => clearInterval(intervalId);
   }, [currentUser]);
+  
+  // Verificar autenticação em cada mudança de rota para maior segurança
+  useEffect(() => {
+    if (location.pathname.startsWith('/dashboard') || 
+        location.pathname === '/strategic-review' ||
+        location.pathname === '/history') {
+      console.log(`AuthProvider: Mudança para rota protegida "${location.pathname}" - verificando autenticação`);
+      
+      // Verifica se o token foi verificado recentemente para evitar muitas chamadas
+      if (!wasTokenRecentlyVerified(5)) {
+        const { isValid } = getStoredAuth();
+        if (!isValid && currentUser) {
+          console.log("AuthProvider: Token inválido detectado na mudança de rota");
+          setAuthError('session_expired');
+          setCurrentUser(null);
+        }
+      }
+    }
+  }, [location.pathname, currentUser]);
   
   const login = async (email: string, password: string): Promise<boolean> => {
     setIsLoading(true);
@@ -96,7 +121,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { success, user } = simulateLogin(email, password);
       
       if (success && user) {
-        console.log("AuthProvider: Login successful");
+        console.log("AuthProvider: Login bem-sucedido");
         setCurrentUser(user);
         
         // Apply user preferences
@@ -113,12 +138,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return true;
       }
       
-      console.log("AuthProvider: Login failed - invalid credentials");
+      console.log("AuthProvider: Falha no login - credenciais inválidas");
       setAuthError('invalid_credentials');
       clearPendingLogin();
       return false;
     } catch (error) {
-      console.error("AuthProvider: Login error", error);
+      console.error("AuthProvider: Erro durante login", error);
       setAuthError('connection_lost');
       return false;
     } finally {
@@ -143,7 +168,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       clearPendingLogin();
       return false;
     } catch (error) {
-      console.error("AuthProvider: Resume login error", error);
+      console.error("AuthProvider: Erro ao retomar login", error);
       return false;
     } finally {
       setIsLoading(false);
@@ -151,13 +176,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
   
   const logout = () => {
-    console.log("AuthProvider: Logging out");
+    console.log("AuthProvider: Realizando logout");
     if (currentUser) {
       try {
         // Save current preferences before logout
         updateUserPreferences(currentUser.id, currentUser.preferences);
       } catch (error) {
-        console.error("AuthProvider: Error saving preferences during logout", error);
+        console.error("AuthProvider: Erro ao salvar preferências durante logout", error);
       }
     }
     
