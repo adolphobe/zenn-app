@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User, UserPreferences } from '../types/user';
 import { 
@@ -8,7 +9,7 @@ import {
   loadUserPreferences 
 } from '../mock/users';
 import { useNavigate } from 'react-router-dom';
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/use-toast-context";
 
 interface UserContextType {
   currentUser: User | null;
@@ -24,7 +25,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
-  const { toast } = useToast();
+  const { addToast } = useToast();
 
   // Initialize user from localStorage on component mount
   useEffect(() => {
@@ -84,7 +85,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Update last login time
       updateUserPreferences(user.id, {});
       
-      toast({
+      addToast({
         title: "Bem-vindo de volta!",
         description: "Login realizado com sucesso",
       });
@@ -93,7 +94,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return true;
     }
     
-    toast({
+    addToast({
       variant: "destructive",
       title: "Erro de login",
       description: "Email ou senha incorretos",
@@ -114,7 +115,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.removeItem('acto_is_logged_in');
     setCurrentUser(null);
     
-    toast({
+    addToast({
       title: "Logout realizado",
       description: "Você foi desconectado com sucesso."
     });
