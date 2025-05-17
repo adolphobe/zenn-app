@@ -448,15 +448,14 @@ const Landing: React.FC = () => {
           </div>
         </div>
         
-        {/* Scroll indicator */}
-        <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 flex flex-col items-center opacity-0 animate-pulse" style={{ animation: 'fadeUp 2s ease-out 2s forwards, pulse 2s infinite' }}>
-          <p className="text-gray-600 mb-2 text-sm">Conheça mais</p>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M7 13L12 18L17 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            <path d="M7 7L12 12L17 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        </div>
-      </section>
+       {/* Scroll indicator */}
+      <div className="absolute bottom-10 left-0 right-0 mx-auto w-max flex flex-col items-center opacity-0 animate-pulse" style={{ animation: 'fadeUp 2s ease-out 2s forwards, pulse 2s infinite' }}>
+        <p className="text-gray-600 mb-2 text-sm">Conheça mais</p>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M7 13L12 18L17 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          <path d="M7 7L12 12L17 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      </div>
 
       {/* Features Section - ENHANCED */}
       <section className="pt-32 pb-10 relative z-10 overflow-hidden bg-gradient-to-b from-white to-blue-50">
