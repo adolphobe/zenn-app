@@ -1,12 +1,19 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 import { LogOut, User as UserIcon } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
 const UserMenu: React.FC = () => {
-  const { currentUser, logout } = useAuth();
+  const { currentUser, logout, isAuthenticated, session } = useAuth();
+
+  // Log de estado de autenticação para debugging
+  useEffect(() => {
+    console.log("[UserMenu] Estado de autenticação:", isAuthenticated ? "Autenticado" : "Não autenticado");
+    console.log("[UserMenu] Usuário atual:", currentUser?.email || "Nenhum usuário");
+    console.log("[UserMenu] Sessão ativa:", !!session ? "Sim" : "Não");
+  }, [isAuthenticated, currentUser, session]);
 
   const handleLogout = async () => {
     try {
@@ -41,7 +48,10 @@ const UserMenu: React.FC = () => {
     }
   };
 
-  if (!currentUser) return null;
+  if (!currentUser) {
+    console.log("[UserMenu] UserMenu não renderizado - usuário não encontrado");
+    return null;
+  }
 
   return (
     <div className="p-4 border-t border-gray-200 dark:border-gray-700 mt-auto">

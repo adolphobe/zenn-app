@@ -11,17 +11,26 @@ import { cn } from '@/lib/utils';
  * Now enhanced to properly check authentication status but doesn't redirect
  */
 export const PrivateRoute = () => {
-  const { isAuthenticated, isLoading, currentUser } = useAuth();
+  const { isAuthenticated, isLoading, currentUser, session } = useAuth();
   const location = useLocation();
   const { isOpen: sidebarOpen, open: openSidebar, isMobile } = useSidebar();
 
+  // Log detailed authentication information for debugging
   console.log(`[PrivateRoute] Verificando autenticação em ${location.pathname}, isAuthenticated: ${isAuthenticated}, isLoading: ${isLoading}`);
   console.log(`[PrivateRoute] DETALHES EM PORTUGUÊS: Verificando se o usuário está autenticado para acessar a rota ${location.pathname}`);
+  console.log(`[PrivateRoute] DETALHES DE SESSÃO:`, { 
+    hasSession: !!session, 
+    sessionExpiry: session?.expires_at ? new Date(session.expires_at * 1000).toISOString() : 'N/A',
+    sessionAcquiredAt: session?.created_at ? new Date(session.created_at * 1000).toISOString() : 'N/A' 
+  });
   
   if (currentUser) {
     console.log(`[PrivateRoute] Usuário encontrado:`, currentUser.email);
+    console.log(`[PrivateRoute] DETALHES DO USUÁRIO:`, { id: currentUser.id, email: currentUser.email });
   } else {
     console.log(`[PrivateRoute] Nenhum usuário encontrado no contexto de autenticação`);
+    console.log(`[PrivateRoute] DETALHES: Verificando localStorage para tokens...`);
+    console.log(`[PrivateRoute] Token no localStorage:`, !!localStorage.getItem('sb-wbvxnapruffchikhrqrs-auth-token'));
   }
 
   // Show loading state while checking authentication
@@ -55,6 +64,15 @@ export const PrivateRoute = () => {
           <p className="text-sm text-gray-500 mt-4">
             Path: {location.pathname} | Auth Status: {isAuthenticated ? "Autenticado" : "Não Autenticado"}
           </p>
+          
+          <div className="mt-6">
+            <a 
+              href="/login" 
+              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+            >
+              Ir para Login manualmente
+            </a>
+          </div>
         </div>
       </div>
     );

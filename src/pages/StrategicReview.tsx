@@ -21,16 +21,31 @@ import { cn } from '@/lib/utils';
 // Main Strategic Review Page Component
 const StrategicReview: React.FC = () => {
   const { state } = useAppContext();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isLoading, currentUser, session } = useAuth();
   const [period, setPeriod] = useState<PeriodType>('week');
   const [customStartDate, setCustomStartDate] = useState<Date | undefined>(undefined);
   const [customEndDate, setCustomEndDate] = useState<Date | undefined>(undefined);
   const [showCustomDatePicker, setShowCustomDatePicker] = useState(false);
   
-  // Verificação simples de autenticação
+  // Verificação detalhada de autenticação
   useEffect(() => {
-    console.log("StrategicReview: Estado de autenticação =>", isAuthenticated ? "Autenticado" : "Não autenticado");
-  }, [isAuthenticated]);
+    console.log("[StrategicReview] Inicializando componente de revisão estratégica");
+    console.log("[StrategicReview] Estado de autenticação =>", isAuthenticated ? "Autenticado" : "Não autenticado");
+    console.log("[StrategicReview] Estado de carregamento =>", isLoading ? "Carregando" : "Carregamento concluído");
+    console.log("[StrategicReview] Usuário atual =>", currentUser?.email || "Nenhum usuário");
+    console.log("[StrategicReview] Sessão =>", !!session ? "Ativa" : "Inativa");
+    
+    if (session) {
+      console.log("[StrategicReview] DETALHES DA SESSÃO:", {
+        expira: session.expires_at ? new Date(session.expires_at * 1000).toISOString() : 'N/A',
+        criada: session.created_at ? new Date(session.created_at * 1000).toISOString() : 'N/A'
+      });
+    }
+    
+    // Verificar tokens no localStorage (apenas para debugging)
+    const hasTokenInStorage = !!localStorage.getItem('sb-wbvxnapruffchikhrqrs-auth-token');
+    console.log("[StrategicReview] Token no localStorage:", hasTokenInStorage ? "Presente" : "Ausente");
+  }, [isAuthenticated, isLoading, currentUser, session]);
   
   // Use the task pillars hook to ensure all tasks have pillars assigned
   const { assignMissingPillars } = useTaskPillars();
@@ -100,6 +115,43 @@ const StrategicReview: React.FC = () => {
   }, [dateRange, period, customStartDate, customEndDate]);
 
   const hasCompletedTasks = filteredTasks.length > 0;
+  
+  // Se estiver carregando ou não estiver autenticado, exibe mensagem apropriada
+  if (isLoading) {
+    console.log("[StrategicReview] Ainda verificando autenticação...");
+    return <div className="flex items-center justify-center min-h-screen">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+    </div>;
+  }
+  
+  if (!isAuthenticated) {
+    console.error("[StrategicReview] ERRO: Tentativa de acessar página protegida sem autenticação");
+    console.error("[StrategicReview] DETALHES EM PORTUGUÊS: Você precisa estar logado para acessar esta página");
+    
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-red-50">
+        <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full border-l-4 border-red-500">
+          <h1 className="text-2xl font-bold text-red-700 mb-4">Acesso Restrito</h1>
+          <p className="mb-4 text-gray-700">
+            Você não está autenticado e está tentando acessar a página de Revisão Estratégica.
+          </p>
+          <p className="mb-4 text-gray-700">
+            Em uma versão normal, você seria redirecionado para a página de login, 
+            mas o redirecionamento automático foi desativado.
+          </p>
+          
+          <div className="mt-6">
+            <a 
+              href="/login" 
+              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+            >
+              Ir para Login manualmente
+            </a>
+          </div>
+        </div>
+      </div>
+    );
+  }
   
   return (
     <div className="w-full">
