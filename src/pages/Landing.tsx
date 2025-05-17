@@ -276,60 +276,70 @@ const Landing: React.FC = () => {
             <div className={`relative w-full h-[600px] transition-all duration-1000 ease-in-out ${
               loaded ? 'opacity-100' : 'opacity-0'
             }`}>
-              {/* 3D image com círculos totalmente chapados - estilo minimalista */}
+              {/* ESTILO A PARTIR DAQUI */}
+              {/* 3D image com círculos em estilo neomorfismo */}
               <div className="absolute inset-0 flex items-center justify-center">
-                // Estilo #3 - Flat design moderno com cores suaves
-
-{/* 3D image com círculos no estilo flat design */}
-<div className="absolute inset-0 flex items-center justify-center">
-  {/* Primeiro círculo (maior) - estilo flat com borda */}
-  <div 
-    className="w-[350px] h-[350px] rounded-full animate-crystal-pulse"
-    style={{
-      backgroundColor: 'rgba(111, 166, 255, 0.15)',
-      border: '2px solid rgba(111, 166, 255, 0.3)'
-    }}
-  >
-    {/* Pequeno círculo simbolizando o primeiro círculo do logo */}
-    <div 
-      className="absolute top-[25%] left-[25%] w-[15px] h-[15px] rounded-full"
-      style={{ backgroundColor: 'rgba(111, 166, 255, 0.5)' }}
-    ></div>
-  </div>
-  
-  {/* Segundo círculo (médio) - estilo flat com borda */}
-  <div 
-    className="absolute w-[300px] h-[300px] rounded-full animate-floating-enhanced" 
-    style={{ 
-      animationDuration: '10s',
-      backgroundColor: 'rgba(92, 143, 255, 0.12)',
-      border: '2px solid rgba(92, 143, 255, 0.25)'
-    }}
-  >
-    {/* Pequeno círculo simbolizando o segundo círculo do logo */}
-    <div 
-      className="absolute top-[35%] left-[65%] w-[12px] h-[12px] rounded-full"
-      style={{ backgroundColor: 'rgba(92, 143, 255, 0.4)' }}
-    ></div>
-  </div>
-  
-  {/* Terceiro círculo (menor) - estilo flat com borda */}
-  <div 
-    className="absolute w-[250px] h-[250px] rounded-full animate-floating-enhanced" 
-    style={{ 
-      animationDuration: '8s', 
-      animationDelay: '1s',
-      backgroundColor: 'rgba(93, 156, 255, 0.1)',
-      border: '2px solid rgba(93, 156, 255, 0.2)'
-    }}
-  >
-    {/* Pequeno círculo simbolizando o terceiro círculo do logo */}
-    <div 
-      className="absolute top-[60%] left-[45%] w-[10px] h-[10px] rounded-full"
-      style={{ backgroundColor: 'rgba(93, 156, 255, 0.35)' }}
-    ></div>
-  </div>
-</div>
+                {/* Primeiro círculo (maior) - estilo neomorfismo */}
+                <div 
+                  className="w-[350px] h-[350px] rounded-full animate-crystal-pulse"
+                  style={{
+                    backgroundColor: 'rgba(236, 245, 255, 0.15)',
+                    boxShadow: '10px 10px 20px rgba(180, 200, 230, 0.15), -10px -10px 20px rgba(255, 255, 255, 0.2)',
+                    border: '1px solid rgba(255, 255, 255, 0.15)'
+                  }}
+                >
+                  {/* Pequeno círculo simbolizando o primeiro círculo do logo */}
+                  <div 
+                    className="absolute top-[25%] left-[25%] w-[15px] h-[15px] rounded-full"
+                    style={{ 
+                      backgroundColor: 'rgba(111, 166, 255, 0.3)',
+                      boxShadow: '1px 1px 2px rgba(111, 166, 255, 0.15), -1px -1px 2px rgba(255, 255, 255, 0.25)' 
+                    }}
+                  ></div>
+                </div>
+                
+                {/* Segundo círculo (médio) - estilo neomorfismo */}
+                <div 
+                  className="absolute w-[300px] h-[300px] rounded-full animate-floating-enhanced" 
+                  style={{ 
+                    animationDuration: '10s',
+                    backgroundColor: 'rgba(236, 245, 255, 0.12)',
+                    boxShadow: '8px 8px 16px rgba(180, 200, 230, 0.15), -8px -8px 16px rgba(255, 255, 255, 0.2)',
+                    border: '1px solid rgba(255, 255, 255, 0.15)'
+                  }}
+                >
+                  {/* Pequeno círculo simbolizando o segundo círculo do logo */}
+                  <div 
+                    className="absolute top-[35%] left-[65%] w-[12px] h-[12px] rounded-full"
+                    style={{ 
+                      backgroundColor: 'rgba(92, 143, 255, 0.25)',
+                      boxShadow: '1px 1px 2px rgba(92, 143, 255, 0.15), -1px -1px 2px rgba(255, 255, 255, 0.25)' 
+                    }}
+                  ></div>
+                </div>
+                
+                {/* Terceiro círculo (menor) - estilo neomorfismo */}
+                <div 
+                  className="absolute w-[250px] h-[250px] rounded-full animate-floating-enhanced" 
+                  style={{ 
+                    animationDuration: '8s', 
+                    animationDelay: '1s',
+                    backgroundColor: 'rgba(236, 245, 255, 0.1)',
+                    boxShadow: '6px 6px 12px rgba(180, 200, 230, 0.15), -6px -6px 12px rgba(255, 255, 255, 0.2)',
+                    border: '1px solid rgba(255, 255, 255, 0.15)'
+                  }}
+                >
+                  {/* Pequeno círculo simbolizando o terceiro círculo do logo */}
+                  <div 
+                    className="absolute top-[60%] left-[45%] w-[10px] h-[10px] rounded-full"
+                    style={{ 
+                      backgroundColor: 'rgba(93, 156, 255, 0.2)',
+                      boxShadow: '1px 1px 2px rgba(93, 156, 255, 0.1), -1px -1px 2px rgba(255, 255, 255, 0.2)' 
+                    }}
+                  ></div>
+                </div>
+              </div>
+              {/* TERMINA AQUI */}
             </div>
           )}
         </div>
