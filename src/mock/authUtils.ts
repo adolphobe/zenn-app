@@ -10,10 +10,18 @@ const TOKEN_LAST_VERIFIED_KEY = 'acto_token_last_verified';
 const USER_PREFERENCES_KEY = 'acto_user_preferences_';
 
 /**
+ * Função de log com timestamp para autenticação
+ */
+export const authLog = (message: string, ...data: any[]) => {
+  const timestamp = new Date().toISOString();
+  console.log(`[AUTH ${timestamp}] ${message}`, ...data);
+};
+
+/**
  * Simulates a login by checking credentials against the mock users
  */
 export const simulateLogin = (email: string, password: string): { success: boolean; user: User | null } => {
-  console.log("Auth: Tentando login para", email);
+  authLog("Tentando login para", email);
   const user = getUserByCredentials(email, password);
   if (user) {
     // Create a simple token (in a real app, this would be JWT or similar)
@@ -43,7 +51,7 @@ export const storeAuth = (user: User, token: string): void => {
   // Limpar qualquer estado de reconexão
   localStorage.removeItem(CONNECTION_RETRY_KEY);
   
-  console.log("Auth: Token armazenado e expira em", expiresAt, "para usuário", user.id);
+  authLog("Token armazenado e expira em " + expiresAt + " para usuário " + user.id);
 };
 
 /**
@@ -54,6 +62,8 @@ export const getStoredAuth = (): { user: User | null; isValid: boolean; token: s
   const userId = localStorage.getItem(USER_ID_KEY);
   const isLoggedIn = localStorage.getItem(IS_LOGGED_IN_KEY) === 'true';
   const tokenExpires = localStorage.getItem(`${TOKEN_KEY}_expires`);
+  
+  authLog(`Verificando token: token=${!!token}, userId=${userId}, isLoggedIn=${isLoggedIn}, expira=${tokenExpires || 'N/A'}`);
   
   // Registra a verificação do token com timestamp
   const now = new Date();
@@ -66,7 +76,7 @@ export const getStoredAuth = (): { user: User | null; isValid: boolean; token: s
   
   if (token && userId && isLoggedIn && !isExpired) {
     const user = getUserById(userId);
-    console.log(`Auth: [${now.toISOString()}] Token válido para usuário`, userId);
+    authLog(`Token válido para usuário ${userId}, expira em ${tokenExpires}`);
     return { 
       user, 
       isValid: !!user, 
@@ -74,12 +84,15 @@ export const getStoredAuth = (): { user: User | null; isValid: boolean; token: s
     };
   }
   
+  // If any condition fails, log exactly why
+  if (!token) authLog("Falha na autenticação: token ausente");
+  if (!userId) authLog("Falha na autenticação: userId ausente");
+  if (!isLoggedIn) authLog("Falha na autenticação: isLoggedIn ausente ou falso");
+  if (isExpired && tokenExpires) authLog(`Falha na autenticação: token expirado em ${tokenExpires}, agora é ${now.toISOString()}`);
+  
   // If any condition fails, clear auth data
   if ((token || userId || isLoggedIn) && (isExpired || !token || !userId || !isLoggedIn)) {
-    console.log(`Auth: [${now.toISOString()}] Token inválido ou expirado. Limpando dados de autenticação.`);
-    if (isExpired && tokenExpires) {
-      console.log(`Auth: Token expirado em ${new Date(tokenExpires).toISOString()}, agora é ${now.toISOString()}`);
-    }
+    authLog("Limpando dados de autenticação devido a falha nas condições");
     clearAuth();
   }
   
@@ -91,19 +104,23 @@ export const getStoredAuth = (): { user: User | null; isValid: boolean; token: s
  */
 export const storeConnectionRetry = (email: string): void => {
   localStorage.setItem(CONNECTION_RETRY_KEY, email);
+  authLog(`Estado de reconexão armazenado para ${email}`);
 };
 
 /**
  * Gets connection retry state
  */
 export const getConnectionRetry = (): string | null => {
-  return localStorage.getItem(CONNECTION_RETRY_KEY);
+  const email = localStorage.getItem(CONNECTION_RETRY_KEY);
+  authLog(`Verificando estado de reconexão: ${email || 'nenhum'}`);
+  return email;
 };
 
 /**
  * Clears connection retry state
  */
 export const clearConnectionRetry = (): void => {
+  authLog("Limpando estado de reconexão");
   localStorage.removeItem(CONNECTION_RETRY_KEY);
 };
 
@@ -111,7 +128,7 @@ export const clearConnectionRetry = (): void => {
  * Clears authentication data from localStorage
  */
 export const clearAuth = (): void => {
-  console.log(`Auth: [${new Date().toISOString()}] Limpando dados de autenticação`);
+  authLog("Limpando dados de autenticação");
   localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem(USER_ID_KEY);
   localStorage.removeItem(IS_LOGGED_IN_KEY);
@@ -123,7 +140,7 @@ export const clearAuth = (): void => {
  * Checks if authentication is valid
  */
 export const isAuthValid = (): boolean => {
-  console.log(`Auth: [${new Date().toISOString()}] Verificando validade do token`);
+  authLog("Verificando validade do token");
   const { isValid } = getStoredAuth();
   return isValid;
 };
@@ -134,13 +151,16 @@ export const isAuthValid = (): boolean => {
  */
 export const wasTokenRecentlyVerified = (maxAgeSeconds = 10): boolean => {
   const lastVerified = localStorage.getItem(TOKEN_LAST_VERIFIED_KEY);
-  if (!lastVerified) return false;
+  if (!lastVerified) {
+    authLog("Token nunca foi verificado");
+    return false;
+  }
   
   const lastVerifiedTime = new Date(lastVerified).getTime();
   const currentTime = new Date().getTime();
   const secondsSinceVerification = (currentTime - lastVerifiedTime) / 1000;
   
-  console.log(`Auth: Última verificação há ${secondsSinceVerification.toFixed(1)} segundos`);
+  authLog(`Última verificação há ${secondsSinceVerification.toFixed(1)} segundos`);
   
   return secondsSinceVerification <= maxAgeSeconds;
 };
@@ -159,7 +179,7 @@ export const updateUserPreferences = (userId: string, preferences: Record<string
     // Merge new preferences with existing ones
     const updatedPrefs = { ...currentPrefs, ...preferences };
     localStorage.setItem(key, JSON.stringify(updatedPrefs));
-    console.log(`Auth: Preferências atualizadas para usuário ${userId}`, updatedPrefs);
+    authLog(`Preferências atualizadas para usuário ${userId}`, updatedPrefs);
   } catch (error) {
     console.error(`Auth: Erro ao atualizar preferências para usuário ${userId}`, error);
   }
@@ -171,18 +191,18 @@ export const updateUserPreferences = (userId: string, preferences: Record<string
  */
 export const applyUserPreferences = (preferences: Record<string, any>): void => {
   try {
-    console.log("Auth: Aplicando preferências do usuário:", preferences);
+    authLog("Aplicando preferências do usuário:", preferences);
     
     // Apply theme if present
     if (preferences.theme) {
       document.documentElement.setAttribute('data-theme', preferences.theme);
-      console.log(`Auth: Tema aplicado: ${preferences.theme}`);
+      authLog(`Tema aplicado: ${preferences.theme}`);
     }
     
     // Apply language if present
     if (preferences.language) {
       document.documentElement.setAttribute('lang', preferences.language);
-      console.log(`Auth: Idioma aplicado: ${preferences.language}`);
+      authLog(`Idioma aplicado: ${preferences.language}`);
     }
     
     // Apply other preferences as needed
