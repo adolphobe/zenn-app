@@ -1,15 +1,21 @@
 
 import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import LoginForm from '../components/LoginForm';
 import SignupForm from '../components/SignupForm';
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { isAuthenticated, isLoading } = useAuth();
   const [isSignup, setIsSignup] = React.useState(false);
   const [loaded, setLoaded] = React.useState(false);
   
-  // Controlar carregamento visual suave
+  // Get redirect path from location state or default to dashboard
+  const from = location.state?.from?.pathname || "/dashboard";
+  
+  // Smooth visual loading
   useEffect(() => {
     const timer = setTimeout(() => {
       setLoaded(true);
@@ -18,12 +24,19 @@ const Login: React.FC = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  // Alternar entre login e signup
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated && !isLoading) {
+      navigate(from, { replace: true });
+    }
+  }, [isAuthenticated, isLoading, navigate, from]);
+
+  // Toggle between login and signup
   const toggleSignup = () => {
     setIsSignup(!isSignup);
   };
 
-  // Componentes visuais para o fundo com animações
+  // Background animation elements
   const floatingItems = Array(7).fill(null).map((_, i) => (
     <div 
       key={i}
@@ -102,9 +115,9 @@ const Login: React.FC = () => {
           </div>
 
           {isSignup ? (
-            <SignupForm onCancel={toggleSignup} redirectPath="/dashboard" />
+            <SignupForm onCancel={toggleSignup} />
           ) : (
-            <LoginForm onSwitchToSignup={toggleSignup} redirectPath="/dashboard" />
+            <LoginForm onSwitchToSignup={toggleSignup} />
           )}
         </div>
 

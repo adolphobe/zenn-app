@@ -1,6 +1,5 @@
 
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -9,6 +8,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from '@/hooks/use-toast';
+import { useAuth } from '@/context/AuthContext';
 
 const loginSchema = z.object({
   email: z.string().email("Digite um e-mail válido"),
@@ -19,12 +19,11 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 
 interface LoginFormProps {
   onSuccess?: () => void;
-  redirectPath?: string;
   onSwitchToSignup: () => void;
 }
 
-const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, redirectPath = "/dashboard", onSwitchToSignup }) => {
-  const navigate = useNavigate();
+const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onSwitchToSignup }) => {
+  const { login } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -37,28 +36,35 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, redirectPath = "/dashb
   });
 
   const onSubmit = async (values: LoginFormValues) => {
-    // Simulando um login para fins de demonstração
     setIsLoading(true);
     
-    // Simula carregamento
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      const success = await login(values.email, values.password);
       
-      // Mostrar toast de sucesso
+      if (!success) {
+        toast({
+          title: "Erro de login",
+          description: "Verifique seu email e senha e tente novamente",
+          variant: "destructive",
+        });
+      } else if (onSuccess) {
+        onSuccess();
+      }
+    } catch (error) {
       toast({
-        title: "Login demonstrativo",
-        description: "Navegando para dashboard (sem autenticação)",
+        title: "Erro ao fazer login",
+        description: "Ocorreu um erro ao processar sua solicitação",
+        variant: "destructive",
       });
-      
-      // Redireciona para dashboard
-      navigate(redirectPath, { replace: true });
-      
-    }, 1000);
+      console.error("Login error:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
 
-  // Cores e ícones
+  // Colors and icons
   const iconColor = "text-gray-800 dark:text-gray-200"; 
   const eyeIconColor = "text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-100";
 

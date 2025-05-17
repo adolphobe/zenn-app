@@ -1,6 +1,5 @@
 
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock, User, CheckCircle } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -9,6 +8,8 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useAuth } from '@/context/AuthContext';
+import { toast } from '@/hooks/use-toast';
 
 const signupSchema = z.object({
   name: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
@@ -20,11 +21,10 @@ type SignupFormValues = z.infer<typeof signupSchema>;
 
 interface SignupFormProps {
   onCancel: () => void;
-  redirectPath?: string;
 }
 
-const SignupForm: React.FC<SignupFormProps> = ({ onCancel, redirectPath = "/dashboard" }) => {
-  const navigate = useNavigate();
+const SignupForm: React.FC<SignupFormProps> = ({ onCancel }) => {
+  const { signup } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [signupSuccess, setSignupSuccess] = useState<string | null>(null);
@@ -41,17 +41,28 @@ const SignupForm: React.FC<SignupFormProps> = ({ onCancel, redirectPath = "/dash
   const onSubmit = async (values: SignupFormValues) => {
     setIsLoading(true);
     
-    // Simula carregamento
-    setTimeout(() => {
+    try {
+      const success = await signup(values.email, values.password, values.name);
+      
+      if (success) {
+        setSignupSuccess("Conta criada com sucesso! Você já pode fazer login.");
+        form.reset();
+      }
+    } catch (error) {
+      toast({
+        title: "Erro ao criar conta",
+        description: "Ocorreu um erro ao processar sua solicitação",
+        variant: "destructive",
+      });
+      console.error("Signup error:", error);
+    } finally {
       setIsLoading(false);
-      setSignupSuccess("Conta criada com sucesso! Você já pode fazer login.");
-      form.reset();
-    }, 1000);
+    }
   };
 
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
 
-  // Cores e ícones
+  // Colors and icons
   const iconColor = "text-gray-800 dark:text-gray-200"; 
   const eyeIconColor = "text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-100";
 

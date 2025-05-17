@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/hooks/use-toast';
+import { useAuth } from '@/context/AuthContext';
 
 interface SidebarUserProfileProps {
   sidebarOpen: boolean;
@@ -13,48 +14,56 @@ interface SidebarUserProfileProps {
 
 const SidebarUserProfile: React.FC<SidebarUserProfileProps> = ({ sidebarOpen }) => {
   const navigate = useNavigate();
-  // Mock user data for demo purposes
-  const mockUser = {
-    name: "Usuário Demo",
-    email: "usuario@exemplo.com",
-    profileImage: ""
-  };
+  const { currentUser, logout } = useAuth();
 
-  const handleLogout = () => {
-    // Demonstrative only - just navigate to login
-    toast({
-      title: "Logout demonstrativo",
-      description: "Esta é uma demonstração de logout (sem autenticação real)",
-    });
-    navigate('/login');
+  const handleLogout = async () => {
+    try {
+      await logout();
+      toast({
+        title: "Logout realizado",
+        description: "Você foi desconectado com sucesso",
+      });
+      navigate('/login');
+    } catch (error) {
+      toast({
+        title: "Erro ao sair",
+        description: "Não foi possível fazer logout",
+        variant: "destructive",
+      });
+      console.error("Logout error:", error);
+    }
   };
 
   return (
     <div className="mt-auto">
       <Separator className="mb-4" />
       <div className={`px-4 pb-4 ${sidebarOpen ? 'space-y-2' : 'flex flex-col items-center'}`}>
-        {/* Perfil do usuário com indicador online */}
+        {/* User profile with online indicator */}
         <div className={`flex ${sidebarOpen ? 'items-start gap-3' : 'justify-center'}`}>
           <div className="relative">
             <Avatar className={`${sidebarOpen ? 'h-12 w-12' : 'h-10 w-10'} border-2 border-white shadow-sm`}>
-              <AvatarImage src={mockUser.profileImage} />
+              <AvatarImage src={currentUser?.profileImage} />
               <AvatarFallback className="bg-blue-100 text-blue-800">
                 <User size={sidebarOpen ? 24 : 18} />
               </AvatarFallback>
             </Avatar>
-            {/* Indicador de status online */}
+            {/* Online status indicator */}
             <div className="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full bg-green-500 border-2 border-white" />
           </div>
           
           {sidebarOpen && (
             <div className="flex flex-col min-w-0">
-              <span className="font-medium text-gray-800 dark:text-gray-200 truncate">{mockUser.name}</span>
-              <span className="text-xs text-gray-500 dark:text-gray-400 truncate">{mockUser.email}</span>
+              <span className="font-medium text-gray-800 dark:text-gray-200 truncate">
+                {currentUser?.name || "Usuário"}
+              </span>
+              <span className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                {currentUser?.email || "usuario@exemplo.com"}
+              </span>
             </div>
           )}
         </div>
         
-        {/* Botão de logout */}
+        {/* Logout button */}
         <Button 
           variant="outline"
           size={sidebarOpen ? "default" : "icon"}
