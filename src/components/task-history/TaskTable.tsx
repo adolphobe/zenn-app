@@ -16,7 +16,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from '@/components/ui/button';
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw, Eye } from 'lucide-react';
 import { useAppContext } from '@/context/AppContext';
 import CompletedTaskModal from './CompletedTaskModal';
 import RestoreTaskConfirmation from './RestoreTaskConfirmation';
@@ -71,6 +71,11 @@ export const CompletedTaskRow: React.FC<{ task: Task }> = ({ task }) => {
     setShowRestoreConfirmation(true);
   };
 
+  const handleView = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setShowTaskModal(true);
+  };
+
   const handleRowClick = () => {
     setShowTaskModal(true);
   };
@@ -84,18 +89,32 @@ export const CompletedTaskRow: React.FC<{ task: Task }> = ({ task }) => {
         <TableCell className="capitalize">{dominantPillar}</TableCell>
         <TableCell>{task.feedback ? feedbackLabels[task.feedback] : '-'}</TableCell>
         <TableCell>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className="flex items-center gap-1"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleRestore(e);
-            }}
-          >
-            <RefreshCw size={16} />
-            Restaurar
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="flex items-center gap-1"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleView(e);
+              }}
+            >
+              <Eye size={16} />
+              Visualizar
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="flex items-center gap-1"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleRestore(e);
+              }}
+            >
+              <RefreshCw size={16} />
+              Restaurar
+            </Button>
+          </div>
         </TableCell>
       </TableRow>
 

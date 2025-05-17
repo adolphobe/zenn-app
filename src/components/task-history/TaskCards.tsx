@@ -6,12 +6,13 @@ import { Task } from '@/types';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw, Eye } from 'lucide-react';
 import { useAppContext } from '@/context/AppContext';
 import { useExpandedTask } from '@/context/hooks';
 import TaskPillarDetails from '@/components/TaskPillarDetails';
 import TaskComments from '@/components/TaskComments';
 import RestoreTaskConfirmation from './RestoreTaskConfirmation';
+import CompletedTaskModal from './CompletedTaskModal';
 
 interface TaskGroup {
   label: string;
@@ -24,6 +25,7 @@ export const CompletedTaskCard: React.FC<{ task: Task }> = ({ task }) => {
   const { expandedTaskId, toggleTaskExpanded, isTaskExpanded } = useExpandedTask();
   const expanded = isTaskExpanded(task.id);
   const [showRestoreConfirmation, setShowRestoreConfirmation] = useState(false);
+  const [showTaskModal, setShowTaskModal] = useState(false);
 
   // Determine dominant pillar based on scores
   const getDominantPillar = () => {
@@ -92,6 +94,11 @@ export const CompletedTaskCard: React.FC<{ task: Task }> = ({ task }) => {
     setShowRestoreConfirmation(true);
   };
 
+  const handleView = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setShowTaskModal(true);
+  };
+
   // Prevent expanded content from collapsing card on click
   const handleExpandedContentClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -140,7 +147,16 @@ export const CompletedTaskCard: React.FC<{ task: Task }> = ({ task }) => {
                 </div>
               )}
               
-              <div className="mt-4 flex justify-end">
+              <div className="mt-4 flex justify-end gap-2">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="flex items-center gap-1"
+                  onClick={handleView}
+                >
+                  <Eye size={16} />
+                  Visualizar
+                </Button>
                 <Button 
                   variant="outline" 
                   size="sm" 
@@ -155,6 +171,14 @@ export const CompletedTaskCard: React.FC<{ task: Task }> = ({ task }) => {
           )}
         </CardContent>
       </Card>
+
+      {showTaskModal && (
+        <CompletedTaskModal 
+          task={task} 
+          isOpen={showTaskModal} 
+          onClose={() => setShowTaskModal(false)} 
+        />
+      )}
 
       {showRestoreConfirmation && (
         <RestoreTaskConfirmation
