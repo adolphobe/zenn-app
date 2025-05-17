@@ -22,16 +22,18 @@ const Landing: React.FC = () => {
 
   // Parallax effect for background
   useEffect(() => {
-    const handleMouseMove = (e) => {
-      const parallaxBg = document.getElementById('parallax-bg');
-      if (parallaxBg) {
-        // Ajustado para um movimento um pouco mais suave mas ainda perceptível
-        const x = (window.innerWidth - e.pageX * 2.5) / 60;
-        const y = (window.innerHeight - e.pageY * 2.5) / 60;
-        
-        parallaxBg.style.transform = `scale(1.12) translate(${x}px, ${y}px)`;
-      }
-    };
+   const handleMouseMove = (e) => {
+  const parallaxBg = document.getElementById('parallax-bg');
+  if (parallaxBg) {
+    // Ajustado para um movimento mais suave e com melhor performance
+    const x = (window.innerWidth - e.pageX * 2) / 80;
+    const y = (window.innerHeight - e.pageY * 2) / 80;
+    
+    requestAnimationFrame(() => {
+      parallaxBg.style.transform = `scale(1.12) translate(${x}px, ${y}px)`;
+    });
+  }
+};
     
     window.addEventListener('mousemove', handleMouseMove);
     
@@ -308,7 +310,8 @@ const Landing: React.FC = () => {
           }
           
           .testimonial-card {
-            transition: all 0.5s ease-in-out;
+            transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out, filter 0.5s ease-in-out;
+            will-change: transform, opacity;
           }
           
           .testimonial-active {
@@ -338,7 +341,7 @@ const Landing: React.FC = () => {
               id="parallax-bg"
             />
             {/* Overlay com blur */}
-            <div className="absolute inset-0 bg-[#f9fbff]/50 backdrop-blur-[10px]"></div>
+            <div className="absolute inset-0 bg-[#f9fbff]/50 backdrop-blur-[6px]" style={{willChange: 'auto'}}></div>
           </div>
         </div>
         
@@ -460,8 +463,7 @@ const Landing: React.FC = () => {
       </section>
 
       {/* Features Section - ENHANCED */}
-     <section className="py-32 relative z-10 overflow-hidden bg-gradient-to-b from-white via-blue-100 to-white">
-
+     <section className="py-32 relative z-10 overflow-hidden bg-gradient-to-b from-white via-blue-100 to-white" style={{backfaceVisibility: 'hidden', transform: 'translateZ(0)'}}>
 
         {/* Animated blobs background */}
         <div className="blob-animation w-64 h-64 top-20 left-10" style={{ animation: 'float-around 25s infinite ease-in-out' }}></div>
