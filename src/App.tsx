@@ -4,7 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AppProvider } from "./context/AppProvider";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { ToastProvider } from "@/hooks/use-toast-context";
 import ActoApp from "./pages/ActoApp";
 import NotFound from "./pages/NotFound";
@@ -26,33 +26,31 @@ const App = () => (
         <ToastProvider>
           <Toaster />
           <Sonner />
-          <BrowserRouter>
-            <AuthProvider>
-              <UserProvider>
-                <Routes>
-                  {/* Rotas públicas */}
-                  <Route path="/" element={<Landing />} />
-                  <Route path="/login" element={<Login />} />
-                  
-                  {/* Rotas protegidas usando o PrivateRoute - estrutura unificada */}
-                  <Route element={<PrivateRoute />}>
-                    <Route path="/dashboard" element={<ActoApp />}>
-                      <Route index element={<Dashboard />} />
-                      <Route path="strategic-review" element={<StrategicReview />} />
-                      <Route path="history" element={<TaskHistory />} />
-                    </Route>
+          <AuthProvider>
+            <UserProvider>
+              <Routes>
+                {/* Rotas públicas */}
+                <Route path="/" element={<Landing />} />
+                <Route path="/login" element={<Login />} />
+                
+                {/* Rotas protegidas usando o PrivateRoute - estrutura unificada */}
+                <Route element={<PrivateRoute />}>
+                  <Route path="/dashboard" element={<ActoApp />}>
+                    <Route index element={<Dashboard />} />
+                    <Route path="strategic-review" element={<StrategicReview />} />
+                    <Route path="history" element={<TaskHistory />} />
                   </Route>
-                  
-                  {/* Redirecionamentos de rotas legadas para o novo padrão */}
-                  <Route path="/strategic-review" element={<Navigate to="/dashboard/strategic-review" replace />} />
-                  <Route path="/history" element={<Navigate to="/dashboard/history" replace />} />
-                  
-                  {/* Fallback para qualquer outra rota */}
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </UserProvider>
-            </AuthProvider>
-          </BrowserRouter>
+                </Route>
+                
+                {/* Redirecionamentos de rotas legadas para o novo padrão */}
+                <Route path="/strategic-review" element={<Navigate to="/dashboard/strategic-review" replace />} />
+                <Route path="/history" element={<Navigate to="/dashboard/history" replace />} />
+                
+                {/* Fallback para qualquer outra rota */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </UserProvider>
+          </AuthProvider>
         </ToastProvider>
       </AppProvider>
     </TooltipProvider>
