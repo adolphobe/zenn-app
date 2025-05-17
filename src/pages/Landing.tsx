@@ -100,7 +100,38 @@ const Landing: React.FC = () => {
           .animate-floating-enhanced {
             animation: floating-enhanced 12s ease-in-out infinite;
           }
-          
+
+
+          @keyframes slow-zoom {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.animate-slow-zoom {
+  animation: slow-zoom 20s ease-in-out infinite;
+}
+
+@keyframes subtle-glow {
+  0%, 100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+.animate-subtle-glow {
+  animation: subtle-glow 10s ease-in-out infinite;
+}
+
+
           /* Animação de pulso melhorada */
           @keyframes pulse-enhanced {
             0%, 100% {
@@ -175,34 +206,7 @@ const Landing: React.FC = () => {
           }
         `}
 
-        @keyframes slow-zoom {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.05);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-
-.animate-slow-zoom {
-  animation: slow-zoom 20s ease-in-out infinite;
-}
-
-@keyframes subtle-glow {
-  0%, 100% {
-    opacity: 0.5;
-  }
-  50% {
-    opacity: 0.6;
-  }
-}
-
-.animate-subtle-glow {
-  animation: subtle-glow 10s ease-in-out infinite;
-}
+        
       </style>
       
       {/* Main content */}
