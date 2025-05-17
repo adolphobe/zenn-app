@@ -12,7 +12,7 @@ const SidebarHeader: React.FC<SidebarHeaderProps> = ({ sidebarOpen, toggleSideba
       {sidebarOpen ? (
         <div className="flex items-center">
           <img 
-            src="https://cdn.shopify.com/s/files/1/0629/1993/4061/files/Sem_Titulo-8.jpg?v=1747284016" 
+            src="https://cdn.shopify.com/s/files/1/0629/1993/4061/files/loogzenn.png?v=1747447750" 
             alt="ACTO Logo" 
             className="h-6 max-w-[80px] object-contain" 
           />
