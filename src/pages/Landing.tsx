@@ -11,6 +11,9 @@ const Landing: React.FC = () => {
   const [showLogin, setShowLogin] = useState(false);
   const [activeTestimonial, setActiveTestimonial] = useState(0);
   
+  // State para forçar a key do container dos círculos a mudar
+  const [circlesKey, setCirclesKey] = useState(Date.now());
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setLoaded(true);
@@ -22,6 +25,13 @@ const Landing: React.FC = () => {
   const handleGetStarted = () => {
     setShowLogin(true);
   };
+
+  // Quando o login é fechado, mudamos a key para forçar a remontagem dos círculos
+  useEffect(() => {
+    if (!showLogin) {
+      setCirclesKey(Date.now());
+    }
+  }, [showLogin]);
 
   useEffect(() => {
     if (localStorage.getItem('acto_is_logged_in') === 'true') {
@@ -86,8 +96,7 @@ const Landing: React.FC = () => {
           }
           .animate-floating-enhanced { 
             animation: floating-enhanced 12s ease-in-out infinite;
-            /* Adicionar will-change para os círculos que animam transform e opacity */
-            will-change: transform, opacity;
+            will-change: transform, opacity; /* Movido para cá para ser mais específico */
            }
           @keyframes pulse-enhanced {
             0%, 100% { transform: scale(1); opacity: 0.3; }
@@ -95,8 +104,7 @@ const Landing: React.FC = () => {
           }
           .animate-pulse-enhanced { 
             animation: pulse-enhanced 8s ease-in-out infinite; 
-            /* Adicionar will-change para os círculos que animam transform e opacity */
-            will-change: transform, opacity;
+            will-change: transform, opacity; /* Movido para cá para ser mais específico */
           }
           @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
           .fade-up { animation: fadeUp 1.2s ease-out forwards; }
@@ -179,22 +187,49 @@ const Landing: React.FC = () => {
                 <div className={`w-full max-w-md bg-white/80 backdrop-blur-md p-8 rounded-xl ${showLogin ? 'slide-in' : ''}`}>
                   <div className="flex justify-between items-center mb-6">
                     <h3 className="text-xl font-semibold">Bem-vindo de volta!</h3>
-                    <button onClick={() => setShowLogin(false)} className="text-gray-400 hover:text-gray-600 transition-colors">✕</button>
+                    <button onClick={() => { setShowLogin(false); }} className="text-gray-400 hover:text-gray-600 transition-colors">✕</button>
                   </div>
                   <LoginForm />
                 </div>
               </div>
             ) : (
-              /* CORREÇÃO: Adicionar key ao container dos círculos e isolamento */
               <div 
-                key={showLogin ? 'login-inactive' : 'login-active-circles'} // Key muda quando showLogin muda
+                key={circlesKey} // Key muda para forçar remontagem
                 className={`relative w-full h-[600px] transition-all duration-1000 ease-in-out ${loaded ? 'opacity-100' : 'opacity-0'}`}
-                style={{ isolation: 'isolate', transform: 'translateZ(0)' }} // Adiciona isolamento e promove a camada
+                style={{ isolation: 'isolate', transform: 'translateZ(0)' }} 
               >
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-[350px] h-[350px] rounded-full backdrop-blur-sm animate-pulse-enhanced" style={{ backgroundColor: 'rgb(159 215 255)'}}></div>
-                  <div className="absolute w-[300px] h-[300px] rounded-full backdrop-blur-md animate-floating-enhanced" style={{ animationDuration: '10s', backgroundColor: 'rgb(164 211 245)'}}></div>
-                  <div className="absolute w-[250px] h-[250px] rounded-full backdrop-blur-md animate-floating-enhanced" style={{ animationDuration: '8s', animationDelay: '1s', backgroundColor: 'rgb(159 209 243)'}}></div>
+                  {/* Círculo 1 */}
+                  <div 
+                    className="w-[350px] h-[350px] rounded-full backdrop-blur-sm animate-pulse-enhanced" 
+                    style={{ 
+                      backgroundColor: 'rgb(159 215 255)',
+                      isolation: 'isolate', // Adicionado
+                      transform: 'translateZ(0px)' // Adicionado
+                    }}
+                  ></div>
+                  {/* Círculo 2 */}
+                  <div 
+                    className="absolute w-[300px] h-[300px] rounded-full backdrop-blur-md animate-floating-enhanced" 
+                    style={{ 
+                      animationDuration: '10s', 
+                      backgroundColor: 'rgb(164 211 245)',
+                      isolation: 'isolate', // Adicionado
+                      transform: 'translateZ(0px)' // Adicionado
+                    }}
+                  ></div>
+                  {/* Círculo 3 (problemático) */}
+                  <div 
+                    className="absolute w-[250px] h-[250px] rounded-full backdrop-blur-md animate-floating-enhanced" 
+                    style={{ 
+                      animationDuration: '8s', 
+                      animationDelay: '1s', 
+                      backgroundColor: 'rgb(159 209 243)',
+                      isolation: 'isolate', // Adicionado para o círculo específico
+                      transform: 'translateZ(0px)', // Adicionado para o círculo específico
+                      willChange: 'backdrop-filter, transform, opacity' // Mais específico
+                    }}
+                  ></div>
                 </div>
               </div>
             )}
@@ -210,6 +245,8 @@ const Landing: React.FC = () => {
       </div>
       </section>
 
+     {/* Seções restantes (Features, How It Works, Testimonials, CTA, Footer) permanecem as mesmas da versão anterior sem sombras */}
+     {/* ... (cole o restante do código aqui, igual à versão anterior que você aprovou para a remoção de sombras e parallax) ... */}
      <section className="py-32 relative z-10 overflow-hidden bg-gradient-to-b from-white via-blue-100 to-white" style={{backfaceVisibility: 'hidden', transform: 'translateZ(0)'}}>
         <div className="blob-animation w-64 h-64 top-20 left-10" style={{ animation: 'float-around 25s infinite ease-in-out' }}></div>
         <div className="blob-animation w-96 h-96 bottom-40 right-20" style={{ animation: 'float-around 30s infinite ease-in-out reverse' }}></div>
