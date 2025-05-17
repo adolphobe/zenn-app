@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -18,7 +17,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { RefreshCw, Eye } from 'lucide-react';
 import { useAppContext } from '@/context/AppContext';
-import CompletedTaskModal from './CompletedTaskModal';
+import CompletedTaskModal from './completed-task-modal';
 import RestoreTaskConfirmation from './RestoreTaskConfirmation';
 
 // Table row component

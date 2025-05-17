@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -12,7 +11,7 @@ import { useExpandedTask } from '@/context/hooks';
 import TaskPillarDetails from '@/components/TaskPillarDetails';
 import TaskComments from '@/components/TaskComments';
 import RestoreTaskConfirmation from './RestoreTaskConfirmation';
-import CompletedTaskModal from './CompletedTaskModal';
+import CompletedTaskModal from './completed-task-modal';
 
 interface TaskGroup {
   label: string;
