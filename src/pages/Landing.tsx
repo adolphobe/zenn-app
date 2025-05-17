@@ -40,24 +40,21 @@ const Landing: React.FC = () => {
 
   const openSimpleModal = () => {
     setShowSimpleModal(true);
-    document.body.style.overflow = 'hidden'; // PASSO 3: Reintroduzido
+    document.body.style.overflow = 'hidden'; 
   };
 
   const closeSimpleModal = () => {
     setShowSimpleModal(false);
-    document.body.style.overflow = 'auto'; // PASSO 3: Reintroduzido
+    document.body.style.overflow = 'auto'; 
   };
 
-  // PASSO 3: useEffect para restaurar o scroll do body no unmount, se necessário
   useEffect(() => {
-    // Este efeito só precisa rodar uma vez para adicionar o listener de cleanup
     return () => {
-      // Se o componente for desmontado e o modal estava aberto, restaura o scroll
       if (document.body.style.overflow === 'hidden') {
         document.body.style.overflow = 'auto';
       }
     };
-  }, []); // Array de dependências vazio para rodar apenas no mount/unmount
+  }, []); 
 
 
   useEffect(() => {
@@ -281,7 +278,7 @@ const Landing: React.FC = () => {
       </section>
       
       {/* ... RESTANTE DAS SEÇÕES (How It Works, Testimonials, CTA Final, Footer) ... */}
-      {/* COLE O RESTANTE DO SEU CÓDIGO A PARTIR DAQUI, SEM MODIFICAÇÕES DE MODAL AINDA */}
+      {/* COLE O RESTANTE DO SEU CÓDIGO A PARTIR DAQUI */}
       <section className="relative z-10 overflow-hidden bg-gradient-to-b from-white via-blue-100 to-white dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
           <div className="container mx-auto px-8 relative z-10">
             <div className="max-w-4xl mx-auto">
@@ -377,38 +374,22 @@ const Landing: React.FC = () => {
         </div>
       </footer>
 
-      {/* PASSO 2.3: JSX do Modal Simples */}
+
+      {/* PASSO 4: JSX do Modal Simples ESTILIZADO com Tailwind */}
       {showSimpleModal && (
         <div
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: 'rgba(0, 0, 0, 0.5)', 
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 10000, 
-          }}
+          className="fixed inset-0 bg-black/60 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center z-[9999] p-4" // Estilizado
           onClick={closeSimpleModal} 
         >
           <div
-            style={{
-              backgroundColor: 'white',
-              padding: '20px',
-              borderRadius: '8px',
-              maxWidth: '500px',
-              width: '90%',
-            }}
+            className="bg-white dark:bg-gray-800 rounded-xl w-full max-w-lg shadow-xl p-6 md:p-8" // Estilizado
             onClick={(e) => e.stopPropagation()} 
           >
-            <h2>Título do Modal Simples</h2>
-            <p>Este é um conteúdo de teste para o modal.</p>
-            <button onClick={closeSimpleModal} style={{ marginTop: '10px', padding: '8px 12px', cursor: 'pointer', border: '1px solid black' }}>
-              Fechar Simples
-            </button>
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Título do Modal Simples</h2>
+            <p className="text-gray-600 dark:text-gray-300 mb-6">Este é um conteúdo de teste para o modal.</p>
+            <Button onClick={closeSimpleModal} className="bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-500 dark:hover:bg-blue-600">
+              Fechar
+            </Button>
           </div>
         </div>
       )}
