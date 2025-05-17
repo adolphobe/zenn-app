@@ -80,7 +80,10 @@ const HeroSection: React.FC<HeroSectionProps> = ({
                   <h3 className="text-xl font-semibold text-gray-800 dark:text-white">Faça seu login</h3>
                   <button onClick={() => { setShowLogin(false); }} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">✕</button>
                 </div>
-                <LoginForm onSuccess={() => navigate('/dashboard')} />
+                <LoginForm 
+                  onSuccess={() => navigate('/dashboard')} 
+                  onSwitchToSignup={() => navigate('/login')} 
+                />
               </div>
             </div>
           ) : (
