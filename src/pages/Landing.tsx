@@ -254,7 +254,7 @@ const Landing: React.FC = () => {
         <div className="blob-animation w-96 h-96 bottom-40 right-20" style={{ animation: 'float-around 30s infinite ease-in-out reverse' }}></div>
         <div className="container mx-auto px-8 relative">
           <div className="text-center mb-24 animate-on-scroll">
-            <span className="inline-block px-4 py-2 rounded-full bg-blue-100 text-blue-600 text-sm font-medium mb-4">Nossa Abordagem</span>
+            <span className="inline-block px-4 py-2 rounded-full bg-blue-100 text-blue-600 text-sm font-medium mb-4">Uma lista de tarefas diferente</span>
             <h2 className="text-4xl md:text-5xl font-semibold mb-8 text-gray-900">
               Não se trata apenas de <span className="text-blue-600">fazer</span>.<br />
               Trata-se de <span className="text-blue-600">escolher o que importa</span>.
