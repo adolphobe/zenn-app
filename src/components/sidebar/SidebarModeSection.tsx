@@ -19,16 +19,22 @@ const SidebarModeSection: React.FC<{ sidebarOpen: boolean }> = ({ sidebarOpen })
   const isStrategicReview = location.pathname === '/strategic-review';
   const isHistory = location.pathname === '/history';
   
+  // Check if user is logged in
+  const isLoggedIn = localStorage.getItem('acto_is_logged_in') === 'true';
+  
+  // Determine the target path based on login status
+  const targetPath = isLoggedIn ? '/dashboard' : '/';
+  
   // Navigate to main page with power view mode
   const handlePowerModeClick = () => {
     setViewMode('power');
-    navigate('/');
+    navigate(targetPath);
   };
 
   // Navigate to main page with chronological view mode
   const handleChronologicalModeClick = () => {
     setViewMode('chronological');
-    navigate('/');
+    navigate(targetPath);
   };
   
   return (
@@ -36,7 +42,7 @@ const SidebarModeSection: React.FC<{ sidebarOpen: boolean }> = ({ sidebarOpen })
       <SidebarNavItem 
         icon={LayoutDashboard} 
         label="Modo Potência"
-        path="/"
+        path={targetPath}
         isActive={viewMode === 'power' && !isStrategicReview && !isHistory}
         onClick={handlePowerModeClick}
       />
@@ -44,7 +50,7 @@ const SidebarModeSection: React.FC<{ sidebarOpen: boolean }> = ({ sidebarOpen })
       <SidebarNavItem 
         icon={CalendarClock} 
         label="Modo Cronológico"
-        path="/"
+        path={targetPath}
         isActive={viewMode === 'chronological' && !isStrategicReview && !isHistory}
         onClick={handleChronologicalModeClick}
       />
