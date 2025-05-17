@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
+
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, ArrowUpRight, CheckCircle2, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -19,17 +20,17 @@ const finalModalDataContent = {
           <div className="pl-4 space-y-3">
             <div>
               <h4 className="font-semibold text-blue-600 dark:text-blue-400">Importância real (Risco de não fazer)</h4>
-              <p className="italic text-sm">“Se eu ignorar isso, vai ter consequência?”</p>
+              <p className="italic text-sm">"Se eu ignorar isso, vai ter consequência?"</p>
               <p>É o que te faz priorizar o que realmente não pode ser adiado.</p>
             </div>
             <div>
               <h4 className="font-semibold text-blue-600 dark:text-blue-400">Orgulho pós-execução</h4>
-              <p className="italic text-sm">“Quando eu terminar, vou me sentir mais alinhado com quem quero ser?”</p>
+              <p className="italic text-sm">"Quando eu terminar, vou me sentir mais alinhado com quem quero ser?"</p>
               <p>É o pilar que mede sua conexão com o que você faz. Não é só cumprir — é se respeitar por ter feito.</p>
             </div>
             <div>
               <h4 className="font-semibold text-blue-600 dark:text-blue-400">Crescimento pessoal</h4>
-              <p className="italic text-sm">“Fazer isso me torna alguém melhor?”</p>
+              <p className="italic text-sm">"Fazer isso me torna alguém melhor?"</p>
               <p>É o que separa tarefas operacionais de tarefas que constroem a sua evolução real.</p>
             </div>
           </div>
@@ -49,7 +50,7 @@ const finalModalDataContent = {
             <li>Isso vai me deixar orgulhoso?</li>
             <li>Isso me faz crescer?</li>
           </ul>
-          <p>Você começa a abandonar o excesso, a rasura, o “checklist automático”. No lugar disso, você executa com peso emocional e propósito estratégico.</p>
+          <p>Você começa a abandonar o excesso, a rasura, o "checklist automático". No lugar disso, você executa com peso emocional e propósito estratégico.</p>
           <p className="font-semibold pt-2">E isso te leva longe!</p>
         </div>
       )
@@ -75,9 +76,13 @@ const finalModalDataContent = {
 const Landing: React.FC = () => {
   const navigate = useNavigate();
   const [loaded, setLoaded] = useState(false);
+  const [contentLoaded, setContentLoaded] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
   const [activeTestimonial, setActiveTestimonial] = useState(0);
   const [circlesKey, setCirclesKey] = useState(Date.now());
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  const animationFrameRef = useRef<number | null>(null);
+  const [imagesLoaded, setImagesLoaded] = useState(false);
   
   const { isAuthenticated, isLoading } = useAuth();
 
@@ -91,12 +96,64 @@ const Landing: React.FC = () => {
     }
   }, [isAuthenticated, isLoading, navigate]);
 
+  // Pré-carregamento de imagens críticas
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoaded(true);
-    }, 100);
-    return () => clearTimeout(timer);
+    const imageUrls = [
+      "https://images.unsplash.com/photo-1668853853439-923e013afff1?q=80&w=3870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "https://cdn.shopify.com/s/files/1/0629/1993/4061/files/loogzenn.png?v=1747447750",
+      "https://cdn.shopify.com/s/files/1/0629/1993/4061/files/Sem_Titulo-14_57956f3d-9daf-4aee-a20b-68f3bb0f3858.webp?v=1747464720"
+    ];
+    
+    let loadedCount = 0;
+    const totalImages = imageUrls.length;
+    
+    const preloadImages = () => {
+      imageUrls.forEach(url => {
+        const img = new Image();
+        img.onload = () => {
+          loadedCount++;
+          if (loadedCount === totalImages) {
+            setImagesLoaded(true);
+          }
+        };
+        img.onerror = () => {
+          loadedCount++;
+          console.error(`Failed to load image: ${url}`);
+          if (loadedCount === totalImages) {
+            // Continuar mesmo se alguma imagem falhar
+            setImagesLoaded(true);
+          }
+        };
+        img.src = url;
+      });
+    };
+    
+    preloadImages();
   }, []);
+
+  // Combinando os efeitos de carregamento para garantir uma inicialização suave
+  useEffect(() => {
+    // Só inicializa a carga quando as imagens principais tiverem sido carregadas
+    if (imagesLoaded) {
+      // Usar setTimeout para garantir que o DOM tenha tempo de renderizar completamente
+      const loadTimer = setTimeout(() => {
+        setLoaded(true);
+        
+        // Adicionar um pequeno delay para o conteúdo após o hero
+        const contentTimer = setTimeout(() => {
+          setContentLoaded(true);
+        }, 800);
+        
+        return () => {
+          clearTimeout(contentTimer);
+        };
+      }, 300);
+      
+      return () => {
+        clearTimeout(loadTimer);
+      };
+    }
+  }, [imagesLoaded]);
 
   const handleGetStarted = () => {
     if (isAuthenticated) {
@@ -142,23 +199,60 @@ const Landing: React.FC = () => {
     };
   }, [isExplanationModalOpen, closeExplanationModal]); 
 
-
+  // Separar a configuração do IntersectionObserver em um useEffect com dependências adequadas
   useEffect(() => {
-    const observerOptions = { root: null, rootMargin: '0px', threshold: 0.1 };
-    const observerCallback = (entries: IntersectionObserverEntry[]) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) entry.target.classList.add('animate-in');
+    if (contentLoaded) {
+      // Cancelar qualquer animationFrame pendente
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+      
+      // Desconectar observer anterior se existir
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+      
+      // Configurar novo IntersectionObserver após um pequeno delay para garantir que o DOM esteja pronto
+      const setupObserver = () => {
+        const observerOptions = { root: null, rootMargin: '0px', threshold: 0.1 };
+        observerRef.current = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              // Adicionar classe de animação com um pequeno delay para garantir que seja aplicada após o render
+              const element = entry.target;
+              setTimeout(() => {
+                element.classList.add('animate-in');
+              }, 100);
+              
+              // Parar de observar após animar
+              observerRef.current?.unobserve(element);
+            }
+          });
+        }, observerOptions);
+        
+        // Selecionar e observar todos os elementos com a classe animate-on-scroll
+        const elements = document.querySelectorAll('.animate-on-scroll');
+        if (elements.length > 0) {
+          elements.forEach(section => observerRef.current?.observe(section));
+        }
+      };
+      
+      // Usar requestAnimationFrame para sincronizar com o ciclo de renderização
+      animationFrameRef.current = requestAnimationFrame(() => {
+        setupObserver();
       });
-    };
-    const observer = new IntersectionObserver(observerCallback, observerOptions);
-    const elements = document.querySelectorAll('.animate-on-scroll');
-    elements.forEach(section => observer.observe(section));
+    }
+    
     return () => {
-      elements.forEach(section => {
-        if (section) observer.unobserve(section);
-      });
+      // Limpar na desmontagem
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
     };
-  }, []);
+  }, [contentLoaded]);
 
   useEffect(() => {
     const interval = setInterval(() => setActiveTestimonial(prev => (prev + 1) % 3), 5000);
@@ -241,7 +335,6 @@ const Landing: React.FC = () => {
             </div>
             <div className="relative">
               <h1 className={`text-4xl md:text-5xl lg:text-6xl font-semibold leading-tight md:leading-tight lg:leading-tight text-gray-900 dark:text-white mb-8 opacity-0 ${loaded ? 'fade-up' : ''}`}>
-
                 Listas fazem você lembrar.<br />
                 Zenn faz você evoluir.
               </h1>
@@ -299,160 +392,164 @@ const Landing: React.FC = () => {
         </div>
       </section>
 
-      <section className="py-32 relative z-10 overflow-hidden bg-gradient-to-b from-white via-blue-100 to-white dark:from-gray-900 dark:via-gray-800 dark:to-gray-900" style={{backfaceVisibility: 'hidden', transform: 'translateZ(0)'}}>
-        <div className="blob-animation w-64 h-64 top-20 left-10" style={{ animation: 'float-around 25s infinite ease-in-out' }}></div>
-        <div className="blob-animation w-96 h-96 bottom-40 right-20" style={{ animation: 'float-around 30s infinite ease-in-out reverse' }}></div>
-        <div className="container mx-auto px-8 relative">
-          <div className="text-center mb-24 animate-on-scroll">
-            <span className="inline-block px-4 py-2 rounded-full bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-300 text-sm font-medium mb-4">Uma lista de tarefas diferente</span>
-            <h2 className="text-4xl md:text-5xl font-semibold mb-8 text-gray-900 dark:text-white">
-              Não se trata apenas de <span className="text-blue-600 dark:text-blue-400">fazer</span>.<br />
-              Trata-se de <span className="text-blue-600 dark:text-blue-400">escolher o que importa</span>.
-            </h2>
-            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-              O que faz cada tarefa valer a pena? O Zenn ajuda você a avaliar e escolher o que realmente vai trazer impacto para sua vida.
-            </p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-            <div className="animate-on-scroll" style={{ transitionDelay: '0.1s' }}>
-              <Card className="gradient-card-hover bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-none h-full rounded-xl overflow-hidden transition-all duration-300">
-                <CardContent className="p-10 flex flex-col h-full">
-                  <div className="rounded-full bg-blue-50 dark:bg-blue-900/50 w-16 h-16 flex items-center justify-center mb-8 transition-transform duration-300 group-hover:scale-110">
-                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 12L11 14L15 10M12 3L4.5 10.5L4.5 20.5H19.5V10.5L12 3Z" stroke="#3b82f6" className="dark:stroke-blue-400" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                  </div>
-                  <h3 className="text-2xl font-semibold mb-5 text-gray-800 dark:text-white">Análise por pilares</h3>
-                  <p className="text-gray-600 dark:text-gray-300 text-lg flex-grow">Avalie cada tarefa pelos três pilares fundamentais: importância real, orgulho pós-execução e contribuição para seu crescimento pessoal.</p>
-                  <div className="mt-8">
-                    <Button variant="ghost" className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/70 p-0 flex items-center gap-2 group" onClick={() => openExplanationModal('pilares')}>
-                        Saiba mais
-                        <ArrowUpRight size={18} className="transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-            <div className="animate-on-scroll" style={{ transitionDelay: '0.3s' }}>
-              <Card className="gradient-card-hover bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-none h-full rounded-xl overflow-hidden transition-all duration-300">
-                <CardContent className="p-10 flex flex-col h-full">
-                  <div className="rounded-full bg-blue-50 dark:bg-blue-900/50 w-16 h-16 flex items-center justify-center mb-8">
-                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 16.5V14M7 10.5H17M7 7.5H17M9 19.5H15C16.1046 19.5 17 18.6046 17 17.5V6.5C17 5.39543 16.1046 4.5 15 4.5H9C7.89543 4.5 7 5.39543 7 6.5V17.5C7 18.6046 7.89543 19.5 9 19.5Z" stroke="#3b82f6" className="dark:stroke-blue-400" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                  </div>
-                  <h3 className="text-2xl font-semibold mb-5 text-gray-800 dark:text-white">Clareza nas escolhas</h3>
-                  <p className="text-gray-600 dark:text-gray-300 text-lg flex-grow">Abandone o ruído das tarefas sem propósito. Foque apenas no que realmente vai te levar aonde você quer chegar.</p>
-                  <div className="mt-8">
-                    <Button variant="ghost" className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/70 p-0 flex items-center gap-2 group" onClick={() => openExplanationModal('clareza')}>
-                        Saiba mais 
-                        <ArrowUpRight size={18} className="transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-            <div className="animate-on-scroll" style={{ transitionDelay: '0.5s' }}>
-              <Card className="gradient-card-hover bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-none h-full rounded-xl overflow-hidden transition-all duration-300">
-                <CardContent className="p-10 flex flex-col h-full">
-                  <div className="rounded-full bg-blue-50 dark:bg-blue-900/50 w-16 h-16 flex items-center justify-center mb-8">
-                     <svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 17L15 17M12 13L12 7M12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21Z" stroke="#3b82f6" className="dark:stroke-blue-400" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                  </div>
-                  <h3 className="text-2xl font-semibold mb-5 text-gray-800 dark:text-white">Análise estratégica</h3>
-                  <p className="text-gray-600 dark:text-gray-300 text-lg flex-grow">Entenda padrões e tendências nas suas escolhas para refinar continuamente sua abordagem e melhorar sua execução.</p>
-                  <div className="mt-8">
-                    <Button variant="ghost" className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/70 p-0 flex items-center gap-2 group" onClick={() => openExplanationModal('estrategia')}>
-                        Saiba mais 
-                        <ArrowUpRight size={18} className="transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </div>
-      </section>
-      
-      <section className="relative z-10 overflow-hidden bg-gradient-to-b from-white via-blue-100 to-white dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-          <div className="container mx-auto px-8 relative z-10">
-            <div className="max-w-4xl mx-auto">
+      {contentLoaded && (
+        <>
+          <section className="py-32 relative z-10 overflow-hidden bg-gradient-to-b from-white via-blue-100 to-white dark:from-gray-900 dark:via-gray-800 dark:to-gray-900" style={{backfaceVisibility: 'hidden', transform: 'translateZ(0)'}}>
+            <div className="blob-animation w-64 h-64 top-20 left-10" style={{ animation: 'float-around 25s infinite ease-in-out' }}></div>
+            <div className="blob-animation w-96 h-96 bottom-40 right-20" style={{ animation: 'float-around 30s infinite ease-in-out reverse' }}></div>
+            <div className="container mx-auto px-8 relative">
               <div className="text-center mb-24 animate-on-scroll">
-                <span className="inline-block px-4 py-2 rounded-full bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-300 text-sm font-medium mb-4">Fluxo Simples</span>
+                <span className="inline-block px-4 py-2 rounded-full bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-300 text-sm font-medium mb-4">Uma lista de tarefas diferente</span>
                 <h2 className="text-4xl md:text-5xl font-semibold mb-8 text-gray-900 dark:text-white">
-                  Como o <span className="text-blue-600 dark:text-blue-400">Zenn</span> funciona
+                  Não se trata apenas de <span className="text-blue-600 dark:text-blue-400">fazer</span>.<br />
+                  Trata-se de <span className="text-blue-600 dark:text-blue-400">escolher o que importa</span>.
                 </h2>
+                <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+                  O que faz cada tarefa valer a pena? O Zenn ajuda você a avaliar e escolher o que realmente vai trazer impacto para sua vida.
+                </p>
               </div>
-              <div className="relative">
-                <div className="absolute left-16 top-4 bottom-4 w-0.5 bg-gradient-to-b from-blue-200 via-blue-400 to-blue-200 dark:from-blue-700 dark:via-blue-500 dark:to-blue-700 hidden md:block"></div>
-                <div className="space-y-20">
-                  <div className="flex flex-col md:flex-row gap-8 md:gap-12 items-start animate-on-scroll">
-                    <div className="flex-shrink-0 relative"><div className="w-32 h-32 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-400 dark:from-blue-600 dark:to-blue-500 flex items-center justify-center text-white text-4xl font-bold">1</div><div className="absolute -bottom-2 -right-2 w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 opacity-70"></div></div>
-                    <div className="md:pt-3">
-                      <h3 className="text-2xl font-semibold mb-4 text-gray-800 dark:text-white">Defina suas tarefas</h3>
-                      <p className="text-gray-600 dark:text-gray-300 text-lg mb-6">Adicione suas tarefas no Zenn e as classifique usando os três pilares fundamentais: importância real para seus objetivos, orgulho que sentirá após concluí-la, e contribuição para seu crescimento pessoal.</p>
-                      <div className="p-5 bg-blue-50 dark:bg-gray-800 rounded-xl" style={{ border: '1px solid #bddbff', backgroundColor: '#f5f9ff' }} ><div className="flex items-start gap-3"><CheckCircle2 className="text-blue-500 dark:text-blue-400 mt-1 flex-shrink-0" size={20} /><p className="text-blue-700 dark:text-blue-300">Interface intuitiva que torna simples a classificação de cada tarefa</p></div></div>
-                    </div>
-                  </div>
-                  <div className="flex flex-col md:flex-row gap-8 md:gap-12 items-start animate-on-scroll">
-                    <div className="flex-shrink-0 relative"><div className="w-32 h-32 rounded-2xl bg-gradient-to-br from-blue-600 to-blue-500 dark:from-blue-700 dark:to-blue-600 flex items-center justify-center text-white text-4xl font-bold">2</div><div className="absolute -bottom-2 -right-2 w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 opacity-70"></div></div>
-                    <div className="md:pt-3">
-                      <h3 className="text-2xl font-semibold mb-4 text-gray-800 dark:text-white">Priorize o que importa</h3>
-                      <p className="text-gray-600 dark:text-gray-300 text-lg mb-6">A análise de pilares gera um score que te ajuda a distinguir o essencial do acessório. Foque nas tarefas com maior impacto e significado para seus objetivos de longo prazo.</p>
-                      <div className="p-5 bg-blue-50 dark:bg-gray-800 rounded-xl" style={{ border: '1px solid #bddbff', backgroundColor: '#f5f9ff' }} ><div className="flex items-start gap-3"><CheckCircle2 className="text-blue-500 dark:text-blue-400 mt-1 flex-shrink-0" size={20} /><p className="text-blue-700 dark:text-blue-300">Sistema de score visual que permite identificar imediatamente o que merece sua atenção</p></div></div>
-                    </div>
-                  </div>
-                  <div className="flex flex-col md:flex-row gap-8 md:gap-12 items-start animate-on-scroll">
-                    <div className="flex-shrink-0 relative"><div className="w-32 h-32 rounded-2xl bg-gradient-to-br from-blue-700 to-blue-600 dark:from-blue-800 dark:to-blue-700 flex items-center justify-center text-white text-4xl font-bold">3</div><div className="absolute -bottom-2 -right-2 w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 opacity-70"></div></div>
-                    <div className="md:pt-3">
-                      <h3 className="text-2xl font-semibold mb-4 text-gray-800 dark:text-white">Revise e aprenda</h3>
-                      <p className="text-gray-600 dark:text-gray-300 text-lg mb-6">Acompanhe seu progresso através de insights estratégicos que revelam padrões em suas escolhas. Refine sua abordagem ao longo do tempo para maximizar seu impacto e satisfação pessoal.</p>
-                      <div className="p-5 bg-blue-50 dark:bg-gray-800 rounded-xl" style={{ border: '1px solid #bddbff', backgroundColor: '#f5f9ff' }} ><div className="flex items-start gap-3"><CheckCircle2 className="text-blue-500 dark:text-blue-400 mt-1 flex-shrink-0" size={20} /><p className="text-blue-700 dark:text-blue-300">Relatórios semanais personalizados para aprimorar constantemente suas decisões</p></div></div>
-                    </div>
-                  </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+                <div className="animate-on-scroll" style={{ transitionDelay: '0.1s' }}>
+                  <Card className="gradient-card-hover bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-none h-full rounded-xl overflow-hidden transition-all duration-300">
+                    <CardContent className="p-10 flex flex-col h-full">
+                      <div className="rounded-full bg-blue-50 dark:bg-blue-900/50 w-16 h-16 flex items-center justify-center mb-8 transition-transform duration-300 group-hover:scale-110">
+                        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 12L11 14L15 10M12 3L4.5 10.5L4.5 20.5H19.5V10.5L12 3Z" stroke="#3b82f6" className="dark:stroke-blue-400" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                      </div>
+                      <h3 className="text-2xl font-semibold mb-5 text-gray-800 dark:text-white">Análise por pilares</h3>
+                      <p className="text-gray-600 dark:text-gray-300 text-lg flex-grow">Avalie cada tarefa pelos três pilares fundamentais: importância real, orgulho pós-execução e contribuição para seu crescimento pessoal.</p>
+                      <div className="mt-8">
+                        <Button variant="ghost" className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/70 p-0 flex items-center gap-2 group" onClick={() => openExplanationModal('pilares')}>
+                            Saiba mais
+                            <ArrowUpRight size={18} className="transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+                <div className="animate-on-scroll" style={{ transitionDelay: '0.3s' }}>
+                  <Card className="gradient-card-hover bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-none h-full rounded-xl overflow-hidden transition-all duration-300">
+                    <CardContent className="p-10 flex flex-col h-full">
+                      <div className="rounded-full bg-blue-50 dark:bg-blue-900/50 w-16 h-16 flex items-center justify-center mb-8">
+                        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 16.5V14M7 10.5H17M7 7.5H17M9 19.5H15C16.1046 19.5 17 18.6046 17 17.5V6.5C17 5.39543 16.1046 4.5 15 4.5H9C7.89543 4.5 7 5.39543 7 6.5V17.5C7 18.6046 7.89543 19.5 9 19.5Z" stroke="#3b82f6" className="dark:stroke-blue-400" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                      </div>
+                      <h3 className="text-2xl font-semibold mb-5 text-gray-800 dark:text-white">Clareza nas escolhas</h3>
+                      <p className="text-gray-600 dark:text-gray-300 text-lg flex-grow">Abandone o ruído das tarefas sem propósito. Foque apenas no que realmente vai te levar aonde você quer chegar.</p>
+                      <div className="mt-8">
+                        <Button variant="ghost" className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/70 p-0 flex items-center gap-2 group" onClick={() => openExplanationModal('clareza')}>
+                            Saiba mais 
+                            <ArrowUpRight size={18} className="transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+                <div className="animate-on-scroll" style={{ transitionDelay: '0.5s' }}>
+                  <Card className="gradient-card-hover bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-none h-full rounded-xl overflow-hidden transition-all duration-300">
+                    <CardContent className="p-10 flex flex-col h-full">
+                      <div className="rounded-full bg-blue-50 dark:bg-blue-900/50 w-16 h-16 flex items-center justify-center mb-8">
+                         <svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 17L15 17M12 13L12 7M12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21Z" stroke="#3b82f6" className="dark:stroke-blue-400" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                      </div>
+                      <h3 className="text-2xl font-semibold mb-5 text-gray-800 dark:text-white">Análise estratégica</h3>
+                      <p className="text-gray-600 dark:text-gray-300 text-lg flex-grow">Entenda padrões e tendências nas suas escolhas para refinar continuamente sua abordagem e melhorar sua execução.</p>
+                      <div className="mt-8">
+                        <Button variant="ghost" className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/70 p-0 flex items-center gap-2 group" onClick={() => openExplanationModal('estrategia')}>
+                            Saiba mais 
+                            <ArrowUpRight size={18} className="transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
                 </div>
               </div>
             </div>
-            <div className="mt-32 animate-on-scroll">
-              <div className="relative mx-auto max-w-4xl">
-                <div className="absolute -top-8 -left-8 w-64 h-64 bg-blue-100 dark:bg-blue-900/50 rounded-full opacity-70 blur-3xl"></div><div className="absolute -bottom-8 -right-8 w-64 h-64 bg-blue-200 dark:bg-blue-800/50 rounded-full opacity-70 blur-3xl"></div>
-                <div className="relative overflow-hidden rounded-2xl border border-white/30 dark:border-gray-700/30"><img src="https://cdn.shopify.com/s/files/1/0629/1993/4061/files/Sem_Titulo-14_57956f3d-9daf-4aee-a20b-68f3bb0f3858.webp?v=1747464720" alt="Dashboard" className="w-full h-auto"/><div className="hidden absolute inset-0 bg-gradient-to-tr from-blue-600/20 via-blue-400/10 to-transparent dark:from-blue-900/20 dark:via-blue-700/10"></div></div>
-                <div className="absolute top-10 right-10 max-w-xs bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm p-4 rounded-lg border border-blue-100 dark:border-gray-700"><h4 className="font-medium text-blue-700 dark:text-blue-300 mb-1">Visão por Pilares</h4><p className="text-sm text-gray-600 dark:text-gray-400">Visualize rapidamente suas tarefas organizadas de acordo com os três pilares fundamentais.</p></div>
-                <div className="absolute bottom-10 left-10 max-w-xs bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm p-4 rounded-lg border border-blue-100 dark:border-gray-700"><h4 className="font-medium text-blue-700 dark:text-blue-300 mb-1">Score Intuitivo</h4><p className="text-sm text-gray-600 dark:text-gray-400">Identifique facilmente quais tarefas merecem sua atenção prioritária através dos scores visuais.</p></div>
+          </section>
+          
+          <section className="relative z-10 overflow-hidden bg-gradient-to-b from-white via-blue-100 to-white dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+              <div className="container mx-auto px-8 relative z-10">
+                <div className="max-w-4xl mx-auto">
+                  <div className="text-center mb-24 animate-on-scroll">
+                    <span className="inline-block px-4 py-2 rounded-full bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-300 text-sm font-medium mb-4">Fluxo Simples</span>
+                    <h2 className="text-4xl md:text-5xl font-semibold mb-8 text-gray-900 dark:text-white">
+                      Como o <span className="text-blue-600 dark:text-blue-400">Zenn</span> funciona
+                    </h2>
+                  </div>
+                  <div className="relative">
+                    <div className="absolute left-16 top-4 bottom-4 w-0.5 bg-gradient-to-b from-blue-200 via-blue-400 to-blue-200 dark:from-blue-700 dark:via-blue-500 dark:to-blue-700 hidden md:block"></div>
+                    <div className="space-y-20">
+                      <div className="flex flex-col md:flex-row gap-8 md:gap-12 items-start animate-on-scroll">
+                        <div className="flex-shrink-0 relative"><div className="w-32 h-32 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-400 dark:from-blue-600 dark:to-blue-500 flex items-center justify-center text-white text-4xl font-bold">1</div><div className="absolute -bottom-2 -right-2 w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 opacity-70"></div></div>
+                        <div className="md:pt-3">
+                          <h3 className="text-2xl font-semibold mb-4 text-gray-800 dark:text-white">Defina suas tarefas</h3>
+                          <p className="text-gray-600 dark:text-gray-300 text-lg mb-6">Adicione suas tarefas no Zenn e as classifique usando os três pilares fundamentais: importância real para seus objetivos, orgulho que sentirá após concluí-la, e contribuição para seu crescimento pessoal.</p>
+                          <div className="p-5 bg-blue-50 dark:bg-gray-800 rounded-xl" style={{ border: '1px solid #bddbff', backgroundColor: '#f5f9ff' }} ><div className="flex items-start gap-3"><CheckCircle2 className="text-blue-500 dark:text-blue-400 mt-1 flex-shrink-0" size={20} /><p className="text-blue-700 dark:text-blue-300">Interface intuitiva que torna simples a classificação de cada tarefa</p></div></div>
+                        </div>
+                      </div>
+                      <div className="flex flex-col md:flex-row gap-8 md:gap-12 items-start animate-on-scroll">
+                        <div className="flex-shrink-0 relative"><div className="w-32 h-32 rounded-2xl bg-gradient-to-br from-blue-600 to-blue-500 dark:from-blue-700 dark:to-blue-600 flex items-center justify-center text-white text-4xl font-bold">2</div><div className="absolute -bottom-2 -right-2 w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 opacity-70"></div></div>
+                        <div className="md:pt-3">
+                          <h3 className="text-2xl font-semibold mb-4 text-gray-800 dark:text-white">Priorize o que importa</h3>
+                          <p className="text-gray-600 dark:text-gray-300 text-lg mb-6">A análise de pilares gera um score que te ajuda a distinguir o essencial do acessório. Foque nas tarefas com maior impacto e significado para seus objetivos de longo prazo.</p>
+                          <div className="p-5 bg-blue-50 dark:bg-gray-800 rounded-xl" style={{ border: '1px solid #bddbff', backgroundColor: '#f5f9ff' }} ><div className="flex items-start gap-3"><CheckCircle2 className="text-blue-500 dark:text-blue-400 mt-1 flex-shrink-0" size={20} /><p className="text-blue-700 dark:text-blue-300">Sistema de score visual que permite identificar imediatamente o que merece sua atenção</p></div></div>
+                        </div>
+                      </div>
+                      <div className="flex flex-col md:flex-row gap-8 md:gap-12 items-start animate-on-scroll">
+                        <div className="flex-shrink-0 relative"><div className="w-32 h-32 rounded-2xl bg-gradient-to-br from-blue-700 to-blue-600 dark:from-blue-800 dark:to-blue-700 flex items-center justify-center text-white text-4xl font-bold">3</div><div className="absolute -bottom-2 -right-2 w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 opacity-70"></div></div>
+                        <div className="md:pt-3">
+                          <h3 className="text-2xl font-semibold mb-4 text-gray-800 dark:text-white">Revise e aprenda</h3>
+                          <p className="text-gray-600 dark:text-gray-300 text-lg mb-6">Acompanhe seu progresso através de insights estratégicos que revelam padrões em suas escolhas. Refine sua abordagem ao longo do tempo para maximizar seu impacto e satisfação pessoal.</p>
+                          <div className="p-5 bg-blue-50 dark:bg-gray-800 rounded-xl" style={{ border: '1px solid #bddbff', backgroundColor: '#f5f9ff' }} ><div className="flex items-start gap-3"><CheckCircle2 className="text-blue-500 dark:text-blue-400 mt-1 flex-shrink-0" size={20} /><p className="text-blue-700 dark:text-blue-300">Relatórios semanais personalizados para aprimorar constantemente suas decisões</p></div></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="mt-32 animate-on-scroll">
+                  <div className="relative mx-auto max-w-4xl">
+                    <div className="absolute -top-8 -left-8 w-64 h-64 bg-blue-100 dark:bg-blue-900/50 rounded-full opacity-70 blur-3xl"></div><div className="absolute -bottom-8 -right-8 w-64 h-64 bg-blue-200 dark:bg-blue-800/50 rounded-full opacity-70 blur-3xl"></div>
+                    <div className="relative overflow-hidden rounded-2xl border border-white/30 dark:border-gray-700/30"><img src="https://cdn.shopify.com/s/files/1/0629/1993/4061/files/Sem_Titulo-14_57956f3d-9daf-4aee-a20b-68f3bb0f3858.webp?v=1747464720" alt="Dashboard" className="w-full h-auto"/><div className="hidden absolute inset-0 bg-gradient-to-tr from-blue-600/20 via-blue-400/10 to-transparent dark:from-blue-900/20 dark:via-blue-700/10"></div></div>
+                    <div className="absolute top-10 right-10 max-w-xs bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm p-4 rounded-lg border border-blue-100 dark:border-gray-700"><h4 className="font-medium text-blue-700 dark:text-blue-300 mb-1">Visão por Pilares</h4><p className="text-sm text-gray-600 dark:text-gray-400">Visualize rapidamente suas tarefas organizadas de acordo com os três pilares fundamentais.</p></div>
+                    <div className="absolute bottom-10 left-10 max-w-xs bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm p-4 rounded-lg border border-blue-100 dark:border-gray-700"><h4 className="font-medium text-blue-700 dark:text-blue-300 mb-1">Score Intuitivo</h4><p className="text-sm text-gray-600 dark:text-gray-400">Identifique facilmente quais tarefas merecem sua atenção prioritária através dos scores visuais.</p></div>
+                  </div>
+                </div>
+              </div>
+            </section>
+          <section className="py-32 relative z-10 overflow-hidden bg-gradient-to-b from-white via-blue-100 to-white dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+            <div className="blob-animation w-72 h-72 top-40 right-20 opacity-50" style={{ animation: 'float-around 20s infinite ease-in-out' }}></div>
+            <div className="blob-animation w-80 h-80 bottom-40 left-10 opacity-40" style={{ animation: 'float-around 25s infinite ease-in-out reverse' }}></div>
+            <div className="container mx-auto px-8 relative z-10">
+              <div className="text-center mb-20 animate-on-scroll">
+                <span className="inline-block px-4 py-2 rounded-full bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-300 text-sm font-medium mb-4">Experiências Reais</span>
+                <h2 className="text-4xl md:text-5xl font-semibold mb-8 text-gray-900 dark:text-white">O que nossos usuários dizem</h2>
+                <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">Pessoas que encontraram clareza e propósito em suas tarefas diárias com o Zenn</p>
+              </div>
+              <div className="max-w-6xl mx-auto">
+                <div className="relative">
+                  <div className="flex flex-col lg:flex-row gap-6 justify-center items-center">
+                    {[ { name: "Mariana Silva", role: "Empreendedora", initials: "MS", quote: "\"Finalmente consigo focar no que realmente importa. O Zenn me ajudou a eliminar o ruído e focar nas tarefas que realmente movem minha empresa para frente.\"" }, { name: "Ricardo Mendes", role: "Gerente de Projetos", initials: "RM", quote: "\"A análise por pilares mudou completamente a maneira como eu priorizo tarefas. Agora tenho clareza sobre o que realmente vai gerar impacto no meu trabalho e na minha vida.\"" }, { name: "Juliana Costa", role: "Desenvolvedora", initials: "JC", quote: "\"Eu estava sobrecarregada com milhares de tarefas. O Zenn me ajudou a simplificar e focar apenas no que vai realmente me fazer crescer profissionalmente.\"" } ].map((testimonial, index) => ( <div key={index} className={`testimonial-card w-full lg:w-1/3 ${activeTestimonial === index ? 'testimonial-active' : 'testimonial-inactive'}`} onClick={() => setActiveTestimonial(index)} onMouseEnter={() => setActiveTestimonial(index)}> <Card className="bg-white dark:bg-gray-800 border-none transition-all duration-300 overflow-hidden rounded-2xl h-full"> <CardContent className="p-8"> <div className="mb-8"> <div className="flex gap-1 mb-4">{[...Array(5)].map((_, i) => (<svg key={i} className="text-yellow-400" width="20" height="20" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>))}</div> <p className="text-gray-700 dark:text-gray-300 text-lg italic">{testimonial.quote}</p> </div> <div className="flex items-center"> <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 text-white flex items-center justify-center font-bold text-xl mr-4">{testimonial.initials}</div> <div><h4 className="font-semibold text-gray-900 dark:text-white">{testimonial.name}</h4><p className="text-gray-500 dark:text-gray-400 text-sm">{testimonial.role}</p></div> </div> </CardContent> </Card> </div> ))}
+                  </div>
+                  <div className="flex justify-center mt-10 gap-3"> {[0, 1, 2].map((index) => (<button key={index} onClick={() => setActiveTestimonial(index)} className={`w-3 h-3 rounded-full transition-all duration-300 ${activeTestimonial === index ? 'bg-blue-600 dark:bg-blue-400 w-10' : 'bg-blue-200 dark:bg-gray-700'}`}/>))} </div>
+                </div>
               </div>
             </div>
-          </div>
-        </section>
-      <section className="py-32 relative z-10 overflow-hidden bg-gradient-to-b from-white via-blue-100 to-white dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-        <div className="blob-animation w-72 h-72 top-40 right-20 opacity-50" style={{ animation: 'float-around 20s infinite ease-in-out' }}></div>
-        <div className="blob-animation w-80 h-80 bottom-40 left-10 opacity-40" style={{ animation: 'float-around 25s infinite ease-in-out reverse' }}></div>
-        <div className="container mx-auto px-8 relative z-10">
-          <div className="text-center mb-20 animate-on-scroll">
-            <span className="inline-block px-4 py-2 rounded-full bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-300 text-sm font-medium mb-4">Experiências Reais</span>
-            <h2 className="text-4xl md:text-5xl font-semibold mb-8 text-gray-900 dark:text-white">O que nossos usuários dizem</h2>
-            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">Pessoas que encontraram clareza e propósito em suas tarefas diárias com o Zenn</p>
-          </div>
-          <div className="max-w-6xl mx-auto">
-            <div className="relative">
-              <div className="flex flex-col lg:flex-row gap-6 justify-center items-center">
-                {[ { name: "Mariana Silva", role: "Empreendedora", initials: "MS", quote: "\"Finalmente consigo focar no que realmente importa. O Zenn me ajudou a eliminar o ruído e focar nas tarefas que realmente movem minha empresa para frente.\"" }, { name: "Ricardo Mendes", role: "Gerente de Projetos", initials: "RM", quote: "\"A análise por pilares mudou completamente a maneira como eu priorizo tarefas. Agora tenho clareza sobre o que realmente vai gerar impacto no meu trabalho e na minha vida.\"" }, { name: "Juliana Costa", role: "Desenvolvedora", initials: "JC", quote: "\"Eu estava sobrecarregada com milhares de tarefas. O Zenn me ajudou a simplificar e focar apenas no que vai realmente me fazer crescer profissionalmente.\"" } ].map((testimonial, index) => ( <div key={index} className={`testimonial-card w-full lg:w-1/3 ${activeTestimonial === index ? 'testimonial-active' : 'testimonial-inactive'}`} onClick={() => setActiveTestimonial(index)} onMouseEnter={() => setActiveTestimonial(index)}> <Card className="bg-white dark:bg-gray-800 border-none transition-all duration-300 overflow-hidden rounded-2xl h-full"> <CardContent className="p-8"> <div className="mb-8"> <div className="flex gap-1 mb-4">{[...Array(5)].map((_, i) => (<svg key={i} className="text-yellow-400" width="20" height="20" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>))}</div> <p className="text-gray-700 dark:text-gray-300 text-lg italic">{testimonial.quote}</p> </div> <div className="flex items-center"> <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 text-white flex items-center justify-center font-bold text-xl mr-4">{testimonial.initials}</div> <div><h4 className="font-semibold text-gray-900 dark:text-white">{testimonial.name}</h4><p className="text-gray-500 dark:text-gray-400 text-sm">{testimonial.role}</p></div> </div> </CardContent> </Card> </div> ))}
+          </section>
+          <section className="py-32 relative z-10 overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-blue-500 dark:from-blue-800 dark:to-blue-700 z-0"></div>
+            <div className="absolute inset-0 overflow-hidden"> <div className="absolute -top-40 -left-40 w-80 h-80 bg-white/10 rounded-full blur-xl"></div> <div className="absolute top-20 right-20 w-60 h-60 bg-white/10 rounded-full blur-xl"></div> <div className="absolute bottom-20 left-1/3 w-40 h-40 bg-white/10 rounded-full blur-xl"></div> <svg className="absolute bottom-0 left-0 w-full" viewBox="0 0 1440 320" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0,256L80,261.3C160,267,320,277,480,250.7C640,224,800,160,960,138.7C1120,117,1280,139,1360,149.3L1440,160L1440,320L1360,320C1280,320,1120,320,960,320C800,320,640,320,480,320C320,320,160,320,80,320L0,320Z" fill="rgba(255,255,255,0.05)"></path></svg> <svg className="absolute bottom-0 left-0 w-full" viewBox="0 0 1440 200" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0,128L48,117.3C96,107,192,85,288,90.7C384,96,480,128,576,144C672,160,768,160,864,138.7C960,117,1056,75,1152,58.7C1248,43,1344,53,1392,58.7L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z" fill="rgba(255,255,255,0.1)"></path></svg> </div>
+            <div className="container mx-auto px-8 relative z-10">
+              <div className="max-w-3xl mx-auto text-center">
+                <div className="animate-on-scroll">
+                  <h2 className="text-4xl md:text-5xl lg:text-6xl font-semibold mb-6 text-white">Pronto para encontrar clareza?</h2>
+                  <p className="text-xl text-blue-100 dark:text-blue-200 mb-10 max-w-2xl mx-auto">Comece hoje a jornada para uma execução pessoal com propósito e direção.</p>
+                  <Button onClick={handleGetStarted} className="bg-white text-blue-600 dark:text-blue-700 hover:text-blue-700 dark:hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-100 px-10 py-6 rounded-xl text-lg font-medium transition-all duration-300 hover:scale-105 flex items-center gap-3 mx-auto group">
+                    Começar Agora <ArrowRight className="transition-transform duration-300 group-hover:translate-x-1" />
+                  </Button>
+                  <p className="text-blue-100/80 dark:text-blue-200/80 mt-10">Experimente gratuitamente por 14 dias. Sem compromisso.</p>
+                </div>
               </div>
-              <div className="flex justify-center mt-10 gap-3"> {[0, 1, 2].map((index) => (<button key={index} onClick={() => setActiveTestimonial(index)} className={`w-3 h-3 rounded-full transition-all duration-300 ${activeTestimonial === index ? 'bg-blue-600 dark:bg-blue-400 w-10' : 'bg-blue-200 dark:bg-gray-700'}`}/>))} </div>
             </div>
-          </div>
-        </div>
-      </section>
-      <section className="py-32 relative z-10 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-blue-500 dark:from-blue-800 dark:to-blue-700 z-0"></div>
-        <div className="absolute inset-0 overflow-hidden"> <div className="absolute -top-40 -left-40 w-80 h-80 bg-white/10 rounded-full blur-xl"></div> <div className="absolute top-20 right-20 w-60 h-60 bg-white/10 rounded-full blur-xl"></div> <div className="absolute bottom-20 left-1/3 w-40 h-40 bg-white/10 rounded-full blur-xl"></div> <svg className="absolute bottom-0 left-0 w-full" viewBox="0 0 1440 320" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0,256L80,261.3C160,267,320,277,480,250.7C640,224,800,160,960,138.7C1120,117,1280,139,1360,149.3L1440,160L1440,320L1360,320C1280,320,1120,320,960,320C800,320,640,320,480,320C320,320,160,320,80,320L0,320Z" fill="rgba(255,255,255,0.05)"></path></svg> <svg className="absolute bottom-0 left-0 w-full" viewBox="0 0 1440 200" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0,128L48,117.3C96,107,192,85,288,90.7C384,96,480,128,576,144C672,160,768,160,864,138.7C960,117,1056,75,1152,58.7C1248,43,1344,53,1392,58.7L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z" fill="rgba(255,255,255,0.1)"></path></svg> </div>
-        <div className="container mx-auto px-8 relative z-10">
-          <div className="max-w-3xl mx-auto text-center">
-            <div className="animate-on-scroll">
-              <h2 className="text-4xl md:text-5xl lg:text-6xl font-semibold mb-6 text-white">Pronto para encontrar clareza?</h2>
-              <p className="text-xl text-blue-100 dark:text-blue-200 mb-10 max-w-2xl mx-auto">Comece hoje a jornada para uma execução pessoal com propósito e direção.</p>
-              <Button onClick={handleGetStarted} className="bg-white text-blue-600 dark:text-blue-700 hover:text-blue-700 dark:hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-100 px-10 py-6 rounded-xl text-lg font-medium transition-all duration-300 hover:scale-105 flex items-center gap-3 mx-auto group">
-                Começar Agora <ArrowRight className="transition-transform duration-300 group-hover:translate-x-1" />
-              </Button>
-              <p className="text-blue-100/80 dark:text-blue-200/80 mt-10">Experimente gratuitamente por 14 dias. Sem compromisso.</p>
-            </div>
-          </div>
-        </div>
-      </section>
+          </section>
+        </>
+      )}
       <footer className="py-16 bg-gray-900 text-gray-400 relative z-10 dark:bg-gray-950">
         <div className="container mx-auto px-8">
           <div className="flex flex-col items-center text-center">
