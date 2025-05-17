@@ -118,7 +118,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                   setCurrentUser(mappedUser);
                 }
               })
-              .catch(error => {
+              .catch((error: Error) => {
                 console.error("Error fetching user profile:", error);
                 if (mounted) {
                   const mappedUser = mapSupabaseUser(newSession.user);
@@ -156,7 +156,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               setCurrentUser(mappedUser);
             }
           })
-          .catch(error => {
+          .catch((error: Error) => {
             console.error("Error fetching initial user profile:", error);
             if (mounted) {
               const mappedUser = mapSupabaseUser(existingSession.user);
@@ -175,7 +175,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setIsLoading(false);
         setAuthInitialized(true);
       }
-    }).catch(error => {
+    }).catch((error: Error) => {
       console.error("Error checking session:", error);
       if (mounted) {
         setIsLoading(false);

@@ -1,12 +1,11 @@
 
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import LoginForm from '../components/LoginForm';
 import SignupForm from '../components/SignupForm';
 import { useAuth } from '@/context/AuthContext';
 
 const Login: React.FC = () => {
-  const navigate = useNavigate();
   const location = useLocation();
   const { isAuthenticated, isLoading } = useAuth();
   const [loaded, setLoaded] = useState(false);
@@ -27,24 +26,8 @@ const Login: React.FC = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  // Redirecionar se já estiver autenticado
-  useEffect(() => {
-    let redirectTimeout: NodeJS.Timeout;
-    
-    // Só redireciona quando não estiver carregando e estiver autenticado
-    if (!isLoading && isAuthenticated) {
-      console.log('Usuário já autenticado, redirecionando para:', from);
-      
-      // Usar setTimeout para evitar loops de renderização
-      redirectTimeout = setTimeout(() => {
-        navigate(from, { replace: true });
-      }, 50);
-    }
-    
-    return () => {
-      if (redirectTimeout) clearTimeout(redirectTimeout);
-    };
-  }, [isAuthenticated, isLoading, from, navigate]);
+  // TEMPORARILY DISABLED: Automatic redirect after authentication
+  // This helps us break the redirect loop
 
   // Alternar entre login e signup
   const toggleSignup = () => {
@@ -59,16 +42,6 @@ const Login: React.FC = () => {
         <div className="ml-3 text-blue-500">Verificando autenticação...</div>
       </div>
     );
-  }
-
-  // Nunca mostrar página de login se já estiver autenticado
-  if (isAuthenticated) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-        <div className="ml-3">Redirecionando para {from}...</div>
-      </div>
-    ); 
   }
 
   // Componentes visuais para o fundo com animações
@@ -172,6 +145,11 @@ const Login: React.FC = () => {
           />
           <div className="absolute inset-0 bg-gradient-to-r from-blue-500/30 to-blue-600/20 mix-blend-multiply" />
         </div>
+      </div>
+      
+      {/* Login Status Debug Banner */}
+      <div className="fixed bottom-0 left-0 right-0 bg-orange-100 text-orange-800 p-2 text-xs text-center">
+        Debug Mode: Authentication check temporarily disabled | Auth Status: {isAuthenticated ? 'Logged In' : 'Not Logged In'}
       </div>
     </div>
   );
