@@ -1,5 +1,5 @@
 
-import { Outlet, useLocation, Navigate } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import Sidebar from './Sidebar';
 import { useSidebar } from '@/context/hooks';
@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils';
 
 /**
  * PrivateRoute - Protects routes that require authentication
- * Now enhanced to properly check authentication status
+ * Now enhanced to properly check authentication status but doesn't redirect
  */
 export const PrivateRoute = () => {
   const { isAuthenticated, isLoading, currentUser } = useAuth();
@@ -33,15 +33,31 @@ export const PrivateRoute = () => {
     </div>;
   }
 
-  // Instead of just logging, actually redirect if not authenticated
+  // Log authentication issues but don't redirect
   if (!isAuthenticated) {
     console.error(`[PrivateRoute] ERRO DE AUTENTICAÇÃO: Usuário não autenticado em ${location.pathname}`);
-    console.error("[PrivateRoute] DETALHES TÉCNICOS: Redirecionando para /login");
-    console.error("[PrivateRoute] DETALHES EM PORTUGUÊS: Você não está logado e tentou acessar uma página protegida. Redirecionando para a página de login.");
+    console.error("[PrivateRoute] DETALHES TÉCNICOS: Usuário tentando acessar página protegida sem estar autenticado");
+    console.error("[PrivateRoute] DETALHES EM PORTUGUÊS: Você não está logado e está tentando acessar uma página protegida. REDIRECIONAMENTO DESATIVADO.");
     console.error("[PrivateRoute] ESTADO DE AUTENTICAÇÃO:", { isAuthenticated, isLoading, path: location.pathname });
     
-    // Now actually redirecting instead of just showing a message
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    // Return authentication warning instead of redirecting
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-red-50">
+        <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full border-l-4 border-red-500">
+          <h1 className="text-2xl font-bold text-red-700 mb-4">Acesso Restrito</h1>
+          <p className="mb-4 text-gray-700">
+            Você não está autenticado e está tentando acessar uma página protegida.
+          </p>
+          <p className="mb-4 text-gray-700">
+            Em uma versão normal, você seria redirecionado para a página de login, 
+            mas o redirecionamento automático foi desativado.
+          </p>
+          <p className="text-sm text-gray-500 mt-4">
+            Path: {location.pathname} | Auth Status: {isAuthenticated ? "Autenticado" : "Não Autenticado"}
+          </p>
+        </div>
+      </div>
+    );
   }
 
   // User is authenticated, render the protected layout with sidebar

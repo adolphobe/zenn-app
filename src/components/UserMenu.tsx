@@ -3,12 +3,10 @@ import React from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 import { LogOut, User as UserIcon } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 import { toast } from '@/hooks/use-toast';
 
 const UserMenu: React.FC = () => {
   const { currentUser, logout } = useAuth();
-  const navigate = useNavigate();
 
   const handleLogout = async () => {
     try {
@@ -24,17 +22,13 @@ const UserMenu: React.FC = () => {
       
       toast({
         title: "Logout realizado",
-        description: "Você foi desconectado com sucesso",
+        description: "Você foi desconectado com sucesso. Redirecionamento automático desativado.",
       });
       
-      console.log("[UserMenu] DETALHES EM PORTUGUÊS: Logout realizado com sucesso, redirecionando para página de login");
+      console.log("[UserMenu] DETALHES EM PORTUGUÊS: Logout realizado com sucesso, redirecionamento automático DESATIVADO");
+      console.log("[UserMenu] DETALHES DE DEBUG: Em um fluxo normal, você seria redirecionado para a página de login");
       
-      // Navigate to login page after a delay to ensure logout is complete
-      setTimeout(() => {
-        navigate('/login', { 
-          state: { loggedOut: true } 
-        });
-      }, 300);
+      // No automatic redirect
     } catch (error) {
       console.error("[UserMenu] Erro ao fazer logout:", error);
       console.error("[UserMenu] DETALHES EM PORTUGUÊS: Ocorreu um erro ao tentar deslogar do sistema");

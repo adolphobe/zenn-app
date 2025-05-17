@@ -11,7 +11,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 import { toast } from '@/hooks/use-toast';
 import { useAuth } from '@/context/AuthContext';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 
 const loginSchema = z.object({
   email: z.string().email("Digite um e-mail válido"),
@@ -27,7 +27,6 @@ interface LoginFormProps {
 
 const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onSwitchToSignup }) => {
   const { login } = useAuth();
-  const navigate = useNavigate();
   const location = useLocation();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -60,12 +59,12 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onSwitchToSignup }) =>
         setLoginError("Usuário não encontrado ou senha incorreta. Por favor, verifique suas credenciais.");
       } else {
         console.log("[LoginForm] Login bem-sucedido para:", values.email);
-        console.log("[LoginForm] DETALHES EM PORTUGUÊS: Login realizado com sucesso, redirecionando automaticamente");
-        console.log("[LoginForm] Redirecionando para:", from);
+        console.log("[LoginForm] DETALHES EM PORTUGUÊS: Login realizado com sucesso, redirecionamento automático DESATIVADO");
+        console.log("[LoginForm] DETALHES DE DEBUG: Em um fluxo normal, seria redirecionado para:", from);
         
         toast({
           title: "Login realizado com sucesso",
-          description: "Você foi autenticado com sucesso",
+          description: "Você foi autenticado com sucesso. Redirecionamento automático desativado.",
         });
         
         if (onSuccess) {
@@ -73,8 +72,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onSwitchToSignup }) =>
           onSuccess();
         }
         
-        // Redirect to the page the user was trying to access or dashboard
-        navigate(from, { replace: true });
+        // No automatic redirect
       }
     } catch (error) {
       console.error("[LoginForm] Erro de login:", error);
