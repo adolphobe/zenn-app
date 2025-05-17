@@ -554,7 +554,7 @@ const Landing: React.FC = () => {
       </section>
       
       {/* How It Works Section - ENHANCED */}
-      <section className="py-32 bg-white relative z-10 overflow-hidden">
+    <section className="pt-32 bg-white relative z-10 overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-blue-50 to-white z-0"></div>
         
         <div className="container mx-auto px-8 relative z-10">
