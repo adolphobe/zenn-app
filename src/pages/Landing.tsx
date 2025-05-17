@@ -404,7 +404,7 @@ const Landing: React.FC = () => {
               <div className="absolute -bottom-8 -right-8 w-64 h-64 bg-blue-200 rounded-full opacity-70 blur-3xl"></div>
               <div className="relative overflow-hidden rounded-2xl border border-white/30">
                 <img 
-                  src="https://img.freepik.com/free-photo/busy-man-working-white-laptop_329181-14556.jpg?t=st=1747459743~exp=1747463343~hmac=c6095cc09c07170cdfec770246c216ace889849b4957f3bef4226caf026bb769&w=900" 
+                  src="https://img.freepik.com/free-photo/thoughtful-man-with-laptop-cup-coffee_329181-12159.jpg?t=st=1747460059~exp=1747463659~hmac=c9828903006eb597d9ba4d67bb46ba5a6b44ee0e455e8362caf22c2c07ff9215&w=1800" 
                   alt="Dashboard" 
                   className="w-full h-auto"
                 />
