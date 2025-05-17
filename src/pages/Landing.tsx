@@ -460,7 +460,8 @@ const Landing: React.FC = () => {
       </section>
 
       {/* Features Section - ENHANCED */}
-      <section className="py-32 relative z-10 overflow-hidden bg-gradient-to-b from-white via-blue-50 to-blue-100">
+     <section className="py-32 relative z-10 overflow-hidden bg-gradient-to-b from-white via-blue-100 to-white">
+
 
         {/* Animated blobs background */}
         <div className="blob-animation w-64 h-64 top-20 left-10" style={{ animation: 'float-around 25s infinite ease-in-out' }}></div>
