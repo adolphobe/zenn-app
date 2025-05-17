@@ -230,8 +230,9 @@ const Landing: React.FC = () => {
             </div>
             <div className="relative">
               <h1 className={`text-4xl md:text-5xl lg:text-6xl font-semibold leading-tight md:leading-tight lg:leading-tight text-gray-900 dark:text-white mb-8 opacity-0 ${loaded ? 'fade-up' : ''}`}>
-                Você não precisa de mais tarefas.<br />
-                Precisa de intenção.
+
+                Listas fazem você lembrar.<br />
+                Zenn faz você evoluir.
               </h1>
             </div>
             <p className={`text-lg md:text-xl text-gray-600 dark:text-gray-300 font-light leading-relaxed mb-10 opacity-0 ${loaded ? 'fade-up fade-up-delay-1' : ''}`}>
