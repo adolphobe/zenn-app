@@ -1,12 +1,13 @@
 
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import LoginForm from '../components/LoginForm';
 import SignupForm from '../components/SignupForm';
 import { useAuth } from '@/context/AuthContext';
 
 const Login: React.FC = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { isAuthenticated, isLoading } = useAuth();
   const [loaded, setLoaded] = useState(false);
   const [isSignup, setIsSignup] = useState(false);
@@ -14,8 +15,46 @@ const Login: React.FC = () => {
   // Obtém o caminho para redirecionar após o login
   const from = location.state?.from || "/dashboard";
 
-  // Debug log
-  console.log('Login page render:', { isAuthenticated, isLoading, from, state: location.state });
+  // Function to show visual alert on screen
+  const showAlert = (message: string, type: 'info' | 'success' | 'error' = 'info') => {
+    // Create alert element
+    const alertDiv = document.createElement('div');
+    alertDiv.style.position = 'fixed';
+    alertDiv.style.bottom = '20px';
+    alertDiv.style.left = '20px';
+    alertDiv.style.padding = '10px 20px';
+    alertDiv.style.borderRadius = '4px';
+    alertDiv.style.zIndex = '9999';
+    alertDiv.style.maxWidth = '80%';
+    alertDiv.style.wordBreak = 'break-word';
+    
+    // Set color based on type
+    if (type === 'info') {
+      alertDiv.style.backgroundColor = '#3b82f6';
+    } else if (type === 'success') {
+      alertDiv.style.backgroundColor = '#10b981';
+    } else if (type === 'error') {
+      alertDiv.style.backgroundColor = '#ef4444';
+    }
+    
+    alertDiv.style.color = 'white';
+    alertDiv.textContent = message;
+    
+    // Add to DOM
+    document.body.appendChild(alertDiv);
+    
+    // Remove after 5 seconds
+    setTimeout(() => {
+      alertDiv.style.opacity = '0';
+      alertDiv.style.transition = 'opacity 0.5s';
+      setTimeout(() => {
+        document.body.removeChild(alertDiv);
+      }, 500);
+    }, 5000);
+  };
+
+  // Debug log with visual alert
+  showAlert(`Login page render: Auth=${isAuthenticated}, Loading=${isLoading}, From=${from}, State=${JSON.stringify(location.state)}`, 'info');
 
   // Controlar carregamento visual suave
   useEffect(() => {
@@ -26,8 +65,18 @@ const Login: React.FC = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  // TEMPORARILY DISABLED: Automatic redirect after authentication
-  // This helps us break the redirect loop
+  // Re-enable redirect after authentication
+  useEffect(() => {
+    if (isAuthenticated && !isLoading) {
+      showAlert(`Usuário autenticado, redirecionando para: ${from}`, 'success');
+      // Add a small delay to ensure the alert is seen before redirect
+      const redirectTimer = setTimeout(() => {
+        navigate(from, { replace: true });
+      }, 1500);
+      
+      return () => clearTimeout(redirectTimer);
+    }
+  }, [isAuthenticated, isLoading, navigate, from]);
 
   // Alternar entre login e signup
   const toggleSignup = () => {
@@ -36,6 +85,7 @@ const Login: React.FC = () => {
 
   // Exibir estado de carregamento enquanto verifica autenticação
   if (isLoading) {
+    showAlert('Verificando autenticação...', 'info');
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
@@ -149,7 +199,9 @@ const Login: React.FC = () => {
       
       {/* Login Status Debug Banner */}
       <div className="fixed bottom-0 left-0 right-0 bg-orange-100 text-orange-800 p-2 text-xs text-center">
-        Debug Mode: Authentication check temporarily disabled | Auth Status: {isAuthenticated ? 'Logged In' : 'Not Logged In'}
+        Login Status: {isAuthenticated ? 'Logado' : 'Não Logado'} | 
+        Carregando: {isLoading ? 'Sim' : 'Não'} | 
+        Redirecionamento para: {from}
       </div>
     </div>
   );
