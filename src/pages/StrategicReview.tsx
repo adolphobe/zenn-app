@@ -16,20 +16,31 @@ import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { CalendarIcon, CalendarRange } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { getStoredAuth } from '@/mock/authUtils';
 
 // Main Strategic Review Page Component
 const StrategicReview: React.FC = () => {
   const { state } = useAppContext();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, logout, checkAuth } = useAuth();
   const [period, setPeriod] = useState<PeriodType>('week');
   const [customStartDate, setCustomStartDate] = useState<Date | undefined>(undefined);
   const [customEndDate, setCustomEndDate] = useState<Date | undefined>(undefined);
   const [showCustomDatePicker, setShowCustomDatePicker] = useState(false);
   
-  // Verificação de autenticação em cada renderização
+  // Verificação forçada de autenticação em cada renderização
   useEffect(() => {
-    console.log("StrategicReview: Estado de autenticação =>", isAuthenticated ? "Autenticado" : "Não autenticado");
-  }, [isAuthenticated]);
+    const timestamp = new Date().toISOString();
+    console.log(`[${timestamp}] StrategicReview: Verificando estado de autenticação => ${isAuthenticated ? "Autenticado" : "Não autenticado"}`);
+    
+    // Força verificação de token ao montar
+    const { isValid } = getStoredAuth();
+    if (!isValid && isAuthenticated) {
+      console.log(`[${timestamp}] StrategicReview: Inconsistência detectada - Token inválido mas isAuthenticated=true`);
+      logout();
+    } else {
+      checkAuth();
+    }
+  }, [isAuthenticated, logout, checkAuth]);
   
   // Use the task pillars hook to ensure all tasks have pillars assigned
   const { assignMissingPillars } = useTaskPillars();

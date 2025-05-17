@@ -12,6 +12,7 @@ const TOKEN_LAST_VERIFIED_KEY = 'acto_token_last_verified';
  * Simulates a login by checking credentials against the mock users
  */
 export const simulateLogin = (email: string, password: string): { success: boolean; user: User | null } => {
+  console.log("Auth: Tentando login para", email);
   const user = getUserByCredentials(email, password);
   if (user) {
     // Create a simple token (in a real app, this would be JWT or similar)
@@ -41,7 +42,7 @@ export const storeAuth = (user: User, token: string): void => {
   // Limpar qualquer estado de reconexão
   localStorage.removeItem(CONNECTION_RETRY_KEY);
   
-  console.log("Auth: Token armazenado e expira em", expiresAt);
+  console.log("Auth: Token armazenado e expira em", expiresAt, "para usuário", user.id);
 };
 
 /**
@@ -53,17 +54,18 @@ export const getStoredAuth = (): { user: User | null; isValid: boolean; token: s
   const isLoggedIn = localStorage.getItem(IS_LOGGED_IN_KEY) === 'true';
   const tokenExpires = localStorage.getItem(`${TOKEN_KEY}_expires`);
   
-  // Registra a verificação do token
-  localStorage.setItem(TOKEN_LAST_VERIFIED_KEY, new Date().toISOString());
+  // Registra a verificação do token com timestamp
+  const now = new Date();
+  localStorage.setItem(TOKEN_LAST_VERIFIED_KEY, now.toISOString());
   
   // Check token expiration
   const isExpired = tokenExpires 
-    ? new Date(tokenExpires) < new Date() 
+    ? new Date(tokenExpires) < now
     : true;
   
   if (token && userId && isLoggedIn && !isExpired) {
     const user = getUserById(userId);
-    console.log("Auth: Token válido para usuário", userId);
+    console.log(`Auth: [${now.toISOString()}] Token válido para usuário`, userId);
     return { 
       user, 
       isValid: !!user, 
@@ -73,7 +75,10 @@ export const getStoredAuth = (): { user: User | null; isValid: boolean; token: s
   
   // If any condition fails, clear auth data
   if ((token || userId || isLoggedIn) && (isExpired || !token || !userId || !isLoggedIn)) {
-    console.log("Auth: Token inválido ou expirado. Limpando dados de autenticação.");
+    console.log(`Auth: [${now.toISOString()}] Token inválido ou expirado. Limpando dados de autenticação.`);
+    if (isExpired && tokenExpires) {
+      console.log(`Auth: Token expirado em ${new Date(tokenExpires).toISOString()}, agora é ${now.toISOString()}`);
+    }
     clearAuth();
   }
   
@@ -105,7 +110,7 @@ export const clearConnectionRetry = (): void => {
  * Clears authentication data from localStorage
  */
 export const clearAuth = (): void => {
-  console.log("Auth: Limpando dados de autenticação");
+  console.log(`Auth: [${new Date().toISOString()}] Limpando dados de autenticação`);
   localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem(USER_ID_KEY);
   localStorage.removeItem(IS_LOGGED_IN_KEY);
@@ -117,7 +122,7 @@ export const clearAuth = (): void => {
  * Checks if authentication is valid
  */
 export const isAuthValid = (): boolean => {
-  console.log("Auth: Verificando validade do token");
+  console.log(`Auth: [${new Date().toISOString()}] Verificando validade do token`);
   const { isValid } = getStoredAuth();
   return isValid;
 };
@@ -133,6 +138,8 @@ export const wasTokenRecentlyVerified = (maxAgeSeconds = 10): boolean => {
   const lastVerifiedTime = new Date(lastVerified).getTime();
   const currentTime = new Date().getTime();
   const secondsSinceVerification = (currentTime - lastVerifiedTime) / 1000;
+  
+  console.log(`Auth: Última verificação há ${secondsSinceVerification.toFixed(1)} segundos`);
   
   return secondsSinceVerification <= maxAgeSeconds;
 }

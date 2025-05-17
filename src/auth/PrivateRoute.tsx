@@ -2,6 +2,7 @@
 import React, { useEffect } from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from './useAuth';
+import { getStoredAuth } from '../mock/authUtils';
 
 interface PrivateRouteProps {
   redirectPath?: string;
@@ -13,12 +14,28 @@ interface PrivateRouteProps {
 export const PrivateRoute: React.FC<PrivateRouteProps> = ({ 
   redirectPath = '/login'  
 }) => {
-  const { isAuthenticated, isLoading, authError } = useAuth();
+  const { isAuthenticated, isLoading, authError, logout, checkAuth } = useAuth();
   const location = useLocation();
+  
+  // Forçar verificação de autenticação ao montar o componente
+  useEffect(() => {
+    const timestamp = new Date().toISOString();
+    console.log(`[${timestamp}] PrivateRoute: Inicializando proteção para rota "${location.pathname}"`);
+    
+    // Verificação forçada de token ao montar
+    const { isValid } = getStoredAuth();
+    if (!isValid && isAuthenticated) {
+      console.log(`[${timestamp}] PrivateRoute: Inconsistência detectada - Token inválido mas isAuthenticated=true`);
+      logout();
+    } else {
+      checkAuth();
+    }
+  }, [location.pathname, isAuthenticated, logout, checkAuth]);
 
   // Log de depuração para rastrear o estado de autenticação
   useEffect(() => {
-    console.log(`PrivateRoute: Verificando autenticação para rota "${location.pathname}"`, {
+    const timestamp = new Date().toISOString();
+    console.log(`[${timestamp}] PrivateRoute: Status de autenticação para "${location.pathname}"`, {
       isAuthenticated,
       isLoading,
       authError
@@ -27,6 +44,8 @@ export const PrivateRoute: React.FC<PrivateRouteProps> = ({
 
   // Mostra um loader enquanto verifica a autenticação
   if (isLoading) {
+    const timestamp = new Date().toISOString();
+    console.log(`[${timestamp}] PrivateRoute: Carregando verificação de autenticação...`);
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
@@ -36,7 +55,8 @@ export const PrivateRoute: React.FC<PrivateRouteProps> = ({
 
   // Se a sessão expirou, redireciona para login com mensagem específica
   if (authError === 'session_expired') {
-    console.log("PrivateRoute: Sessão expirada, redirecionando para", redirectPath);
+    const timestamp = new Date().toISOString();
+    console.log(`[${timestamp}] PrivateRoute: Sessão expirada, redirecionando para ${redirectPath}`);
     return <Navigate 
       to={redirectPath} 
       state={{ 
@@ -50,7 +70,8 @@ export const PrivateRoute: React.FC<PrivateRouteProps> = ({
   // Se não estiver autenticado, redireciona para a rota especificada
   // Armazena a localização atual para redirecionar de volta após login
   if (!isAuthenticated) {
-    console.log("PrivateRoute: Não autenticado, redirecionando para", redirectPath);
+    const timestamp = new Date().toISOString();
+    console.log(`[${timestamp}] PrivateRoute: Não autenticado, redirecionando para ${redirectPath}`);
     return <Navigate 
       to={redirectPath} 
       state={{ from: location }} 
@@ -59,6 +80,7 @@ export const PrivateRoute: React.FC<PrivateRouteProps> = ({
   }
 
   // Se estiver autenticado, renderiza as rotas filhas
-  console.log("PrivateRoute: Autenticado, renderizando rota protegida");
+  const timestamp = new Date().toISOString();
+  console.log(`[${timestamp}] PrivateRoute: Autenticado, renderizando rota protegida ${location.pathname}`);
   return <Outlet />;
 };

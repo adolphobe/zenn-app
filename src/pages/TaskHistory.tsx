@@ -1,7 +1,7 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '@/context/AppContext';
-import { useAuth } from '@/auth/useAuth'; // Adicionando import direto do useAuth
+import { useAuth } from '@/auth/useAuth';
+import { getStoredAuth } from '@/mock/authUtils';
 
 // Import refactored hooks
 import { useCompletedTasks } from '@/components/task-history/hooks/useCompletedTasks';
@@ -19,13 +19,23 @@ import { TaskPagination } from '@/components/task-history/TaskPagination';
 
 const TaskHistory = () => {
   const { state } = useAppContext();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, logout, checkAuth } = useAuth();
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('grid');
   
-  // Verificação de autenticação em cada renderização
+  // Verificação forçada de autenticação em cada renderização
   useEffect(() => {
-    console.log("TaskHistory: Estado de autenticação =>", isAuthenticated ? "Autenticado" : "Não autenticado");
-  }, [isAuthenticated]);
+    const timestamp = new Date().toISOString();
+    console.log(`[${timestamp}] TaskHistory: Verificando estado de autenticação => ${isAuthenticated ? "Autenticado" : "Não autenticado"}`);
+    
+    // Força verificação de token ao montar
+    const { isValid } = getStoredAuth();
+    if (!isValid && isAuthenticated) {
+      console.log(`[${timestamp}] TaskHistory: Inconsistência detectada - Token inválido mas isAuthenticated=true`);
+      logout();
+    } else {
+      checkAuth();
+    }
+  }, [isAuthenticated, logout, checkAuth]);
   
   // Use our custom hooks to manage the task data, filtering and pagination
   const { completedTasks } = useCompletedTasks(state.tasks);

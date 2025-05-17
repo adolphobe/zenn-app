@@ -18,6 +18,7 @@ export interface AuthContextType {
   logout: () => void;
   clearAuthError: () => void;
   resumePendingLogin: () => Promise<boolean>;
+  checkAuth: () => Promise<void>; // Nova função para verificação de autenticação
 }
 
 // Create context with default values
@@ -31,4 +32,5 @@ export const AuthContext = createContext<AuthContextType>({
   logout: () => {},
   clearAuthError: () => {},
   resumePendingLogin: () => Promise.resolve(false),
+  checkAuth: () => Promise.resolve(),
 });
