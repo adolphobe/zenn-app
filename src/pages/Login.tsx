@@ -15,10 +15,10 @@ const Login: React.FC = () => {
   // Get redirect path from location state or default to dashboard
   const from = location.state?.from || "/dashboard";
 
-  // Debug log
+  // Debug log - returning fragment instead of void
   const renderDebugLog = () => {
     console.log(`[AUTH:LOGIN] Página de login renderizada: Auth=${isAuthenticated}, Loading=${isLoading}, From=${from}, State=${JSON.stringify(location.state)}`);
-    return null;
+    return <></>;
   };
 
   // Redirect after authentication

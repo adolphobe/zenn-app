@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock, User, AlertCircle, CheckCircle } from 'lucide-react';
@@ -80,11 +79,17 @@ const SignupForm: React.FC<SignupFormProps> = ({ onCancel, redirectPath = "/dash
   const iconColor = "text-gray-800 dark:text-gray-200"; 
   const eyeIconColor = "text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-100";
 
+  // Log for debugging - using a fragment to not return void
+  const renderLog = () => {
+    console.log('[AUTH:FORM:SIGNUP] Renderizando formulário de cadastro');
+    return <></>;
+  };
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         {/* Log and notification area */}
-        {console.log('[AUTH:FORM:SIGNUP] Renderizando formulário de cadastro')}
+        {renderLog()}
         
         {signupError && (
           <Alert variant="destructive" className="bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 py-2 animate-in fade-in slide-in-from-top-5 duration-300">

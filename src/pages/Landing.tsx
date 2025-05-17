@@ -11,28 +11,25 @@ import CTASection from '@/components/landing/CTASection';
 import Footer from '@/components/landing/Footer';
 import ExplanationModal from '@/components/landing/ExplanationModal';
 
-// Add types for HeroSectionProps
+// Make sure these interfaces match the component requirements
 interface HeroSectionProps {
-  openModal: () => void;
+  // Add the required props based on the component definition
+  openExplanationModal: () => void;
 }
 
-// Add types for FeaturesSectionProps
 interface FeaturesSectionProps {
   openExplanationModal: () => void;
 }
 
-// Add types for TestimonialsSectionProps
 interface TestimonialsSectionProps {
   activeTestimonial: number;
   setActiveTestimonial: (index: number) => void;
 }
 
-// Add types for CTASectionProps
 interface CTASectionProps {
   handleGetStarted: () => void;
 }
 
-// Add types for ExplanationModalProps
 interface ExplanationModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -46,7 +43,11 @@ const Landing: React.FC = () => {
   const [activeTestimonial, setActiveTestimonial] = React.useState(0);
   const [currentModalData, setCurrentModalData] = React.useState(null);
 
-  console.log(`[AUTH:LANDING] Renderizando página inicial: Autenticado=${isAuthenticated}`);
+  // Log with fragment return instead of void
+  const renderDebugLog = () => {
+    console.log(`[AUTH:LANDING] Renderizando página inicial: Autenticado=${isAuthenticated}`);
+    return <></>;
+  };
 
   const handleLogout = async () => {
     console.log('[AUTH:LANDING] Iniciando logout');
@@ -66,9 +67,9 @@ const Landing: React.FC = () => {
 
   return (
     <div className="bg-white dark:bg-gray-900">
-      {console.log('[AUTH:LANDING] Renderizando conteúdo da página inicial')}
+      {renderDebugLog()}
       
-      <HeroSection openModal={openExplanationModal} />
+      <HeroSection openExplanationModal={openExplanationModal} />
       <FeaturesSection openExplanationModal={openExplanationModal} />
       <TestimonialsSection 
         activeTestimonial={activeTestimonial}

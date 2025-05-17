@@ -1,4 +1,3 @@
-
 import { createContext, useState, useEffect, ReactNode } from 'react';
 import { User } from '@/types/user';
 import { supabase } from '@/integrations/supabase/client';

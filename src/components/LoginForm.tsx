@@ -93,11 +93,17 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, redirectPath = "/dashb
   const iconColor = "text-gray-800 dark:text-gray-200"; 
   const eyeIconColor = "text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-100";
 
+  // Log for debugging - using a fragment to not return void
+  const renderLog = () => {
+    console.log('[AUTH:FORM:LOGIN] Renderizando formulário de login');
+    return <></>;
+  };
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         {/* Log and notification area */}
-        {console.log('[AUTH:FORM:LOGIN] Renderizando formulário de login')}
+        {renderLog()}
         
         {loginError && (
           <Alert variant="destructive" className="bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 py-2 animate-in fade-in slide-in-from-top-5 duration-300">

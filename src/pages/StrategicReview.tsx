@@ -33,7 +33,6 @@ import { cn } from "@/lib/utils"
 import { Calendar } from "lucide-react"
 
 interface Task {
-  // Define the task interface structure here
   id: string;
   title: string;
   // Add other fields as needed
@@ -42,10 +41,15 @@ interface Task {
 const StrategicReview: React.FC = () => {
   const { currentUser } = useAuth();
   const {
-    data: { taskSummary, pillarsAnalysis, feedbackAnalysis },
+    data, // Properly destructure data object
     isLoading,
     error
   } = useInsightsAnalysis();
+
+  // Extract data properties correctly
+  const taskSummary = data?.taskSummary || [];
+  const pillarsAnalysis = data?.pillarsAnalysis || [];
+  const feedbackAnalysis = data?.feedbackAnalysis || [];
 
   if (isLoading) {
     return <div>Loading...</div>;

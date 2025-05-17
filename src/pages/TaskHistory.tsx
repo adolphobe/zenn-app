@@ -4,16 +4,17 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { useAuth } from '@/context/auth';
 import { TaskHistoryStats } from '@/components/task-history/TaskHistoryStats';
-import { TaskFilters } from '@/components/task-history/TaskFilters';
+import TaskFilters from '@/components/task-history/TaskFilters';
 import { ViewToggle } from '@/components/task-history/ViewToggle';
-import { TaskCards } from '@/components/task-history/TaskCards';
-import { TaskTable } from '@/components/task-history/TaskTable';
+import { CompletedTaskCard, TaskGroupGrid } from '@/components/task-history/task-cards';
+import { TasksTable } from '@/components/task-history/TaskTable';
 
 const TaskHistory: React.FC = () => {
   const { currentUser } = useAuth();
   const [tasks, setTasks] = useState([]);
   const [filteredTasks, setFilteredTasks] = useState([]);
   const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards');
+  const [sortBy, setSortBy] = useState('recent');
   const [filters, setFilters] = useState({
     pillar: 'all',
     dateRange: 'all',
@@ -71,15 +72,20 @@ const TaskHistory: React.FC = () => {
 
       <div className="flex justify-between items-center mb-4">
         <TaskFilters onFilterChange={handleFilterChange} />
-        <ViewToggle onViewToggle={handleViewToggle} />
+        <ViewToggle 
+          viewMode={viewMode} 
+          setViewMode={setViewMode}
+          sortBy={sortBy}
+          setSortBy={setSortBy}
+        />
       </div>
 
-      <TaskHistoryStats tasks={filteredTasks} />
+      <TaskHistoryStats filteredTasks={filteredTasks} />
 
       {viewMode === 'cards' ? (
-        <TaskCards tasks={filteredTasks} />
+        <TaskGroupGrid tasks={filteredTasks} />
       ) : (
-        <TaskTable tasks={filteredTasks} />
+        <TasksTable tasks={filteredTasks} />
       )}
     </div>
   );
