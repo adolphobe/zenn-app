@@ -8,14 +8,14 @@ export const PrivateRoute = () => {
   const location = useLocation();
   const [authChecked, setAuthChecked] = useState(false);
   
-  // Definir authChecked como verdadeiro após a verificação inicial
+  // Mark authChecked as true once the initial authentication check is complete
   useEffect(() => {
     if (!isLoading) {
       setAuthChecked(true);
     }
   }, [isLoading]);
   
-  // Se ainda estiver carregando, mostra um indicador de carregamento
+  // Show loading indicator if authentication state is still being determined
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">
@@ -24,15 +24,13 @@ export const PrivateRoute = () => {
     );
   }
   
-  // Em desenvolvimento, permitir acesso independentemente da autenticação
-  // Remova esta condição para exigir autenticação mesmo em desenvolvimento
-  // const isDevelopment = import.meta.env.DEV;
-  
-  // Se estiver autenticado, permite o acesso
+  // If authenticated, allow access to protected routes
   if (isAuthenticated) {
+    console.log('User is authenticated, rendering protected route');
     return <Outlet />;
   }
   
-  // Caso contrário, redireciona para login com o caminho atual como estado
+  // If not authenticated and authentication check is complete, redirect to login
+  console.log('User is not authenticated, redirecting to login from', location.pathname);
   return <Navigate to="/login" state={{ from: location }} replace />;
 };

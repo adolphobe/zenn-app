@@ -4,7 +4,6 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import LoginForm from '../components/LoginForm';
 import SignupForm from '../components/SignupForm';
 import { useAuth } from '@/context/AuthContext';
-import { toast } from '@/hooks/use-toast';
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -13,19 +12,19 @@ const Login: React.FC = () => {
   const [loaded, setLoaded] = useState(false);
   const [isSignup, setIsSignup] = useState(false);
   
-  // Obter o caminho para onde redirecionar após o login
+  // Get the path to redirect to after login
   const from = location.state?.from?.pathname || "/dashboard";
 
-  // Verificar se já está logado e redirecionar para dashboard
+  // Check if already logged in and redirect to dashboard
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
-      console.log('Já autenticado, redirecionando para:', from);
+      console.log('Already authenticated, redirecting to:', from);
       navigate(from, { replace: true });
     } else {
-      console.log('Estado de autenticação:', { isLoading, isAuthenticated });
+      console.log('Auth state in Login:', { isLoading, isAuthenticated });
     }
     
-    // Definir estado carregado para animações
+    // Set loaded state for animations
     const timer = setTimeout(() => {
       setLoaded(true);
     }, 100);
@@ -33,12 +32,12 @@ const Login: React.FC = () => {
     return () => clearTimeout(timer);
   }, [navigate, isAuthenticated, isLoading, from]);
 
-  // Alternar entre login e cadastro
+  // Toggle between login and signup
   const toggleSignup = () => {
     setIsSignup(!isSignup);
   };
 
-  // Se estiver verificando a autenticação, exibe um loader
+  // If checking authentication, display a loader
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">
@@ -47,7 +46,7 @@ const Login: React.FC = () => {
     );
   }
 
-  // Itens flutuantes animados para o fundo com posições aleatórias e animações contínuas
+  // Animated floating items for background with random positions and continuous animations
   const floatingItems = Array(7).fill(null).map((_, i) => (
     <div 
       key={i}

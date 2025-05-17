@@ -1,9 +1,9 @@
 
 import React, { createContext, useContext } from 'react';
 import { User } from '../types/user';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from './AuthContext';
 
-// Tipo do contexto do usuário
+// User context type
 interface UserContextType {
   currentUser: User | null;
   isLoading: boolean;
@@ -11,15 +11,21 @@ interface UserContextType {
   logout: () => Promise<void>;  
 }
 
-// Criação do contexto
+// Create context
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
-// Provider do contexto
+// Context provider
 export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Agora estamos usando nosso contexto de autenticação atualizado
+  // Using our updated authentication context
   const { currentUser, isLoading, isAuthenticated, logout } = useAuth();
   
-  // Valor fornecido pelo contexto
+  console.log("UserProvider: Received auth state", { 
+    isAuthenticated, 
+    isLoading,
+    hasUser: !!currentUser
+  });
+  
+  // Value provided by the context
   const value = {
     currentUser,
     isLoading,
@@ -30,7 +36,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 };
 
-// Hook personalizado para usar o contexto
+// Custom hook to use the context
 export const useUser = (): UserContextType => {
   const context = useContext(UserContext);
   if (context === undefined) {

@@ -19,13 +19,9 @@ const SidebarUserProfile: React.FC<SidebarUserProfileProps> = ({ sidebarOpen }) 
   const handleLogout = async () => {
     try {
       await logout();
-      toast({
-        title: "Logout realizado",
-        description: "Você foi desconectado com sucesso",
-      });
       navigate('/login');
     } catch (error) {
-      console.error("Erro ao fazer logout:", error);
+      console.error("Error logging out:", error);
       toast({
         title: "Erro ao fazer logout",
         description: "Ocorreu um erro ao tentar desconectar",

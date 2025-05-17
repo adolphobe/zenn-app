@@ -20,7 +20,7 @@ interface AuthContextType {
 export const AuthContext = createContext<AuthContextType>({
   currentUser: null,
   isAuthenticated: false,
-  isLoading: false,
+  isLoading: true,
   login: async () => false,
   signup: async () => false,
   logout: async () => {},
@@ -88,67 +88,75 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Efeito para configurar o listener de autenticação do Supabase
   useEffect(() => {
-    // Primeiro configurar o listener para mudanças no estado de autenticação
+    console.log("AuthProvider: Initializing auth state");
+    
+    // First set up the auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        console.log("Event from Supabase auth:", event);
-        setSession(session);
+      (event, newSession) => {
+        console.log("Auth state changed:", event, newSession?.user?.email);
+        setSession(newSession);
         
-        if (session?.user) {
-          try {
-            // Buscar dados do perfil do usuário
-            const { data: profileData } = await supabase
-              .from('profiles')
-              .select('*')
-              .eq('id', session.user.id)
-              .maybeSingle();
+        if (newSession?.user) {
+          // Deferred API call to prevent blocking the auth flow
+          setTimeout(async () => {
+            try {
+              // Fetch user profile data
+              const { data: profileData } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', newSession.user.id)
+                .maybeSingle();
               
-            // Mapear o usuário do Supabase para nosso formato
-            const mappedUser = mapSupabaseUser(session.user, profileData);
-            setCurrentUser(mappedUser);
-          } catch (error) {
-            console.error("Erro ao buscar perfil do usuário:", error);
-            // Mesmo sem perfil, podemos usar os dados básicos do usuário
-            const mappedUser = mapSupabaseUser(session.user);
-            setCurrentUser(mappedUser);
-          }
+              const mappedUser = mapSupabaseUser(newSession.user, profileData);
+              console.log("User mapped:", mappedUser.email);
+              setCurrentUser(mappedUser);
+            } catch (error) {
+              console.error("Error fetching user profile:", error);
+              const mappedUser = mapSupabaseUser(newSession.user);
+              setCurrentUser(mappedUser);
+            }
+          }, 0);
         } else {
           setCurrentUser(null);
         }
       }
     );
-
-    // Em seguida, verificar se já existe uma sessão ativa
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      console.log("Initial session check:", session ? "Session found" : "No session");
-      setSession(session);
+    
+    // Then check for an existing session
+    supabase.auth.getSession().then(({ data: { session: existingSession } }) => {
+      console.log("Initial session check:", existingSession ? "Session found" : "No session");
+      setSession(existingSession);
       
-      if (session?.user) {
-        try {
-          // Buscar dados do perfil do usuário
-          const { data: profileData } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', session.user.id)
-            .maybeSingle();
+      if (existingSession?.user) {
+        // Deferred API call to prevent blocking the auth flow
+        setTimeout(async () => {
+          try {
+            // Fetch user profile data
+            const { data: profileData } = await supabase
+              .from('profiles')
+              .select('*')
+              .eq('id', existingSession.user.id)
+              .maybeSingle();
             
-          // Mapear o usuário do Supabase para nosso formato
-          const mappedUser = mapSupabaseUser(session.user, profileData);
-          setCurrentUser(mappedUser);
-        } catch (error) {
-          console.error("Erro ao buscar perfil do usuário:", error);
-          // Mesmo sem perfil, podemos usar os dados básicos do usuário
-          const mappedUser = mapSupabaseUser(session.user);
-          setCurrentUser(mappedUser);
-        }
+            const mappedUser = mapSupabaseUser(existingSession.user, profileData);
+            console.log("Initial user mapped:", mappedUser.email);
+            setCurrentUser(mappedUser);
+          } catch (error) {
+            console.error("Error fetching initial user profile:", error);
+            const mappedUser = mapSupabaseUser(existingSession.user);
+            setCurrentUser(mappedUser);
+          } finally {
+            setIsLoading(false);
+          }
+        }, 0);
+      } else {
+        setIsLoading(false);
       }
-      
-      setIsLoading(false);
     });
-
+    
     return () => {
+      console.log("AuthProvider: Cleanup - unsubscribing from auth state changes");
       subscription.unsubscribe();
     };
   }, []);
@@ -158,35 +166,33 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setIsLoading(true);
     
     try {
-      console.log("Tentando fazer login com email:", email);
+      console.log("Attempting login with email:", email);
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password
       });
       
       if (error) {
-        console.error("Erro ao fazer login:", error);
+        console.error("Login error:", error.message);
         toast({
           title: "Erro ao fazer login",
           description: error.message,
           variant: "destructive"
         });
         
-        // Propagar o erro para o componente de login tratar adequadamente
-        if (error.message.includes("Email not confirmed")) {
-          throw new Error("Email not confirmed");
-        } else if (error.message.includes("Invalid login credentials")) {
-          throw new Error("Invalid login credentials");
-        }
-        
-        return false;
+        throw error;
       }
       
-      console.log("Login bem-sucedido:", data.user?.email);
+      console.log("Login successful:", data.user?.email);
+      toast({
+        title: "Login bem-sucedido",
+        description: "Você foi autenticado com sucesso",
+      });
+      
       return true;
     } catch (error: any) {
-      console.error("Erro ao fazer login:", error);
-      throw error; // Propagar o erro para o componente de login
+      console.error("Login error:", error);
+      throw error;
     } finally {
       setIsLoading(false);
     }
@@ -197,8 +203,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setIsLoading(true);
     
     try {
-      console.log("Tentando criar conta com email:", email);
-      // Criar usuário no Supabase Auth
+      console.log("Attempting to create account with email:", email);
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -210,7 +215,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       });
       
       if (error) {
-        console.error("Erro ao criar conta:", error);
+        console.error("Signup error:", error.message);
         toast({
           title: "Erro ao criar conta",
           description: error.message,
@@ -220,7 +225,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
       
       if (data?.user?.identities?.length === 0) {
-        console.error("Usuário já existente");
+        console.error("User already exists");
         toast({
           title: "Erro ao criar conta",
           description: "Este e-mail já está registrado.",
@@ -229,25 +234,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         throw new Error("user_already_exists");
       }
       
-      // Verificar se a confirmação de e-mail está ativada
+      // Check if email confirmation is required
       if (data?.user && !data.session) {
-        console.log("Confirmação de email necessária");
+        console.log("Email confirmation required");
         toast({
           title: "Conta criada com sucesso",
           description: "Um e-mail de confirmação foi enviado para " + email + ". Por favor, verifique sua caixa de entrada e confirme seu e-mail para fazer login.",
         });
       } else {
-        console.log("Conta criada e autenticada automaticamente");
+        console.log("Account created and automatically authenticated");
         toast({
           title: "Conta criada com sucesso",
           description: "Sua conta foi criada e você foi autenticado automaticamente."
         });
       }
       
-      // O listener onAuthStateChange irá atualizar o estado do usuário
       return true;
     } catch (error: any) {
-      console.error("Erro ao criar conta:", error);
+      console.error("Signup error:", error);
       if (!error.message) {
         error.message = "Ocorreu um erro ao criar sua conta";
       }
@@ -259,10 +263,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   
   // Logout
   const logout = async () => {
+    console.log("Logging out user");
     const { error } = await supabase.auth.signOut();
     
     if (error) {
-      console.error("Erro ao fazer logout:", error);
+      console.error("Logout error:", error.message);
       toast({
         title: "Erro ao fazer logout",
         description: error.message,
@@ -271,10 +276,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     } else {
       setCurrentUser(null);
       setSession(null);
+      console.log("User logged out successfully");
+      toast({
+        title: "Logout realizado",
+        description: "Você foi desconectado com sucesso",
+      });
     }
   };
   
-  // Valor do contexto
+  // Value provided by the context
   const value = {
     currentUser,
     isAuthenticated: !!session?.user,
