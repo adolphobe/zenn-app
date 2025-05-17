@@ -13,7 +13,7 @@ import TaskHistory from "./pages/TaskHistory";
 import Landing from "./pages/Landing";
 import Dashboard from "./components/Dashboard";
 import Login from "./pages/Login";
-import { AuthProvider } from "./context/AuthContext";
+import { AuthProvider } from "./context/auth";
 import { PrivateRoute } from "./components/PrivateRoute";
 import { UserProvider } from "./context/UserContext";
 

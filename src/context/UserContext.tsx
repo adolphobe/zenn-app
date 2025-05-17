@@ -1,7 +1,7 @@
 
 import React, { createContext, useContext } from 'react';
 import { User } from '../types/user';
-import { useAuth } from './AuthContext';
+import { useAuth } from '@/context/auth';
 
 // Tipo do contexto do usuário
 interface UserContextType {

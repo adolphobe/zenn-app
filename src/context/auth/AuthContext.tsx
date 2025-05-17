@@ -1,22 +1,13 @@
 
-import { createContext, useState, useContext, useEffect, ReactNode } from 'react';
-import { User } from '../types/user';
+import { createContext, useState, useEffect, ReactNode } from 'react';
+import { User } from '@/types/user';
 import { supabase } from '@/integrations/supabase/client';
-import { Session, User as SupabaseUser } from '@supabase/supabase-js';
+import { Session } from '@supabase/supabase-js';
 import { toast } from '@/hooks/use-toast';
+import { AuthContextType } from './types';
+import { mapSupabaseUser } from './utils';
 
-// Tipo para o contexto de autenticação
-interface AuthContextType {
-  currentUser: User | null;
-  isAuthenticated: boolean;
-  isLoading: boolean;
-  login: (email: string, password: string) => Promise<boolean>;
-  signup: (email: string, password: string, name: string) => Promise<boolean>;
-  logout: () => Promise<void>;
-  session: Session | null;
-}
-
-// Criar contexto
+// Create context with default values
 export const AuthContext = createContext<AuthContextType>({
   currentUser: null,
   isAuthenticated: false,
@@ -27,61 +18,7 @@ export const AuthContext = createContext<AuthContextType>({
   session: null,
 });
 
-// Hook para usar o contexto
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth deve ser usado dentro de um AuthProvider');
-  }
-  return context;
-};
-
-// Função para converter usuário do Supabase para o formato do nosso app
-const mapSupabaseUser = (user: SupabaseUser, profileData?: any): User => {
-  return {
-    id: user.id,
-    name: profileData?.full_name || user.user_metadata?.name || '',
-    email: user.email || '',
-    profileImage: profileData?.avatar_url || user.user_metadata?.avatar_url || '',
-    lastLoginAt: new Date().toISOString(),
-    createdAt: user.created_at || new Date().toISOString(),
-    preferences: {
-      darkMode: false,
-      activeViewMode: 'power',
-      sidebarOpen: true,
-      viewModeSettings: {
-        power: {
-          showHiddenTasks: false,
-          showPillars: true,
-          showDates: true,
-          showScores: true,
-          sortOptions: {
-            sortDirection: 'desc',
-            noDateAtEnd: true
-          }
-        },
-        chronological: {
-          showHiddenTasks: false,
-          showPillars: true,
-          showDates: true,
-          showScores: true,
-          sortOptions: {
-            sortDirection: 'asc',
-            noDateAtEnd: true
-          }
-        }
-      },
-      dateDisplayOptions: {
-        hideYear: false,
-        hideTime: false,
-        hideDate: false
-      }
-    },
-    password: ''
-  };
-};
-
-// Provider
+// Provider component
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
@@ -92,7 +29,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     console.log('[AUTH] Inicializando provider de autenticação');
     let mounted = true;
     
-    // First set up the auth state listener
+    // Set up the auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, newSession) => {
         console.log(`[AUTH] Evento de autenticação: ${event} para ${newSession?.user?.email || 'usuário desconhecido'}`);
@@ -102,7 +39,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
           setSession(newSession);
           if (newSession?.user) {
-            // Update user synchronously to avoid race conditions
             console.log(`[AUTH] Usuário autenticado: ${newSession.user.email}`);
             
             // Fetch profile data non-blocking
@@ -118,7 +54,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                   setCurrentUser(mappedUser);
                 }
               })
-              .catch((error) => {
+              .catch((error: Error) => {
                 console.error(`[AUTH] Erro ao buscar perfil: ${error.message}`);
                 if (mounted) {
                   const mappedUser = mapSupabaseUser(newSession.user);
@@ -134,7 +70,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
     );
     
-    // Then check for an existing session
+    // Check for an existing session
     supabase.auth.getSession().then(({ data: { session: existingSession } }) => {
       console.log(`[AUTH] Verificação inicial de sessão: ${existingSession ? "Sessão encontrada" : "Sem sessão"}`);
       
@@ -156,7 +92,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               setCurrentUser(mappedUser);
             }
           })
-          .catch((error) => {
+          .catch((error: Error) => {
             console.error(`[AUTH] Erro ao buscar perfil inicial: ${error.message}`);
             if (mounted) {
               const mappedUser = mapSupabaseUser(existingSession.user);
@@ -165,7 +101,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           })
           .finally(() => {
             if (mounted) {
-              // Mark auth as initialized and not loading anymore
               setIsLoading(false);
               setAuthInitialized(true);
               console.log('[AUTH] Autenticação inicializada com sessão existente');
@@ -177,7 +112,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setAuthInitialized(true);
         console.log('[AUTH] Sem sessão inicial, autenticação inicializada');
       }
-    }).catch((error) => {
+    }).catch((error: Error) => {
       console.error(`[AUTH] Erro ao verificar sessão: ${error.message}`);
       if (mounted) {
         setIsLoading(false);
@@ -192,7 +127,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
   }, []);
 
-  // Login
+  // Login function
   const login = async (email: string, password: string): Promise<boolean> => {
     setIsLoading(true);
     console.log(`[AUTH] Tentando login com email: ${email}`);
@@ -211,7 +146,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           variant: "destructive"
         });
         
-        return false; // Return false instead of throwing
+        return false;
       }
       
       console.log(`[AUTH] Login bem-sucedido: ${data.user?.email}`);
@@ -223,13 +158,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       return true;
     } catch (error: any) {
       console.error("[AUTH] Login error:", error);
-      return false; // Return false on exception
+      return false;
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Cadastro
+  // Signup function
   const signup = async (email: string, password: string, name: string): Promise<boolean> => {
     setIsLoading(true);
     console.log(`[AUTH] Tentando criar conta com email: ${email}`);
@@ -252,7 +187,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           description: error.message,
           variant: "destructive"
         });
-        return false; // Return false instead of throwing
+        return false;
       }
       
       if (data?.user?.identities?.length === 0) {
@@ -262,7 +197,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           description: "Este e-mail já está registrado.",
           variant: "destructive"
         });
-        return false; // Return false instead of throwing
+        return false;
       }
       
       // Check if email confirmation is required
@@ -283,13 +218,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       return true;
     } catch (error: any) {
       console.error("[AUTH] Signup error:", error);
-      return false; // Return false on exception
+      return false;
     } finally {
       setIsLoading(false);
     }
   };
   
-  // Logout
+  // Logout function
   const logout = async (): Promise<void> => {
     console.log('[AUTH] Desconectando usuário');
     setIsLoading(true);
@@ -304,7 +239,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           description: error.message,
           variant: "destructive"
         });
-        // Don't use .catch here since we're already in a try/catch
         throw error;
       } else {
         setCurrentUser(null);
@@ -317,14 +251,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
     } catch (error: any) {
       console.error("[AUTH] Error during logout:", error);
-      // Don't use .catch here since we're already in a try/catch
       throw error;
     } finally {
       setIsLoading(false);
     }
   };
   
-  // Value provided by the context
+  // Context value
   const value = {
     currentUser,
     isAuthenticated: !!session?.user,
