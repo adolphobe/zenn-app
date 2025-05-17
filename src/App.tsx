@@ -11,7 +11,6 @@ import StrategicReview from "./pages/StrategicReview";
 import TaskHistory from "./pages/TaskHistory";
 import Landing from "./pages/Landing";
 import Dashboard from "./components/Dashboard";
-import Dashboard2 from "./components/Dashboard2";
 import Login from "./pages/Login";
 import { PrivateRoute } from "./components/PrivateRoute";
 import { AuthProvider } from "./context/AuthContext";
@@ -43,7 +42,6 @@ const App = () => (
               {/* Protected routes */}
               <Route element={<PrivateRoute />}>
                 <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/dashboard2" element={<Dashboard2 />} />
                 <Route path="/strategic-review" element={<StrategicReview />} />
                 <Route path="/history" element={<TaskHistory />} />
               </Route>

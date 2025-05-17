@@ -43,16 +43,26 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onSwitchToSignup }) =>
     setLoginError(null);
     
     try {
+      console.log("[LoginForm] Attempting login with:", values.email);
       const success = await login(values.email, values.password);
       
       if (!success) {
+        console.error("[LoginForm] Login failed for:", values.email);
         setLoginError("Usuário não encontrado ou senha incorreta. Por favor, verifique suas credenciais.");
-      } else if (onSuccess) {
-        onSuccess();
+      } else {
+        console.log("[LoginForm] Login successful for:", values.email);
+        toast({
+          title: "Login realizado com sucesso",
+          description: "Você foi autenticado com sucesso",
+        });
+        if (onSuccess) {
+          console.log("[LoginForm] Running onSuccess callback");
+          onSuccess();
+        }
       }
     } catch (error) {
+      console.error("[LoginForm] Login error:", error);
       setLoginError("Ocorreu um erro ao processar sua solicitação. Por favor, tente novamente.");
-      console.error("Login error:", error);
     } finally {
       setIsLoading(false);
     }

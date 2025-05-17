@@ -1,5 +1,5 @@
 
-import { Navigate, Outlet, useLocation } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import Sidebar from './Sidebar';
 import { useSidebar } from '@/context/hooks';
@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils';
 
 /**
  * PrivateRoute - Protects routes that require authentication
- * Redirects to login if not authenticated
+ * Logs instead of redirecting when not authenticated
  */
 export const PrivateRoute = () => {
   const { isAuthenticated, isLoading } = useAuth();
@@ -25,10 +25,21 @@ export const PrivateRoute = () => {
     </div>;
   }
 
-  // Redirect to login if not authenticated
+  // Log auth status but don't redirect
   if (!isAuthenticated) {
-    console.log(`[PrivateRoute] User not authenticated, redirecting to login from ${location.pathname}`);
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    console.error(`[PrivateRoute] AUTHENTICATION ERROR: User not authenticated at ${location.pathname}`);
+    console.error("[PrivateRoute] TECHNICAL DETAILS: Would normally redirect to /login but redirection is disabled");
+    console.error("[PrivateRoute] AUTH STATE:", { isAuthenticated, isLoading, path: location.pathname });
+    
+    // Return a message instead of redirecting
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gray-50">
+        <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4 max-w-lg">
+          <p className="font-bold">Authentication Required</p>
+          <p>You need to be logged in to access this page. Check console for technical details.</p>
+        </div>
+      </div>
+    );
   }
 
   // User is authenticated, render the protected layout with sidebar

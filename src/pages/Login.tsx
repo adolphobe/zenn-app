@@ -1,19 +1,18 @@
 
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import LoginForm from '../components/LoginForm';
 import SignupForm from '../components/SignupForm';
 
 const Login: React.FC = () => {
-  const navigate = useNavigate();
   const location = useLocation();
   const { isAuthenticated, isLoading } = useAuth();
   const [isSignup, setIsSignup] = useState(false);
   const [loaded, setLoaded] = useState(false);
   
-  // Get redirect path from location state or default to dashboard2
-  const from = location.state?.from?.pathname || "/dashboard2";
+  // Get redirect path from location state or default to dashboard
+  const from = location.state?.from?.pathname || "/dashboard";
   
   // Smooth visual loading
   useEffect(() => {
@@ -24,30 +23,37 @@ const Login: React.FC = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  // Redirect if already authenticated, but only after initial load
+  // Log authentication status but don't redirect
   useEffect(() => {
-    // Avoid immediate redirect to prevent loops
     if (isAuthenticated && !isLoading) {
-      console.log("Login page: User already authenticated, redirecting to", from);
-      // Add a small delay to avoid potential redirect loops
-      const redirectTimer = setTimeout(() => {
-        navigate(from, { replace: true });
-      }, 100);
-      
-      return () => clearTimeout(redirectTimer);
+      console.log("[Login] User is already authenticated");
+      console.log(`[Login] TECHNICAL DETAILS: Would normally redirect to ${from} but redirection is disabled`);
+      console.log("[Login] AUTH STATE:", { isAuthenticated, isLoading, redirectPath: from });
     }
-  }, [isAuthenticated, isLoading, navigate, from]);
+  }, [isAuthenticated, isLoading, from]);
 
   // Toggle between login and signup
   const toggleSignup = () => {
     setIsSignup(!isSignup);
   };
 
-  // Prevent rendering content during loading or if already authenticated
+  // Prevent rendering content during loading
   if (isLoading) {
     return <div className="flex items-center justify-center min-h-screen">
       <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
     </div>;
+  }
+
+  // If user is authenticated, show message instead of redirecting
+  if (isAuthenticated) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gray-50">
+        <div className="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 mb-4 max-w-lg">
+          <p className="font-bold">Already Authenticated</p>
+          <p>You are already logged in. Check console for technical details.</p>
+        </div>
+      </div>
+    );
   }
 
   // Background animation elements
@@ -131,7 +137,9 @@ const Login: React.FC = () => {
           {isSignup ? (
             <SignupForm onCancel={toggleSignup} />
           ) : (
-            <LoginForm onSwitchToSignup={toggleSignup} onSuccess={() => navigate('/dashboard2', { replace: true })} />
+            <LoginForm onSwitchToSignup={toggleSignup} onSuccess={() => {
+              console.log("[Login] Login successful, would redirect to", from);
+            }} />
           )}
         </div>
 
