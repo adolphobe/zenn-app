@@ -30,24 +30,30 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Initialize user from localStorage on component mount
   useEffect(() => {
-    const checkLoggedInUser = () => {
-      const userId = localStorage.getItem('acto_user_id');
-      
-      if (userId) {
-        const user = getUserById(userId);
-        if (user) {
-          setCurrentUser(user);
+    const checkLoggedInUser = async () => {
+      try {
+        const userId = localStorage.getItem('acto_user_id');
+        const isLoggedIn = localStorage.getItem('acto_is_logged_in') === 'true';
+        
+        if (userId && isLoggedIn) {
+          const user = getUserById(userId);
           
-          // Apply user preferences
-          applyUserPreferences(user.preferences);
-        } else {
-          // Invalid user ID stored, clear it
-          localStorage.removeItem('acto_user_id');
-          localStorage.removeItem('acto_is_logged_in');
+          if (user) {
+            setCurrentUser(user);
+            
+            // Apply user preferences
+            applyUserPreferences(user.preferences);
+          } else {
+            // Invalid user ID stored, clear it
+            localStorage.removeItem('acto_user_id');
+            localStorage.removeItem('acto_is_logged_in');
+          }
         }
+      } catch (error) {
+        console.error('Error checking logged in user:', error);
+      } finally {
+        setIsLoading(false);
       }
-      
-      setIsLoading(false);
     };
     
     checkLoggedInUser();
@@ -70,64 +76,73 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = async (email: string, password: string): Promise<boolean> => {
     setIsLoading(true);
     
-    // Simulate API call delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    const user = getUserByCredentials(email, password);
-    
-    if (user) {
-      setCurrentUser(user);
-      localStorage.setItem('acto_user_id', user.id);
-      localStorage.setItem('acto_is_logged_in', 'true');
+    try {
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Apply user preferences
-      applyUserPreferences(user.preferences);
+      const user = getUserByCredentials(email, password);
       
-      // Update last login time
-      updateUserPreferences(user.id, {});
+      if (user) {
+        setCurrentUser(user);
+        localStorage.setItem('acto_user_id', user.id);
+        localStorage.setItem('acto_is_logged_in', 'true');
+        
+        // Apply user preferences
+        applyUserPreferences(user.preferences);
+        
+        // Update last login time
+        updateUserPreferences(user.id, {});
+        
+        if (addToast) {
+          addToast({
+            title: "Bem-vindo de volta!",
+            description: "Login realizado com sucesso",
+          });
+        }
+        
+        return true;
+      }
       
       if (addToast) {
         addToast({
-          title: "Bem-vindo de volta!",
-          description: "Login realizado com sucesso",
+          variant: "destructive",
+          title: "Erro de login",
+          description: "Email ou senha incorretos",
         });
       }
       
+      return false;
+    } catch (error) {
+      console.error('Login error:', error);
+      return false;
+    } finally {
       setIsLoading(false);
-      return true;
     }
-    
-    if (addToast) {
-      addToast({
-        variant: "destructive",
-        title: "Erro de login",
-        description: "Email ou senha incorretos",
-      });
-    }
-    
-    setIsLoading(false);
-    return false;
   };
 
   // Logout function
   const logout = () => {
-    if (currentUser) {
-      // Save current preferences before logout
-      saveUserPreferences(currentUser.id);
+    try {
+      if (currentUser) {
+        // Save current preferences before logout
+        saveUserPreferences(currentUser.id);
+      }
+      
+      localStorage.removeItem('acto_user_id');
+      localStorage.removeItem('acto_is_logged_in');
+      setCurrentUser(null);
+      
+      if (addToast) {
+        addToast({
+          title: "Logout realizado",
+          description: "Você foi desconectado com sucesso."
+        });
+      }
+      
+      navigate('/');
+    } catch (error) {
+      console.error('Logout error:', error);
     }
-    
-    localStorage.removeItem('acto_user_id');
-    localStorage.removeItem('acto_is_logged_in');
-    setCurrentUser(null);
-    
-    if (addToast) {
-      addToast({
-        title: "Logout realizado",
-        description: "Você foi desconectado com sucesso."
-      });
-    }
-    
-    navigate('/');
   };
 
   // Update user preferences

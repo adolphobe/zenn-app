@@ -7,6 +7,7 @@ import { useAppContext } from '../context/AppContext';
 import { useSidebar } from '@/context/hooks';
 import { Menu } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useUser } from '@/context/UserContext';
 
 const ActoApp: React.FC = () => {
   const { state, toggleSidebar } = useAppContext();
@@ -14,19 +15,17 @@ const ActoApp: React.FC = () => {
   const { isOpen: sidebarOpen, open: openSidebar, isMobile } = useSidebar();
   const location = useLocation();
   const navigate = useNavigate();
+  const { currentUser, isLoading } = useUser(); // Get current user from context
   const isDashboardRoute = location.pathname === '/dashboard';
 
-  // Check if user is logged in
-  const isLoggedIn = localStorage.getItem('acto_is_logged_in') === 'true';
-
   useEffect(() => {
-    // Only redirect to login if user tries to access protected routes
-    if (!isLoggedIn && 
+    // Only redirect to login if user is not logged in and not loading
+    if (!isLoading && !currentUser && 
         location.pathname !== '/' && 
         location.pathname !== '/login') {
       navigate('/login');
     }
-  }, [isLoggedIn, navigate, location.pathname]);
+  }, [currentUser, isLoading, navigate, location.pathname]);
 
   // Close sidebar on route change if on mobile
   useEffect(() => {
@@ -34,6 +33,13 @@ const ActoApp: React.FC = () => {
       toggleSidebar();
     }
   }, [isMobile, location.pathname, sidebarOpen, toggleSidebar]);
+
+  // If still loading, show nothing
+  if (isLoading) {
+    return <div className="min-h-screen flex items-center justify-center">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+    </div>;
+  }
 
   // Determine if we should use a narrower max-width for task cards (only in power and chronological mode)
   const isTaskCardView = isDashboardRoute && (viewMode === 'power' || viewMode === 'chronological');
