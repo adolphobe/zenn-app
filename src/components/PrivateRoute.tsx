@@ -7,7 +7,7 @@ import { useAuth } from '../context/AuthContext';
  * Adiciona logs detalhados para ajudar na depuração
  */
 export const PrivateRoute = () => {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, currentUser } = useAuth();
   const location = useLocation();
   
   // Adiciona logs detalhados para depuração
@@ -15,6 +15,11 @@ export const PrivateRoute = () => {
     path: location.pathname,
     isAuthenticated, 
     isLoading,
+    currentUser: currentUser ? {
+      id: currentUser.id,
+      email: currentUser.email,
+      name: currentUser.name
+    } : null,
     timestamp: new Date().toISOString()
   });
 

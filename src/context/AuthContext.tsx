@@ -38,6 +38,7 @@ export const useAuth = () => {
 
 // Função para converter usuário do Supabase para o formato do nosso app
 const mapSupabaseUser = (user: SupabaseUser, profileData?: any): User => {
+  console.log("[mapSupabaseUser] Mapeando usuário:", user.email);
   return {
     id: user.id,
     name: profileData?.full_name || user.user_metadata?.name || '',

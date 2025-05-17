@@ -20,13 +20,15 @@ const Dashboard: React.FC = () => {
   const location = useLocation();
   const [isTaskFormOpen, setIsTaskFormOpen] = useState(false);
   const { isTaskExpanded, toggleTaskExpanded } = useExpandedTask();
-  const { currentUser, isAuthenticated, isLoading } = useAuth();
+  const { currentUser, isAuthenticated, isLoading, session } = useAuth();
   
   // Log detalhado do estado de autenticação
   useEffect(() => {
     console.log("[Dashboard] Estado de autenticação:", { 
       isAuthenticated, 
       isLoading,
+      sessionExists: !!session,
+      sessionUserId: session?.user?.id,
       currentUser: currentUser ? {
         id: currentUser.id,
         email: currentUser.email,
@@ -34,7 +36,7 @@ const Dashboard: React.FC = () => {
       } : null,
       timestamp: new Date().toISOString()
     });
-  }, [isAuthenticated, isLoading, currentUser]);
+  }, [isAuthenticated, isLoading, currentUser, session]);
   
   // State for showing/hiding overdue tasks, initialized from localStorage
   const [showOverdueTasks, setShowOverdueTasks] = useState(() => {
@@ -129,18 +131,23 @@ const Dashboard: React.FC = () => {
                   <span className="text-green-600 font-medium">Autenticado</span>
                   <span> como {currentUser?.email}</span>
                   {currentUser?.name && <span> ({currentUser.name})</span>}
+                  <div className="mt-1 opacity-75">ID do usuário: {session?.user?.id || 'N/A'}</div>
+                  <div className="opacity-75">Sessão válida: {session ? 'Sim' : 'Não'}</div>
                 </>
               ) : (
                 <span className="text-red-600 font-medium">Não autenticado</span>
               )}
             </div>
-            <div className="text-xs mt-1 text-amber-600">
-              PrivateRoute desabilitado: Acesso temporário sem autenticação para testes
-            </div>
+            {!isAuthenticated && !isLoading && (
+              <div className="text-xs mt-1 text-red-600 font-medium">
+                Você deveria ser redirecionado para a página de login...
+              </div>
+            )}
           </div>
         </div>
       </div>
       
+      {/* Resto do componente permanece igual */}
       <div className="container p-4 mx-auto max-w-5xl">
         <div className="flex flex-col space-y-4">
           <div className="mb-6">
