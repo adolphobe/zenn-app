@@ -15,12 +15,30 @@ const UserMenu: React.FC = () => {
       // Log the logout attempt
       console.log("[UserMenu] Iniciando processo completo de logout");
       
+      // Prevent any navigation while logout is in progress
+      const inProgress = localStorage.getItem('logout_in_progress');
+      if (inProgress === 'true') {
+        console.log("[UserMenu] Logout já em andamento, ignorando nova solicitação");
+        return;
+      }
+
+      // Set logout flag
+      localStorage.setItem('logout_in_progress', 'true');
+      
       // Force clear local storage first
       localStorage.removeItem('sb-wbvxnapruffchikhrqrs-auth-token');
       localStorage.removeItem('supabase.auth.token');
       
+      toast({
+        title: "Logout em andamento",
+        description: "Encerrando sua sessão...",
+      });
+      
       // Call the AuthContext logout function
       await logout();
+      
+      // Clear logout flag
+      localStorage.removeItem('logout_in_progress');
       
       toast({
         title: "Logout realizado",
@@ -32,10 +50,16 @@ const UserMenu: React.FC = () => {
       // Navigate to login page after a delay to ensure logout is complete
       setTimeout(() => {
         navigate('/login', { 
-          state: { loggedOut: true } 
+          state: { 
+            loggedOut: true,
+            timestamp: new Date().getTime() // Add timestamp to prevent caching issues
+          } 
         });
-      }, 300);
+      }, 500);
     } catch (error) {
+      // Clear logout flag on error
+      localStorage.removeItem('logout_in_progress');
+      
       console.error("[UserMenu] Erro ao fazer logout:", error);
       console.error("[UserMenu] DETALHES EM PORTUGUÊS: Ocorreu um erro ao tentar deslogar do sistema");
       

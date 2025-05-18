@@ -27,6 +27,14 @@ const Login: React.FC = () => {
       console.log("[Login] Usuário acabou de deslogar conforme indicado por parâmetro");
       console.log("[Login] DETALHES EM PORTUGUÊS: Detectado logout recente");
       setIsJustLoggedOut(true);
+      
+      // Clear any lingering logout flags
+      localStorage.removeItem('logout_in_progress');
+      
+      // Reset the flag after a delay to allow re-login
+      setTimeout(() => {
+        setIsJustLoggedOut(false);
+      }, 1000);
     }
   }, [location]);
   
@@ -44,7 +52,13 @@ const Login: React.FC = () => {
     if (isAuthenticated && !isLoading && !isJustLoggedOut) {
       console.log("[Login] Usuário autenticado, redirecionando para:", from);
       console.log("[Login] DETALHES EM PORTUGUÊS: Autenticação verificada. Redirecionando para " + from);
-      navigate(from);
+      
+      // Add a small delay before redirect to prevent loops
+      const redirectTimer = setTimeout(() => {
+        navigate(from);
+      }, 200);
+      
+      return () => clearTimeout(redirectTimer);
     }
   }, [isAuthenticated, isLoading, from, navigate, isJustLoggedOut]);
 
