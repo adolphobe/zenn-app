@@ -40,8 +40,8 @@ function App() {
           <Toaster />
           <AuthProvider>
             <AppProvider>
-              <TaskDataProvider>
-                <TaskProviders>
+              <TaskProviders>
+                <TaskDataProvider>
                   <Router>
                     <Routes>
                       <Route path="/" element={<Landing />} />
@@ -58,8 +58,8 @@ function App() {
                       <Route path="*" element={<NotFound />} />
                     </Routes>
                   </Router>
-                </TaskProviders>
-              </TaskDataProvider>
+                </TaskDataProvider>
+              </TaskProviders>
             </AppProvider>
           </AuthProvider>
         </ThemeProvider>

@@ -25,6 +25,7 @@ export const TaskToastProvider = ({ children }: { children: ReactNode }) => {
         ? "A tarefa foi ocultada e só será visível com o filtro ativado." 
         : "A tarefa agora está visível.",
       // Icon as separate JSX element to avoid type error
+      icon: task.hidden ? <EyeOff size={16} /> : <Eye size={16} />
     });
   };
 
@@ -36,6 +37,7 @@ export const TaskToastProvider = ({ children }: { children: ReactNode }) => {
       description: `"${task.title}" foi marcada como concluída.`,
       // Type-safe variant and use icon in separate element
       variant: "default",
+      icon: <Check size={16} />
     });
   };
 
