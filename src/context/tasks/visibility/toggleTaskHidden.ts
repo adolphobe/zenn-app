@@ -4,23 +4,35 @@ import { v4 as uuidv4 } from 'uuid';
 import { AppDispatch } from '../../types';
 import { toggleTaskHidden as toggleTaskHiddenService } from '@/services/taskService';
 
-// This function is now simplified as most of the functionality is handled by React Query
+// Esta função é simplificada e focada na comunicação com o serviço e o estado local
 export const toggleTaskHidden = async (dispatch: AppDispatch, id: string) => {
   try {
     console.log('Iniciando processo de ocultar/mostrar tarefa com ID:', id);
     
-    // Local state update for immediate UI feedback
-    // This maintains backward compatibility with components using AppContext
+    // Atualização local imediata para melhor UX
     dispatch({ type: 'TOGGLE_TASK_HIDDEN', payload: id });
     
-    // The actual API call and optimistic updates are now handled in useTaskData.ts
-    // This function just maintains compatibility with the older context-based architecture
-    return await toggleTaskHiddenService(id);
+    // Chamada ao serviço para persistir a mudança no banco de dados
+    const updatedTask = await toggleTaskHiddenService(id);
+    
+    // Despachamos uma ação adicional após a confirmação do serviço
+    // Isso garante que o estado local esteja sincronizado com o banco de dados
+    dispatch({ 
+      type: 'UPDATE_TASK_VISIBILITY_CONFIRMED', 
+      payload: { 
+        id, 
+        hidden: updatedTask.hidden 
+      } 
+    });
+    
+    return updatedTask;
     
   } catch (error) {
     console.error('Error toggling task hidden status:', error);
     
-    // Show a generic error toast
+    // Em caso de erro, revertemos a mudança local e mostramos um toast
+    dispatch({ type: 'TOGGLE_TASK_HIDDEN', payload: id });
+    
     toast({
       id: uuidv4(),
       title: "Erro ao atualizar tarefa",

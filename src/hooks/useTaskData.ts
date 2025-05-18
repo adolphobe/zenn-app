@@ -152,12 +152,45 @@ export const useTaskData = (completed: boolean = false) => {
     },
     onMutate: (id) => {
       setTaskOperationLoading(id, 'toggle-complete', true);
+      
+      // Optimistic update
+      queryClient.setQueryData(['tasks', currentUser?.id, completed], (old: Task[] | undefined) => {
+        if (!old) return [];
+        
+        return old.map(t => {
+          if (t.id === id) {
+            return { 
+              ...t, 
+              completed: !t.completed,
+              _optimisticUpdateTime: Date.now()
+            };
+          }
+          return t;
+        });
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
     },
-    onError: (error: any) => {
+    onError: (error: any, id) => {
       console.error('Error toggling task completion:', error);
+      
+      // Revert optimistic update
+      queryClient.setQueryData(['tasks', currentUser?.id, completed], (old: Task[] | undefined) => {
+        if (!old) return [];
+        
+        return old.map(t => {
+          if (t.id === id) {
+            return { 
+              ...t, 
+              completed: !t.completed,
+              _optimisticUpdateTime: Date.now()
+            };
+          }
+          return t;
+        });
+      });
+      
       toast({
         id: uuidv4(),
         title: "Erro ao atualizar tarefa",
@@ -203,7 +236,7 @@ export const useTaskData = (completed: boolean = false) => {
             return { 
               ...t, 
               hidden: newHiddenState,
-              // Add a timestamp to ensure the component detects the change
+              // Add a timestamp to ensure the animation detects the change
               _optimisticUpdateTime: Date.now()
             };
           }
@@ -241,33 +274,32 @@ export const useTaskData = (completed: boolean = false) => {
         variant: "destructive",
       });
     },
-    onSettled: (result, error, id, context) => {
+    onSuccess: (result, id) => {
+      console.log(`[Success] Task ${id} hidden status updated successfully:`, result);
+      
+      // Explicitly update the cache with server data
+      queryClient.setQueryData(['tasks', currentUser?.id, completed], (old: Task[] | undefined) => {
+        if (!old) return [];
+        
+        return old.map(t => {
+          if (t.id === id) {
+            return { 
+              ...t, 
+              ...result,
+              // Keep the timestamp for animation purposes
+              _optimisticUpdateTime: t._optimisticUpdateTime || Date.now()
+            };
+          }
+          return t;
+        });
+      });
+    },
+    onSettled: (_, error, id) => {
       setTaskOperationLoading(id, 'toggle-hidden', false);
       
-      if (!error && result) {
-        // On successful completion, update the query data precisely to match the server
-        queryClient.setQueryData(['tasks', currentUser?.id, completed], (old: Task[] | undefined) => {
-          if (!old) return [];
-          
-          return old.map(t => {
-            if (t.id === id) {
-              console.log(`[Server Update] Setting task ${id} hidden to ${result.hidden}`);
-              return { 
-                ...t,
-                ...result,
-                // Keep the enhanced fields
-                operationLoading: t.operationLoading
-              };
-            }
-            return t;
-          });
-        });
-      }
-      
-      // Always invalidate to ensure consistency
+      // Always invalidate to ensure consistency, but don't auto-refetch if no error
       queryClient.invalidateQueries({ 
         queryKey: ['tasks', currentUser?.id, completed],
-        // Use refetchType: 'none' to prevent auto-refetching if our optimistic update is good
         refetchType: error ? 'all' : 'none'
       });
     }

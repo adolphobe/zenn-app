@@ -12,6 +12,7 @@ import TaskForm from './TaskForm';
 import TaskComments from './TaskComments';
 import DeleteTaskConfirmation from './DeleteTaskConfirmation';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTaskDataContext } from '@/context/TaskDataProvider';
 
 interface TaskCardProps {
   task: Task;
@@ -25,11 +26,12 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
   const [feedbackModalOpen, setFeedbackModalOpen] = useState(false);
   const [editTaskModalOpen, setEditTaskModalOpen] = useState(false);
   const [deleteConfirmModalOpen, setDeleteConfirmModalOpen] = useState(false);
-  const { toggleTaskCompleted, toggleTaskHidden, updateTaskTitle, state, setTaskFeedback } = useAppContext();
+  const { state, updateTaskTitle } = useAppContext();
+  const { toggleTaskHidden, toggleTaskCompleted, setTaskFeedback } = useTaskDataContext();
   const { dateDisplayOptions, showHiddenTasks, viewMode } = state;
   
-  // Only apply priority class in power mode
-  // In chronological mode, use a neutral light style
+  // Aplicar classe de prioridade apenas no modo potência
+  // No modo cronológico, usar um estilo neutro claro
   const cardClass = viewMode === 'chronological' 
     ? 'bg-white text-gray-800 border-gray-200' 
     : getTaskPriorityClass(task.totalScore);
@@ -67,11 +69,12 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
     setFeedbackModalOpen(true);
   };
 
-  // Handle toggle hidden with improved debugging
+  // Implementação melhorada da função de alternar visibilidade
   const handleToggleHidden = (e: React.MouseEvent) => {
     e.stopPropagation();
     console.log('Ocultar/Mostrar tarefa clicado:', task.id, 'Status atual:', task.hidden);
     
+    // Usamos o método do TaskDataProvider que tem atualização otimista
     toggleTaskHidden(task.id);
   };
 
@@ -89,7 +92,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
     // Primeiro marcamos a tarefa como completa
     toggleTaskCompleted(task.id);
     
-    // Depois salvamos o feedback (importante ser nessa ordem para garantir que ambos os dados sejam atualizados)
+    // Depois salvamos o feedback
     if (setTaskFeedback) {
       setTaskFeedback(task.id, feedbackType);
     }
@@ -101,7 +104,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
     setFeedbackModalOpen(false);
   };
 
-  // Animation variants for expanded content - improved to prevent stretching
+  // Variantes de animação para o conteúdo expandido
   const expandedContentVariants = {
     hidden: { 
       opacity: 0,
@@ -134,7 +137,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
     }
   };
 
-  // Manipulador para expansão do card que verifica se o clique veio de um elemento na área de conteúdo expandido
+  // Manipulador para expansão do card
   const handleCardClick = (e: React.MouseEvent) => {
     // Se estivermos editando o título, não faremos nada
     if (isEditingTitle) return;
@@ -145,7 +148,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
 
   // Manipulador para cliques em áreas expandidas
   const handleExpandedContentClick = (e: React.MouseEvent) => {
-    // Impedir a propagação para o card, assim o card não vai colapsar quando clicamos no conteúdo
+    // Impedir a propagação para o card
     e.stopPropagation();
   };
 
