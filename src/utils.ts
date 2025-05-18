@@ -1,3 +1,4 @@
+
 import { Task, DateDisplayOptions, ViewMode, SortOption } from './types';
 
 export const formatDate = (date: Date | null, options?: DateDisplayOptions): string => {
@@ -215,3 +216,4 @@ export const isTaskOverdue = (date: Date | null): boolean => {
   const now = new Date();
   return date < now;
 };
+

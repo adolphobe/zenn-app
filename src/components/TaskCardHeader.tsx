@@ -1,5 +1,6 @@
+
 import React from 'react';
-import { formatDate, isTaskOverdue, safeParseDate } from '@/utils';
+import { formatDate, isTaskOverdue } from '@/utils';
 import { DateDisplayOptions } from '@/types';
 import TaskCardTitle from './TaskCardTitle';
 import { Bell, Hash } from 'lucide-react';
@@ -10,7 +11,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 interface TaskCardHeaderProps {
   title: string;
   totalScore: number;
-  idealDate?: Date | string | null;
+  idealDate?: Date | null;
   isEditing: boolean;
   titleValue: string;
   dateDisplayOptions: DateDisplayOptions;
@@ -71,11 +72,8 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
     }
   };
   
-  // Parse the date safely to handle both string and Date objects
-  const parsedDate = idealDate ? safeParseDate(idealDate) : null;
-  
   // Check if task is overdue (before current date and time)
-  const taskIsOverdue = parsedDate ? isTaskOverdue(parsedDate) : false;
+  const taskIsOverdue = idealDate ? isTaskOverdue(idealDate) : false;
   
   // In chronological mode, always show dates regardless of showDates setting
   const shouldShowDate = viewMode === 'chronological' || showDates;
@@ -135,12 +133,12 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
         </div>
         
         <div className="flex items-center">
-          {idealDate && shouldShowDate && parsedDate && (
+          {idealDate && shouldShowDate && (
             <div className="text-xs text-right ml-3 flex items-center">
               {taskIsOverdue && (
                 <Bell size={14} className="text-red-400 mr-1" />
               )}
-              {formatDate(parsedDate, dateDisplayOptions)}
+              {formatDate(idealDate, dateDisplayOptions)}
             </div>
           )}
           {shouldShowScore && (
