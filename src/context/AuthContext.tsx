@@ -1,3 +1,5 @@
+
+// I'll only modify the initialization part of the context to improve the auth state detection
 import { createContext, useState, useContext, useEffect, ReactNode } from 'react';
 import { User } from '../types/user';
 import { supabase } from '@/integrations/supabase/client';
@@ -88,6 +90,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [authInitialized, setAuthInitialized] = useState(false);
 
   // Set up auth state listener and check for existing session
   useEffect(() => {
@@ -99,38 +102,54 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (logoutInProgress === 'true') {
       console.log("[AuthProvider] Detectada flag de logout em andamento ao inicializar, limpando");
       localStorage.removeItem('logout_in_progress');
+      localStorage.removeItem('sb-wbvxnapruffchikhrqrs-auth-token');
+      localStorage.removeItem('supabase.auth.token');
     }
     
+    let authSubscription: { unsubscribe: () => void } | null = null;
+    
     // Set up auth state change listener FIRST
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, newSession) => {
-        console.log("[AuthProvider] Estado de autenticação alterado:", event);
-        console.log("[AuthProvider] DETALHES EM PORTUGUÊS: Evento de autenticação detectado:", 
-          event === 'SIGNED_IN' ? 'Usuário entrou' : 
-          event === 'SIGNED_OUT' ? 'Usuário saiu' : 
-          'Outro evento de autenticação');
+    const setupAuthListener = () => {
+      try {
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(
+          (event, newSession) => {
+            console.log("[AuthProvider] Estado de autenticação alterado:", event);
+            console.log("[AuthProvider] DETALHES EM PORTUGUÊS: Evento de autenticação detectado:", 
+              event === 'SIGNED_IN' ? 'Usuário entrou' : 
+              event === 'SIGNED_OUT' ? 'Usuário saiu' : 
+              'Outro evento de autenticação');
+            
+            // Update session state
+            setSession(newSession);
+            
+            if (event === 'SIGNED_OUT') {
+              console.log("[AuthProvider] Usuário deslogado");
+              console.log("[AuthProvider] DETALHES EM PORTUGUÊS: Usuário encerrou a sessão");
+              setCurrentUser(null);
+              setIsLoading(false);
+              return;
+            }
+            
+            // Use setTimeout to prevent potential race conditions
+            if (newSession?.user) {
+              console.log("[AuthProvider] Nova sessão detectada");
+              console.log("[AuthProvider] DETALHES EM PORTUGUÊS: Iniciando nova sessão para o usuário");
+              
+              // Use setTimeout to avoid race conditions
+              setTimeout(() => {
+                fetchUserProfile(newSession.user);
+              }, 0);
+            }
+          }
+        );
         
-        setSession(newSession);
-        
-        if (event === 'SIGNED_OUT') {
-          console.log("[AuthProvider] Usuário deslogado");
-          console.log("[AuthProvider] DETALHES EM PORTUGUÊS: Usuário encerrou a sessão");
-          setCurrentUser(null);
-          setIsLoading(false);
-          return;
-        }
-        
-        // Use setTimeout for any Supabase calls to prevent potential race conditions
-        if (newSession?.user) {
-          console.log("[AuthProvider] Nova sessão detectada");
-          console.log("[AuthProvider] DETALHES EM PORTUGUÊS: Iniciando nova sessão para o usuário");
-          
-          setTimeout(() => {
-            fetchUserProfile(newSession.user);
-          }, 0);
-        }
+        authSubscription = subscription;
+        return true;
+      } catch (error) {
+        console.error("[AuthProvider] Erro ao configurar listener de autenticação:", error);
+        return false;
       }
-    );
+    };
     
     // Helper function to fetch user profile
     const fetchUserProfile = async (user: any) => {
@@ -152,18 +171,39 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setCurrentUser(mappedUser);
       } finally {
         setIsLoading(false);
+        setAuthInitialized(true);
       }
     };
+    
+    // First set up the auth listener
+    const listenerSetup = setupAuthListener();
+    
+    if (!listenerSetup) {
+      console.error("[AuthProvider] Falha ao configurar listener de autenticação, tentando recuperar sessão existente");
+      setIsLoading(false);
+    }
     
     // THEN check for existing session
     const checkInitialSession = async () => {
       try {
         console.log("[AuthProvider] Verificando sessão inicial...");
+        
+        // First check if we have a token before making an API call
+        const hasToken = !!localStorage.getItem('sb-wbvxnapruffchikhrqrs-auth-token');
+        if (!hasToken) {
+          console.log("[AuthProvider] Nenhum token encontrado no localStorage");
+          setIsLoading(false);
+          setAuthInitialized(true);
+          return;
+        }
+        
+        // Now verify with Supabase
         const { data, error } = await supabase.auth.getSession();
         
         if (error) {
           console.error("[AuthProvider] Erro ao verificar sessão:", error);
           setIsLoading(false);
+          setAuthInitialized(true);
           return;
         }
         
@@ -177,21 +217,27 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         } else {
           // No session found, mark as not loading
           setIsLoading(false);
+          setAuthInitialized(true);
         }
       } catch (error) {
         console.error("[AuthProvider] Erro ao verificar sessão:", error);
         console.error("[AuthProvider] DETALHES EM PORTUGUÊS: Ocorreu um erro ao verificar se existe uma sessão ativa");
         setIsLoading(false);
+        setAuthInitialized(true);
       }
     };
     
     // Check for initial session after setting up the listener
-    checkInitialSession();
+    setTimeout(() => {
+      checkInitialSession();
+    }, 10); // Small delay to ensure listener is registered first
     
     // Clean up subscription on unmount
     return () => {
       console.log("[AuthProvider] Limpando - cancelando inscrição em eventos de autenticação");
-      subscription.unsubscribe();
+      if (authSubscription) {
+        authSubscription.unsubscribe();
+      }
     };
   }, []);
 
@@ -451,7 +497,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const value = {
     currentUser,
     isAuthenticated: !!session && !!currentUser,
-    isLoading,
+    isLoading: isLoading || !authInitialized,
     login,
     signup,
     logout,

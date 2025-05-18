@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import LoginForm from '../components/LoginForm';
 import SignupForm from '../components/SignupForm';
 import PasswordResetForm from '../components/PasswordResetForm';
+import { supabase } from '@/integrations/supabase/client';
 
 const Login: React.FC = () => {
   const location = useLocation();
@@ -15,6 +16,7 @@ const Login: React.FC = () => {
   const [loaded, setLoaded] = useState(false);
   const [isJustLoggedOut, setIsJustLoggedOut] = useState(false);
   const [redirectAttempts, setRedirectAttempts] = useState(0);
+  const [localAuthCheck, setLocalAuthCheck] = useState<boolean | null>(null);
   
   // Get redirect path from location state or default to dashboard
   const from = location.state?.from?.pathname || "/dashboard";
@@ -48,6 +50,33 @@ const Login: React.FC = () => {
       }, 800);
     }
   }, [location]);
+
+  // Additional check for authentication using localStorage directly
+  useEffect(() => {
+    const checkLocalAuth = async () => {
+      try {
+        // First check if there's a token in localStorage
+        const hasToken = !!localStorage.getItem('sb-wbvxnapruffchikhrqrs-auth-token');
+        
+        // If no token in localStorage, we're definitely not authenticated
+        if (!hasToken) {
+          setLocalAuthCheck(false);
+          return;
+        }
+        
+        // Double-check with Supabase API for an active session
+        const { data } = await supabase.auth.getSession();
+        setLocalAuthCheck(!!data.session);
+        
+        console.log("[Login] Verificação local de autenticação:", !!data.session);
+      } catch (err) {
+        console.error("[Login] Erro ao verificar token local:", err);
+        setLocalAuthCheck(false);
+      }
+    };
+
+    checkLocalAuth();
+  }, []);
   
   // Smooth visual loading
   useEffect(() => {
@@ -60,7 +89,10 @@ const Login: React.FC = () => {
 
   // Redirect automatically if authenticated and not just logged out
   useEffect(() => {
-    if (isAuthenticated && !isLoading && !isJustLoggedOut) {
+    // Use both authentication checks to determine if user is truly authenticated
+    const actuallyAuthenticated = isAuthenticated || (localAuthCheck === true);
+    
+    if (actuallyAuthenticated && !isLoading && !isJustLoggedOut && localAuthCheck !== null) {
       console.log("[Login] Usuário autenticado, redirecionando para:", from);
       console.log("[Login] DETALHES EM PORTUGUÊS: Autenticação verificada. Redirecionando para " + from);
       
@@ -77,7 +109,7 @@ const Login: React.FC = () => {
         console.error("[Login] Muitas tentativas de redirecionamento detectadas. Possível loop de redirecionamento.");
       }
     }
-  }, [isAuthenticated, isLoading, from, navigate, isJustLoggedOut, redirectAttempts]);
+  }, [isAuthenticated, isLoading, from, navigate, isJustLoggedOut, redirectAttempts, localAuthCheck]);
 
   // Toggle between login and signup
   const toggleSignup = () => {
@@ -98,14 +130,17 @@ const Login: React.FC = () => {
   };
 
   // Prevent rendering content during loading
-  if (isLoading) {
+  if (isLoading || localAuthCheck === null) {
     return <div className="flex items-center justify-center min-h-screen">
       <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
     </div>;
   }
 
+  // Use both authentication checks to determine if user is truly authenticated
+  const actuallyAuthenticated = isAuthenticated || (localAuthCheck === true);
+
   // If user is authenticated and not just logged out, show a temporary message
-  if (isAuthenticated && !isJustLoggedOut) {
+  if (actuallyAuthenticated && !isJustLoggedOut) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gray-50">
         <div className="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 mb-4 max-w-lg">

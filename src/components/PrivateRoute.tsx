@@ -7,6 +7,7 @@ import { Menu } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useEffect, useState } from 'react';
 import { toast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 /**
  * PrivateRoute - Protects routes that require authentication
@@ -17,9 +18,35 @@ export const PrivateRoute = () => {
   const location = useLocation();
   const { isOpen: sidebarOpen, open: openSidebar, isMobile } = useSidebar();
   const [authChecked, setAuthChecked] = useState(false);
+  const [localAuthCheck, setLocalAuthCheck] = useState<boolean | null>(null);
 
   // Check if a logout is in progress to prevent login/logout loops
   const logoutInProgress = localStorage.getItem('logout_in_progress') === 'true';
+
+  // Additional check for authentication using localStorage directly
+  useEffect(() => {
+    const checkLocalAuth = async () => {
+      try {
+        // Check for token in localStorage
+        const hasToken = !!localStorage.getItem('sb-wbvxnapruffchikhrqrs-auth-token');
+        
+        // If no token in localStorage, we're definitely not authenticated
+        if (!hasToken) {
+          setLocalAuthCheck(false);
+          return;
+        }
+        
+        // Double-check with Supabase API
+        const { data } = await supabase.auth.getSession();
+        setLocalAuthCheck(!!data.session);
+      } catch (err) {
+        console.error("[PrivateRoute] Erro ao verificar token local:", err);
+        setLocalAuthCheck(false);
+      }
+    };
+
+    checkLocalAuth();
+  }, []);
 
   // Use effect to ensure we've completed at least one auth check
   useEffect(() => {
@@ -28,11 +55,11 @@ export const PrivateRoute = () => {
     }
   }, [isLoading]);
 
-  console.log(`[PrivateRoute] Verificando autenticação em ${location.pathname}, isAuthenticated: ${isAuthenticated}, isLoading: ${isLoading}, authChecked: ${authChecked}, logoutInProgress: ${logoutInProgress}`);
+  console.log(`[PrivateRoute] Verificando autenticação em ${location.pathname}, isAuthenticated: ${isAuthenticated}, isLoading: ${isLoading}, authChecked: ${authChecked}, logoutInProgress: ${logoutInProgress}, localAuthCheck: ${localAuthCheck}`);
   console.log(`[PrivateRoute] DETALHES EM PORTUGUÊS: Verificando se o usuário está autenticado para acessar a rota ${location.pathname}`);
 
   // Show loading state while checking authentication
-  if (isLoading || !authChecked) {
+  if (isLoading || !authChecked || localAuthCheck === null) {
     console.log("[PrivateRoute] Ainda carregando estado de autenticação...");
     console.log("[PrivateRoute] DETALHES EM PORTUGUÊS: O sistema está verificando se você está autenticado. Por favor, aguarde.");
     return <div className="flex items-center justify-center min-h-screen">
@@ -41,12 +68,15 @@ export const PrivateRoute = () => {
   }
 
   // Log auth status and redirect if not authenticated
-  if (!isAuthenticated || logoutInProgress) {
-    const reason = !isAuthenticated ? "não autenticado" : "logout em andamento";
+  // Use both checks - from context AND from local storage
+  const actuallyAuthenticated = isAuthenticated || localAuthCheck === true;
+  
+  if (!actuallyAuthenticated || logoutInProgress) {
+    const reason = !actuallyAuthenticated ? "não autenticado" : "logout em andamento";
     console.error(`[PrivateRoute] ERRO DE AUTENTICAÇÃO: Usuário ${reason} em ${location.pathname}`);
     console.error("[PrivateRoute] DETALHES TÉCNICOS: Redirecionando para /login");
     console.error("[PrivateRoute] DETALHES EM PORTUGUÊS: Você não está logado e tentou acessar uma página protegida. Redirecionando para a página de login.");
-    console.error("[PrivateRoute] ESTADO DE AUTENTICAÇÃO:", { isAuthenticated, isLoading, path: location.pathname });
+    console.error("[PrivateRoute] ESTADO DE AUTENTICAÇÃO:", { isAuthenticated, isLoading, localAuthCheck, path: location.pathname });
     
     // Clear any lingering session data if we detect a logout in progress
     if (logoutInProgress) {

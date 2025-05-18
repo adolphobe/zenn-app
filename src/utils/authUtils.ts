@@ -92,6 +92,14 @@ export const checkAuthStatus = async () => {
       return { isAuthenticated: false, error: null };
     }
 
+    // Check if there's a session token in localStorage before making an API call
+    const tokenString = localStorage.getItem('sb-wbvxnapruffchikhrqrs-auth-token');
+    if (!tokenString) {
+      console.log("[AuthUtils] Nenhum token encontrado no localStorage");
+      return { isAuthenticated: false, error: null };
+    }
+
+    // Now verify with Supabase if the token is valid
     const { data, error } = await supabase.auth.getSession();
     
     if (error) {
@@ -100,8 +108,11 @@ export const checkAuthStatus = async () => {
       return { isAuthenticated: false, error };
     }
     
+    const isAuthenticated = !!data.session;
+    console.log("[AuthUtils] Status de autenticação verificado:", isAuthenticated ? "Autenticado" : "Não autenticado");
+    
     return {
-      isAuthenticated: !!data.session,
+      isAuthenticated,
       session: data.session,
       user: data.session?.user
     };
