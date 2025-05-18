@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { Task, TaskFormData } from '@/types';
 
@@ -170,47 +169,52 @@ export const toggleTaskCompletion = async (id: string, currentStatus: boolean): 
   return mapToTask(data);
 };
 
-export const toggleTaskHidden = async (id: string, currentStatus: boolean): Promise<Task> => {
-  console.log(`Tentando atualizar tarefa com ID ${id}, status atual hidden: ${currentStatus}`);
+export const toggleTaskHidden = async (id: string): Promise<Task> => {
+  console.log(`Verificando e atualizando tarefa com ID ${id}`);
   
-  // Validate that the task exists before attempting to update
-  const { data: existingTask, error: checkError } = await supabase
-    .from('tasks')
-    .select('id, hidden')
-    .eq('id', id)
-    .single();
-  
-  if (checkError) {
-    console.error(`Erro ao verificar existência da tarefa ${id}:`, checkError);
-    throw new Error(`Tarefa com ID ${id} não foi encontrada: ${checkError.message}`);
-  }
-  
-  if (!existingTask) {
-    console.error(`Tarefa com ID ${id} não existe no banco de dados`);
-    throw new Error(`Tarefa com ID ${id} não existe no banco de dados`);
-  }
-  
-  console.log(`Tarefa encontrada: ${existingTask.id}, estado atual hidden: ${existingTask.hidden}`);
-  
-  // Use the status from the database instead of the provided one to ensure accuracy
-  const { data, error } = await supabase
-    .from('tasks')
-    .update({ hidden: !existingTask.hidden })
-    .eq('id', id)
-    .select(`
-      *,
-      comments:task_comments(*)
-    `)
-    .single();
+  try {
+    // First fetch the current state to ensure it exists and to get accurate hidden status
+    const { data: existingTask, error: fetchError } = await supabase
+      .from('tasks')
+      .select('id, hidden')
+      .eq('id', id)
+      .single();
+    
+    if (fetchError) {
+      console.error(`Erro ao buscar tarefa ${id}:`, fetchError);
+      throw new Error(`Não foi possível encontrar a tarefa: ${fetchError.message}`);
+    }
+    
+    if (!existingTask) {
+      console.error(`Tarefa com ID ${id} não existe no banco de dados`);
+      throw new Error(`Tarefa com ID ${id} não foi encontrada no banco de dados`);
+    }
+    
+    console.log(`Tarefa encontrada: ${existingTask.id}, estado atual hidden: ${existingTask.hidden}`);
+    
+    // Now update with the confirmed current state
+    const { data, error } = await supabase
+      .from('tasks')
+      .update({ hidden: !existingTask.hidden })
+      .eq('id', id)
+      .select(`
+        *,
+        comments:task_comments(*)
+      `)
+      .single();
 
-  if (error) {
-    console.error('Error toggling task hidden status:', error);
+    if (error) {
+      console.error('Erro ao alterar visibilidade da tarefa:', error);
+      throw error;
+    }
+
+    console.log('Tarefa atualizada com sucesso:', data);
+
+    return mapToTask(data);
+  } catch (error) {
+    console.error(`Falha ao processar alteração de visibilidade para tarefa ${id}:`, error);
     throw error;
   }
-
-  console.log('Tarefa atualizada com sucesso:', data);
-
-  return mapToTask(data);
 };
 
 export const setTaskFeedback = async (

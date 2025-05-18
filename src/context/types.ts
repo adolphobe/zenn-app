@@ -31,6 +31,8 @@ export interface AppState {
   showPillars: boolean;
   showDates: boolean;
   showScores: boolean;
+  // New sync status field
+  syncStatus: 'idle' | 'syncing' | 'synced' | 'error';
 }
 
 // Define Action
@@ -59,7 +61,9 @@ export type Action =
   | { type: 'TOGGLE_SHOW_PILLARS' }
   | { type: 'TOGGLE_SHOW_DATES' }
   | { type: 'TOGGLE_SHOW_SCORES' }
-  | { type: 'SET_SORT_OPTIONS'; payload: { sortDirection: 'asc' | 'desc'; noDateAtEnd?: boolean } };
+  | { type: 'SET_SORT_OPTIONS'; payload: { sortDirection: 'asc' | 'desc'; noDateAtEnd?: boolean } }
+  | { type: 'SET_TASK_OPERATION_LOADING'; payload: { id: string, operation: string, loading: boolean } }
+  | { type: 'SET_SYNC_STATUS'; payload: 'idle' | 'syncing' | 'synced' | 'error' };
 
 // AppDispatch type
 export type AppDispatch = Dispatch<Action>;

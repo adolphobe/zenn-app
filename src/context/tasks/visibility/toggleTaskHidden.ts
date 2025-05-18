@@ -9,57 +9,53 @@ export const toggleTaskHidden = async (dispatch: AppDispatch, id: string) => {
   try {
     console.log('Iniciando processo de ocultar/mostrar tarefa com ID:', id);
     
-    // Get current task status
-    const taskStore = document.querySelector('#task-store');
-    const tasks = taskStore ? JSON.parse(taskStore.getAttribute('data-tasks') || '[]') : [];
-    const task = tasks.find((t: any) => t.id === id);
-    
-    if (!task) {
-      console.error('Tarefa não encontrada no armazenamento local:', id);
-      toast({
-        id: uuidv4(),
-        title: "Erro ao atualizar tarefa",
-        description: "Não foi possível encontrar a tarefa no estado local.",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    console.log('Dados da tarefa antes de chamar o serviço:', task);
+    // Dispatch a loading state to give immediate feedback
+    dispatch({ type: 'SET_TASK_OPERATION_LOADING', payload: { id, operation: 'toggle-hidden', loading: true } });
     
     try {
-      // Toggle in database
-      const updatedTask = await toggleTaskHiddenService(id, task.hidden);
+      // Call service directly without relying on local state
+      const updatedTask = await toggleTaskHiddenService(id);
       console.log('Tarefa atualizada com sucesso:', updatedTask);
       
       // Update local state
       dispatch({ type: 'TOGGLE_TASK_HIDDEN', payload: id });
       
+      // Reset loading state
+      dispatch({ type: 'SET_TASK_OPERATION_LOADING', payload: { id, operation: 'toggle-hidden', loading: false } });
+      
       toast({
         id: uuidv4(),
-        title: task.hidden ? "Tarefa visível" : "Tarefa oculta",
-        description: task.hidden ? "A tarefa agora está visível." : "A tarefa foi ocultada.",
+        title: updatedTask.hidden ? "Tarefa oculta" : "Tarefa visível",
+        description: updatedTask.hidden ? "A tarefa foi ocultada." : "A tarefa agora está visível.",
       });
     } catch (error: any) {
       console.error('Error toggling task hidden status:', error);
       
-      // If the error indicates the task wasn't found, refresh the task list
-      if (error.message && error.message.includes('não existe')) {
-        console.log('Tentando recarregar tarefas para sincronizar com o banco de dados...');
+      // Reset loading state
+      dispatch({ type: 'SET_TASK_OPERATION_LOADING', payload: { id, operation: 'toggle-hidden', loading: false } });
+      
+      // Attempt data recovery - fetch from database regardless of specific error
+      console.log('Tentando recarregar tarefas para sincronizar com o banco de dados...');
+      
+      // Get current user
+      const authStore = document.querySelector('#auth-store');
+      const currentUser = authStore ? JSON.parse(authStore.getAttribute('data-user') || '{}') : null;
+      
+      if (currentUser?.id) {
+        // Show sync toast
+        toast({
+          id: uuidv4(),
+          title: "Sincronizando dados...",
+          description: "Detectamos uma inconsistência. Sincronizando com o servidor.",
+        });
         
-        // Get current user
-        const authStore = document.querySelector('#auth-store');
-        const currentUser = authStore ? JSON.parse(authStore.getAttribute('data-user') || '{}') : null;
-        
-        if (currentUser?.id) {
-          // Reload tasks from database and update state
-          await syncTasksFromDatabase(dispatch, currentUser.id);
-        }
+        // Force sync with database to resolve inconsistency
+        await syncTasksFromDatabase(dispatch, currentUser.id);
       } else {
         toast({
           id: uuidv4(),
           title: "Erro ao atualizar tarefa",
-          description: "Não foi possível atualizar a visibilidade da tarefa. Tente novamente.",
+          description: "Não foi possível atualizar a visibilidade da tarefa. Tente novamente após fazer login.",
           variant: "destructive",
         });
       }

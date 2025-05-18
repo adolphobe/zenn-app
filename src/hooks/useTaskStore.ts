@@ -17,10 +17,31 @@ export const useTaskStore = (tasks: Task[]) => {
       document.body.appendChild(taskStore);
     }
     
-    taskStore.setAttribute('data-tasks', JSON.stringify(tasks));
+    // Make a clean copy of tasks that excludes methods and class instances
+    // This prevents issues with JSON serialization
+    const cleanTasks = tasks.map(task => {
+      // Create a clean copy without any potential circular references
+      const cleanTask = { ...task };
+      
+      // Convert Date objects to ISO strings to ensure proper serialization
+      if (cleanTask.createdAt instanceof Date) {
+        cleanTask.createdAt = cleanTask.createdAt.toISOString();
+      }
+      
+      if (cleanTask.idealDate instanceof Date) {
+        cleanTask.idealDate = cleanTask.idealDate.toISOString();
+      }
+      
+      return cleanTask;
+    });
+    
+    // Store serialized tasks in the DOM
+    taskStore.setAttribute('data-tasks', JSON.stringify(cleanTasks));
     
     return () => {
       if (taskStore && document.body.contains(taskStore)) {
+        // Clear data before removal to prevent memory leaks
+        taskStore.setAttribute('data-tasks', '[]');
         document.body.removeChild(taskStore);
       }
     };
@@ -42,10 +63,18 @@ export const useAuthStore = (currentUser: any) => {
       document.body.appendChild(authStore);
     }
     
-    authStore.setAttribute('data-user', JSON.stringify(currentUser || {}));
+    // Only store minimal user data and ensure it's serializable
+    const userJson = currentUser ? JSON.stringify({
+      id: currentUser.id,
+      email: currentUser.email
+    }) : '{}';
+    
+    authStore.setAttribute('data-user', userJson);
     
     return () => {
       if (authStore && document.body.contains(authStore)) {
+        // Clear user data before removal
+        authStore.setAttribute('data-user', '{}');
         document.body.removeChild(authStore);
       }
     };

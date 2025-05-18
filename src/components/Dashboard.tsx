@@ -15,13 +15,12 @@ import { toast } from '@/hooks/use-toast';
 
 const Dashboard: React.FC = () => {
   const { state, syncTasksWithDatabase } = useAppContext();
-  const { tasks, viewMode, showHiddenTasks, sortOptions } = state;
+  const { tasks, viewMode, showHiddenTasks, sortOptions, syncStatus } = state;
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const isMobile = useIsMobile();
   const [isTaskFormOpen, setIsTaskFormOpen] = useState(false);
   const { isTaskExpanded, toggleTaskExpanded } = useExpandedTask();
   const [isLoading, setIsLoading] = useState(true);
-  const [isSyncing, setIsSyncing] = useState(false);
   
   // State for showing/hiding overdue tasks, initialized from localStorage
   const [showOverdueTasks, setShowOverdueTasks] = useState(() => {
@@ -108,17 +107,11 @@ const Dashboard: React.FC = () => {
   };
   
   const handleSyncTasks = async () => {
-    if (isSyncing) return;
+    if (syncStatus === 'syncing') return;
     
-    setIsSyncing(true);
     await syncTasksWithDatabase(true);
-    setIsSyncing(false);
     
-    // Show success toast
-    toast({
-      title: "Tarefas sincronizadas",
-      description: "Suas tarefas foram atualizadas com sucesso.",
-    });
+    // Toast is now managed in the syncTasksWithDatabase function
   };
   
   if (isLoading || authLoading) {
@@ -159,15 +152,23 @@ const Dashboard: React.FC = () => {
                   variant="outline"
                   size="sm"
                   onClick={handleSyncTasks}
-                  disabled={isSyncing}
-                  className="flex items-center gap-1"
+                  disabled={syncStatus === 'syncing'}
+                  className={`flex items-center gap-1 ${
+                    syncStatus === 'error' ? 'border-red-500 text-red-500 hover:bg-red-50' : ''
+                  }`}
                 >
-                  {isSyncing ? (
+                  {syncStatus === 'syncing' ? (
                     <Loader2 size={16} className="animate-spin" />
+                  ) : syncStatus === 'error' ? (
+                    <RefreshCw size={16} className="text-red-500" />
                   ) : (
-                    <RefreshCw size={16} />
+                    <RefreshCw size={16} className={syncStatus === 'synced' ? "text-green-500" : ""} />
                   )}
-                  <span className="ml-1">Sincronizar</span>
+                  <span className="ml-1">
+                    {syncStatus === 'syncing' ? 'Sincronizando...' : 
+                     syncStatus === 'error' ? 'Tentar novamente' : 
+                     syncStatus === 'synced' ? 'Sincronizado' : 'Sincronizar'}
+                  </span>
                 </Button>
                 
                 <SortDropdown />

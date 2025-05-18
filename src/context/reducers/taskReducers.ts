@@ -1,4 +1,3 @@
-
 import { v4 as uuidv4 } from 'uuid';
 import { Task } from '../../types';
 import { AppState, Action } from '../types';
@@ -19,7 +18,8 @@ export const addTask = (state: AppState, action: Action): AppState => {
     completed: false,
     createdAt: new Date(),
     feedback: null,
-    comments: []
+    comments: [],
+    operationLoading: {}
   };
   return { ...state, tasks: [...state.tasks, newTask] };
 };
@@ -62,6 +62,28 @@ export const toggleTaskHidden = (state: AppState, action: Action): AppState => {
     tasks: state.tasks.map(task =>
       task.id === action.payload ? { ...task, hidden: !task.hidden } : task
     )
+  };
+};
+
+export const setTaskOperationLoading = (state: AppState, action: Action): AppState => {
+  if (action.type !== 'SET_TASK_OPERATION_LOADING') return state;
+
+  const { id, operation, loading } = action.payload;
+
+  return {
+    ...state,
+    tasks: state.tasks.map(task => {
+      if (task.id === id) {
+        return {
+          ...task,
+          operationLoading: { 
+            ...task.operationLoading,
+            [operation]: loading 
+          }
+        };
+      }
+      return task;
+    })
   };
 };
 

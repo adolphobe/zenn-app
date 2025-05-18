@@ -1,4 +1,3 @@
-
 export interface Task {
   id: string;
   title: string;
@@ -6,14 +5,17 @@ export interface Task {
   prideScore: number;
   constructionScore: number;
   totalScore: number;
-  idealDate?: Date | null;
+  idealDate: Date | null;
   hidden: boolean;
   completed: boolean;
   completedAt?: string | null;
   createdAt: Date;
-  feedback?: 'transformed' | 'relief' | 'obligation' | null;
+  feedback: 'transformed' | 'relief' | 'obligation' | null;
+  comments: any[];
   pillar?: string;
-  comments?: Comment[];
+  operationLoading?: {
+    [key: string]: boolean;
+  };
 }
 
 export interface Comment {

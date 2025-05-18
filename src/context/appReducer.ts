@@ -13,7 +13,8 @@ import {
   toggleShowPillars,
   toggleShowDates,
   toggleShowScores,
-  setSortOptions
+  setSortOptions,
+  setSyncStatus
 } from './reducers/uiReducers';
 
 import { 
@@ -28,7 +29,8 @@ import {
   completeTaskWithDate,
   setTaskFeedback,
   setTaskFeedbackByTitle,
-  clearTasks
+  clearTasks,
+  setTaskOperationLoading
 } from './reducers/taskReducers';
 
 import { 
@@ -51,6 +53,7 @@ export const appReducer = (state: AppState, action: Action): AppState => {
   if (action.type === 'SET_TASK_FEEDBACK') return setTaskFeedback(state, action);
   if (action.type === 'SET_TASK_FEEDBACK_BY_TITLE') return setTaskFeedbackByTitle(state, action);
   if (action.type === 'RESTORE_TASK') return restoreTask(state, action);
+  if (action.type === 'SET_TASK_OPERATION_LOADING') return setTaskOperationLoading(state, action);
   
   // UI reducers
   if (action.type === 'TOGGLE_VIEW_MODE') return toggleViewMode(state, action);
@@ -64,6 +67,7 @@ export const appReducer = (state: AppState, action: Action): AppState => {
   if (action.type === 'UPDATE_DATE_DISPLAY_OPTIONS') return updateDateDisplayOptions(state, action);
   if (action.type === 'UPDATE_SORT_OPTIONS') return updateSortOptions(state, action);
   if (action.type === 'SET_SORT_OPTIONS') return setSortOptions(state, action);
+  if (action.type === 'SET_SYNC_STATUS') return setSyncStatus(state, action);
   
   // Comment reducers
   if (action.type === 'ADD_COMMENT') return addComment(state, action);
