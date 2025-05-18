@@ -56,6 +56,7 @@ export const pendingTasksData: Task[] = [
     completed: false,
     createdAt: new Date(2025, 4, 10, 8, 30), // 10/05/2025 08:30
     pillar: "crescimento",
+    feedback: null,
     comments: [
       {
         id: "comm-001",
@@ -76,6 +77,7 @@ export const pendingTasksData: Task[] = [
     completed: false,
     createdAt: new Date(2025, 4, 9, 22, 15), // 09/05/2025 22:15
     pillar: "crescimento",
+    feedback: null,
     comments: []
   },
   {
@@ -90,6 +92,7 @@ export const pendingTasksData: Task[] = [
     completed: false,
     createdAt: new Date(2025, 4, 12, 17, 45), // 12/05/2025 17:45
     pillar: "crescimento",
+    feedback: null,
     comments: []
   },
   
@@ -106,6 +109,7 @@ export const pendingTasksData: Task[] = [
     completed: false,
     createdAt: new Date(2025, 4, 5, 9, 10), // 05/05/2025 09:10
     pillar: "risco",
+    feedback: null,
     comments: [
       {
         id: "comm-002",
@@ -131,6 +135,7 @@ export const pendingTasksData: Task[] = [
     completed: false,
     createdAt: new Date(2025, 4, 10, 14, 20), // 10/05/2025 14:20
     pillar: "risco",
+    feedback: null,
     comments: []
   },
   
@@ -147,6 +152,7 @@ export const pendingTasksData: Task[] = [
     completed: false,
     createdAt: new Date(2025, 4, 8, 20, 0), // 08/05/2025 20:00
     pillar: "orgulho",
+    feedback: null,
     comments: []
   },
   {
@@ -161,6 +167,7 @@ export const pendingTasksData: Task[] = [
     completed: false,
     createdAt: new Date(2025, 4, 11, 21, 35), // 11/05/2025 21:35
     pillar: "risco",
+    feedback: null,
     comments: []
   },
   
@@ -177,6 +184,7 @@ export const pendingTasksData: Task[] = [
     completed: false,
     createdAt: new Date(2025, 4, 12, 18, 15), // 12/05/2025 18:15
     pillar: "risco",
+    feedback: null,
     comments: []
   },
   {
@@ -191,6 +199,7 @@ export const pendingTasksData: Task[] = [
     completed: false,
     createdAt: new Date(2025, 4, 13, 12, 45), // 13/05/2025 12:45
     pillar: "orgulho",
+    feedback: null,
     comments: []
   },
   {
@@ -205,6 +214,7 @@ export const pendingTasksData: Task[] = [
     completed: false,
     createdAt: new Date(2025, 4, 14, 23, 0), // 14/05/2025 23:00
     pillar: null,
+    feedback: null,
     comments: []
   },
   
@@ -221,6 +231,7 @@ export const pendingTasksData: Task[] = [
     completed: false,
     createdAt: new Date(2025, 3, 25, 9, 20), // 25/04/2025 09:20
     pillar: "risco",
+    feedback: null,
     comments: []
   },
   {
@@ -235,6 +246,7 @@ export const pendingTasksData: Task[] = [
     completed: false,
     createdAt: new Date(2025, 3, 28, 15, 40), // 28/04/2025 15:40
     pillar: "crescimento",
+    feedback: null,
     comments: []
   },
   {
@@ -249,6 +261,7 @@ export const pendingTasksData: Task[] = [
     completed: false,
     createdAt: new Date(2025, 3, 20, 11, 0), // 20/04/2025 11:00
     pillar: "risco",
+    feedback: null,
     comments: []
   }
 ];

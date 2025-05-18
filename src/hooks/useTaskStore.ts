@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { Task } from '@/types';
 
@@ -26,10 +25,16 @@ export const useTaskStore = (tasks: Task[]) => {
       // Convert Date objects to ISO strings to ensure proper serialization
       if (cleanTask.createdAt instanceof Date) {
         cleanTask.createdAt = cleanTask.createdAt.toISOString();
+      } else if (typeof cleanTask.createdAt === 'string') {
+        // Keep it as a string if it's already a string
+        cleanTask.createdAt = cleanTask.createdAt;
       }
       
       if (cleanTask.idealDate instanceof Date) {
         cleanTask.idealDate = cleanTask.idealDate.toISOString();
+      } else if (typeof cleanTask.idealDate === 'string') {
+        // Keep it as a string if it's already a string
+        cleanTask.idealDate = cleanTask.idealDate;
       }
       
       return cleanTask;

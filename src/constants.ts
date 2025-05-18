@@ -32,7 +32,9 @@ export const SAMPLE_TASKS: Array<Omit<import('./types').Task, 'id' | 'createdAt'
     totalScore: 14,
     idealDate: new Date(2023, 5, 25, 8, 0),
     hidden: false,
-    completed: false
+    completed: false,
+    feedback: null,
+    comments: []
   },
   {
     title: "Preparar apresentação para o cliente XYZ",
@@ -42,7 +44,9 @@ export const SAMPLE_TASKS: Array<Omit<import('./types').Task, 'id' | 'createdAt'
     totalScore: 11,
     idealDate: new Date(2023, 5, 26, 14, 0),
     hidden: false,
-    completed: false
+    completed: false,
+    feedback: null,
+    comments: []
   },
   {
     title: "Revisar e-mails pendentes",
@@ -52,7 +56,9 @@ export const SAMPLE_TASKS: Array<Omit<import('./types').Task, 'id' | 'createdAt'
     totalScore: 7,
     idealDate: null,
     hidden: true,
-    completed: false
+    completed: false,
+    feedback: null,
+    comments: []
   },
   {
     title: "Escrever artigo sobre sistemas de produtividade",
@@ -62,6 +68,8 @@ export const SAMPLE_TASKS: Array<Omit<import('./types').Task, 'id' | 'createdAt'
     totalScore: 10,
     idealDate: new Date(2023, 5, 28, 10, 0),
     hidden: false,
-    completed: false
+    completed: false,
+    feedback: null,
+    comments: []
   }
 ];
