@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -6,8 +7,6 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from "@/component
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle } from "lucide-react";
 import { toast } from '@/hooks/use-toast';
 import { useAuth } from '@/context/auth';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -73,6 +72,9 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onSwitchToSignup, onFo
           const errorDetails = processAuthError(error);
           setLoginError(errorDetails.message);
           setLoginSuggestion(errorDetails.suggestion || null);
+          
+          console.log("[LoginForm] Erro definido:", errorDetails.message);
+          console.log("[LoginForm] Sugestão:", errorDetails.suggestion);
         } else {
           setLoginError("Usuário não encontrado ou senha incorreta. Por favor, verifique suas credenciais.");
         }
