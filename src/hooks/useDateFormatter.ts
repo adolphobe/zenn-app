@@ -3,6 +3,7 @@ import { useState, useCallback, useMemo } from 'react';
 import { dateService } from '@/services/dateService';
 import { DateDisplayOptions, AdvancedDateFormatOptions } from '@/types/dates';
 import { useAppContext } from '@/context/AppContext';
+import { formatDisplayDate, formatRelativeDate, formatDateDistance, formatDateInTimeZone } from '@/services/dateModules/dateFormatter';
 
 /**
  * Hook para formatação de datas com suporte a opções avançadas

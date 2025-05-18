@@ -37,6 +37,9 @@ export interface DateDisplayOptions {
   hideTime?: boolean;
   hideDate?: boolean;
   useTimeZone?: boolean; // Indica se deve usar timezone na formatação
+  dateFormat?: string; // Campo adicionado
+  timeFormat?: string; // Campo adicionado
+  format?: string; // Campo adicionado para compatibilidade
 }
 
 // Interface para informações de timezone

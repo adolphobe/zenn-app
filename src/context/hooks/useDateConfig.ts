@@ -18,7 +18,7 @@ export function useDateConfig() {
     if (state.dateDisplayOptions) {
       updateDateConfig({
         // Adapta as preferências do usuário para o formato do DateFormatConfig
-        dateFormat: state.dateDisplayOptions.format || 'dd/MM/yyyy',
+        dateFormat: state.dateDisplayOptions.dateFormat || 'dd/MM/yyyy',
         timeFormat: state.dateDisplayOptions.timeFormat || 'HH:mm',
       });
     }

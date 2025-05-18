@@ -5,8 +5,6 @@ import {
   isValid,
   parseISO,
   formatISO,
-  isAfter as dateIsAfter,
-  isBefore as dateIsBefore,
   startOfDay,
   endOfDay,
   addDays,
@@ -16,7 +14,9 @@ import {
   isYesterday,
   formatRelative as fnsFormatRelative,
   formatDistance,
-  Locale
+  Locale,
+  isBefore as dateIsBefore,
+  isAfter as dateIsAfter
 } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { 
@@ -26,6 +26,27 @@ import {
   getTimezoneOffset
 } from 'date-fns-tz';
 import { ISODateString, DateDisplayOptions, DateFormatConfig } from '@/types/dates';
+import { parseDate } from './dateModules/dateParser';
+import { 
+  addDaysToDate, 
+  getDaysDifference, 
+  isSameDate, 
+  isToday as isDateToday,
+  isYesterday as isDateYesterday,
+  startOfDay as getStartOfDay,
+  endOfDay as getEndOfDay,
+  isDateBefore,
+  isDateAfter,
+  isTaskOverdue as checkTaskOverdue
+} from './dateModules/dateOperations';
+import { 
+  formatInTimeZone as formatDateInTimeZone,
+  toZonedTime as convertToZonedTime,
+  fromZonedTime as convertFromZonedTime,
+  getTimezoneOffset as getTimeZoneOffsetMinutes,
+  getDefaultTimeZone,
+  setDefaultTimeZone as setGlobalTimeZone
+} from './dateModules/dateTimezone';
 
 // Configuração padrão para formatação de datas
 const DEFAULT_CONFIG: DateFormatConfig = {
@@ -47,48 +68,7 @@ export const dateService = {
    * Converte uma string ISO ou objeto Date para um objeto Date
    * @returns Date objeto ou null se inválido
    */
-  parseDate(date: Date | ISODateString | null | undefined): Date | null {
-    if (!date) return null;
-    
-    try {
-      // Se já for um Date, verificamos se é válido
-      if (date instanceof Date) {
-        return isValid(date) ? date : null;
-      }
-      
-      // Se for string, tentamos converter para Date
-      if (typeof date === 'string') {
-        // Tenta padrão ISO primeiro
-        try {
-          const parsedDate = parseISO(date);
-          if (isValid(parsedDate)) {
-            return parsedDate;
-          }
-        } catch (err) {
-          console.debug('Não foi possível converter como ISO:', date);
-        }
-        
-        // Tenta formatos alternativos (DD/MM/YYYY)
-        if (date.includes('/')) {
-          try {
-            const parsedDate = parse(date, 'dd/MM/yyyy', new Date());
-            if (isValid(parsedDate)) {
-              return parsedDate;
-            }
-          } catch (err) {
-            console.debug('Não foi possível converter como dd/MM/yyyy:', date);
-          }
-        }
-      }
-      
-      // Se chegou aqui, não conseguimos obter um Date válido
-      console.warn('Data inválida:', date);
-      return null;
-    } catch (error) {
-      console.error('Erro ao analisar data:', error);
-      return null;
-    }
-  },
+  parseDate,
   
   /**
    * Converte uma data para string ISO para armazenamento ou API
@@ -214,83 +194,28 @@ export const dateService = {
    * @param format Formato de saída (ex: 'dd/MM/yyyy HH:mm')
    * @param timeZone Fuso horário (ex: 'America/Sao_Paulo')
    */
-  formatInTimeZone(
-    date: Date | ISODateString | null | undefined,
-    format: string,
-    timeZone: string = this.config.timeZone
-  ): string {
-    if (!date) return '';
-    
-    try {
-      const parsedDate = this.parseDate(date);
-      if (!parsedDate || !isValid(parsedDate)) return '';
-      
-      return formatInTimeZone(parsedDate, timeZone, format, {
-        locale: this.config.locale
-      });
-    } catch (error) {
-      console.error('Erro formatando data no fuso horário:', error);
-      return '';
-    }
-  },
+  formatInTimeZone: formatDateInTimeZone,
   
   /**
    * Converte uma data para o fuso horário especificado
    * @param date Data a ser convertida
    * @param timeZone Fuso horário de destino (ex: 'America/Sao_Paulo')
    */
-  toTimeZone(
-    date: Date | ISODateString | null | undefined, 
-    timeZone: string = this.config.timeZone
-  ): Date | null {
-    if (!date) return null;
-    
-    try {
-      const parsedDate = this.parseDate(date);
-      if (!parsedDate || !isValid(parsedDate)) return null;
-      
-      return toZonedTime(parsedDate, timeZone);
-    } catch (error) {
-      console.error('Erro convertendo data para fuso horário:', error);
-      return null;
-    }
-  },
+  toTimeZone: convertToZonedTime,
   
   /**
    * Converte uma data de um fuso horário específico para UTC
    * @param date Data no fuso horário especificado
    * @param timeZone Fuso horário de origem (ex: 'America/Sao_Paulo')
    */
-  fromTimeZone(
-    date: Date | ISODateString | null | undefined,
-    timeZone: string = this.config.timeZone
-  ): Date | null {
-    if (!date) return null;
-    
-    try {
-      const parsedDate = this.parseDate(date);
-      if (!parsedDate || !isValid(parsedDate)) return null;
-      
-      return fromZonedTime(parsedDate, timeZone);
-    } catch (error) {
-      console.error('Erro convertendo data do fuso horário para UTC:', error);
-      return null;
-    }
-  },
+  fromTimeZone: convertFromZonedTime,
   
   /**
    * Retorna o deslocamento do fuso horário em minutos
    * @param timeZone Fuso horário (ex: 'America/Sao_Paulo')
    * @param date Data para calcular o deslocamento (relevante para DST)
    */
-  getTimeZoneOffset(timeZone: string = this.config.timeZone, date: Date = new Date()): number {
-    try {
-      return getTimezoneOffset(timeZone, date);
-    } catch (error) {
-      console.error('Erro obtendo deslocamento do fuso horário:', error);
-      return 0;
-    }
-  },
+  getTimeZoneOffset: getTimeZoneOffsetMinutes,
   
   /**
    * Compara duas datas e retorna informações detalhadas sobre a comparação
@@ -327,8 +252,8 @@ export const dateService = {
       }
       
       const isEqual = isSameDay(parsed1, parsed2);
-      const isBeforeResult = dateIsBefore(parsed1, parsed2);
-      const isAfterResult = dateIsAfter(parsed1, parsed2);
+      const isBeforeResult = dateIsBefore(parsed1, parsed2);  // Usando a versão renomeada
+      const isAfterResult = dateIsAfter(parsed1, parsed2);    // Usando a versão renomeada
       
       const diffInMillis = Math.abs(parsed2.getTime() - parsed1.getTime());
       const diffInSeconds = Math.floor(diffInMillis / 1000);
@@ -398,7 +323,7 @@ export const dateService = {
       // Verifica data mínima, se especificada
       if (options?.minDate) {
         const minDate = this.parseDate(options.minDate);
-        if (minDate && isBefore(parsedDate, minDate)) {
+        if (minDate && dateIsBefore(parsedDate, minDate)) {  // Usando a versão renomeada
           return { 
             isValid: false, 
             message: `Data não pode ser anterior a ${this.formatForDisplay(minDate)}`
@@ -409,7 +334,7 @@ export const dateService = {
       // Verifica data máxima, se especificada
       if (options?.maxDate) {
         const maxDate = this.parseDate(options.maxDate);
-        if (maxDate && isAfter(parsedDate, maxDate)) {
+        if (maxDate && dateIsAfter(parsedDate, maxDate)) {  // Usando a versão renomeada
           return { 
             isValid: false, 
             message: `Data não pode ser posterior a ${this.formatForDisplay(maxDate)}`
@@ -450,105 +375,42 @@ export const dateService = {
   /**
    * Verifica se uma data é anterior à data atual
    */
-  isTaskOverdue(date: Date | string | null): boolean {
-    if (!date) return false;
-    
-    try {
-      const dateToCompare = this.parseDate(date);
-      
-      if (!dateToCompare || !isValid(dateToCompare)) {
-        return false;
-      }
-      
-      return dateIsBefore(dateToCompare, new Date());
-    } catch (error) {
-      console.error('Erro ao verificar se tarefa está vencida:', error);
-      return false;
-    }
-  },
+  isTaskOverdue: checkTaskOverdue,
   
   /**
    * Adiciona ou subtrai dias a uma data
    */
-  addDaysToDate(date: Date | null | undefined, days: number): Date | null {
-    if (!date) return null;
-    const parsedDate = this.parseDate(date);
-    if (!parsedDate) return null;
-    
-    return addDays(parsedDate, days);
-  },
+  addDaysToDate,
   
   /**
    * Verifica se duas datas são no mesmo dia (ignorando hora)
    */
-  isSameDate(date1: Date | null | undefined, date2: Date | null | undefined): boolean {
-    if (!date1 || !date2) return false;
-    
-    const parsed1 = this.parseDate(date1);
-    const parsed2 = this.parseDate(date2);
-    
-    if (!parsed1 || !parsed2) return false;
-    
-    return isSameDay(parsed1, parsed2);
-  },
+  isSameDate,
   
   /**
    * Obtém a diferença em dias entre duas datas
    */
-  getDaysDifference(date1: Date | null | undefined, date2: Date | null | undefined): number | null {
-    if (!date1 || !date2) return null;
-    
-    const parsed1 = this.parseDate(date1);
-    const parsed2 = this.parseDate(date2);
-    
-    if (!parsed1 || !parsed2) return null;
-    
-    return differenceInDays(parsed1, parsed2);
-  },
+  getDaysDifference,
   
   /**
    * Verifica se a data é hoje
    */
-  isToday(date: Date | null | undefined): boolean {
-    if (!date) return false;
-    const parsedDate = this.parseDate(date);
-    if (!parsedDate) return false;
-    
-    return isToday(parsedDate);
-  },
+  isToday: isDateToday,
   
   /**
    * Verifica se a data é ontem
    */
-  isYesterday(date: Date | null | undefined): boolean {
-    if (!date) return false;
-    const parsedDate = this.parseDate(date);
-    if (!parsedDate) return false;
-    
-    return isYesterday(parsedDate);
-  },
+  isYesterday: isDateYesterday,
   
   /**
    * Retorna o início do dia (00:00:00)
    */
-  startOfDay(date: Date | null | undefined): Date | null {
-    if (!date) return null;
-    const parsedDate = this.parseDate(date);
-    if (!parsedDate) return null;
-    
-    return startOfDay(parsedDate);
-  },
+  startOfDay: getStartOfDay,
   
   /**
    * Retorna o fim do dia (23:59:59)
    */
-  endOfDay(date: Date | null | undefined): Date | null {
-    if (!date) return null;
-    const parsedDate = this.parseDate(date);
-    if (!parsedDate) return null;
-    
-    return endOfDay(parsedDate);
-  }
+  endOfDay: getEndOfDay
 };
 
 /**
@@ -562,9 +424,7 @@ export const configureDateTime = (config: Partial<DateFormatConfig>) => {
  * Define o fuso horário padrão para toda a aplicação
  * @param timeZone Fuso horário (ex: 'America/Sao_Paulo', 'Europe/London')
  */
-export const setDefaultTimeZone = (timeZone: string) => {
-  dateService.config.timeZone = timeZone;
-};
+export const setDefaultTimeZone = setGlobalTimeZone;
 
 /**
  * Define o locale padrão para toda a aplicação
