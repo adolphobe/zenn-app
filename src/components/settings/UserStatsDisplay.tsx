@@ -69,48 +69,48 @@ const UserStatsDisplay: React.FC = () => {
           </div>
         </div>
         
-        {/* Chart - Redesenhado para ficar mais minimalista, como no exemplo */}
-        <div className="h-[200px] mt-4 mb-6">
+        {/* Chart - Modern, clean style */}
+        <div className="h-[180px] mt-6 mb-4">
           <ChartContainer
             config={{
               created: {
                 label: 'Tarefas Cadastradas',
                 theme: { 
-                  light: '#FF3366', // Rosa/vermelho para tarefas cadastradas (similar ao exemplo)
-                  dark: '#FF3366' 
+                  light: '#D3E4FD', // Soft blue for tasks created
+                  dark: '#D3E4FD' 
                 },
               },
               completed: {
                 label: 'Tarefas Concluídas',
                 theme: { 
-                  light: '#3366FF', // Azul para tarefas concluídas
-                  dark: '#3366FF' 
+                  light: '#F2FCE2', // Soft green for tasks completed
+                  dark: '#F2FCE2' 
                 },
               },
             }}
           >
             <ResponsiveContainer width="100%" height="100%">
               <LineChart 
-                data={chartData} 
-                margin={{ top: 10, right: 15, left: 15, bottom: 20 }}
+                data={chartData}
+                margin={{ top: 5, right: 10, left: 10, bottom: 5 }}
               >
                 <CartesianGrid 
-                  vertical={true} 
-                  horizontal={false} 
-                  verticalPoints={chartData.map((_, index) => index)} 
-                  stroke="#EBEBEB" 
-                  strokeDasharray="3 3" 
-                  opacity={0.5}
+                  vertical={true}
+                  horizontal={false}
+                  verticalPoints={chartData.map((_, index) => index)}
+                  stroke="#EBEBEB"
+                  strokeDasharray="3 3"
+                  opacity={0.3}
                 />
                 <XAxis 
-                  dataKey="name" 
-                  axisLine={false} 
+                  dataKey="name"
+                  axisLine={false}
                   tickLine={false}
-                  tick={{ fontSize: 11 }}
-                  dy={10}
+                  tick={{ fontSize: 10, fill: '#8E9196' }}
+                  dy={5}
                 />
                 <YAxis 
-                  hide={true} 
+                  hide={true}
                 />
                 <ChartTooltip
                   content={<ChartTooltipContent />}
@@ -118,34 +118,33 @@ const UserStatsDisplay: React.FC = () => {
                 <Line
                   type="monotone"
                   dataKey="created"
-                  strokeWidth={3}
-                  activeDot={{ r: 6, strokeWidth: 0 }}
+                  strokeWidth={2.5}
+                  activeDot={{ r: 4, strokeWidth: 0 }}
                   dot={{ r: 0 }}
                   style={{ strokeLinecap: "round" }}
                 />
                 <Line
                   type="monotone"
                   dataKey="completed"
-                  strokeWidth={3}
-                  activeDot={{ r: 6, strokeWidth: 0 }}
+                  strokeWidth={2.5}
+                  activeDot={{ r: 4, strokeWidth: 0 }}
                   dot={{ r: 0 }}
                   style={{ strokeLinecap: "round" }}
                 />
               </LineChart>
             </ResponsiveContainer>
           </ChartContainer>
-          
-          {/* Legend - Redesenhada para combinar com o estilo minimalista */}
-          <div className="flex justify-center mt-1">
-            <ChartLegend
-              payload={[
-                { value: 'created', color: '#FF3366' },
-                { value: 'completed', color: '#3366FF' }
-              ]}
-              verticalAlign="bottom"
-            >
-              <ChartLegendContent />
-            </ChartLegend>
+        </div>
+        
+        {/* Clear Legend with labels */}
+        <div className="flex justify-center gap-6 mt-2 mb-2">
+          <div className="flex items-center gap-2">
+            <div className="h-3 w-3 bg-[#D3E4FD] rounded"></div>
+            <span className="text-xs text-[#1A1F2C]">Tarefas Cadastradas</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="h-3 w-3 bg-[#F2FCE2] rounded"></div>
+            <span className="text-xs text-[#1A1F2C]">Tarefas Concluídas</span>
           </div>
         </div>
       </CardContent>
