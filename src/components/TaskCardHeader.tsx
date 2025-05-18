@@ -11,7 +11,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 interface TaskCardHeaderProps {
   title: string;
   totalScore: number;
-  idealDate?: Date | null;
+  idealDate?: Date | string | null;
   isEditing: boolean;
   titleValue: string;
   dateDisplayOptions: DateDisplayOptions;

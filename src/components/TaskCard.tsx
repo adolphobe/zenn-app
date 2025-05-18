@@ -1,6 +1,6 @@
 
 //src/components/TaskCard.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Task } from '@/types';
 import { useAppContext } from '@/context/AppContext';
 import { getTaskPriorityClass } from '@/utils';
@@ -26,15 +26,20 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
   const [feedbackModalOpen, setFeedbackModalOpen] = useState(false);
   const [editTaskModalOpen, setEditTaskModalOpen] = useState(false);
   const [deleteConfirmModalOpen, setDeleteConfirmModalOpen] = useState(false);
+  const [showBorderAnimation, setShowBorderAnimation] = useState(false);
   const { state, updateTaskTitle } = useAppContext();
   const { toggleTaskHidden, toggleTaskCompleted, setTaskFeedback } = useTaskDataContext();
   const { dateDisplayOptions, showHiddenTasks, viewMode } = state;
+  const prevHiddenRef = useRef(task.hidden);
   
   // Aplicar classe de prioridade apenas no modo potência
   // No modo cronológico, usar um estilo neutro claro
   const cardClass = viewMode === 'chronological' 
     ? 'bg-white text-gray-800 border-gray-200' 
     : getTaskPriorityClass(task.totalScore);
+
+  // Add border animation class when task changes from hidden to visible
+  const borderAnimationClass = showBorderAnimation ? 'animate-border-pulse' : '';
   
   const handleTitleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -73,6 +78,16 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
   const handleToggleHidden = (e: React.MouseEvent) => {
     e.stopPropagation();
     console.log('Ocultar/Mostrar tarefa clicado:', task.id, 'Status atual:', task.hidden);
+    
+    // If we're in power mode and changing from hidden to visible, show border animation
+    if (viewMode === 'power' && task.hidden && showHiddenTasks) {
+      // Trigger border animation when going from hidden to visible
+      setShowBorderAnimation(true);
+      // Reset the animation after it completes
+      setTimeout(() => {
+        setShowBorderAnimation(false);
+      }, 1200); // Animation lasts 1.2 seconds
+    }
     
     // Usamos o método do TaskDataProvider que tem atualização otimista
     toggleTaskHidden(task.id);
@@ -161,7 +176,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
       <motion.div
         layout
         layoutId={`task-card-${task.id}`}
-        className={`task-card ${cardClass} ${task.completed ? 'opacity-50' : ''} relative cursor-pointer`}
+        className={`task-card ${cardClass} ${borderAnimationClass} ${task.completed ? 'opacity-50' : ''} relative cursor-pointer`}
         onClick={handleCardClick}
         data-task-id={task.id}
         transition={{ 
@@ -234,7 +249,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
             consequenceScore: task.consequenceScore,
             prideScore: task.prideScore,
             constructionScore: task.constructionScore,
-            idealDate: task.idealDate
+            idealDate: task.idealDate instanceof Date ? task.idealDate : task.idealDate ? new Date(task.idealDate) : null
           }}
           taskId={task.id}
           task={task}
