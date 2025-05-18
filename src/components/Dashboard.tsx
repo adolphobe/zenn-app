@@ -68,11 +68,11 @@ const Dashboard: React.FC = () => {
     localStorage.setItem('showOverdueTasks', JSON.stringify(showOverdueTasks));
   }, [showOverdueTasks]);
   
-  // In chronological mode, always show hidden tasks
+  // Em modo cronológico, sempre mostrar tarefas ocultas
+  // Em modo potência, depende da configuração showHiddenTasks
   const shouldShowHiddenTasks = viewMode === 'chronological' || showHiddenTasks;
   
-  // Filter tasks to only show non-completed tasks
-  // and filter out hidden tasks if shouldShowHiddenTasks is false
+  // Filtrar as tarefas não-completadas e visíveis, de acordo com as configurações
   const filteredTasks = tasks.filter(task => {
     // Primeiro, verificar se é uma tarefa não-completada
     const isNotCompleted = !task.completed;
@@ -80,8 +80,13 @@ const Dashboard: React.FC = () => {
     // Em seguida, verificar a visibilidade com base nas preferências
     const isVisible = shouldShowHiddenTasks || !task.hidden;
     
-    // Retornar apenas tarefas não-completadas que são visíveis
-    return isNotCompleted && isVisible;
+    // Filtrar também tarefas com atualização de visibilidade pendente
+    const isPendingHiddenUpdate = task._pendingHiddenUpdate;
+    
+    // Mostrar tarefas que:
+    // 1. Não estão completadas E
+    // 2. (Estão visíveis de acordo com as configurações OU têm uma atualização pendente)
+    return isNotCompleted && (isVisible || isPendingHiddenUpdate);
   });
   
   // First separate overdue tasks from non-overdue tasks

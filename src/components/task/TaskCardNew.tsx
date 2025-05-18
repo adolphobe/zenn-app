@@ -72,15 +72,25 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
     e.stopPropagation();
     console.log('Ocultar/Mostrar tarefa clicado:', task.id, 'Status atual:', task.hidden);
     
-    // Verificar se o usuário está tentando ocultar uma tarefa quando as tarefas ocultas não estão sendo mostradas
-    if (!task.hidden && !showHiddenTasks && viewMode !== 'chronological') {
-      // Notificar o usuário que a tarefa será ocultada
-      toast({
-        title: "Tarefa será ocultada",
-        description: "A tarefa será ocultada. Para vê-la novamente, ative a opção 'Mostrar tarefas ocultas'.",
-      });
+    // Se estamos prestes a ocultar uma tarefa (atualmente visível)
+    if (!task.hidden) {
+      // E se estamos no modo potência e as tarefas ocultas não estão sendo mostradas
+      if (viewMode === 'power' && !showHiddenTasks) {
+        // Notificar o usuário que a tarefa irá desaparecer
+        toast({
+          title: "A tarefa será ocultada",
+          description: "Esta tarefa desaparecerá da lista. Para vê-la novamente, ative a opção 'Mostrar tarefas ocultas' no menu lateral.",
+        });
+        
+        // Aplicar uma pequena pausa para permitir que o usuário veja o toast antes da animação
+        setTimeout(() => {
+          toggleTaskHidden(task.id);
+        }, 300);
+        return;
+      }
     }
     
+    // Em todos os outros casos, alternar imediatamente
     toggleTaskHidden(task.id);
   };
 
@@ -137,17 +147,29 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
     setTitleValue(task.title);
   }, [task.title]);
 
+  // Determine se a tarefa tem uma animação de saída pendente
+  const isPendingHiddenUpdate = task._pendingHiddenUpdate;
+
+  // Determine a classe de animação para saída
+  const exitClass = isPendingHiddenUpdate ? 'animate-fade-out' : '';
+
   return (
     <>
       <motion.div
         layout
         layoutId={`task-card-${task.id}`}
-        className={`task-card ${cardClass} ${task.completed ? 'opacity-50' : ''} relative cursor-pointer`}
+        className={`task-card ${cardClass} ${task.completed ? 'opacity-50' : ''} ${exitClass} relative cursor-pointer`}
         onClick={handleCardClick}
         data-task-id={task.id}
         transition={{ 
           layout: { duration: 0.3, ease: "easeInOut" },
           opacity: { duration: 0.2 }
+        }}
+        exit={{ 
+          opacity: 0, 
+          scale: 0.9, 
+          y: -20,
+          transition: { duration: 0.2, ease: "easeInOut" }
         }}
       >
         <TaskCardHeader 

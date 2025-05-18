@@ -81,7 +81,7 @@ export const useTaskStateOperations = (
     }
   });
   
-  // Toggle hidden mutation
+  // Toggle hidden mutation com animação de saída melhorada
   const toggleHiddenMutation = useMutation({
     mutationFn: (id: string) => {
       // Validate task exists
@@ -97,9 +97,12 @@ export const useTaskStateOperations = (
       // Cancel any outgoing refetches
       await queryClient.cancelQueries({ queryKey: ['tasks', currentUser?.id, completed] });
       
+      // Snapshot of the current data
+      const previousTasks = queryClient.getQueryData(['tasks', currentUser?.id, completed]);
+      
       // Get snapshot of the current task
       const task = tasks.find(t => t.id === id);
-      if (!task) return { previousTasks: tasks };
+      if (!task) return { previousTasks };
       
       const newHiddenState = !task.hidden;
       
@@ -113,7 +116,8 @@ export const useTaskStateOperations = (
               ...t, 
               hidden: newHiddenState,
               // Add a timestamp to ensure the animation detects the change
-              _optimisticUpdateTime: Date.now()
+              _optimisticUpdateTime: Date.now(),
+              _pendingHiddenUpdate: true // Marcador para animação de saída
             };
           }
           return t;
@@ -122,9 +126,79 @@ export const useTaskStateOperations = (
       
       // Return context with original tasks for potential rollback
       return { 
-        previousTasks: tasks,
+        previousTasks,
         newHiddenState
       };
+    },
+    onSuccess: (result, id) => {
+      const task = tasks.find(t => t.id === id);
+      const wasHidden = task?.hidden;
+      const isNowHidden = result.hidden;
+      
+      // Se a tarefa vai ser ocultada, aplicamos um pequeno delay para permitir a animação de saída
+      if (!wasHidden && isNowHidden) {
+        setTimeout(() => {
+          // Depois que a animação de saída terminar, atualizamos o cache
+          queryClient.setQueryData(['tasks', currentUser?.id, completed], (old: Task[] | undefined) => {
+            if (!old) return [];
+            
+            // A tarefa que acabou de ser ocultada não é mais filtrada aqui, pois queremos
+            // que ela seja removida da visualização ao ser ocultada, a menos que o filtro
+            // de tarefas ocultas esteja ativado
+            return old.map(t => {
+              if (t.id === id) {
+                return { 
+                  ...t, 
+                  ...result,
+                  // Manter a marca de timestamp para animação
+                  _optimisticUpdateTime: t._optimisticUpdateTime || Date.now(),
+                  _pendingHiddenUpdate: false
+                };
+              }
+              return t;
+            });
+          });
+          
+          // Invalidar a query para atualizar os filtros de visibilidade
+          queryClient.invalidateQueries({ 
+            queryKey: ['tasks', currentUser?.id, completed],
+            exact: true
+          });
+        }, 300); // Tempo para animação de saída
+      } else {
+        // Para mostrar uma tarefa, atualizamos imediatamente
+        queryClient.setQueryData(['tasks', currentUser?.id, completed], (old: Task[] | undefined) => {
+          if (!old) return [];
+          
+          return old.map(t => {
+            if (t.id === id) {
+              return { 
+                ...t, 
+                ...result,
+                // Manter a marca de timestamp para animação
+                _optimisticUpdateTime: t._optimisticUpdateTime || Date.now(),
+                _pendingHiddenUpdate: false
+              };
+            }
+            return t;
+          });
+        });
+        
+        // Invalidar a query para atualizar os filtros de visibilidade
+        queryClient.invalidateQueries({ 
+          queryKey: ['tasks', currentUser?.id, completed],
+          exact: true
+        });
+      }
+      
+      // Adicionar feedback visual imediato
+      toast({
+        id: `toggle-hidden-${id}-${Date.now()}`,
+        title: isNowHidden ? "Tarefa oculta" : "Tarefa visível",
+        description: isNowHidden 
+          ? "A tarefa foi ocultada e só será visível com o filtro ativado." 
+          : "A tarefa agora está visível.",
+      });
     },
     onError: (error: any, id, context) => {
       console.error('Error toggling task hidden status:', error);
@@ -141,43 +215,8 @@ export const useTaskStateOperations = (
         variant: "destructive",
       });
     },
-    onSuccess: (result, id) => {
-      // Explicitly update the cache with server data
-      queryClient.setQueryData(['tasks', currentUser?.id, completed], (old: Task[] | undefined) => {
-        if (!old) return [];
-        
-        return old.map(t => {
-          if (t.id === id) {
-            return { 
-              ...t, 
-              ...result,
-              // Keep the timestamp for animation purposes
-              _optimisticUpdateTime: t._optimisticUpdateTime || Date.now()
-            };
-          }
-          return t;
-        });
-      });
-      
-      // Adicionar feedback visual imediato
-      const isHidden = result.hidden;
-      
-      toast({
-        id: `toggle-hidden-${id}-${Date.now()}`,
-        title: isHidden ? "Tarefa oculta" : "Tarefa visível",
-        description: isHidden 
-          ? "A tarefa foi ocultada e só será visível com o filtro ativado." 
-          : "A tarefa agora está visível.",
-      });
-    },
     onSettled: (_, error, id) => {
       setTaskOperationLoading(id, 'toggle-hidden', false);
-      
-      // Always invalidate to ensure consistency, but don't auto-refetch if no error
-      queryClient.invalidateQueries({ 
-        queryKey: ['tasks', currentUser?.id, completed],
-        refetchType: error ? 'all' : 'none'
-      });
     }
   });
   

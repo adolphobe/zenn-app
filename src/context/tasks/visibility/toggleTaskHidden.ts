@@ -9,6 +9,10 @@ export const toggleTaskHidden = async (dispatch: AppDispatch, id: string) => {
   try {
     console.log('Iniciando processo de ocultar/mostrar tarefa com ID:', id);
     
+    // Primeiro buscamos o estado atual da tarefa para determinar o feedback correto
+    const currentState = await dispatch({ type: 'GET_TASK_HIDDEN_STATUS', payload: id });
+    const currentlyHidden = currentState?.hidden;
+    
     // Atualização local imediata para melhor UX
     dispatch({ type: 'TOGGLE_TASK_HIDDEN', payload: id });
     
