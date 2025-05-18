@@ -1,5 +1,4 @@
-
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { toast } from '@/hooks/use-toast';
 import { processAuthError } from '@/utils/authErrorUtils';
 import { login as authLogin, signup as authSignup, sendPasswordResetEmail as authSendPasswordResetEmail, fetchUserProfile } from '../authService';
