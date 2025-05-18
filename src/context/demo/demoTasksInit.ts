@@ -1,6 +1,7 @@
 
 import { AppDispatch } from '../types';
 import { pendingTasksData, completedTasksData } from '@/mock/database';
+import { dateService } from '@/services/dateService';
 
 // Função para inicializar tarefas de demonstração a partir dos dados fixos
 export const initializeDemoTasks = (dispatch: AppDispatch, tasksLength: number) => {
@@ -59,6 +60,7 @@ export const initializeDemoTasks = (dispatch: AppDispatch, tasksLength: number) 
       });
       
       // Depois marcamos como concluída com a data específica
+      // Usamos o objeto diretamente, compatível com o tipo Date | string | null
       dispatch({
         type: 'COMPLETE_TASK_WITH_DATE',
         payload: {

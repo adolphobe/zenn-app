@@ -2,6 +2,7 @@
 import { Task } from '@/types';
 import { format, isToday, isYesterday, startOfWeek, startOfMonth, parseISO, differenceInMonths } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { dateService } from '@/services/dateService';
 
 // Timeline grouping function
 export const groupTasksByTimeline = (tasks: Task[], periodFilter: string = 'all') => {
@@ -35,10 +36,8 @@ export const groupTasksByTimeline = (tasks: Task[], periodFilter: string = 'all'
     if (!task.completedAt) return;
     
     try {
-      const completedDateStr = typeof task.completedAt === 'object' ? 
-        task.completedAt.toISOString() : task.completedAt;
-        
-      const completedDate = parseISO(completedDateStr);
+      // Parse the completedAt date using our consistent date service
+      const completedDate = task.completedAt;
       
       if (isToday(completedDate)) {
         groups.today.tasks.push(task);
@@ -67,4 +66,3 @@ export const groupTasksByTimeline = (tasks: Task[], periodFilter: string = 'all'
   // Filter out empty groups and return
   return Object.values(groups).filter(group => group.tasks.length > 0);
 };
-

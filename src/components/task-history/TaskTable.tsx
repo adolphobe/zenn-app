@@ -20,6 +20,7 @@ import { RefreshCw, Eye } from 'lucide-react';
 import { useAppContext } from '@/context/AppContext';
 import CompletedTaskModal from './completed-task-modal';
 import RestoreTaskConfirmation from './RestoreTaskConfirmation';
+import { dateService } from '@/services/dateService';
 
 // Table row component
 export const CompletedTaskRow: React.FC<{ task: Task }> = ({ task }) => {
@@ -51,23 +52,27 @@ export const CompletedTaskRow: React.FC<{ task: Task }> = ({ task }) => {
   };
 
   // Format the completion date and time in Brazilian format (DD/MM/YYYY HH:MM)
-  const formatCompletionDateTime = (dateString: string | null | undefined) => {
-    if (!dateString) return '-';
+  const formatCompletionDateTime = (date: Date | null) => {
+    if (!date) return '-';
     try {
-      // Make sure we have a valid date string
-      const date = parseISO(dateString);
-      if (isNaN(date.getTime())) {
-        console.warn('Invalid date:', dateString);
+      // Convert to ISO string first to ensure consistent formatting
+      const isoString = dateService.toISOString(date);
+      if (!isoString) return '-';
+      
+      // Parse and format using date-fns
+      const parsedDate = parseISO(isoString);
+      if (isNaN(parsedDate.getTime())) {
+        console.warn('Invalid date:', date);
         return '-';
       }
-      return format(date, 'dd/MM/yyyy HH:mm', { locale: ptBR });
+      return format(parsedDate, 'dd/MM/yyyy HH:mm', { locale: ptBR });
     } catch (e) {
-      console.error('Error formatting date:', e, dateString);
+      console.error('Error formatting date:', e, date);
       return '-';
     }
   };
 
-  const completedDateTime = formatCompletionDateTime(task.completedAt ? task.completedAt.toString() : null);
+  const completedDateTime = formatCompletionDateTime(task.completedAt);
 
   const handleRestore = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -163,4 +168,3 @@ export const TasksTable: React.FC<{ tasks: Task[] }> = ({ tasks }) => (
     </CardContent>
   </Card>
 );
-

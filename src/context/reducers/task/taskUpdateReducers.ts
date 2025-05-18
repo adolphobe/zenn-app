@@ -69,8 +69,8 @@ export const completeTaskByTitle = (state: AppState, action: Action): AppState =
 export const completeTaskWithDate = (state: AppState, action: Action): AppState => {
   if (action.type !== 'COMPLETE_TASK_WITH_DATE') return state;
   
-  // Parse the date string to a Date object
-  const completedAtDate = dateService.parseDate(action.payload.completedAt) || new Date();
+  // Ensure completedAt is a Date object
+  const completedAtDate = dateService.parseDate(action.payload.completedAt);
   
   return {
     ...state,
@@ -102,4 +102,3 @@ export const restoreTask = (state: AppState, action: Action): AppState => {
     )
   };
 };
-

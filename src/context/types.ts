@@ -46,7 +46,7 @@ export type Action =
   | { type: 'UPDATE_TASK_TITLE'; payload: { id: string; title: string } }
   | { type: 'CLEAR_TASKS' }
   | { type: 'COMPLETE_TASK_BY_TITLE'; payload: string }
-  | { type: 'COMPLETE_TASK_WITH_DATE'; payload: { title: string; completedAt: string } }
+  | { type: 'COMPLETE_TASK_WITH_DATE'; payload: { title: string; completedAt: Date | string | null } }
   | { type: 'SET_TASK_FEEDBACK'; payload: { id: string; feedback: 'transformed' | 'relief' | 'obligation' } }
   | { type: 'SET_TASK_FEEDBACK_BY_TITLE'; payload: { title: string; feedback: 'transformed' | 'relief' | 'obligation' } }
   | { type: 'RESTORE_TASK'; payload: string }
