@@ -55,6 +55,12 @@ const FeedbackAnalysisCard: React.FC<FeedbackAnalysisCardProps> = ({ tasks }) =>
     return titles[id] || id;
   };
   
+  // Make sure distribution data exists before using it
+  const hasValidData = feedbackData && 
+                       feedbackData.distribution && 
+                       feedbackData.distribution.length > 0 &&
+                       feedbackData.withFeedback;
+  
   return (
     <Card className="w-full h-full flex flex-col">
       <CardHeader>
@@ -63,7 +69,7 @@ const FeedbackAnalysisCard: React.FC<FeedbackAnalysisCardProps> = ({ tasks }) =>
       </CardHeader>
       <CardContent className="space-y-4 flex-grow flex flex-col">
         <div className="h-64">
-          {feedbackData.withFeedback ? (
+          {hasValidData ? (
             <ChartContainer 
               className="h-full w-full"
               config={{
@@ -112,12 +118,12 @@ const FeedbackAnalysisCard: React.FC<FeedbackAnalysisCardProps> = ({ tasks }) =>
         </div>
         
         {/* Dynamic Insight Box - moved directly below the chart without spacing */}
-        {feedbackData.withFeedback && feedbackData.topFeedback && (
+        {hasValidData && feedbackData.topFeedback && (
           <div>
             <div 
               className="border rounded-lg p-4 animate-fade-in"
               style={{ 
-                background: GRADIENTS[feedbackData.topFeedback as keyof typeof GRADIENTS],
+                background: GRADIENTS[feedbackData.topFeedback as keyof typeof GRADIENTS] || GRADIENTS.balanced,
                 animationDuration: '0.3s',
                 transition: 'background 0.3s ease'
               }}

@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Task } from '@/types';
 import { useInsightsAnalysis } from './hooks/useInsightsAnalysis';
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
+import { ChartContainer, ChartTooltipContent } from '@/components/ui/chart';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, LabelList, Cell } from 'recharts';
 import { usePillarHover } from '@/context/hooks';
 
@@ -16,7 +16,7 @@ const PillarsAnalysisCard: React.FC<PillarsAnalysisCardProps> = ({ tasks }) => {
   const pillarData = useInsightsAnalysis(tasks);
   
   // Use the pillar hover hook to handle dynamic insights
-  const { activeInsight, handlePillarHover } = usePillarHover(pillarData.insights, 'consequence');
+  const { activeInsight, handlePillarHover } = usePillarHover(pillarData.insights || [], 'consequence');
   
   // Function to determine background gradient based on insight id
   const getBackgroundGradient = (id: string) => {
@@ -30,29 +30,6 @@ const PillarsAnalysisCard: React.FC<PillarsAnalysisCardProps> = ({ tasks }) => {
       default:
         return 'linear-gradient(to right, rgba(240, 240, 240, 0.5), rgba(230, 230, 230, 0.3))';
     }
-  };
-  
-  // Function to get pillar title based on id
-  const getPillarTitle = (id: string, classification: string) => {
-    const titles = {
-      consequence: 'Risco',
-      pride: 'Orgulho',
-      construction: 'Crescimento pessoal'
-    };
-    
-    const emoji = classification === 'prioridade_alta' 
-      ? '🟢' 
-      : classification === 'negligenciado' 
-        ? '🔴' 
-        : '🔵';
-    
-    const status = classification === 'prioridade_alta' 
-      ? 'Priorizado' 
-      : classification === 'negligenciado' 
-        ? 'Negligenciado' 
-        : 'Equilibrado';
-    
-    return `${emoji} ${titles[id as keyof typeof titles]} - ${status}`;
   };
   
   // Helper function to generate tooltip text based on pillar and score
@@ -124,7 +101,7 @@ const PillarsAnalysisCard: React.FC<PillarsAnalysisCardProps> = ({ tasks }) => {
       </CardHeader>
       <CardContent>
         <div className="h-64 mb-6">
-          {pillarData.averages.length > 0 ? (
+          {pillarData.averages && pillarData.averages.length > 0 ? (
             <ChartContainer 
               className="h-full w-full"
               config={{
@@ -145,7 +122,7 @@ const PillarsAnalysisCard: React.FC<PillarsAnalysisCardProps> = ({ tasks }) => {
                     tickCount={6} 
                     hide={true} 
                   />
-                  <ChartTooltip 
+                  <Tooltip 
                     content={<CustomTooltipContent />}
                     cursor={{fill: 'rgba(0, 0, 0, 0.05)'}}
                   />
@@ -196,7 +173,7 @@ const PillarsAnalysisCard: React.FC<PillarsAnalysisCardProps> = ({ tasks }) => {
               <h4 className="font-medium mb-3 text-base">
                 {activeInsight.customTitle}
               </h4>
-              {activeInsight.messages.map((message, msgIndex) => (
+              {activeInsight.messages && activeInsight.messages.map((message, msgIndex) => (
                 <p key={msgIndex} className="text-sm text-muted-foreground">{message}</p>
               ))}
             </div>

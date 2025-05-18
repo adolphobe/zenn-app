@@ -35,35 +35,37 @@ const queryClient = new QueryClient({
 function App() {
   return (
     <div className="App">
-      <QueryClientProvider client={queryClient}>
-        <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
+      <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
+        <QueryClientProvider client={queryClient}>
           <Toaster />
           <AuthProvider>
             <AppProvider>
-              <TaskProviders>
-                <TaskDataProvider>
-                  <Router>
-                    <Routes>
-                      <Route path="/" element={<Landing />} />
-                      <Route path="/login" element={<Login />} />
-                      <Route path="/reset-password" element={<ResetPassword />} />
-                      <Route path="/app" element={<ActoApp />} />
-                      <Route element={<PrivateRoute />}>
-                        <Route path="/dashboard" element={<Dashboard />} />
-                        <Route path="/dashboard2" element={<Dashboard2 />} />
-                        <Route path="/task-history" element={<TaskHistory />} />
-                        <Route path="/strategic-review" element={<StrategicReview />} />
-                        <Route path="/settings" element={<Settings />} />
-                      </Route>
-                      <Route path="*" element={<NotFound />} />
-                    </Routes>
-                  </Router>
-                </TaskDataProvider>
-              </TaskProviders>
+              <UserProvider>
+                <TaskProviders>
+                  <TaskDataProvider>
+                    <Router>
+                      <Routes>
+                        <Route path="/" element={<Landing />} />
+                        <Route path="/login" element={<Login />} />
+                        <Route path="/reset-password" element={<ResetPassword />} />
+                        <Route path="/app" element={<ActoApp />} />
+                        <Route element={<PrivateRoute />}>
+                          <Route path="/dashboard" element={<Dashboard />} />
+                          <Route path="/dashboard2" element={<Dashboard2 />} />
+                          <Route path="/task-history" element={<TaskHistory />} />
+                          <Route path="/strategic-review" element={<StrategicReview />} />
+                          <Route path="/settings" element={<Settings />} />
+                        </Route>
+                        <Route path="*" element={<NotFound />} />
+                      </Routes>
+                    </Router>
+                  </TaskDataProvider>
+                </TaskProviders>
+              </UserProvider>
             </AppProvider>
           </AuthProvider>
-        </ThemeProvider>
-      </QueryClientProvider>
+        </QueryClientProvider>
+      </ThemeProvider>
     </div>
   );
 }
