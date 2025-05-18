@@ -1,4 +1,3 @@
-
 export interface Task {
   id: string;
   title: string;
@@ -17,6 +16,7 @@ export interface Task {
   operationLoading?: {
     [key: string]: boolean;
   };
+  _optimisticUpdateTime?: number; // Added this property for tracking optimistic updates
 }
 
 export interface Comment {
