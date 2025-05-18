@@ -1,6 +1,6 @@
 
 import { Outlet, useLocation } from 'react-router-dom';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/context/AuthContext'; // Import directly from file
 import Sidebar from './Sidebar';
 import { useSidebar } from '@/context/hooks';
 import { Menu } from 'lucide-react';
@@ -8,48 +8,41 @@ import { cn } from '@/lib/utils';
 
 /**
  * PrivateRoute - Protects routes that require authentication
- * Enhanced with detailed logging
+ * Enhanced with detailed logging and improved authentication handling
  */
 export const PrivateRoute = () => {
   const { isAuthenticated, isLoading, currentUser, session } = useAuth();
   const location = useLocation();
   const { isOpen: sidebarOpen, open: openSidebar, isMobile } = useSidebar();
-
-  // Component mount tracking for debugging authentication flow
-  console.log(`[PrivateRoute] PrivateRoute MONTADO/RE-RENDERIZADO em ${location.pathname} - ${new Date().toISOString()}`);
   
-  // Log detailed authentication information for debugging
-  console.log(`[PrivateRoute] Verificando autenticação em ${location.pathname}, isAuthenticated: ${isAuthenticated}, isLoading: ${isLoading}`);
-  console.log(`[PrivateRoute] DETALHES EM PORTUGUÊS: Verificando se o usuário está autenticado para acessar a rota ${location.pathname}`);
-  console.log(`[PrivateRoute] DETALHES DE SESSÃO:`, { 
-    hasSession: !!session, 
-    sessionExpiry: session?.expires_at ? new Date(session.expires_at * 1000).toISOString() : 'N/A',
-  });
+  // Create an instance identifier for better tracking in logs
+  const instanceId = Math.random().toString(36).substring(2, 7);
+
+  // Component mount tracking with timestamp
+  const timestamp = new Date().toISOString();
+  console.log(`[PrivateRoute:${instanceId}] MONTADO em ${location.pathname} - ${timestamp}`);
+  
+  // Log detailed authentication information 
+  console.log(`[PrivateRoute:${instanceId}] Estado de autenticação: ${isAuthenticated ? 'Autenticado' : 'Não-autenticado'}, Carregando: ${isLoading}, Rota: ${location.pathname}`);
   
   if (currentUser) {
-    console.log(`[PrivateRoute] Usuário encontrado:`, currentUser.email);
-    console.log(`[PrivateRoute] DETALHES DO USUÁRIO:`, { id: currentUser.id, email: currentUser.email });
+    console.log(`[PrivateRoute:${instanceId}] Usuário encontrado: ${currentUser.email}`);
   } else {
-    console.log(`[PrivateRoute] Nenhum usuário encontrado no contexto de autenticação`);
-    console.log(`[PrivateRoute] DETALHES: Verificando localStorage para tokens...`);
-    console.log(`[PrivateRoute] Token no localStorage:`, !!localStorage.getItem('sb-wbvxnapruffchikhrqrs-auth-token'));
+    console.log(`[PrivateRoute:${instanceId}] Nenhum usuário encontrado no contexto`);
   }
 
   // Show loading state while checking authentication
   if (isLoading) {
-    console.log("[PrivateRoute] Ainda carregando estado de autenticação...");
-    console.log("[PrivateRoute] DETALHES EM PORTUGUÊS: O sistema está verificando se você está autenticado. Por favor, aguarde.");
+    console.log(`[PrivateRoute:${instanceId}] Aguardando carregamento de autenticação...`);
     return <div className="flex items-center justify-center min-h-screen">
       <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      <div className="ml-4">Verificando autenticação... {timestamp}</div>
     </div>;
   }
 
-  // Log authentication issues but don't redirect
+  // Log authentication result but don't redirect
   if (!isAuthenticated) {
-    console.error(`[PrivateRoute] ERRO DE AUTENTICAÇÃO: Usuário não autenticado em ${location.pathname}`);
-    console.error("[PrivateRoute] DETALHES TÉCNICOS: Usuário tentando acessar página protegida sem estar autenticado");
-    console.error("[PrivateRoute] DETALHES EM PORTUGUÊS: Você não está logado e está tentando acessar uma página protegida. REDIRECIONAMENTO DESATIVADO.");
-    console.error("[PrivateRoute] ESTADO DE AUTENTICAÇÃO:", { isAuthenticated, isLoading, path: location.pathname });
+    console.error(`[PrivateRoute:${instanceId}] ERRO DE AUTENTICAÇÃO: Usuário não autenticado em ${location.pathname}`);
     
     // Return authentication warning instead of redirecting
     return (
@@ -75,14 +68,21 @@ export const PrivateRoute = () => {
               Ir para Login manualmente
             </a>
           </div>
+          
+          {/* Debug information */}
+          <div className="mt-4 p-3 bg-gray-100 rounded text-xs">
+            <p className="font-semibold">Informações técnicas:</p>
+            <p>Instance ID: {instanceId}</p>
+            <p>Timestamp: {timestamp}</p>
+            <p>HasToken: {!!localStorage.getItem('sb-wbvxnapruffchikhrqrs-auth-token') ? 'Sim' : 'Não'}</p>
+          </div>
         </div>
       </div>
     );
   }
 
   // User is authenticated, render the protected layout with sidebar
-  console.log(`[PrivateRoute] Usuário está autenticado, renderizando conteúdo protegido em ${location.pathname}`);
-  console.log(`[PrivateRoute] DETALHES EM PORTUGUÊS: Autenticação confirmada. Exibindo conteúdo da página ${location.pathname}`);
+  console.log(`[PrivateRoute:${instanceId}] Usuário autenticado, renderizando conteúdo em ${location.pathname}`);
   
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 flex">

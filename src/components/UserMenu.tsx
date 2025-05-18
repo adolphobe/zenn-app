@@ -1,41 +1,30 @@
 
 import React, { useEffect } from 'react';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/context/AuthContext'; // Direct import
 import { Button } from '@/components/ui/button';
 import { LogOut, User as UserIcon } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
 const UserMenu: React.FC = () => {
+  // Create instance ID for better tracking
+  const instanceId = Math.random().toString(36).substring(2, 7);
   const { currentUser, logout, isAuthenticated, session } = useAuth();
 
   // Log de estado de autenticação para debugging
   useEffect(() => {
-    console.log("[UserMenu] Estado de autenticação:", isAuthenticated ? "Autenticado" : "Não autenticado");
-    console.log("[UserMenu] Usuário atual:", currentUser?.email || "Nenhum usuário");
-    console.log("[UserMenu] Sessão ativa:", !!session ? "Sim" : "Não");
+    console.log(`[UserMenu:${instanceId}] Estado de autenticação:`, isAuthenticated ? "Autenticado" : "Não autenticado");
+    console.log(`[UserMenu:${instanceId}] Usuário atual:`, currentUser?.email || "Nenhum usuário");
+    console.log(`[UserMenu:${instanceId}] Timestamp:`, new Date().toISOString());
     
-    // Verificar se os dados de autenticação estão consistentes
-    if (isAuthenticated && !currentUser) {
-      console.error("[UserMenu] INCONSISTÊNCIA: isAuthenticated=true mas não há currentUser");
-    }
-    
-    if (!isAuthenticated && currentUser) {
-      console.error("[UserMenu] INCONSISTÊNCIA: isAuthenticated=false mas há currentUser");
-    }
-    
-    // Verificar localStorage
-    const hasToken = !!localStorage.getItem('sb-wbvxnapruffchikhrqrs-auth-token');
-    console.log("[UserMenu] Token no localStorage:", hasToken ? "Presente" : "Ausente");
-    
-    if (hasToken && !isAuthenticated) {
-      console.warn("[UserMenu] ALERTA: Token presente no localStorage mas usuário não está autenticado!");
-    }
-  }, [isAuthenticated, currentUser, session]);
+    return () => {
+      console.log(`[UserMenu:${instanceId}] Componente desmontado em ${new Date().toISOString()}`);
+    };
+  }, [isAuthenticated, currentUser, instanceId]);
 
   const handleLogout = async () => {
     try {
       // Log the logout attempt
-      console.log("[UserMenu] Iniciando processo completo de logout");
+      console.log(`[UserMenu:${instanceId}] Iniciando processo de logout em ${new Date().toISOString()}`);
       
       // Force clear local storage first
       localStorage.removeItem('sb-wbvxnapruffchikhrqrs-auth-token');
@@ -49,13 +38,11 @@ const UserMenu: React.FC = () => {
         description: "Você foi desconectado com sucesso. Redirecionamento automático desativado.",
       });
       
-      console.log("[UserMenu] DETALHES EM PORTUGUÊS: Logout realizado com sucesso, redirecionamento automático DESATIVADO");
-      console.log("[UserMenu] DETALHES DE DEBUG: Em um fluxo normal, você seria redirecionado para a página de login");
+      console.log(`[UserMenu:${instanceId}] Logout realizado com sucesso - ${new Date().toISOString()}`);
       
       // No automatic redirect
     } catch (error) {
-      console.error("[UserMenu] Erro ao fazer logout:", error);
-      console.error("[UserMenu] DETALHES EM PORTUGUÊS: Ocorreu um erro ao tentar deslogar do sistema");
+      console.error(`[UserMenu:${instanceId}] Erro ao fazer logout:`, error);
       
       toast({
         title: "Erro ao sair",
@@ -66,7 +53,7 @@ const UserMenu: React.FC = () => {
   };
 
   if (!currentUser) {
-    console.log("[UserMenu] UserMenu não renderizado - usuário não encontrado");
+    console.log(`[UserMenu:${instanceId}] UserMenu não renderizado - usuário não encontrado`);
     return null;
   }
 

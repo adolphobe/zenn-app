@@ -15,8 +15,8 @@ import Login from "./pages/Login";
 import { PrivateRoute } from "./components/PrivateRoute";
 import { AuthProvider } from "./context/AuthContext";
 
-// Logging app initialization
-console.log("[App] Inicializando o componente App");
+// Logging app initialization with timestamp for better tracking
+console.log(`[App] Inicializando o componente App em ${new Date().toISOString()}`);
 
 // Create Query Client with better error handling
 const queryClient = new QueryClient({
@@ -30,11 +30,14 @@ const queryClient = new QueryClient({
 });
 
 const App = () => {
-  console.log("[App] Renderizando App");
+  // Add a unique identifier to help track component instances in logs
+  const instanceId = Math.random().toString(36).substring(2, 9);
+  console.log(`[App:${instanceId}] Renderizando App em ${new Date().toISOString()}`);
   
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
+        {/* AuthProvider comes first and is separate from other context */}
         <AuthProvider>
           <AppProvider>
             <ToastProvider>
@@ -63,6 +66,7 @@ const App = () => {
   );
 };
 
-console.log("[App] Componente App exportado");
+// Add unmount tracking
+console.log(`[App] Componente App exportado em ${new Date().toISOString()}`);
 
 export default App;
