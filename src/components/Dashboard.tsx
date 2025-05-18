@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '@/context/AppContext';
 import { useTaskDataContext } from '@/context/TaskDataProvider'; // Use the new context
@@ -13,6 +14,7 @@ import { Badge } from './ui/badge';
 import { Alert, AlertTitle, AlertDescription } from './ui/alert';
 import { Button } from './ui/button';
 import { toast } from '@/hooks/use-toast';
+import { AnimatePresence, motion } from 'framer-motion';
 
 const Dashboard: React.FC = () => {
   const { state } = useAppContext();
@@ -156,6 +158,27 @@ const Dashboard: React.FC = () => {
     );
   }
   
+  // Animation variants for task cards
+  const taskVariants = {
+    hidden: { 
+      opacity: 0,
+      y: 20,
+      scale: 0.95,
+      transition: { duration: 0.3 }
+    },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      scale: 1,
+      transition: { duration: 0.3 }
+    },
+    exit: { 
+      opacity: 0,
+      scale: 0.95,
+      transition: { duration: 0.2 }
+    }
+  };
+  
   return (
     <>
       <div className="container p-4 mx-auto max-w-5xl">
@@ -230,27 +253,48 @@ const Dashboard: React.FC = () => {
                     showOverdueTasks ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'
                   }`}
                 >
-                  {sortedOverdueTasks.map(task => (
-                    <TaskCard 
-                      key={task.id} 
-                      task={task} 
-                      isExpanded={isTaskExpanded(task.id)} 
-                      onToggleExpand={toggleTaskExpanded} 
-                    />
-                  ))}
+                  <AnimatePresence>
+                    {sortedOverdueTasks.map(task => (
+                      <motion.div
+                        key={task.id}
+                        initial="hidden"
+                        animate="visible"
+                        exit="exit"
+                        variants={taskVariants}
+                        layout
+                      >
+                        <TaskCard 
+                          key={task.id} 
+                          task={task} 
+                          isExpanded={isTaskExpanded(task.id)} 
+                          onToggleExpand={toggleTaskExpanded} 
+                        />
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
                 </div>
               </div>
             )}
 
             {/* Non-overdue tasks */}
-            {sortedNonOverdueTasks.map(task => (
-              <TaskCard 
-                key={task.id} 
-                task={task} 
-                isExpanded={isTaskExpanded(task.id)} 
-                onToggleExpand={toggleTaskExpanded} 
-              />
-            ))}
+            <AnimatePresence>
+              {sortedNonOverdueTasks.map(task => (
+                <motion.div
+                  key={task.id}
+                  initial="hidden"
+                  animate="visible"
+                  exit="exit"
+                  variants={taskVariants}
+                  layout
+                >
+                  <TaskCard 
+                    task={task} 
+                    isExpanded={isTaskExpanded(task.id)} 
+                    onToggleExpand={toggleTaskExpanded} 
+                  />
+                </motion.div>
+              ))}
+            </AnimatePresence>
 
             {filteredTasks.length === 0 && (
               <div className="text-center py-12 border border-dashed rounded-lg bg-muted/30 border-border">

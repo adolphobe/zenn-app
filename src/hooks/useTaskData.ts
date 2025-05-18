@@ -171,7 +171,7 @@ export const useTaskData = (completed: boolean = false) => {
     }
   });
   
-  // Toggle hidden mutation
+  // Toggle hidden mutation - Implementing optimistic updates
   const toggleHiddenMutation = useMutation({
     mutationFn: (id: string) => {
       // Validate task exists
@@ -180,29 +180,56 @@ export const useTaskData = (completed: boolean = false) => {
       
       return toggleHiddenService(id);
     },
-    onMutate: (id) => {
+    onMutate: async (id) => {
+      // Set loading state
       setTaskOperationLoading(id, 'toggle-hidden', true);
+      
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey: ['tasks', currentUser?.id, completed] });
+      
+      // Snapshot the previous value
+      const previousTasks = queryClient.getQueryData(['tasks', currentUser?.id, completed]);
+      
+      // Optimistically update to the new value
+      queryClient.setQueryData(['tasks', currentUser?.id, completed], (old: Task[] | undefined) => {
+        if (!old) return [];
+        return old.map(task => {
+          if (task.id === id) {
+            return { ...task, hidden: !task.hidden };
+          }
+          return task;
+        });
+      });
+      
+      // Return a context object with the snapshotted value
+      return { previousTasks };
     },
     onSuccess: (updatedTask) => {
-      queryClient.invalidateQueries({ queryKey: ['tasks'] });
       toast({
         id: uuidv4(),
         title: updatedTask.hidden ? "Tarefa oculta" : "Tarefa visível",
         description: updatedTask.hidden ? "A tarefa foi ocultada." : "A tarefa agora está visível.",
       });
     },
-    onError: (error: any) => {
+    onError: (error: any, id, context) => {
       console.error('Error toggling task hidden status:', error);
+      
+      // Revert back to previous state if there's an error
+      if (context?.previousTasks) {
+        queryClient.setQueryData(['tasks', currentUser?.id, completed], context.previousTasks);
+      }
+      
       toast({
         id: uuidv4(),
         title: "Erro ao atualizar tarefa",
         description: "Não foi possível atualizar a visibilidade da tarefa. Tente novamente.",
         variant: "destructive",
       });
-      queryClient.invalidateQueries({ queryKey: ['tasks'] }); // Force refetch on error
     },
     onSettled: (_, __, id) => {
       setTaskOperationLoading(id, 'toggle-hidden', false);
+      // Always invalidate to ensure consistency with server state
+      queryClient.invalidateQueries({ queryKey: ['tasks', currentUser?.id, completed] });
     }
   });
   

@@ -6,6 +6,7 @@ import TaskCardTitle from './TaskCardTitle';
 import { Bell, Hash } from 'lucide-react';
 import { useAppContext } from '@/context/AppContext';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface TaskCardHeaderProps {
   title: string;
@@ -80,32 +81,48 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
   // In chronological mode, only show score if showScores is true
   const shouldShowScore = viewMode !== 'chronological' || showScores;
   
+  // Animation variants for the hidden badge
+  const badgeVariants = {
+    initial: { opacity: 0, scale: 0.8 },
+    animate: { opacity: 1, scale: 1, transition: { duration: 0.3 } },
+    exit: { opacity: 0, scale: 0.8, transition: { duration: 0.2 } }
+  };
+  
   return (
     <div className={`${isHidden && showHiddenTasks ? 'pt-[15px]' : ''}`}>
-      {/* Hidden label for hidden tasks that are only visible because of the filter - now with tooltip */}
-      {isHidden && showHiddenTasks && (
-        <TooltipProvider>
-        <Tooltip delayDuration={0}>
-          <TooltipTrigger asChild>
-            <div className="absolute top-0 left-0 text-xs font-medium px-3 py-1 z-10 shadow-sm backdrop-blur-sm border-b border-r border-gray-300/50"
-                 style={{ 
-                   background: '#0000001c',
-                   color: '#676767',
-                   borderTopLeftRadius: '10px', 
-                   borderBottomRightRadius: '9px',
-                   borderTopRightRadius: '0px',
-                   borderBottomLeftRadius: '0px'
-                 }}>
-              OCULTO
-            </div>
-          </TooltipTrigger>
-          <TooltipContent className="text-sm max-w-xs leading-relaxed border border-gray-200 bg-white/95 backdrop-blur-sm shadow-md"
-                         style={{ borderRadius: '6px' }}>
-            {getTooltipMessage()}
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
-      )}
+      {/* Hidden label for hidden tasks that are only visible because of the filter - now with tooltip and animation */}
+      <AnimatePresence>
+        {isHidden && showHiddenTasks && (
+          <TooltipProvider>
+            <Tooltip delayDuration={0}>
+              <TooltipTrigger asChild>
+                <motion.div 
+                  className="absolute top-0 left-0 text-xs font-medium px-3 py-1 z-10 shadow-sm backdrop-blur-sm border-b border-r border-gray-300/50"
+                  style={{ 
+                    background: '#0000001c',
+                    color: '#676767',
+                    borderTopLeftRadius: '10px', 
+                    borderBottomRightRadius: '9px',
+                    borderTopRightRadius: '0px',
+                    borderBottomLeftRadius: '0px'
+                  }}
+                  initial="initial"
+                  animate="animate"
+                  exit="exit"
+                  variants={badgeVariants}
+                  layout
+                >
+                  OCULTO
+                </motion.div>
+              </TooltipTrigger>
+              <TooltipContent className="text-sm max-w-xs leading-relaxed border border-gray-200 bg-white/95 backdrop-blur-sm shadow-md"
+                           style={{ borderRadius: '6px' }}>
+                {getTooltipMessage()}
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        )}
+      </AnimatePresence>
       
       <div className="flex justify-between items-start">
         <div className="flex-1">

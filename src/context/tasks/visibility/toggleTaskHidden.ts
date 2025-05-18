@@ -17,7 +17,7 @@ export const toggleTaskHidden = async (dispatch: AppDispatch, id: string) => {
       const updatedTask = await toggleTaskHiddenService(id);
       console.log('Tarefa atualizada com sucesso:', updatedTask);
       
-      // Update local state
+      // Update local state IMMEDIATELY for instant UI feedback
       dispatch({ type: 'TOGGLE_TASK_HIDDEN', payload: id });
       
       // Reset loading state
@@ -28,6 +28,8 @@ export const toggleTaskHidden = async (dispatch: AppDispatch, id: string) => {
         title: updatedTask.hidden ? "Tarefa oculta" : "Tarefa visível",
         description: updatedTask.hidden ? "A tarefa foi ocultada." : "A tarefa agora está visível.",
       });
+      
+      return updatedTask;
     } catch (error: any) {
       console.error('Error toggling task hidden status:', error);
       
@@ -59,6 +61,8 @@ export const toggleTaskHidden = async (dispatch: AppDispatch, id: string) => {
           variant: "destructive",
         });
       }
+      
+      throw error;
     }
   } catch (generalError) {
     console.error('Erro geral ao processar ocultação da tarefa:', generalError);
@@ -68,5 +72,6 @@ export const toggleTaskHidden = async (dispatch: AppDispatch, id: string) => {
       description: "Ocorreu um erro inesperado. Tente novamente mais tarde.",
       variant: "destructive",
     });
+    throw generalError;
   }
 };
