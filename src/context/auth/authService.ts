@@ -30,7 +30,7 @@ export const fetchUserProfile = async (user: any): Promise<User> => {
 };
 
 // Login function
-export const login = async (email: string, password: string): Promise<{ success: boolean, error?: any, user?: User | null, session?: Session | null }> => {
+export const login = async (email: string, password: string): Promise<{ success: boolean, error?: any, user?: any, session?: Session | null }> => {
   try {
     console.log("[AuthService] Tentando login com email:", email);
     console.log("[AuthService] DETALHES EM PORTUGUÊS: Tentando fazer login com o email:", email);

@@ -1,7 +1,6 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '@/context/AppContext';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/context/auth';
 
 // Import refactored hooks
 import { useCompletedTasks } from '@/components/task-history/hooks/useCompletedTasks';
