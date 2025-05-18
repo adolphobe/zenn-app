@@ -17,25 +17,14 @@ const LoginForm: React.FC<LoginFormProps> = ({
   onSwitchToSignup, 
   onForgotPassword 
 }) => {
-  const { form, isLoading, loginError, loginSuggestion, onSubmit } = useLoginForm(onSuccess);
+  const { form, isLoading, loginError, loginSuggestion, handleSubmit } = useLoginForm(onSuccess);
   const formRef = useRef<HTMLFormElement>(null);
-
-  // Adicionar efeito para logs quando os erros mudarem
-  useEffect(() => {
-    console.log("[LoginForm Component] Recebendo erro:", loginError);
-    console.log("[LoginForm Component] Recebendo sugestão:", loginSuggestion);
-  }, [loginError, loginSuggestion]);
 
   return (
     <Form {...form}>
-      {/* 
-        Importante: 
-        1. Usar onSubmit diretamente do useLoginForm 
-        2. Não adicionar onSubmit diretamente no form element nativo
-      */}
-      <form ref={formRef} onSubmit={onSubmit} className="space-y-6">
-        {/* Garantir que a mensagem de erro seja exibida com alta prioridade e local fixo */}
-        <div className="min-h-[80px]">  {/* Altura fixa para evitar saltos no layout */}
+      <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
+        {/* Error message display with compact height */}
+        <div className="min-h-[40px]">
           {loginError && (
             <LoginErrorDisplay 
               error={loginError} 

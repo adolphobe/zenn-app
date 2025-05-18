@@ -8,7 +8,6 @@ import { Session } from '@supabase/supabase-js';
 export const login = async (email: string, password: string): Promise<{ success: boolean, error?: any, user?: any, session?: Session | null }> => {
   try {
     console.log("[AuthService] Tentando login com email:", email);
-    console.log("[AuthService] DETALHES EM PORTUGUÊS: Tentando fazer login com o email:", email);
     
     // Enhanced login with explicit storage options
     const { data, error } = await supabase.auth.signInWithPassword({
@@ -18,43 +17,20 @@ export const login = async (email: string, password: string): Promise<{ success:
     
     if (error) {
       console.error("[AuthService] Erro de login:", error.message);
-      console.error("[AuthService] DETALHES EM PORTUGUÊS: Falha ao fazer login. Erro:", error.message);
       
-      // A principal mudança está aqui: não exibir toast para erros de credenciais para evitar duplicação
-      // já que o erro já será exibido no formulário
-      if (!error.message.includes('Invalid login credentials')) {
-        const errorDetails = processAuthError(error);
-        toast({
-          title: "Falha no login",
-          description: errorDetails.message,
-          variant: "destructive"
-        });
-      }
-      
-      // Retornar o erro explicitamente
+      // Return the error explicitly without showing toast
+      // The error will be handled by the component
       return { success: false, error };
     }
     
     console.log("[AuthService] Login bem-sucedido:", data.user?.email);
-    console.log("[AuthService] DETALHES EM PORTUGUÊS: Login realizado com sucesso");
     
-    // Não exibir toast de sucesso aqui, pois a página será redirecionada
-    // Isso evita flash de mensagens
-    
+    // Don't show success toast here, let the component handle it
     return { success: true, user: data.user, session: data.session };
   } catch (error: any) {
     console.error("[AuthService] Erro de login:", error);
-    console.error("[AuthService] DETALHES EM PORTUGUÊS: Ocorreu um erro inesperado durante o processo de login");
     
-    const errorDetails = processAuthError(error);
-    
-    // Exibir toast apenas para erros técnicos/inesperados
-    toast({
-      title: "Erro no login",
-      description: errorDetails.message,
-      variant: "destructive"
-    });
-    
+    // Return the error without showing toast
     return { success: false, error };
   }
 };

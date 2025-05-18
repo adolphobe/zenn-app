@@ -7,36 +7,28 @@ interface LoginErrorDisplayProps {
 }
 
 const LoginErrorDisplay: React.FC<LoginErrorDisplayProps> = ({ error, suggestion }) => {
-  // Adicionar estado para controlar a visibilidade da animação
   const [isVisible, setIsVisible] = useState(false);
   
-  // Adicionar um efeito para garantir que o erro seja exibido com animação
   useEffect(() => {
     if (error) {
-      // Primeiro, forçamos um reset da animação definindo como false
+      // Reset animation first
       setIsVisible(false);
       
-      // Em seguida, disparamos a animação após um pequeno delay
+      // Trigger animation after a small delay
       const timer = setTimeout(() => {
         setIsVisible(true);
-        console.log("[LoginErrorDisplay] Exibindo erro animado:", error);
       }, 50);
       
       return () => clearTimeout(timer);
     }
   }, [error]);
-
-  // Logs para debugging
-  console.log("[LoginErrorDisplay] Rendering with error:", error);
-  console.log("[LoginErrorDisplay] Rendering with suggestion:", suggestion);
-  console.log("[LoginErrorDisplay] Visibility state:", isVisible);
   
-  // Se não houver erro, ainda renderizamos um elemento vazio para manter o layout
-  if (!error) return <div className="min-h-[4rem]"></div>;
+  // If no error, return minimal space holder
+  if (!error) return <div className="h-0"></div>;
   
   return (
     <div 
-      className={`bg-red-50 text-red-700 px-3 py-2 rounded-md mb-4 transition-all duration-500 ease-in-out fixed-height ${
+      className={`bg-red-50 text-red-700 px-3 py-2 rounded-md mb-2 transition-all duration-300 ease-in-out ${
         isVisible 
           ? 'opacity-100 transform translate-y-0' 
           : 'opacity-0 transform -translate-y-2'
