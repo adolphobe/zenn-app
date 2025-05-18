@@ -1,4 +1,3 @@
-
 import { ISODateString } from './types/dates';
 
 export interface Task {
@@ -8,16 +7,16 @@ export interface Task {
   prideScore: number;
   constructionScore: number;
   totalScore: number;
-  idealDate: Date | null;  // Internamente sempre Date | null
-  hidden: boolean;
+  idealDate: Date | null;
   completed: boolean;
-  completedAt: Date | null;  // Internamente sempre Date | null
-  createdAt: Date;  // Sempre Date internamente
-  feedback: 'transformed' | 'relief' | 'obligation' | null;
+  completedAt: Date | null;
+  hidden: boolean;
+  feedback?: 'transformed' | 'relief' | 'obligation';
   comments: Comment[];
-  pillar?: string | null;
+  isDeleted?: boolean;
   operationLoading?: Record<string, boolean>;
-  _optimisticUpdateTime?: number; // Propriedade para acompanhamento de animações
+  _optimisticUpdateTime?: number;
+  _pendingHiddenUpdate?: boolean;
 }
 
 export interface Comment {
@@ -32,8 +31,8 @@ export interface TaskFormData {
   consequenceScore: number;
   prideScore: number;
   constructionScore: number;
-  idealDate: Date | null;  // Padronizado para Date | null internamente
-  completedAt?: Date | null;  // Padronizado para Date | null
+  idealDate: Date | null;
+  completedAt?: Date | null;
   feedback?: 'transformed' | 'relief' | 'obligation';
   pillar?: string;
   date?: ISODateString;

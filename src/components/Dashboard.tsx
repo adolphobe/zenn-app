@@ -81,7 +81,7 @@ const Dashboard: React.FC = () => {
     const isVisible = shouldShowHiddenTasks || !task.hidden;
     
     // Filtrar também tarefas com atualização de visibilidade pendente
-    const isPendingHiddenUpdate = task._pendingHiddenUpdate;
+    const isPendingHiddenUpdate = task._pendingHiddenUpdate || false;
     
     // Mostrar tarefas que:
     // 1. Não estão completadas E

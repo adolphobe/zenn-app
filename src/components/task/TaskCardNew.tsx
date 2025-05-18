@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Task } from '@/types';
 import { useAppContext } from '@/context/AppContext';
@@ -148,7 +147,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
   }, [task.title]);
 
   // Determine se a tarefa tem uma animação de saída pendente
-  const isPendingHiddenUpdate = task._pendingHiddenUpdate;
+  const isPendingHiddenUpdate = task._pendingHiddenUpdate || false;
 
   // Determine a classe de animação para saída
   const exitClass = isPendingHiddenUpdate ? 'animate-fade-out' : '';
