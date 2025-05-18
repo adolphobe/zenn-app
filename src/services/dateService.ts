@@ -1,32 +1,29 @@
 
-import {
-  parse,
-  format,
-  isValid,
-  parseISO,
-  formatISO,
-  startOfDay,
-  endOfDay,
-  addDays,
-  differenceInDays,
-  isSameDay,
-  isToday,
-  isYesterday,
-  formatRelative as fnsFormatRelative,
-  formatDistance,
-  Locale,
-  isBefore as dateIsBefore,
-  isAfter as dateIsAfter
-} from 'date-fns';
+import { Locale } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { 
-  formatInTimeZone, 
-  toZonedTime, 
-  fromZonedTime,
-  getTimezoneOffset
-} from 'date-fns-tz';
 import { ISODateString, DateDisplayOptions, DateFormatConfig } from '@/types/dates';
+
+// Importações dos módulos refatorados
 import { parseDate } from './dateModules/dateParser';
+import { 
+  formatDisplayDate, 
+  formatRelativeDate, 
+  formatDateDistance,
+  formatToISOString,
+  formatForDateTimeInput,
+  formatWithOptions,
+  formatDateInTimeZone,
+  setDefaultFormatLocale,
+  setDefaultFormats
+} from './dateModules/dateFormatter';
+import { 
+  formatInTimeZone as formatDateInTimeZone,
+  toZonedTime as convertToZonedTime,
+  fromZonedTime as convertFromZonedTime,
+  getTimezoneOffset as getTimeZoneOffsetMinutes,
+  getDefaultTimeZone,
+  setDefaultTimeZone as setGlobalTimeZone
+} from './dateModules/dateTimezone';
 import { 
   addDaysToDate, 
   getDaysDifference, 
@@ -39,14 +36,6 @@ import {
   isDateAfter,
   isTaskOverdue as checkTaskOverdue
 } from './dateModules/dateOperations';
-import { 
-  formatInTimeZone as formatDateInTimeZone,
-  toZonedTime as convertToZonedTime,
-  fromZonedTime as convertFromZonedTime,
-  getTimezoneOffset as getTimeZoneOffsetMinutes,
-  getDefaultTimeZone,
-  setDefaultTimeZone as setGlobalTimeZone
-} from './dateModules/dateTimezone';
 
 // Configuração padrão para formatação de datas
 const DEFAULT_CONFIG: DateFormatConfig = {
@@ -75,42 +64,14 @@ export const dateService = {
    * @returns String ISO ou null
    */
   toISOString(date: Date | ISODateString | null | undefined): ISODateString | null {
-    if (!date) return null;
-    
-    try {
-      // Se já for string, verifica se está em formato ISO
-      if (typeof date === 'string') {
-        // Converte para Date e depois para ISO para validar
-        const parsedDate = this.parseDate(date);
-        return parsedDate ? formatISO(parsedDate) : null;
-      }
-      
-      // Se for Date, converte para ISO
-      return isValid(date) ? formatISO(date) : null;
-    } catch (error) {
-      console.error('Erro ao converter para ISO:', error);
-      return null;
-    }
+    return formatToISOString(date);
   },
   
   /**
    * Formata uma data para exibição no input datetime-local
    */
   formatForDateTimeInput(date: Date | ISODateString | null | undefined): string {
-    if (!date) return '';
-    
-    try {
-      const parsedDate = this.parseDate(date);
-      
-      if (!parsedDate || !isValid(parsedDate)) return '';
-      
-      // Ajustar para o fuso horário local (para inputs datetime-local)
-      const localDate = new Date(parsedDate.getTime() - (parsedDate.getTimezoneOffset() * 60000));
-      return formatISO(localDate).slice(0, 16);
-    } catch (error) {
-      console.error('Erro formatando data para input:', error);
-      return '';
-    }
+    return formatForDateTimeInput(date);
   },
   
   /**
@@ -124,7 +85,7 @@ export const dateService = {
     
     try {
       const parsedDate = this.parseDate(date);
-      if (!parsedDate || !isValid(parsedDate)) return '';
+      if (!parsedDate) return '';
       
       const { hideYear = false, hideTime = false, hideDate = false } = options || {};
       
@@ -142,7 +103,7 @@ export const dateService = {
         formatString += this.config.timeFormat;
       }
       
-      return format(parsedDate, formatString, { locale: this.config.locale });
+      return formatWithOptions(parsedDate, formatString, this.config.locale);
       
     } catch (error) {
       console.error('Erro formatando data para exibição:', error);
@@ -154,38 +115,7 @@ export const dateService = {
    * Formata uma data para exibição relativa (hoje, ontem, etc)
    */
   formatRelative(date: Date | ISODateString | null | undefined): string {
-    if (!date) return '';
-    
-    try {
-      const parsedDate = this.parseDate(date);
-      if (!parsedDate || !isValid(parsedDate)) return '';
-      
-      if (this.isToday(parsedDate)) {
-        return 'Hoje';
-      }
-      
-      if (this.isYesterday(parsedDate)) {
-        return 'Ontem';
-      }
-      
-      // Para datas mais antigas (até 30 dias), usar formato relativo
-      const now = new Date();
-      const daysDiff = this.getDaysDifference(now, parsedDate);
-      
-      if (daysDiff !== null && daysDiff <= 30) {
-        // Usar formatDistance do date-fns para formato relativo
-        return formatDistance(parsedDate, now, { 
-          addSuffix: true,
-          locale: this.config.locale
-        });
-      }
-      
-      // Para datas mais antigas, usar formato padrão
-      return this.formatForDisplay(parsedDate);
-    } catch (error) {
-      console.error('Erro formatando data relativa:', error);
-      return '';
-    }
+    return formatRelativeDate(date);
   },
   
   /**
@@ -251,9 +181,9 @@ export const dateService = {
         };
       }
       
-      const isEqual = isSameDay(parsed1, parsed2);
-      const isBeforeResult = dateIsBefore(parsed1, parsed2);  // Usando a versão renomeada
-      const isAfterResult = dateIsAfter(parsed1, parsed2);    // Usando a versão renomeada
+      const datesAreEqual = isSameDate(parsed1, parsed2);
+      const firstIsBeforeSecond = isDateBefore(parsed1, parsed2);
+      const firstIsAfterSecond = isDateAfter(parsed1, parsed2);
       
       const diffInMillis = Math.abs(parsed2.getTime() - parsed1.getTime());
       const diffInSeconds = Math.floor(diffInMillis / 1000);
@@ -261,14 +191,12 @@ export const dateService = {
       const diffInHours = Math.floor(diffInMinutes / 60);
       const diffInDays = Math.floor(diffInHours / 24);
       
-      const humanReadableDiff = formatDistance(parsed1, parsed2, {
-        locale: this.config.locale
-      });
+      const humanReadableDiff = formatDateDistance(parsed1, parsed2);
       
       return {
-        isEqual,
-        isBefore: isBeforeResult,
-        isAfter: isAfterResult,
+        isEqual: datesAreEqual,
+        isBefore: firstIsBeforeSecond,
+        isAfter: firstIsAfterSecond,
         diffInDays,
         diffInHours,
         diffInMinutes,
@@ -316,14 +244,14 @@ export const dateService = {
       const parsedDate = this.parseDate(date);
       
       // Verifica se a data é válida
-      if (!parsedDate || !isValid(parsedDate)) {
+      if (!parsedDate) {
         return { isValid: false, message: 'Data inválida' };
       }
       
       // Verifica data mínima, se especificada
       if (options?.minDate) {
         const minDate = this.parseDate(options.minDate);
-        if (minDate && dateIsBefore(parsedDate, minDate)) {  // Usando a versão renomeada
+        if (minDate && isDateBefore(parsedDate, minDate)) {
           return { 
             isValid: false, 
             message: `Data não pode ser anterior a ${this.formatForDisplay(minDate)}`
@@ -334,7 +262,7 @@ export const dateService = {
       // Verifica data máxima, se especificada
       if (options?.maxDate) {
         const maxDate = this.parseDate(options.maxDate);
-        if (maxDate && dateIsAfter(parsedDate, maxDate)) {  // Usando a versão renomeada
+        if (maxDate && isDateAfter(parsedDate, maxDate)) {
           return { 
             isValid: false, 
             message: `Data não pode ser posterior a ${this.formatForDisplay(maxDate)}`
@@ -417,7 +345,25 @@ export const dateService = {
  * Exporta uma função helper para configurar o serviço de data
  */
 export const configureDateTime = (config: Partial<DateFormatConfig>) => {
+  // Atualiza a configuração do serviço de data
   dateService.config = { ...dateService.config, ...config };
+  
+  // Atualiza a configuração do formatador
+  if (config.locale) {
+    setDefaultFormatLocale(config.locale);
+  }
+  
+  if (config.dateFormat || config.timeFormat || config.dateTimeFormat) {
+    setDefaultFormats({
+      dateFormat: config.dateFormat,
+      timeFormat: config.timeFormat,
+      dateTimeFormat: config.dateTimeFormat
+    });
+  }
+  
+  if (config.timeZone) {
+    setGlobalTimeZone(config.timeZone);
+  }
 };
 
 /**
@@ -432,4 +378,5 @@ export const setDefaultTimeZone = setGlobalTimeZone;
  */
 export const setDefaultLocale = (locale: Locale) => {
   dateService.config.locale = locale;
+  setDefaultFormatLocale(locale);
 };
