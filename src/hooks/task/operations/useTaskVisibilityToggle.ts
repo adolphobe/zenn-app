@@ -1,4 +1,3 @@
-
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Task } from '@/types';
 import { toggleTaskHidden as toggleHiddenService } from '@/services/taskService';

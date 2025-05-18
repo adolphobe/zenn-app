@@ -1,11 +1,9 @@
 
 import React from 'react';
-import { Task } from '@/types';
-import TaskPillarDetails from '../TaskPillarDetails';
+import { Task, ViewMode } from '@/types';
 import TaskCardActions from '../TaskCardActions';
+import TaskPillarDetails from '../TaskPillarDetails';
 import TaskComments from '../TaskComments';
-import { motion } from 'framer-motion';
-import { ViewMode } from '@/types';
 
 interface TaskCardExpandedProps {
   task: Task;
@@ -15,40 +13,8 @@ interface TaskCardExpandedProps {
   onDeleteTask: (e: React.MouseEvent) => void;
   handleExpandedContentClick: (e: React.MouseEvent) => void;
   viewMode: ViewMode;
-  onCollapseTask: () => void; // Prop to handle task collapsing
+  onCollapseTask: () => void;
 }
-
-const expandedContentVariants = {
-  hidden: { 
-    opacity: 0,
-    height: 0,
-    scale: 0.98,
-    transformOrigin: "top",
-    transition: { 
-      duration: 0.2,
-      ease: "easeInOut"
-    }
-  },
-  visible: { 
-    opacity: 1,
-    height: "auto",
-    scale: 1,
-    transformOrigin: "top",
-    transition: {
-      height: {
-        duration: 0.25,
-        ease: "easeInOut"
-      },
-      opacity: {
-        duration: 0.15,
-        delay: 0.1
-      },
-      scale: {
-        duration: 0.2
-      }
-    }
-  }
-};
 
 const TaskCardExpanded: React.FC<TaskCardExpandedProps> = ({
   task,
@@ -61,24 +27,20 @@ const TaskCardExpanded: React.FC<TaskCardExpandedProps> = ({
   onCollapseTask
 }) => {
   return (
-    <motion.div 
-      className="mt-4 overflow-hidden"
-      variants={expandedContentVariants}
-      initial="hidden"
-      animate="visible"
-      exit="hidden"
+    <div 
+      className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700 animate-fade-in"
       onClick={handleExpandedContentClick}
+      data-testid="task-card-expanded"
     >
-      <TaskPillarDetails task={task} onCollapseTask={onCollapseTask} />
+      <TaskPillarDetails task={task} />
       
-      {/* Display comments if they exist - shown in both modes */}
       {task.comments && task.comments.length > 0 && (
-        <div className="mt-4 cursor-default">
+        <div className="mt-4">
           <TaskComments taskId={task.id} comments={task.comments} />
         </div>
       )}
       
-      <TaskCardActions 
+      <TaskCardActions
         isHidden={task.hidden}
         onToggleHidden={onToggleHidden}
         onEditTask={onEditTask}
@@ -86,7 +48,7 @@ const TaskCardExpanded: React.FC<TaskCardExpandedProps> = ({
         onDeleteTask={onDeleteTask}
         viewMode={viewMode}
       />
-    </motion.div>
+    </div>
   );
 };
 
