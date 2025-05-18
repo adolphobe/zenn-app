@@ -8,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { motion } from 'framer-motion';
 import LoginErrorToast from '@/components/auth/LoginErrorToast';
+import { fetchUserPreferences } from '@/services/preferencesService';
 
 // Map of error codes to messages
 const ERROR_MESSAGES = {
@@ -20,7 +21,7 @@ const ERROR_MESSAGES = {
 const Login: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, currentUser } = useAuth();
   const [isSignup, setIsSignup] = useState(false);
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [loaded, setLoaded] = useState(false);
@@ -64,6 +65,22 @@ const Login: React.FC = () => {
       }, 800);
     }
   }, [location]);
+
+  // Pre-load user preferences after successful login
+  useEffect(() => {
+    const preloadUserPreferences = async () => {
+      if (currentUser?.id && isAuthenticated && !isJustLoggedOut) {
+        try {
+          // Pre-load user preferences to make transition smoother
+          await fetchUserPreferences(currentUser.id);
+        } catch (error) {
+          console.warn("[Login] Erro não-crítico ao pré-carregar preferências:", error);
+        }
+      }
+    };
+    
+    preloadUserPreferences();
+  }, [currentUser?.id, isAuthenticated, isJustLoggedOut]);
 
   // Additional check for authentication using localStorage directly
   const [localAuthCheck, setLocalAuthCheck] = useState<boolean | null>(null);

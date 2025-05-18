@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { NavigateFunction } from 'react-router-dom';
 import { processAuthError } from './authErrorUtils';
+import { savePreferencesToLocalStorage } from '@/services/preferencesService';
 
 /**
  * Performs a complete logout, clearing all session data and redirecting to login
@@ -14,6 +15,25 @@ export const performLogout = async (navigate: NavigateFunction): Promise<void> =
   try {
     // Set logout in progress flag to prevent multiple logout attempts
     localStorage.setItem('logout_in_progress', 'true');
+    
+    // Backup current preferences to localStorage before clearing session
+    // This ensures preferences are preserved for the next login
+    try {
+      const { data } = await supabase.auth.getSession();
+      if (data.session?.user) {
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('preferences')
+          .eq('id', data.session.user.id)
+          .maybeSingle();
+          
+        if (profileData?.preferences) {
+          savePreferencesToLocalStorage(profileData.preferences);
+        }
+      }
+    } catch (e) {
+      console.warn("[AuthUtils] Não foi possível fazer backup das preferências:", e);
+    }
     
     // Clear any Supabase tokens manually first to ensure session is invalidated
     localStorage.removeItem('sb-wbvxnapruffchikhrqrs-auth-token');

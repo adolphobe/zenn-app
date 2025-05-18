@@ -1,90 +1,88 @@
 
 import { AppState } from './types';
+import { loadPreferencesFromLocalStorage } from '@/services/preferencesService';
 
-// Define simple localStorage helper function directly in this file
-const getLocalStorage = (key: string): string | null => {
+// Get stored preferences from localStorage or use defaults
+const getStoredPreferences = () => {
   try {
-    return localStorage.getItem(key);
+    return loadPreferencesFromLocalStorage();
   } catch (e) {
-    console.error('Error accessing localStorage:', e);
+    console.error('Error accessing preferences from localStorage:', e);
     return null;
   }
 };
 
-// Get stored state from localStorage or use defaults
-const getStoredState = () => {
-  const storedState = getLocalStorage('app_state');
-  return storedState ? JSON.parse(storedState) : {};
-};
+// Get the stored preferences
+const storedPreferences = getStoredPreferences();
 
-// Get the stored state
-const storedState = getStoredState();
-
-// Define initial state with stored values or defaults
+// Define initial state with stored preferences or defaults
 export const initialState: AppState = {
   tasks: [],
-  viewMode: storedState.viewMode || 'power',
-  showHiddenTasks: storedState.showHiddenTasks || false,
-  darkMode: storedState.darkMode || false,
-  sidebarOpen: storedState.sidebarOpen !== undefined ? storedState.sidebarOpen : true,
-  showPillars: storedState.showPillars !== undefined ? storedState.showPillars : false,
-  showDates: storedState.showDates !== undefined ? storedState.showDates : true,
-  showScores: storedState.showScores !== undefined ? storedState.showScores : true,
+  viewMode: storedPreferences?.activeViewMode || 'power',
+  showHiddenTasks: storedPreferences?.viewModeSettings?.power?.showHiddenTasks || false,
+  darkMode: storedPreferences?.darkMode || false,
+  sidebarOpen: storedPreferences?.sidebarOpen !== undefined ? storedPreferences.sidebarOpen : true,
+  showPillars: storedPreferences?.viewModeSettings?.power?.showPillars !== undefined 
+    ? storedPreferences.viewModeSettings.power.showPillars : false,
+  showDates: storedPreferences?.viewModeSettings?.power?.showDates !== undefined 
+    ? storedPreferences.viewModeSettings.power.showDates : true,
+  showScores: storedPreferences?.viewModeSettings?.power?.showScores !== undefined 
+    ? storedPreferences.viewModeSettings.power.showScores : true,
   
   // Initialize the mode-specific settings from stored state or defaults
   viewModeSettings: {
     power: {
-      showHiddenTasks: storedState.viewModeSettings?.power?.showHiddenTasks !== undefined
-        ? storedState.viewModeSettings.power.showHiddenTasks
+      showHiddenTasks: storedPreferences?.viewModeSettings?.power?.showHiddenTasks !== undefined
+        ? storedPreferences.viewModeSettings.power.showHiddenTasks
         : false,
-      showPillars: storedState.viewModeSettings?.power?.showPillars !== undefined
-        ? storedState.viewModeSettings.power.showPillars
+      showPillars: storedPreferences?.viewModeSettings?.power?.showPillars !== undefined
+        ? storedPreferences.viewModeSettings.power.showPillars
         : false,
-      showDates: storedState.viewModeSettings?.power?.showDates !== undefined
-        ? storedState.viewModeSettings.power.showDates
+      showDates: storedPreferences?.viewModeSettings?.power?.showDates !== undefined
+        ? storedPreferences.viewModeSettings.power.showDates
         : true,
-      showScores: storedState.viewModeSettings?.power?.showScores !== undefined
-        ? storedState.viewModeSettings.power.showScores
+      showScores: storedPreferences?.viewModeSettings?.power?.showScores !== undefined
+        ? storedPreferences.viewModeSettings.power.showScores
         : true,
     },
     chronological: {
-      showHiddenTasks: storedState.viewModeSettings?.chronological?.showHiddenTasks !== undefined
-        ? storedState.viewModeSettings.chronological.showHiddenTasks
+      showHiddenTasks: storedPreferences?.viewModeSettings?.chronological?.showHiddenTasks !== undefined
+        ? storedPreferences.viewModeSettings.chronological.showHiddenTasks
         : true, // Always true in chronological mode
-      showPillars: storedState.viewModeSettings?.chronological?.showPillars !== undefined
-        ? storedState.viewModeSettings.chronological.showPillars
+      showPillars: storedPreferences?.viewModeSettings?.chronological?.showPillars !== undefined
+        ? storedPreferences.viewModeSettings.chronological.showPillars
         : false,
-      showDates: storedState.viewModeSettings?.chronological?.showDates !== undefined
-        ? storedState.viewModeSettings.chronological.showDates
+      showDates: storedPreferences?.viewModeSettings?.chronological?.showDates !== undefined
+        ? storedPreferences.viewModeSettings.chronological.showDates
         : false, // Hidden by default in chronological mode
-      showScores: storedState.viewModeSettings?.chronological?.showScores !== undefined
-        ? storedState.viewModeSettings.chronological.showScores
+      showScores: storedPreferences?.viewModeSettings?.chronological?.showScores !== undefined
+        ? storedPreferences.viewModeSettings.chronological.showScores
         : true,
     },
   },
   
   dateDisplayOptions: {
-    hideYear: storedState.dateDisplayOptions?.hideYear !== undefined 
-      ? storedState.dateDisplayOptions.hideYear 
+    hideYear: storedPreferences?.dateDisplayOptions?.hideYear !== undefined 
+      ? storedPreferences.dateDisplayOptions.hideYear 
       : false,
-    hideTime: storedState.dateDisplayOptions?.hideTime !== undefined 
-      ? storedState.dateDisplayOptions.hideTime 
+    hideTime: storedPreferences?.dateDisplayOptions?.hideTime !== undefined 
+      ? storedPreferences.dateDisplayOptions.hideTime 
       : false,
-    hideDate: storedState.dateDisplayOptions?.hideDate !== undefined 
-      ? storedState.dateDisplayOptions.hideDate 
+    hideDate: storedPreferences?.dateDisplayOptions?.hideDate !== undefined 
+      ? storedPreferences.dateDisplayOptions.hideDate 
       : false,
   },
   sortOptions: {
     power: {
-      sortDirection: storedState.sortOptions?.power?.sortDirection || 'desc',
-      noDateAtEnd: storedState.sortOptions?.power?.noDateAtEnd !== undefined 
-        ? storedState.sortOptions.power.noDateAtEnd 
+      sortDirection: storedPreferences?.viewModeSettings?.power?.sortOptions?.sortDirection || 'desc',
+      noDateAtEnd: storedPreferences?.viewModeSettings?.power?.sortOptions?.noDateAtEnd !== undefined 
+        ? storedPreferences.viewModeSettings.power.sortOptions.noDateAtEnd 
         : true,
     },
     chronological: {
-      sortDirection: storedState.sortOptions?.chronological?.sortDirection || 'asc',
-      noDateAtEnd: storedState.sortOptions?.chronological?.noDateAtEnd !== undefined 
-        ? storedState.sortOptions.chronological.noDateAtEnd 
+      sortDirection: storedPreferences?.viewModeSettings?.chronological?.sortOptions?.sortDirection || 'asc',
+      noDateAtEnd: storedPreferences?.viewModeSettings?.chronological?.sortOptions?.noDateAtEnd !== undefined 
+        ? storedPreferences.viewModeSettings.chronological.sortOptions.noDateAtEnd 
         : false,
     }
   }

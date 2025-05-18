@@ -14,6 +14,7 @@ export type Database = {
           avatar_url: string | null
           full_name: string | null
           id: string
+          preferences: Json | null
           updated_at: string | null
           username: string | null
           website: string | null
@@ -22,6 +23,7 @@ export type Database = {
           avatar_url?: string | null
           full_name?: string | null
           id: string
+          preferences?: Json | null
           updated_at?: string | null
           username?: string | null
           website?: string | null
@@ -30,6 +32,7 @@ export type Database = {
           avatar_url?: string | null
           full_name?: string | null
           id?: string
+          preferences?: Json | null
           updated_at?: string | null
           username?: string | null
           website?: string | null
@@ -41,7 +44,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      update_user_preferences: {
+        Args: { user_id: string; user_preferences: Json }
+        Returns: Json
+      }
     }
     Enums: {
       [_ in never]: never
