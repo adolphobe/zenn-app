@@ -37,9 +37,9 @@ export interface DateDisplayOptions {
   hideTime?: boolean;
   hideDate?: boolean;
   useTimeZone?: boolean; // Indica se deve usar timezone na formatação
-  dateFormat?: string; // Campo adicionado
-  timeFormat?: string; // Campo adicionado
-  format?: string; // Campo adicionado para compatibilidade
+  dateFormat?: string; // Formato específico para datas
+  timeFormat?: string; // Formato específico para horas
+  format?: string; // Campo mantido para compatibilidade
 }
 
 // Interface para informações de timezone
@@ -64,7 +64,6 @@ export interface UserDatePreferences {
 
 // Interface para opções avançadas de formatação de datas
 export interface AdvancedDateFormatOptions extends DateDisplayOptions {
-  format?: string; // Formato personalizado (sobrescreve dateFormat/timeFormat)
   relative?: boolean; // Usar formato relativo (hoje, ontem, há 3 dias)
   includeTime?: boolean; // Incluir hora na formatação
   longFormat?: boolean; // Usar formato longo (ex: "5 de Janeiro de 2023" vs "05/01/2023")

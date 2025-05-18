@@ -15,7 +15,7 @@ import {
   setDefaultFormats
 } from './dateModules/dateFormatter';
 import { 
-  formatInTimeZone as formatDateInTimeZone,
+  formatInTimeZone,
   toZonedTime as convertToZonedTime,
   fromZonedTime as convertFromZonedTime,
   getTimezoneOffset as getTimeZoneOffsetMinutes,
@@ -122,7 +122,7 @@ export const dateService = {
    * @param format Formato de saída (ex: 'dd/MM/yyyy HH:mm')
    * @param timeZone Fuso horário (ex: 'America/Sao_Paulo')
    */
-  formatInTimeZone: formatDateInTimeZone,
+  formatInTimeZone,
   
   /**
    * Converte uma data para o fuso horário especificado
