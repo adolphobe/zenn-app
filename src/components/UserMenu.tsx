@@ -2,7 +2,7 @@
 import React from 'react';
 import { useAuth } from '@/context/auth';
 import { Button } from '@/components/ui/button';
-import { LogOut, User as UserIcon, Settings } from 'lucide-react';
+import { LogOut, User as UserIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/hooks/use-toast';
 import { performLogout } from '@/utils/authUtils';
@@ -61,7 +61,7 @@ const UserMenu: React.FC = () => {
               <UserIcon size={16} className="text-gray-600 dark:text-gray-300" />
             </div>
           )}
-          <div>
+          <div className="cursor-pointer">
             <p className="text-sm font-medium">{currentUser?.name || "Usuário"}</p>
             <p className="text-xs text-gray-500 dark:text-gray-400">{currentUser?.email || "usuario@exemplo.com"}</p>
           </div>

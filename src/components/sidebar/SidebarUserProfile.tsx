@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { LogOut, User, Settings } from 'lucide-react';
+import { LogOut, User } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -50,7 +50,7 @@ const SidebarUserProfile: React.FC<SidebarUserProfileProps> = ({ sidebarOpen }) 
     <div className="mt-auto">
       <Separator className="mb-4" />
       <div className={`px-4 pb-4 ${sidebarOpen ? 'space-y-2' : 'flex flex-col items-center'}`}>
-        {/* User profile with online indicator */}
+        {/* User profile with online indicator - entire area clickable to go to settings */}
         <div 
           className={`flex ${sidebarOpen ? 'items-start gap-3' : 'justify-center'} cursor-pointer hover:opacity-80`}
           onClick={goToSettings}
@@ -80,24 +80,11 @@ const SidebarUserProfile: React.FC<SidebarUserProfileProps> = ({ sidebarOpen }) 
         </div>
         
         <div className="flex gap-2 mt-2">
-          {/* Settings button */}
-          {sidebarOpen && (
-            <Button
-              variant="outline"
-              size="sm"
-              className="flex-1"
-              onClick={goToSettings}
-            >
-              <Settings size={18} className="mr-1" />
-              Configurar
-            </Button>
-          )}
-          
-          {/* Logout button */}
+          {/* Logout button - now takes full width since "Configurar" button was removed */}
           <Button 
             variant="outline"
             size={sidebarOpen ? "sm" : "icon"}
-            className={`${sidebarOpen ? 'flex-1' : 'w-full'} border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 dark:border-red-900 dark:text-red-400 dark:hover:bg-red-950/20 dark:hover:text-red-300`}
+            className="w-full border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 dark:border-red-900 dark:text-red-400 dark:hover:bg-red-950/20 dark:hover:text-red-300"
             onClick={handleLogout}
           >
             <LogOut size={18} />

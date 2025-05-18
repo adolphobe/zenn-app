@@ -4,7 +4,7 @@ import { useAppContext } from '@/context/AppContext';
 import { Moon, Sun, Settings } from 'lucide-react';
 import SidebarSection from './SidebarSection';
 import SidebarNavItem from './SidebarNavItem';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 
 const SidebarSettingsSection: React.FC<{ sidebarOpen: boolean }> = ({ sidebarOpen }) => {
   const { 
@@ -13,14 +13,9 @@ const SidebarSettingsSection: React.FC<{ sidebarOpen: boolean }> = ({ sidebarOpe
   } = useAppContext();
   
   const location = useLocation();
-  const navigate = useNavigate();
   
   // Check if current route is settings
   const isSettings = location.pathname === '/settings';
-  
-  const goToSettings = () => {
-    navigate('/settings');
-  };
   
   return (
     <SidebarSection title="Configurações" sidebarOpen={sidebarOpen}>
@@ -36,7 +31,6 @@ const SidebarSettingsSection: React.FC<{ sidebarOpen: boolean }> = ({ sidebarOpe
         label="Configurações"
         path="/settings"
         isActive={isSettings}
-        onClick={goToSettings}
       />
     </SidebarSection>
   );

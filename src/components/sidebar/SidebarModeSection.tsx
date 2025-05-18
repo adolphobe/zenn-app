@@ -18,12 +18,17 @@ const SidebarModeSection: React.FC<{ sidebarOpen: boolean }> = ({ sidebarOpen })
   // Check if user is on specific routes by checking if the path contains these segments
   const isStrategicReview = location.pathname === '/strategic-review';
   const isHistory = location.pathname === '/task-history';
+  const isSettings = location.pathname === '/settings';
   
   // Check if user is logged in
   const isLoggedIn = localStorage.getItem('acto_is_logged_in') === 'true';
   
   // Determine the target path based on login status
   const targetPath = isLoggedIn ? '/dashboard' : '/';
+  
+  // An item should only be active if we're on its page and not on a different special page
+  const isPowerModeActive = viewMode === 'power' && !isStrategicReview && !isHistory && !isSettings;
+  const isChronologicalModeActive = viewMode === 'chronological' && !isStrategicReview && !isHistory && !isSettings;
   
   // Navigate to main page with power view mode
   const handlePowerModeClick = () => {
@@ -43,7 +48,7 @@ const SidebarModeSection: React.FC<{ sidebarOpen: boolean }> = ({ sidebarOpen })
         icon={LayoutDashboard} 
         label="Modo Potência"
         path={targetPath}
-        isActive={viewMode === 'power' && !isStrategicReview && !isHistory}
+        isActive={isPowerModeActive}
         onClick={handlePowerModeClick}
       />
       
@@ -51,7 +56,7 @@ const SidebarModeSection: React.FC<{ sidebarOpen: boolean }> = ({ sidebarOpen })
         icon={CalendarClock} 
         label="Modo Cronológico"
         path={targetPath}
-        isActive={viewMode === 'chronological' && !isStrategicReview && !isHistory}
+        isActive={isChronologicalModeActive}
         onClick={handleChronologicalModeClick}
       />
       
