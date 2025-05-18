@@ -36,7 +36,7 @@ export const performLogout = async (navigate: NavigateFunction): Promise<void> =
     
     // Wait a moment to ensure complete session termination
     // This helps prevent issues with rapid navigation
-    await new Promise(resolve => setTimeout(resolve, 300));
+    await new Promise(resolve => setTimeout(resolve, 500));
     
     // Show success toast
     toast({
@@ -84,6 +84,14 @@ export const performLogout = async (navigate: NavigateFunction): Promise<void> =
  */
 export const checkAuthStatus = async () => {
   try {
+    // Clear any ongoing logout process flags first
+    const logoutInProgress = localStorage.getItem('logout_in_progress');
+    if (logoutInProgress === 'true') {
+      console.log("[AuthStatus] Detectado logout em progresso, limpando flag");
+      localStorage.removeItem('logout_in_progress');
+      return { isAuthenticated: false, error: null };
+    }
+
     const { data, error } = await supabase.auth.getSession();
     
     if (error) {

@@ -1,4 +1,3 @@
-
 import { createContext, useState, useContext, useEffect, ReactNode } from 'react';
 import { User } from '../types/user';
 import { supabase } from '@/integrations/supabase/client';
@@ -96,12 +95,42 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     console.log("[AuthProvider] DETALHES EM PORTUGUÊS: Verificando se existe uma sessão ativa");
     
     // Check for logout in progress flag and clear it if it exists on page load
-    // This handles cases where the page was refreshed during logout
     const logoutInProgress = localStorage.getItem('logout_in_progress');
     if (logoutInProgress === 'true') {
       console.log("[AuthProvider] Detectada flag de logout em andamento ao inicializar, limpando");
       localStorage.removeItem('logout_in_progress');
     }
+    
+    // Set up auth state change listener FIRST
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, newSession) => {
+        console.log("[AuthProvider] Estado de autenticação alterado:", event);
+        console.log("[AuthProvider] DETALHES EM PORTUGUÊS: Evento de autenticação detectado:", 
+          event === 'SIGNED_IN' ? 'Usuário entrou' : 
+          event === 'SIGNED_OUT' ? 'Usuário saiu' : 
+          'Outro evento de autenticação');
+        
+        setSession(newSession);
+        
+        if (event === 'SIGNED_OUT') {
+          console.log("[AuthProvider] Usuário deslogado");
+          console.log("[AuthProvider] DETALHES EM PORTUGUÊS: Usuário encerrou a sessão");
+          setCurrentUser(null);
+          setIsLoading(false);
+          return;
+        }
+        
+        // Use setTimeout for any Supabase calls to prevent potential race conditions
+        if (newSession?.user) {
+          console.log("[AuthProvider] Nova sessão detectada");
+          console.log("[AuthProvider] DETALHES EM PORTUGUÊS: Iniciando nova sessão para o usuário");
+          
+          setTimeout(() => {
+            fetchUserProfile(newSession.user);
+          }, 0);
+        }
+      }
+    );
     
     // Helper function to fetch user profile
     const fetchUserProfile = async (user: any) => {
@@ -126,43 +155,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
     };
     
-    // Set up auth state change listener FIRST
-    // IMPORTANT: We set this up before checking for an existing session to ensure we don't miss any auth events
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, newSession) => {
-        console.log("[AuthProvider] Estado de autenticação alterado:", event);
-        console.log("[AuthProvider] DETALHES EM PORTUGUÊS: Evento de autenticação detectado:", 
-          event === 'SIGNED_IN' ? 'Usuário entrou' : 
-          event === 'SIGNED_OUT' ? 'Usuário saiu' : 
-          'Outro evento de autenticação');
+    // THEN check for existing session
+    const checkInitialSession = async () => {
+      try {
+        console.log("[AuthProvider] Verificando sessão inicial...");
+        const { data, error } = await supabase.auth.getSession();
         
-        // Use synchronous state updates here
-        setSession(newSession);
-        
-        if (event === 'SIGNED_OUT') {
-          console.log("[AuthProvider] Usuário deslogado");
-          console.log("[AuthProvider] DETALHES EM PORTUGUÊS: Usuário encerrou a sessão");
-          setCurrentUser(null);
+        if (error) {
+          console.error("[AuthProvider] Erro ao verificar sessão:", error);
           setIsLoading(false);
           return;
         }
         
-        // Use setTimeout for any Supabase calls to prevent potential race conditions/deadlocks
-        if (newSession?.user) {
-          console.log("[AuthProvider] Nova sessão detectada");
-          console.log("[AuthProvider] DETALHES EM PORTUGUÊS: Iniciando nova sessão para o usuário");
-          
-          setTimeout(() => {
-            fetchUserProfile(newSession.user);
-          }, 0);
-        }
-      }
-    );
-    
-    // THEN check for existing session
-    const checkInitialSession = async () => {
-      try {
-        const { data } = await supabase.auth.getSession();
         console.log("[AuthProvider] Verificação inicial da sessão:", data.session ? "Sessão encontrada" : "Nenhuma sessão");
         console.log("[AuthProvider] DETALHES EM PORTUGUÊS:", data.session ? "Encontramos uma sessão ativa" : "Nenhuma sessão ativa encontrada");
         
@@ -187,7 +191,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // Clean up subscription on unmount
     return () => {
       console.log("[AuthProvider] Limpando - cancelando inscrição em eventos de autenticação");
-      console.log("[AuthProvider] DETALHES EM PORTUGUÊS: Desativando monitoramento de eventos de autenticação");
       subscription.unsubscribe();
     };
   }, []);
@@ -444,10 +447,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
   
-  // Context value
+  // Context value - Fix the isAuthenticated logic to be more robust
   const value = {
     currentUser,
-    isAuthenticated: !!session?.user,
+    isAuthenticated: !!session && !!currentUser,
     isLoading,
     login,
     signup,

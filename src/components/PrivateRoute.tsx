@@ -5,6 +5,8 @@ import Sidebar from './Sidebar';
 import { useSidebar } from '@/context/hooks';
 import { Menu } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useEffect, useState } from 'react';
+import { toast } from '@/hooks/use-toast';
 
 /**
  * PrivateRoute - Protects routes that require authentication
@@ -14,15 +16,23 @@ export const PrivateRoute = () => {
   const { isAuthenticated, isLoading } = useAuth();
   const location = useLocation();
   const { isOpen: sidebarOpen, open: openSidebar, isMobile } = useSidebar();
+  const [authChecked, setAuthChecked] = useState(false);
 
   // Check if a logout is in progress to prevent login/logout loops
   const logoutInProgress = localStorage.getItem('logout_in_progress') === 'true';
 
-  console.log(`[PrivateRoute] Verificando autenticação em ${location.pathname}, isAuthenticated: ${isAuthenticated}, isLoading: ${isLoading}, logoutInProgress: ${logoutInProgress}`);
+  // Use effect to ensure we've completed at least one auth check
+  useEffect(() => {
+    if (!isLoading) {
+      setAuthChecked(true);
+    }
+  }, [isLoading]);
+
+  console.log(`[PrivateRoute] Verificando autenticação em ${location.pathname}, isAuthenticated: ${isAuthenticated}, isLoading: ${isLoading}, authChecked: ${authChecked}, logoutInProgress: ${logoutInProgress}`);
   console.log(`[PrivateRoute] DETALHES EM PORTUGUÊS: Verificando se o usuário está autenticado para acessar a rota ${location.pathname}`);
 
   // Show loading state while checking authentication
-  if (isLoading) {
+  if (isLoading || !authChecked) {
     console.log("[PrivateRoute] Ainda carregando estado de autenticação...");
     console.log("[PrivateRoute] DETALHES EM PORTUGUÊS: O sistema está verificando se você está autenticado. Por favor, aguarde.");
     return <div className="flex items-center justify-center min-h-screen">
@@ -42,6 +52,12 @@ export const PrivateRoute = () => {
     if (logoutInProgress) {
       localStorage.removeItem('sb-wbvxnapruffchikhrqrs-auth-token');
       localStorage.removeItem('supabase.auth.token');
+      
+      // Show toast before redirecting
+      toast({
+        title: "Sessão encerrada",
+        description: "Você foi desconectado do sistema",
+      });
       
       // Return a redirect to login with current location stored for later redirect back
       // Add a timestamp to avoid caching issues

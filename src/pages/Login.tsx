@@ -14,6 +14,7 @@ const Login: React.FC = () => {
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [isJustLoggedOut, setIsJustLoggedOut] = useState(false);
+  const [redirectAttempts, setRedirectAttempts] = useState(0);
   
   // Get redirect path from location state or default to dashboard
   const from = location.state?.from?.pathname || "/dashboard";
@@ -63,14 +64,20 @@ const Login: React.FC = () => {
       console.log("[Login] Usuário autenticado, redirecionando para:", from);
       console.log("[Login] DETALHES EM PORTUGUÊS: Autenticação verificada. Redirecionando para " + from);
       
-      // Add a small delay before redirect to prevent loops
-      const redirectTimer = setTimeout(() => {
-        navigate(from, { replace: true });
-      }, 200);
-      
-      return () => clearTimeout(redirectTimer);
+      // Prevent redirect loops by tracking redirect attempts
+      if (redirectAttempts < 3) {
+        // Add a small delay before redirect to prevent loops
+        const redirectTimer = setTimeout(() => {
+          navigate(from, { replace: true });
+          setRedirectAttempts(prev => prev + 1);
+        }, 500);
+        
+        return () => clearTimeout(redirectTimer);
+      } else {
+        console.error("[Login] Muitas tentativas de redirecionamento detectadas. Possível loop de redirecionamento.");
+      }
     }
-  }, [isAuthenticated, isLoading, from, navigate, isJustLoggedOut]);
+  }, [isAuthenticated, isLoading, from, navigate, isJustLoggedOut, redirectAttempts]);
 
   // Toggle between login and signup
   const toggleSignup = () => {
