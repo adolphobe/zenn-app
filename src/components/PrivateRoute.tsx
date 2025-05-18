@@ -21,7 +21,6 @@ export const PrivateRoute = () => {
   console.log(`[PrivateRoute] DETALHES DE SESSÃO:`, { 
     hasSession: !!session, 
     sessionExpiry: session?.expires_at ? new Date(session.expires_at * 1000).toISOString() : 'N/A',
-    sessionAcquiredAt: session?.created_at ? new Date(session.created_at * 1000).toISOString() : 'N/A' 
   });
   
   if (currentUser) {

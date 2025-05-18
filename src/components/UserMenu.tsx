@@ -13,6 +13,23 @@ const UserMenu: React.FC = () => {
     console.log("[UserMenu] Estado de autenticação:", isAuthenticated ? "Autenticado" : "Não autenticado");
     console.log("[UserMenu] Usuário atual:", currentUser?.email || "Nenhum usuário");
     console.log("[UserMenu] Sessão ativa:", !!session ? "Sim" : "Não");
+    
+    // Verificar se os dados de autenticação estão consistentes
+    if (isAuthenticated && !currentUser) {
+      console.error("[UserMenu] INCONSISTÊNCIA: isAuthenticated=true mas não há currentUser");
+    }
+    
+    if (!isAuthenticated && currentUser) {
+      console.error("[UserMenu] INCONSISTÊNCIA: isAuthenticated=false mas há currentUser");
+    }
+    
+    // Verificar localStorage
+    const hasToken = !!localStorage.getItem('sb-wbvxnapruffchikhrqrs-auth-token');
+    console.log("[UserMenu] Token no localStorage:", hasToken ? "Presente" : "Ausente");
+    
+    if (hasToken && !isAuthenticated) {
+      console.warn("[UserMenu] ALERTA: Token presente no localStorage mas usuário não está autenticado!");
+    }
   }, [isAuthenticated, currentUser, session]);
 
   const handleLogout = async () => {

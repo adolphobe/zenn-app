@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo, useEffect } from 'react';
 import { useAppContext } from '@/context/AppContext';
 import { useAuth } from '@/context/AuthContext';
@@ -12,7 +11,6 @@ import PillarsAnalysisCard from '@/components/strategic-review/PillarsAnalysisCa
 import FeedbackAnalysisCard from '@/components/strategic-review/FeedbackAnalysisCard';
 import { toast } from '@/hooks/use-toast';
 import { useTaskPillars } from '@/context/hooks';
-import { ResizablePanelGroup, ResizablePanel } from '@/components/ui/resizable';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { CalendarIcon, CalendarRange } from 'lucide-react';
@@ -37,14 +35,26 @@ const StrategicReview: React.FC = () => {
     
     if (session) {
       console.log("[StrategicReview] DETALHES DA SESSÃO:", {
-        expira: session.expires_at ? new Date(session.expires_at * 1000).toISOString() : 'N/A',
-        criada: session.created_at ? new Date(session.created_at * 1000).toISOString() : 'N/A'
+        expira: session.expires_at ? new Date(session.expires_at * 1000).toISOString() : 'N/A'
       });
     }
+    
+    // Verificação adicional do estado do AuthContext
+    console.log("[StrategicReview] VERIFICAÇÃO DIRETA DE AUTENTICAÇÃO:", { 
+      isAuthenticated, 
+      hasUser: !!currentUser,
+      hasSession: !!session,
+      isLoading 
+    });
     
     // Verificar tokens no localStorage (apenas para debugging)
     const hasTokenInStorage = !!localStorage.getItem('sb-wbvxnapruffchikhrqrs-auth-token');
     console.log("[StrategicReview] Token no localStorage:", hasTokenInStorage ? "Presente" : "Ausente");
+    
+    if (!isAuthenticated && !isLoading) {
+      console.error("[StrategicReview] ALERTA: Componente renderizado sem autenticação!");
+      console.error("[StrategicReview] DETALHES EM PORTUGUÊS: A página de revisão estratégica está sendo acessada sem autenticação.");
+    }
   }, [isAuthenticated, isLoading, currentUser, session]);
   
   // Use the task pillars hook to ensure all tasks have pillars assigned
