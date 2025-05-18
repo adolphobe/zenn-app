@@ -22,6 +22,7 @@ import {
   deleteTask,
   toggleTaskCompleted,
   toggleTaskHidden,
+  updateTaskVisibilityConfirmed,
   updateTask,
   updateTaskTitle,
   restoreTask,
@@ -45,6 +46,7 @@ export const appReducer = (state: AppState, action: Action): AppState => {
   if (action.type === 'DELETE_TASK') return deleteTask(state, action);
   if (action.type === 'TOGGLE_TASK_COMPLETED') return toggleTaskCompleted(state, action);
   if (action.type === 'TOGGLE_TASK_HIDDEN') return toggleTaskHidden(state, action);
+  if (action.type === 'UPDATE_TASK_VISIBILITY_CONFIRMED') return updateTaskVisibilityConfirmed(state, action);
   if (action.type === 'UPDATE_TASK') return updateTask(state, action);
   if (action.type === 'UPDATE_TASK_TITLE') return updateTaskTitle(state, action);
   if (action.type === 'CLEAR_TASKS') return clearTasks(state, action);

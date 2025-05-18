@@ -5,18 +5,15 @@ export interface Task {
   prideScore: number;
   constructionScore: number;
   totalScore: number;
-  idealDate: Date | null;
+  idealDate: Date | string | null;
   hidden: boolean;
   completed: boolean;
   completedAt?: string | null;
-  createdAt: Date;
+  createdAt: Date | string;
   feedback: 'transformed' | 'relief' | 'obligation' | null;
   comments: Comment[];
-  pillar?: string;
-  operationLoading?: {
-    [key: string]: boolean;
-  };
-  _optimisticUpdateTime?: number; // Added this property for tracking optimistic updates
+  operationLoading?: Record<string, boolean>;
+  _optimisticUpdateTime?: number; // Add this property for animation tracking
 }
 
 export interface Comment {

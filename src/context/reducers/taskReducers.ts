@@ -1,3 +1,4 @@
+
 import { v4 as uuidv4 } from 'uuid';
 import { Task } from '../../types';
 import { AppState, Action } from '../types';
@@ -61,6 +62,18 @@ export const toggleTaskHidden = (state: AppState, action: Action): AppState => {
     ...state,
     tasks: state.tasks.map(task =>
       task.id === action.payload ? { ...task, hidden: !task.hidden } : task
+    )
+  };
+};
+
+// New reducer function to handle confirmed visibility updates from the server
+export const updateTaskVisibilityConfirmed = (state: AppState, action: Action): AppState => {
+  if (action.type !== 'UPDATE_TASK_VISIBILITY_CONFIRMED') return state;
+
+  return {
+    ...state,
+    tasks: state.tasks.map(task =>
+      task.id === action.payload.id ? { ...task, hidden: action.payload.hidden } : task
     )
   };
 };

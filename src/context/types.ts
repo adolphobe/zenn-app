@@ -41,6 +41,7 @@ export type Action =
   | { type: 'DELETE_TASK'; payload: string }
   | { type: 'TOGGLE_TASK_COMPLETED'; payload: string }
   | { type: 'TOGGLE_TASK_HIDDEN'; payload: string }
+  | { type: 'UPDATE_TASK_VISIBILITY_CONFIRMED'; payload: { id: string; hidden: boolean } }
   | { type: 'UPDATE_TASK'; payload: { id: string; data: Partial<any> } }
   | { type: 'UPDATE_TASK_TITLE'; payload: { id: string; title: string } }
   | { type: 'CLEAR_TASKS' }
