@@ -90,12 +90,7 @@ const PasswordResetForm: React.FC<PasswordResetFormProps> = ({ onCancel, onReset
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <div className="space-y-2 text-left mb-4">
-          <h2 className="text-2xl font-bold tracking-tight text-gray-800 dark:text-gray-100">
-            Esqueceu sua senha?
-          </h2>
-          <p className="text-muted-foreground text-sm">
-            Digite seu email abaixo e nós enviaremos um link para redefinir sua senha.
-          </p>
+       
         </div>
 
         {resetError && (
