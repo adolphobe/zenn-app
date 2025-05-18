@@ -1,4 +1,6 @@
 
+import { ISODateString } from './types/dates';
+
 export const CONSEQUENCE_PHRASES = [
   "Não tem problema algum ignorar",
   "Ignorar não pesa agora, mas tem sua importância",
@@ -33,6 +35,7 @@ export const SAMPLE_TASKS: Array<Omit<import('./types').Task, 'id' | 'createdAt'
     idealDate: new Date(2023, 5, 25, 8, 0),
     hidden: false,
     completed: false,
+    completedAt: null, // Adicionado o campo completedAt
     feedback: null,
     comments: []
   },
@@ -45,6 +48,7 @@ export const SAMPLE_TASKS: Array<Omit<import('./types').Task, 'id' | 'createdAt'
     idealDate: new Date(2023, 5, 26, 14, 0),
     hidden: false,
     completed: false,
+    completedAt: null, // Adicionado o campo completedAt
     feedback: null,
     comments: []
   },
@@ -57,6 +61,7 @@ export const SAMPLE_TASKS: Array<Omit<import('./types').Task, 'id' | 'createdAt'
     idealDate: null,
     hidden: true,
     completed: false,
+    completedAt: null, // Adicionado o campo completedAt
     feedback: null,
     comments: []
   },
@@ -69,7 +74,9 @@ export const SAMPLE_TASKS: Array<Omit<import('./types').Task, 'id' | 'createdAt'
     idealDate: new Date(2023, 5, 28, 10, 0),
     hidden: false,
     completed: false,
+    completedAt: null, // Adicionado o campo completedAt
     feedback: null,
     comments: []
   }
 ];
+

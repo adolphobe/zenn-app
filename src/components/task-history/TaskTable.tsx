@@ -67,7 +67,7 @@ export const CompletedTaskRow: React.FC<{ task: Task }> = ({ task }) => {
     }
   };
 
-  const completedDateTime = formatCompletionDateTime(task.completedAt);
+  const completedDateTime = formatCompletionDateTime(task.completedAt ? task.completedAt.toString() : null);
 
   const handleRestore = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -163,3 +163,4 @@ export const TasksTable: React.FC<{ tasks: Task[] }> = ({ tasks }) => (
     </CardContent>
   </Card>
 );
+

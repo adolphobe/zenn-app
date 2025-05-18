@@ -35,7 +35,10 @@ export const groupTasksByTimeline = (tasks: Task[], periodFilter: string = 'all'
     if (!task.completedAt) return;
     
     try {
-      const completedDate = parseISO(task.completedAt);
+      const completedDateStr = typeof task.completedAt === 'object' ? 
+        task.completedAt.toISOString() : task.completedAt;
+        
+      const completedDate = parseISO(completedDateStr);
       
       if (isToday(completedDate)) {
         groups.today.tasks.push(task);
@@ -64,3 +67,4 @@ export const groupTasksByTimeline = (tasks: Task[], periodFilter: string = 'all'
   // Filter out empty groups and return
   return Object.values(groups).filter(group => group.tasks.length > 0);
 };
+

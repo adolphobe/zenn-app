@@ -1,4 +1,3 @@
-
 /**
  * Arquivo de simulação do banco de dados
  * Este arquivo contém dados fixos que simulam informações que viriam do banco de dados.
@@ -41,10 +40,19 @@ import { Task, Comment } from '@/types';
  * - As datas usam timestamp para precisão e compatibilidade com diferentes fusos horários
  */
 
+// Usamos um helper para adicionar os campos necessários aos dados mockados
+const createMockTask = (taskData: Partial<Task>): Task => {
+  return {
+    ...taskData,
+    completedAt: taskData.completedAt || null, // Garantir que completedAt esteja presente
+    comments: taskData.comments || []
+  } as Task;
+};
+
 // Simulação dos dados de tarefas pendentes
 export const pendingTasksData: Task[] = [
   // Tarefas com foco em crescimento pessoal
-  {
+  createMockTask({
     id: "pend-001",
     title: "Fazer 4 aulas de inglês",
     consequenceScore: 3,
@@ -57,6 +65,7 @@ export const pendingTasksData: Task[] = [
     createdAt: new Date(2025, 4, 10, 8, 30), // 10/05/2025 08:30
     pillar: "crescimento",
     feedback: null,
+    completedAt: null,
     comments: [
       {
         id: "comm-001",
@@ -64,8 +73,8 @@ export const pendingTasksData: Task[] = [
         createdAt: "2025-05-11T14:30:00.000Z"
       }
     ]
-  },
-  {
+  }),
+  createMockTask({
     id: "pend-002",
     title: "Meditar por 20 minutos diários",
     consequenceScore: 2,
@@ -78,9 +87,10 @@ export const pendingTasksData: Task[] = [
     createdAt: new Date(2025, 4, 9, 22, 15), // 09/05/2025 22:15
     pillar: "crescimento",
     feedback: null,
+    completedAt: null,
     comments: []
-  },
-  {
+  }),
+  createMockTask({
     id: "pend-003",
     title: "Ler livro sobre desenvolvimento pessoal",
     consequenceScore: 2,
@@ -93,11 +103,12 @@ export const pendingTasksData: Task[] = [
     createdAt: new Date(2025, 4, 12, 17, 45), // 12/05/2025 17:45
     pillar: "crescimento",
     feedback: null,
+    completedAt: null,
     comments: []
-  },
+  }),
   
   // Tarefas profissionais importantes
-  {
+  createMockTask({
     id: "pend-004",
     title: "Finalizar relatório trimestral",
     consequenceScore: 5,
@@ -110,6 +121,7 @@ export const pendingTasksData: Task[] = [
     createdAt: new Date(2025, 4, 5, 9, 10), // 05/05/2025 09:10
     pillar: "risco",
     feedback: null,
+    completedAt: null,
     comments: [
       {
         id: "comm-002",
@@ -122,8 +134,8 @@ export const pendingTasksData: Task[] = [
         createdAt: "2025-05-14T16:45:00.000Z"
       }
     ]
-  },
-  {
+  }),
+  createMockTask({
     id: "pend-005",
     title: "Preparar apresentação para diretoria",
     consequenceScore: 5,
@@ -136,11 +148,12 @@ export const pendingTasksData: Task[] = [
     createdAt: new Date(2025, 4, 10, 14, 20), // 10/05/2025 14:20
     pillar: "risco",
     feedback: null,
+    completedAt: null,
     comments: []
-  },
+  }),
   
   // Tarefas com balanceamento nos pilares
-  {
+  createMockTask({
     id: "pend-006",
     title: "Planejar férias familiares",
     consequenceScore: 4,
@@ -153,9 +166,10 @@ export const pendingTasksData: Task[] = [
     createdAt: new Date(2025, 4, 8, 20, 0), // 08/05/2025 20:00
     pillar: "orgulho",
     feedback: null,
+    completedAt: null,
     comments: []
-  },
-  {
+  }),
+  createMockTask({
     id: "pend-007",
     title: "Revisar planejamento financeiro",
     consequenceScore: 5,
@@ -168,11 +182,12 @@ export const pendingTasksData: Task[] = [
     createdAt: new Date(2025, 4, 11, 21, 35), // 11/05/2025 21:35
     pillar: "risco",
     feedback: null,
+    completedAt: null,
     comments: []
-  },
+  }),
   
   // Tarefas mais cotidianas com scores menores
-  {
+  createMockTask({
     id: "pend-008",
     title: "Arrumar tomada de casa",
     consequenceScore: 2,
@@ -185,9 +200,10 @@ export const pendingTasksData: Task[] = [
     createdAt: new Date(2025, 4, 12, 18, 15), // 12/05/2025 18:15
     pillar: "risco",
     feedback: null,
+    completedAt: null,
     comments: []
-  },
-  {
+  }),
+  createMockTask({
     id: "pend-009",
     title: "Organizar armário do escritório",
     consequenceScore: 1,
@@ -200,9 +216,10 @@ export const pendingTasksData: Task[] = [
     createdAt: new Date(2025, 4, 13, 12, 45), // 13/05/2025 12:45
     pillar: "orgulho",
     feedback: null,
+    completedAt: null,
     comments: []
-  },
-  {
+  }),
+  createMockTask({
     id: "pend-010",
     title: "Atualizar aplicativos do celular",
     consequenceScore: 1,
@@ -215,11 +232,12 @@ export const pendingTasksData: Task[] = [
     createdAt: new Date(2025, 4, 14, 23, 0), // 14/05/2025 23:00
     pillar: null,
     feedback: null,
+    completedAt: null,
     comments: []
-  },
+  }),
   
   // Tarefas vencidas (com datas anteriores a 16/05/2025)
-  {
+  createMockTask({
     id: "pend-011",
     title: "Enviar documentos para contabilidade",
     consequenceScore: 4,
@@ -232,9 +250,10 @@ export const pendingTasksData: Task[] = [
     createdAt: new Date(2025, 3, 25, 9, 20), // 25/04/2025 09:20
     pillar: "risco",
     feedback: null,
+    completedAt: null,
     comments: []
-  },
-  {
+  }),
+  createMockTask({
     id: "pend-012",
     title: "Atualizar plano de marketing",
     consequenceScore: 5,
@@ -247,9 +266,10 @@ export const pendingTasksData: Task[] = [
     createdAt: new Date(2025, 3, 28, 15, 40), // 28/04/2025 15:40
     pillar: "crescimento",
     feedback: null,
+    completedAt: null,
     comments: []
-  },
-  {
+  }),
+  createMockTask({
     id: "pend-013",
     title: "Revisar contrato de parceria",
     consequenceScore: 5,
@@ -262,14 +282,15 @@ export const pendingTasksData: Task[] = [
     createdAt: new Date(2025, 3, 20, 11, 0), // 20/04/2025 11:00
     pillar: "risco",
     feedback: null,
+    completedAt: null,
     comments: []
-  }
+  })
 ];
 
 // Simulação dos dados de tarefas concluídas
 export const completedTasksData: Task[] = [
   // Tarefas concluídas há mais tempo (40-60 dias atrás)
-  {
+  createMockTask({
     id: "comp-001",
     title: "Concluir relatório semestral",
     consequenceScore: 5,
@@ -284,8 +305,8 @@ export const completedTasksData: Task[] = [
     feedback: "transformed",
     pillar: "risco",
     comments: []
-  },
-  {
+  }),
+  createMockTask({
     id: "comp-002",
     title: "Revisar documentação legal",
     consequenceScore: 4,
@@ -300,8 +321,8 @@ export const completedTasksData: Task[] = [
     feedback: "obligation",
     pillar: "risco",
     comments: []
-  },
-  {
+  }),
+  createMockTask({
     id: "comp-003",
     title: "Finalizar auditoria interna",
     consequenceScore: 5,
@@ -316,10 +337,10 @@ export const completedTasksData: Task[] = [
     feedback: "relief",
     pillar: "risco",
     comments: []
-  },
+  }),
   
   // 30-40 dias atrás
-  {
+  createMockTask({
     id: "comp-004",
     title: "Atualizar manuais operacionais",
     consequenceScore: 2,
@@ -334,8 +355,8 @@ export const completedTasksData: Task[] = [
     feedback: "relief",
     pillar: "crescimento",
     comments: []
-  },
-  {
+  }),
+  createMockTask({
     id: "comp-005",
     title: "Finalizar orçamento do próximo trimestre",
     consequenceScore: 5,
@@ -356,10 +377,10 @@ export const completedTasksData: Task[] = [
         createdAt: "2025-04-05T10:15:00.000Z"
       }
     ]
-  },
+  }),
   
   // 20-30 dias atrás
-  {
+  createMockTask({
     id: "comp-006",
     title: "Implementar melhorias no sistema",
     consequenceScore: 3,
@@ -374,8 +395,8 @@ export const completedTasksData: Task[] = [
     feedback: "transformed",
     pillar: "crescimento",
     comments: []
-  },
-  {
+  }),
+  createMockTask({
     id: "comp-007",
     title: "Finalizar negociação com cliente premium",
     consequenceScore: 5,
@@ -401,10 +422,10 @@ export const completedTasksData: Task[] = [
         createdAt: "2025-04-18T11:45:00.000Z"
       }
     ]
-  },
+  }),
   
   // 10-20 dias atrás
-  {
+  createMockTask({
     id: "comp-008",
     title: "Concluir pesquisa de satisfação",
     consequenceScore: 3,
@@ -419,8 +440,8 @@ export const completedTasksData: Task[] = [
     feedback: "relief",
     pillar: "crescimento",
     comments: []
-  },
-  {
+  }),
+  createMockTask({
     id: "comp-009",
     title: "Atualizar site institucional",
     consequenceScore: 2,
@@ -435,10 +456,10 @@ export const completedTasksData: Task[] = [
     feedback: "transformed",
     pillar: "orgulho",
     comments: []
-  },
+  }),
   
   // Última semana (7 dias atrás)
-  {
+  createMockTask({
     id: "comp-010",
     title: "Resolver problemas técnicos críticos",
     consequenceScore: 5,
@@ -453,8 +474,8 @@ export const completedTasksData: Task[] = [
     feedback: "relief",
     pillar: "risco",
     comments: []
-  },
-  {
+  }),
+  createMockTask({
     id: "comp-011",
     title: "Finalizar apresentação para investidores",
     consequenceScore: 5,
@@ -469,10 +490,10 @@ export const completedTasksData: Task[] = [
     feedback: "transformed",
     pillar: "orgulho",
     comments: []
-  },
+  }),
   
   // Tarefas concluídas mais recentemente (1-3 dias atrás)
-  {
+  createMockTask({
     id: "comp-012",
     title: "Concluir análise de concorrência",
     consequenceScore: 4,
@@ -487,8 +508,8 @@ export const completedTasksData: Task[] = [
     feedback: "obligation",
     pillar: "crescimento",
     comments: []
-  },
-  {
+  }),
+  createMockTask({
     id: "comp-013",
     title: "Atualizar planilha de resultados",
     consequenceScore: 3,
@@ -503,8 +524,8 @@ export const completedTasksData: Task[] = [
     feedback: "obligation",
     pillar: "risco",
     comments: []
-  },
-  {
+  }),
+  createMockTask({
     id: "comp-014",
     title: "Responder solicitações pendentes",
     consequenceScore: 3,
@@ -519,7 +540,7 @@ export const completedTasksData: Task[] = [
     feedback: "obligation",
     pillar: null,
     comments: []
-  }
+  })
 ];
 
 // Combinar todas as tarefas para simular um banco de dados completo

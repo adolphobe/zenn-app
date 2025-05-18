@@ -98,7 +98,7 @@ export const dateService = {
   /**
    * Converte os campos de data de DTO para formato interno (Date)
    */
-  fromDTO(dto: Partial<DateFieldsDTO>): Partial<DateFields> {
+  fromDTO(dto: Partial<any>): Partial<any> {
     return {
       ...(dto.ideal_date !== undefined && { idealDate: this.parseDate(dto.ideal_date) }),
       ...(dto.created_at !== undefined && { createdAt: this.parseDate(dto.created_at) || new Date() }),
@@ -109,7 +109,7 @@ export const dateService = {
   /**
    * Converte os campos de data do formato interno (Date) para DTO
    */
-  toDTO(fields: Partial<DateFields>): Partial<DateFieldsDTO> {
+  toDTO(fields: Partial<any>): Partial<any> {
     return {
       ...(fields.idealDate !== undefined && { ideal_date: this.toISOString(fields.idealDate) }),
       ...(fields.createdAt !== undefined && { created_at: this.toISOString(fields.createdAt) || new Date().toISOString() }),
@@ -120,13 +120,27 @@ export const dateService = {
   /**
    * Verifica se uma tarefa está vencida (antes da data/hora atual)
    */
-  isTaskOverdue(date: Date | ISODateString | null): boolean {
+  isTaskOverdue(date: Date | string | null): boolean {
     if (!date) return false;
     
-    const parsedDate = this.parseDate(date);
-    if (!parsedDate) return false;
-    
-    return parsedDate < new Date();
+    try {
+      let dateToCompare: Date | null = null;
+      
+      if (date instanceof Date) {
+        dateToCompare = date;
+      } else if (typeof date === 'string') {
+        dateToCompare = new Date(date);
+      }
+      
+      if (!dateToCompare || isNaN(dateToCompare.getTime())) {
+        return false;
+      }
+      
+      return dateToCompare < new Date();
+    } catch (error) {
+      console.error('Erro ao verificar se tarefa está vencida:', error);
+      return false;
+    }
   },
   
   /**
@@ -151,3 +165,4 @@ export const dateService = {
     );
   }
 };
+

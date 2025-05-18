@@ -18,6 +18,7 @@ export const addTask = (state: AppState, action: Action): AppState => {
     hidden: (action.payload.consequenceScore + action.payload.prideScore + action.payload.constructionScore) < 8,
     completed: false,
     createdAt: new Date(),
+    completedAt: null, // Adicionado o campo faltante
     feedback: null,
     comments: [],
     operationLoading: {}
@@ -39,3 +40,4 @@ export const deleteTask = (state: AppState, action: Action): AppState => {
     tasks: state.tasks.filter(task => task.id !== action.payload)
   };
 };
+

@@ -84,9 +84,12 @@ export const sortTasks = (
       }
       
       // Ordenação secundária por data se pontuações forem iguais
-      if (a.idealDate && b.idealDate) return (a.idealDate.getTime() - b.idealDate.getTime());
-      if (a.idealDate) return -1;
-      if (b.idealDate) return 1;
+      const aDate = a.idealDate ? new Date(a.idealDate) : null;
+      const bDate = b.idealDate ? new Date(b.idealDate) : null;
+      
+      if (aDate && bDate) return (aDate.getTime() - bDate.getTime());
+      if (aDate) return -1;
+      if (bDate) return 1;
       return 0;
       
     } else {
@@ -99,20 +102,22 @@ export const sortTasks = (
       
       // Ambas têm datas, ordenar por valor de data com base na direção
       if (a.idealDate && b.idealDate) {
-        const aTime = a.idealDate.getTime();
-        const bTime = b.idealDate.getTime();
+        const aDate = new Date(a.idealDate);
+        const bDate = new Date(b.idealDate);
+        const aTime = aDate.getTime();
+        const bTime = bDate.getTime();
         
         // No modo cronológico, tratamos a proximidade com o presente
         const nowTime = now.getTime();
         
-        if (isTaskOverdue(a.idealDate) && isTaskOverdue(b.idealDate)) {
+        if (dateService.isTaskOverdue(aDate) && dateService.isTaskOverdue(bDate)) {
           // Ambas são vencidas, a mais "recente" é a mais próxima de hoje
           if (sortDirection === 'desc') {
             return (bTime - aTime); // Mais próxima do presente primeiro (ordem decrescente)
           } else {
             return (aTime - bTime); // Mais distante do presente primeiro (ordem crescente)
           }
-        } else if (!isTaskOverdue(a.idealDate) && !isTaskOverdue(b.idealDate)) {
+        } else if (!dateService.isTaskOverdue(aDate) && !dateService.isTaskOverdue(bDate)) {
           // Ambas são futuras, a mais "recente" é a mais próxima de hoje
           if (sortDirection === 'desc') {
             return (aTime - bTime); // Mais próxima do presente primeiro (ordem crescente)
@@ -122,7 +127,7 @@ export const sortTasks = (
         } else {
           // Uma é vencida e outra é futura - este caso não deveria ocorrer aqui
           // pois as tarefas já foram separadas, mas mantemos por segurança
-          if (isTaskOverdue(a.idealDate)) return -1;
+          if (dateService.isTaskOverdue(aDate)) return -1;
           return 1;
         }
       }
@@ -136,3 +141,4 @@ export const sortTasks = (
     }
   });
 };
+

@@ -1,5 +1,6 @@
 
 import { AppState, Action } from '../../types';
+import { dateService } from '@/services/dateService';
 
 // Status toggle reducers
 export const toggleTaskCompleted = (state: AppState, action: Action): AppState => {
@@ -11,7 +12,7 @@ export const toggleTaskCompleted = (state: AppState, action: Action): AppState =
       task.id === action.payload ? { 
         ...task, 
         completed: !task.completed,
-        completedAt: !task.completed ? new Date().toISOString() : null
+        completedAt: !task.completed ? new Date() : null
       } : task
     )
   };
@@ -85,3 +86,4 @@ export const setTaskFeedbackByTitle = (state: AppState, action: Action): AppStat
     )
   };
 };
+

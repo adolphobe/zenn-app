@@ -11,7 +11,7 @@ export interface Task {
   idealDate: Date | null;  // Padronizado para Date | null internamente
   hidden: boolean;
   completed: boolean;
-  completedAt: Date | null;  // Padronizado para Date | null internamente
+  completedAt: Date | string | null;  // Aceita Date ou string para compatibilidade
   createdAt: Date;  // Sempre Date internamente
   feedback: 'transformed' | 'relief' | 'obligation' | null;
   comments: Comment[];
@@ -33,7 +33,7 @@ export interface TaskFormData {
   prideScore: number;
   constructionScore: number;
   idealDate: Date | null;  // Padronizado para Date | null internamente
-  completedAt?: Date | null;  // Padronizado para Date | null internamente
+  completedAt?: Date | string | null;  // Adicionado para compatibilidade
   feedback?: 'transformed' | 'relief' | 'obligation';
   pillar?: string;
   date?: ISODateString;
@@ -64,3 +64,4 @@ export interface AppState {
     chronological: SortOption;
   };
 }
+

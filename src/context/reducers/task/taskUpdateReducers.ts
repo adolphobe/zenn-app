@@ -1,5 +1,6 @@
 
 import { AppState, Action } from '../../types';
+import { dateService } from '@/services/dateService';
 
 // Update task properties reducers
 export const updateTask = (state: AppState, action: Action): AppState => {
@@ -57,8 +58,7 @@ export const completeTaskByTitle = (state: AppState, action: Action): AppState =
         ? { 
             ...task, 
             completed: true,
-            // Garantir que sempre tenha uma data de conclusão válida para cada tarefa concluída
-            completedAt: task.completedAt || now.toISOString(),
+            completedAt: now,
           } 
         : task
     )
@@ -69,6 +69,9 @@ export const completeTaskByTitle = (state: AppState, action: Action): AppState =
 export const completeTaskWithDate = (state: AppState, action: Action): AppState => {
   if (action.type !== 'COMPLETE_TASK_WITH_DATE') return state;
   
+  // Parse the date string to a Date object
+  const completedAtDate = dateService.parseDate(action.payload.completedAt) || new Date();
+  
   return {
     ...state,
     tasks: state.tasks.map(task => 
@@ -76,7 +79,7 @@ export const completeTaskWithDate = (state: AppState, action: Action): AppState 
         ? { 
             ...task, 
             completed: true,
-            completedAt: action.payload.completedAt,
+            completedAt: completedAtDate,
           } 
         : task
     )
@@ -99,3 +102,4 @@ export const restoreTask = (state: AppState, action: Action): AppState => {
     )
   };
 };
+

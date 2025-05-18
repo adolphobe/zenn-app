@@ -87,7 +87,7 @@ export const CompletedTaskCard: React.FC<CompletedTaskCardProps> = ({ task }) =>
     }
   };
 
-  const completedDateTime = formatCompletionDateTime(task.completedAt);
+  const completedDateTime = formatCompletionDateTime(task.completedAt ? task.completedAt.toString() : null);
 
   const handleRestore = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -192,3 +192,4 @@ export const CompletedTaskCard: React.FC<CompletedTaskCardProps> = ({ task }) =>
 };
 
 export default CompletedTaskCard;
+
