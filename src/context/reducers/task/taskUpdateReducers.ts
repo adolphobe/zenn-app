@@ -1,4 +1,3 @@
-
 import { AppState, Action } from '../../types';
 import { dateService } from '@/services/dateService';
 
@@ -26,6 +25,15 @@ export const updateTask = (state: AppState, action: Action): AppState => {
           
           // Update hidden status based on total score
           updatedTask.hidden = updatedTask.totalScore < 8;
+        }
+        
+        // Garantir que campos de data sejam Date objects
+        if (action.payload.data.completedAt !== undefined) {
+          updatedTask.completedAt = dateService.parseDate(action.payload.data.completedAt);
+        }
+        
+        if (action.payload.data.idealDate !== undefined) {
+          updatedTask.idealDate = dateService.parseDate(action.payload.data.idealDate);
         }
         
         return updatedTask;

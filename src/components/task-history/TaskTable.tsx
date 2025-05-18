@@ -54,22 +54,9 @@ export const CompletedTaskRow: React.FC<{ task: Task }> = ({ task }) => {
   // Format the completion date and time in Brazilian format (DD/MM/YYYY HH:MM)
   const formatCompletionDateTime = (date: Date | null) => {
     if (!date) return '-';
-    try {
-      // Convert to ISO string first to ensure consistent formatting
-      const isoString = dateService.toISOString(date);
-      if (!isoString) return '-';
-      
-      // Parse and format using date-fns
-      const parsedDate = parseISO(isoString);
-      if (isNaN(parsedDate.getTime())) {
-        console.warn('Invalid date:', date);
-        return '-';
-      }
-      return format(parsedDate, 'dd/MM/yyyy HH:mm', { locale: ptBR });
-    } catch (e) {
-      console.error('Error formatting date:', e, date);
-      return '-';
-    }
+    
+    // Use o dateService para formatar a data consistentemente
+    return dateService.formatForDisplay(date, true);
   };
 
   const completedDateTime = formatCompletionDateTime(task.completedAt);

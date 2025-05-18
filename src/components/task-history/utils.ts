@@ -36,8 +36,13 @@ export const groupTasksByTimeline = (tasks: Task[], periodFilter: string = 'all'
     if (!task.completedAt) return;
     
     try {
-      // Parse the completedAt date using our consistent date service
-      const completedDate = task.completedAt;
+      // Garantir que completedAt seja um objeto Date
+      const completedDate = dateService.parseDate(task.completedAt);
+      
+      if (!completedDate) {
+        groups.older.tasks.push(task);
+        return;
+      }
       
       if (isToday(completedDate)) {
         groups.today.tasks.push(task);
@@ -59,6 +64,7 @@ export const groupTasksByTimeline = (tasks: Task[], periodFilter: string = 'all'
         }
       }
     } catch (error) {
+      console.error("Erro ao processar data de conclusão:", error);
       groups.older.tasks.push(task); // Fallback to "older" if date parsing fails
     }
   });

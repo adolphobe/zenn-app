@@ -60,7 +60,7 @@ export const initializeDemoTasks = (dispatch: AppDispatch, tasksLength: number) 
       });
       
       // Depois marcamos como concluída com a data específica
-      // Usamos o objeto diretamente, compatível com o tipo Date | string | null
+      // Garantimos que a data seja tratada corretamente
       dispatch({
         type: 'COMPLETE_TASK_WITH_DATE',
         payload: {

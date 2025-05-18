@@ -5,6 +5,7 @@
  */
 
 import { Task, Comment } from '@/types';
+import { dateService } from '@/services/dateService';
 
 /**
  * Estrutura do banco de dados proposta:
@@ -40,11 +41,17 @@ import { Task, Comment } from '@/types';
  * - As datas usam timestamp para precisão e compatibilidade com diferentes fusos horários
  */
 
-// Usamos um helper para adicionar os campos necessários aos dados mockados
+// Usamos um helper para adicionar os campos necessários aos dados mockados e garantir tipo correto de data
 const createMockTask = (taskData: Partial<Task>): Task => {
+  // Garantir que completedAt seja Date ou null
+  let completedAt = null;
+  if (taskData.completedAt) {
+    completedAt = dateService.parseDate(taskData.completedAt);
+  }
+  
   return {
     ...taskData,
-    completedAt: taskData.completedAt || null, // Garantir que completedAt esteja presente
+    completedAt,
     comments: taskData.comments || []
   } as Task;
 };
@@ -300,7 +307,7 @@ export const completedTasksData: Task[] = [
     idealDate: new Date(2025, 2, 15, 17, 0), // 15/03/2025 17:00
     hidden: false,
     completed: true,
-    completedAt: "2025-03-18T16:45:22.000Z", // 18/03/2025 16:45:22 (58 dias atrás)
+    completedAt: new Date(2025, 3, 18, 16, 45, 22), // 18/03/2025 16:45:22 (58 dias atrás)
     createdAt: new Date(2025, 2, 1, 9, 0), // 01/03/2025 09:00
     feedback: "transformed",
     pillar: "risco",
@@ -316,7 +323,7 @@ export const completedTasksData: Task[] = [
     idealDate: new Date(2025, 2, 20, 12, 0), // 20/03/2025 12:00
     hidden: false,
     completed: true,
-    completedAt: "2025-03-21T14:20:45.000Z", // 21/03/2025 14:20:45 (55 dias atrás)
+    completedAt: new Date(2025, 3, 21, 14, 20, 45), // 21/03/2025 14:20:45 (55 dias atrás)
     createdAt: new Date(2025, 2, 5, 10, 30), // 05/03/2025 10:30
     feedback: "obligation",
     pillar: "risco",
@@ -332,7 +339,7 @@ export const completedTasksData: Task[] = [
     idealDate: new Date(2025, 2, 22, 16, 0), // 22/03/2025 16:00
     hidden: false,
     completed: true,
-    completedAt: "2025-03-24T18:10:05.000Z", // 24/03/2025 18:10:05 (52 dias atrás)
+    completedAt: new Date(2025, 3, 24, 18, 10, 5), // 24/03/2025 18:10:05 (52 dias atrás)
     createdAt: new Date(2025, 2, 8, 14, 0), // 08/03/2025 14:00
     feedback: "relief",
     pillar: "risco",
@@ -350,7 +357,7 @@ export const completedTasksData: Task[] = [
     idealDate: new Date(2025, 3, 8, 12, 0), // 08/04/2025 12:00
     hidden: false,
     completed: true,
-    completedAt: "2025-04-08T15:45:30.000Z", // 08/04/2025 15:45:30 (38 dias atrás)
+    completedAt: new Date(2025, 4, 8, 15, 45, 30), // 08/04/2025 15:45:30 (38 dias atrás)
     createdAt: new Date(2025, 2, 25, 9, 20), // 25/03/2025 09:20
     feedback: "relief",
     pillar: "crescimento",
@@ -366,7 +373,7 @@ export const completedTasksData: Task[] = [
     idealDate: new Date(2025, 3, 10, 17, 0), // 10/04/2025 17:00
     hidden: false,
     completed: true,
-    completedAt: "2025-04-11T18:30:15.000Z", // 11/04/2025 18:30:15 (35 dias atrás)
+    completedAt: new Date(2025, 4, 11, 18, 30, 15), // 11/04/2025 18:30:15 (35 dias atrás)
     createdAt: new Date(2025, 3, 1, 8, 45), // 01/04/2025 08:45
     feedback: "obligation",
     pillar: "risco",
@@ -390,7 +397,7 @@ export const completedTasksData: Task[] = [
     idealDate: new Date(2025, 3, 18, 10, 0), // 18/04/2025 10:00
     hidden: false,
     completed: true,
-    completedAt: "2025-04-18T16:22:40.000Z", // 18/04/2025 16:22:40 (28 dias atrás)
+    completedAt: new Date(2025, 4, 18, 16, 22, 40), // 18/04/2025 16:22:40 (28 dias atrás)
     createdAt: new Date(2025, 3, 5, 11, 30), // 05/04/2025 11:30
     feedback: "transformed",
     pillar: "crescimento",
@@ -406,7 +413,7 @@ export const completedTasksData: Task[] = [
     idealDate: new Date(2025, 3, 20, 14, 0), // 20/04/2025 14:00
     hidden: false,
     completed: true,
-    completedAt: "2025-04-20T17:05:10.000Z", // 20/04/2025 17:05:10 (26 dias atrás)
+    completedAt: new Date(2025, 4, 20, 17, 5, 10), // 20/04/2025 17:05:10 (26 dias atrás)
     createdAt: new Date(2025, 3, 10, 9, 15), // 10/04/2025 09:15
     feedback: "relief",
     pillar: "risco",
@@ -435,7 +442,7 @@ export const completedTasksData: Task[] = [
     idealDate: new Date(2025, 3, 28, 15, 0), // 28/04/2025 15:00
     hidden: false,
     completed: true,
-    completedAt: "2025-04-28T16:40:25.000Z", // 28/04/2025 16:40:25 (18 dias atrás)
+    completedAt: new Date(2025, 4, 28, 16, 40, 25), // 28/04/2025 16:40:25 (18 dias atrás)
     createdAt: new Date(2025, 3, 15, 10, 20), // 15/04/2025 10:20
     feedback: "relief",
     pillar: "crescimento",
@@ -451,7 +458,7 @@ export const completedTasksData: Task[] = [
     idealDate: new Date(2025, 3, 30, 12, 0), // 30/04/2025 12:00
     hidden: false,
     completed: true,
-    completedAt: "2025-04-30T14:55:38.000Z", // 30/04/2025 14:55:38 (16 dias atrás)
+    completedAt: new Date(2025, 4, 30, 14, 55, 38), // 30/04/2025 14:55:38 (16 dias atrás)
     createdAt: new Date(2025, 3, 20, 9, 0), // 20/04/2025 09:00
     feedback: "transformed",
     pillar: "orgulho",
@@ -469,7 +476,7 @@ export const completedTasksData: Task[] = [
     idealDate: new Date(2025, 4, 9, 10, 0), // 09/05/2025 10:00
     hidden: false,
     completed: true,
-    completedAt: "2025-05-09T11:25:15.000Z", // 09/05/2025 11:25:15 (7 dias atrás)
+    completedAt: new Date(2025, 5, 9, 11, 25, 15), // 09/05/2025 11:25:15 (7 dias atrás)
     createdAt: new Date(2025, 4, 7, 8, 30), // 07/05/2025 08:30
     feedback: "relief",
     pillar: "risco",
@@ -485,7 +492,7 @@ export const completedTasksData: Task[] = [
     idealDate: new Date(2025, 4, 11, 9, 0), // 11/05/2025 09:00
     hidden: false,
     completed: true,
-    completedAt: "2025-05-11T08:50:30.000Z", // 11/05/2025 08:50:30 (5 dias atrás)
+    completedAt: new Date(2025, 5, 11, 8, 50, 30), // 11/05/2025 08:50:30 (5 dias atrás)
     createdAt: new Date(2025, 4, 5, 14, 0), // 05/05/2025 14:00
     feedback: "transformed",
     pillar: "orgulho",
@@ -503,7 +510,7 @@ export const completedTasksData: Task[] = [
     idealDate: new Date(2025, 4, 13, 16, 0), // 13/05/2025 16:00
     hidden: false,
     completed: true,
-    completedAt: "2025-05-13T18:20:45.000Z", // 13/05/2025 18:20:45 (3 dias atrás)
+    completedAt: new Date(2025, 5, 13, 18, 20, 45), // 13/05/2025 18:20:45 (3 dias atrás)
     createdAt: new Date(2025, 4, 8, 10, 15), // 08/05/2025 10:15
     feedback: "obligation",
     pillar: "crescimento",
@@ -519,7 +526,7 @@ export const completedTasksData: Task[] = [
     idealDate: new Date(2025, 4, 15, 12, 0), // 15/05/2025 12:00
     hidden: true,
     completed: true,
-    completedAt: "2025-05-15T11:40:20.000Z", // 15/05/2025 11:40:20 (1 dia atrás)
+    completedAt: new Date(2025, 5, 15, 11, 40, 20), // 15/05/2025 11:40:20 (1 dia atrás)
     createdAt: new Date(2025, 4, 10, 16, 30), // 10/05/2025 16:30
     feedback: "obligation",
     pillar: "risco",
@@ -535,7 +542,7 @@ export const completedTasksData: Task[] = [
     idealDate: new Date(2025, 4, 15, 17, 0), // 15/05/2025 17:00
     hidden: true,
     completed: true,
-    completedAt: "2025-05-15T16:35:10.000Z", // 15/05/2025 16:35:10 (1 dia atrás)
+    completedAt: new Date(2025, 5, 15, 16, 35, 10), // 15/05/2025 16:35:10 (1 dia atrás)
     createdAt: new Date(2025, 4, 14, 9, 0), // 14/05/2025 09:00
     feedback: "obligation",
     pillar: null,

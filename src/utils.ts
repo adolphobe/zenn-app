@@ -1,11 +1,10 @@
-
 import { Task, DateDisplayOptions, ViewMode, SortOption } from './types';
 import { dateService } from './services/dateService';
 
 export const formatDate = (date: Date | string | null, options?: DateDisplayOptions): string => {
   if (!date) return '';
   
-  // Converter para Date se for string
+  // Converter para Date se for string usando dateService
   const dateObj = dateService.parseDate(date);
   
   // Garantir que temos um objeto Date válido
@@ -55,10 +54,8 @@ export const getTaskPriorityClass = (score: number): string => {
   return 'task-light';
 };
 
-// Agora usamos o dateService para o parsing seguro de datas
-export const safeParseDate = dateService.parseDate;
-
 // Utilizamos o dateService para funcionalidades relacionadas a datas
+export const safeParseDate = dateService.parseDate;
 export const addDaysToDate = dateService.addDaysToDate;
 export const isTaskOverdue = dateService.isTaskOverdue;
 
@@ -141,4 +138,3 @@ export const sortTasks = (
     }
   });
 };
-

@@ -8,10 +8,10 @@ export interface Task {
   prideScore: number;
   constructionScore: number;
   totalScore: number;
-  idealDate: Date | null;  // Padronizado para Date | null internamente
+  idealDate: Date | null;  // Internamente sempre Date | null
   hidden: boolean;
   completed: boolean;
-  completedAt: Date | null;  // Padronizado para Date | null internamente
+  completedAt: Date | null;  // Internamente sempre Date | null
   createdAt: Date;  // Sempre Date internamente
   feedback: 'transformed' | 'relief' | 'obligation' | null;
   comments: Comment[];

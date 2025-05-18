@@ -96,6 +96,36 @@ export const dateService = {
   },
   
   /**
+   * Formata uma data para exibição na interface do usuário (formato brasileiro)
+   */
+  formatForDisplay(date: Date | ISODateString | null | undefined, includeTime: boolean = true): string {
+    if (!date) return '';
+    
+    try {
+      const parsedDate = this.parseDate(date);
+      if (!parsedDate) return '';
+      
+      const day = parsedDate.getDate().toString().padStart(2, '0');
+      const month = (parsedDate.getMonth() + 1).toString().padStart(2, '0');
+      const year = parsedDate.getFullYear();
+      
+      let result = `${day}/${month}/${year}`;
+      
+      if (includeTime) {
+        const hours = parsedDate.getHours().toString().padStart(2, '0');
+        const minutes = parsedDate.getMinutes().toString().padStart(2, '0');
+        result += ` ${hours}:${minutes}`;
+      }
+      
+      return result;
+      
+    } catch (error) {
+      console.error('Erro formatando data para exibição:', error);
+      return '';
+    }
+  },
+  
+  /**
    * Converte os campos de data de DTO para formato interno (Date)
    */
   fromDTO(dto: Partial<any>): Partial<any> {
@@ -124,15 +154,9 @@ export const dateService = {
     if (!date) return false;
     
     try {
-      let dateToCompare: Date | null = null;
+      const dateToCompare = this.parseDate(date);
       
-      if (date instanceof Date) {
-        dateToCompare = date;
-      } else if (typeof date === 'string') {
-        dateToCompare = new Date(date);
-      }
-      
-      if (!dateToCompare || isNaN(dateToCompare.getTime())) {
+      if (!dateToCompare) {
         return false;
       }
       
@@ -158,10 +182,15 @@ export const dateService = {
   isSameDate(date1: Date | null | undefined, date2: Date | null | undefined): boolean {
     if (!date1 || !date2) return false;
     
+    const parsed1 = this.parseDate(date1);
+    const parsed2 = this.parseDate(date2);
+    
+    if (!parsed1 || !parsed2) return false;
+    
     return (
-      date1.getDate() === date2.getDate() &&
-      date1.getMonth() === date2.getMonth() &&
-      date1.getFullYear() === date2.getFullYear()
+      parsed1.getDate() === parsed2.getDate() &&
+      parsed1.getMonth() === parsed2.getMonth() &&
+      parsed1.getFullYear() === parsed2.getFullYear()
     );
   }
 };
