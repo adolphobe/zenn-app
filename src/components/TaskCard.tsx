@@ -74,23 +74,26 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
     setFeedbackModalOpen(true);
   };
 
-  // Implementação melhorada da função de alternar visibilidade
+  // Implementação melhorada da função de alternar visibilidade para evitar animação de layout
   const handleToggleHidden = (e: React.MouseEvent) => {
     e.stopPropagation();
     console.log('Ocultar/Mostrar tarefa clicado:', task.id, 'Status atual:', task.hidden);
     
-    // If we're in power mode and changing from hidden to visible, show border animation
+    // Mostrar animação apenas quando estiver mudando de oculto para visível no modo potência
     if (viewMode === 'power' && task.hidden && showHiddenTasks) {
-      // Trigger border animation when going from hidden to visible
+      // Ativar animação de borda ao mostrar a tarefa
       setShowBorderAnimation(true);
-      // Reset the animation after it completes
+      // Resetar a animação após ela terminar
       setTimeout(() => {
         setShowBorderAnimation(false);
-      }, 1200); // Animation lasts 1.2 seconds
+      }, 1200); // Animação dura 1.2 segundos
+      
+      // Usar o método do TaskDataProvider que tem atualização otimista
+      toggleTaskHidden(task.id);
+    } else {
+      // Para outras situações, apenas alternar a visibilidade
+      toggleTaskHidden(task.id);
     }
-    
-    // Usamos o método do TaskDataProvider que tem atualização otimista
-    toggleTaskHidden(task.id);
   };
 
   const handleEditTask = (e: React.MouseEvent) => {
@@ -173,16 +176,10 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
 
   return (
     <>
-      <motion.div
-        layout
-        layoutId={`task-card-${task.id}`}
+      <div
         className={`task-card ${cardClass} ${borderAnimationClass} ${task.completed ? 'opacity-50' : ''} relative cursor-pointer`}
         onClick={handleCardClick}
         data-task-id={task.id}
-        transition={{ 
-          layout: { duration: 0.3, ease: "easeInOut" },
-          opacity: { duration: 0.2 }
-        }}
       >
         <TaskCardHeader 
           title={task.title}
@@ -232,7 +229,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
             </motion.div>
           )}
         </AnimatePresence>
-      </motion.div>
+      </div>
 
       <PostCompletionFeedback
         task={task}
