@@ -11,6 +11,7 @@ import PostCompletionFeedback from '../PostCompletionFeedback';
 import TaskForm from '../TaskForm';
 import DeleteTaskConfirmation from '../DeleteTaskConfirmation';
 import { useTaskDataContext } from '@/context/TaskDataProvider';
+import { toast } from '@/hooks/use-toast';
 
 interface TaskCardProps {
   task: Task;
@@ -70,6 +71,16 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
   const handleToggleHidden = (e: React.MouseEvent) => {
     e.stopPropagation();
     console.log('Ocultar/Mostrar tarefa clicado:', task.id, 'Status atual:', task.hidden);
+    
+    // Verificar se o usuário está tentando ocultar uma tarefa quando as tarefas ocultas não estão sendo mostradas
+    if (!task.hidden && !showHiddenTasks && viewMode !== 'chronological') {
+      // Notificar o usuário que a tarefa será ocultada
+      toast({
+        title: "Tarefa será ocultada",
+        description: "A tarefa será ocultada. Para vê-la novamente, ative a opção 'Mostrar tarefas ocultas'.",
+      });
+    }
+    
     toggleTaskHidden(task.id);
   };
 

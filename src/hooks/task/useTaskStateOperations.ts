@@ -1,3 +1,4 @@
+
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from '@/hooks/use-toast';
 import { v4 as uuidv4 } from 'uuid';
@@ -119,15 +120,6 @@ export const useTaskStateOperations = (
         });
       });
       
-      // Show immediate feedback based on the new state
-      toast({
-        id: `toggle-hidden-${id}-${Date.now()}`,
-        title: newHiddenState ? "Tarefa oculta" : "Tarefa visível",
-        description: newHiddenState 
-          ? "A tarefa foi ocultada e só será visível com o filtro ativado." 
-          : "A tarefa agora está visível.",
-      });
-      
       // Return context with original tasks for potential rollback
       return { 
         previousTasks: tasks,
@@ -165,6 +157,17 @@ export const useTaskStateOperations = (
           }
           return t;
         });
+      });
+      
+      // Adicionar feedback visual imediato
+      const isHidden = result.hidden;
+      
+      toast({
+        id: `toggle-hidden-${id}-${Date.now()}`,
+        title: isHidden ? "Tarefa oculta" : "Tarefa visível",
+        description: isHidden 
+          ? "A tarefa foi ocultada e só será visível com o filtro ativado." 
+          : "A tarefa agora está visível.",
       });
     },
     onSettled: (_, error, id) => {

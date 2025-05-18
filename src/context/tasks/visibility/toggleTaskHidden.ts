@@ -25,6 +25,16 @@ export const toggleTaskHidden = async (dispatch: AppDispatch, id: string) => {
       } 
     });
     
+    // Adicionar feedback de toast para confirmar a ação
+    const actionText = updatedTask.hidden ? "ocultada" : "mostrada";
+    toast({
+      id: uuidv4(),
+      title: `Tarefa ${actionText}`,
+      description: updatedTask.hidden ? 
+        "A tarefa foi ocultada. Ative o filtro de tarefas ocultas para vê-la." : 
+        "A tarefa agora está visível."
+    });
+    
     return updatedTask;
     
   } catch (error) {

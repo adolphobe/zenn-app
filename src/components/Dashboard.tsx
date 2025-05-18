@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '@/context/AppContext';
 import { useTaskDataContext } from '@/context/TaskDataProvider'; // Use the new context
@@ -70,10 +71,18 @@ const Dashboard: React.FC = () => {
   // In chronological mode, always show hidden tasks
   const shouldShowHiddenTasks = viewMode === 'chronological' || showHiddenTasks;
   
-  // Filter tasks to only show non-completed and (if shouldShowHiddenTasks is false, only non-hidden tasks)
-  const filteredTasks = tasks.filter(
-    task => !task.completed && (shouldShowHiddenTasks || !task.hidden)
-  );
+  // Filter tasks to only show non-completed tasks
+  // and filter out hidden tasks if shouldShowHiddenTasks is false
+  const filteredTasks = tasks.filter(task => {
+    // Primeiro, verificar se é uma tarefa não-completada
+    const isNotCompleted = !task.completed;
+    
+    // Em seguida, verificar a visibilidade com base nas preferências
+    const isVisible = shouldShowHiddenTasks || !task.hidden;
+    
+    // Retornar apenas tarefas não-completadas que são visíveis
+    return isNotCompleted && isVisible;
+  });
   
   // First separate overdue tasks from non-overdue tasks
   const overdueTasksChronological = viewMode === 'chronological'

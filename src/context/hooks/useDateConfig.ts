@@ -1,75 +1,41 @@
 
-import { useState, useCallback, useEffect } from 'react';
-import { DateFormatConfig } from '@/types/dates';
-import { dateService, configureDateTime, setDefaultTimeZone, setDefaultLocale } from '@/services/dateService';
-import { ptBR } from 'date-fns/locale';
-import { useAppContext } from '../AppContext';
+import { useState, useCallback, useMemo } from 'react';
+import { dateService, configureDateTime } from '@/services/dateService';
+import { DateDisplayOptions, DateFormatConfig } from '@/types/dates';
+import { useAppContext } from '@/context/AppContext';
 
 /**
- * Hook para gerenciar a configuração global de datas na aplicação,
- * sincronizado com as preferências do usuário
+ * Hook para centralizar a configuração de datas na aplicação
+ * Usa as preferências do usuário do contexto global
  */
 export function useDateConfig() {
   const { state } = useAppContext();
-  const [currentConfig, setCurrentConfig] = useState<DateFormatConfig>(dateService.config);
+  const [lastOptions, setLastOptions] = useState<Record<string, any>>({});
   
-  // Sincroniza com as preferências do usuário quando elas mudarem
-  useEffect(() => {
-    if (state.dateDisplayOptions) {
-      updateDateConfig({
-        // Adapta as preferências do usuário para o formato do DateFormatConfig
-        dateFormat: state.dateDisplayOptions.dateFormat || 'dd/MM/yyyy',
-        timeFormat: state.dateDisplayOptions.timeFormat || 'HH:mm',
-      });
-    }
-  }, [state.dateDisplayOptions]);
+  // Recuperar as opções do contexto global
+  const globalOptions = useMemo(() => state.dateDisplayOptions || {}, [state.dateDisplayOptions]);
   
-  /**
-   * Atualiza a configuração global de datas
-   */
-  const updateDateConfig = useCallback((newConfig: Partial<DateFormatConfig>) => {
-    configureDateTime(newConfig);
-    setCurrentConfig({...dateService.config});
-  }, []);
-  
-  /**
-   * Define o locale (idioma) para formatação de datas
-   */
-  const setLocale = useCallback((locale: any) => {
-    setDefaultLocale(locale);
-    setCurrentConfig({...dateService.config});
-  }, []);
-  
-  /**
-   * Define o fuso horário para formatação de datas
-   */
-  const setTimeZone = useCallback((timeZone: string) => {
-    setDefaultTimeZone(timeZone);
-    setCurrentConfig({...dateService.config});
-  }, []);
-  
-  /**
-   * Reseta a configuração para os valores padrão
-   */
-  const resetToDefaults = useCallback(() => {
-    const defaults: DateFormatConfig = {
-      locale: ptBR,
-      dateFormat: 'dd/MM/yyyy',
-      timeFormat: 'HH:mm',
-      dateTimeFormat: 'dd/MM/yyyy HH:mm',
-      hideSeconds: true,
-      timeZone: 'America/Sao_Paulo'
+  // Configurar o serviço de data baseado nas opções globais
+  const configure = useCallback((options?: Partial<DateFormatConfig>) => {
+    const config: Partial<DateFormatConfig> = {
+      ...(globalOptions.dateFormat && { dateFormat: globalOptions.dateFormat as string }),
+      ...(globalOptions.timeFormat && { timeFormat: globalOptions.timeFormat as string }),
+      ...(globalOptions.useTimeZone && { timeZone: 'America/Sao_Paulo' })
     };
     
-    configureDateTime(defaults);
-    setCurrentConfig({...defaults});
-  }, []);
-
+    if (options) {
+      Object.assign(config, options);
+      setLastOptions(options);
+    }
+    
+    configureDateTime(config);
+    return config;
+  }, [globalOptions]);
+  
   return {
-    config: currentConfig,
-    updateDateConfig,
-    setLocale,
-    setTimeZone,
-    resetToDefaults,
+    configure,
+    globalOptions,
+    currentConfig: dateService.config,
+    lastOptions
   };
 }
