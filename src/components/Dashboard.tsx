@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '@/context/AppContext';
 import { useTaskDataContext } from '@/context/TaskDataProvider';
@@ -159,22 +160,25 @@ const Dashboard: React.FC = () => {
     );
   }
   
-  // Simplified animation variants for task cards
+  // Enhanced animation variants for task cards
   const taskVariants = {
     hidden: { 
       opacity: 0,
-      y: 10,
-      transition: { duration: 0.2 }
+      y: 20,
+      scale: 0.95,
+      transition: { duration: 0.2, ease: "easeInOut" }
     },
     visible: { 
       opacity: 1, 
       y: 0,
-      transition: { duration: 0.2 }
+      scale: 1,
+      transition: { duration: 0.2, ease: "easeInOut" }
     },
     exit: { 
       opacity: 0,
-      y: -5,
-      transition: { duration: 0.15 }
+      scale: 0.95,
+      y: -10,
+      transition: { duration: 0.15, ease: "easeInOut" }
     }
   };
   
@@ -265,6 +269,7 @@ const Dashboard: React.FC = () => {
                             exit="exit"
                             variants={taskVariants}
                             layout
+                            layoutId={`task-container-${task.id}`}
                           >
                             <TaskCard 
                               key={task.id} 
@@ -281,7 +286,7 @@ const Dashboard: React.FC = () => {
               </div>
             )}
 
-            {/* Non-overdue tasks with simplified animations */}
+            {/* Non-overdue tasks with improved animations */}
             <AnimatePresence initial={false} mode="popLayout">
               {sortedNonOverdueTasks.map(task => (
                 <motion.div
@@ -291,6 +296,7 @@ const Dashboard: React.FC = () => {
                   exit="exit"
                   variants={taskVariants}
                   layout
+                  layoutId={`task-container-${task.id}`}
                 >
                   <TaskCard 
                     task={task} 
