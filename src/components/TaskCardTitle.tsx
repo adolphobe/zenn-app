@@ -2,6 +2,7 @@
 import React, { useRef, useEffect } from 'react';
 import { ViewMode } from '@/types';
 import { dateService } from '@/services/dateService';
+import { useTimeZone } from '@/hooks/useTimeZone';
 
 interface TaskCardTitleProps {
   title: string;
@@ -27,10 +28,12 @@ const TaskCardTitle: React.FC<TaskCardTitleProps> = ({
   viewMode
 }) => {
   const titleInputRef = useRef<HTMLInputElement>(null);
+  const { convertToCurrentTimeZone } = useTimeZone();
   
   // Use o timezone configurado globalmente para determinar se a tarefa está vencida
+  // Convertemos a data para o timezone do usuário antes de verificar se está vencida
   const isOverdue = idealDate && dateService.isTaskOverdue(
-    dateService.toTimeZone(idealDate) || idealDate
+    convertToCurrentTimeZone(idealDate) || idealDate
   );
   const showOverdueStyle = viewMode === 'chronological' && isOverdue;
 

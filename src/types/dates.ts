@@ -23,12 +23,12 @@ export interface DateFieldsDTO {
 
 // Configuração global para exibição de datas na interface
 export interface DateFormatConfig {
-  locale: string;
+  locale: any; // Alterado de string para any para aceitar objetos Locale do date-fns
   dateFormat: string;
   timeFormat: string;
   dateTimeFormat: string;
   hideSeconds: boolean;
-  timeZone: string; // Novo campo para timezone
+  timeZone: string;
 }
 
 // Opções para exibição de datas específicas em componentes
@@ -45,4 +45,37 @@ export interface TimeZoneInfo {
   name: string;       // Nome legível (ex: 'Horário de Brasília')
   abbreviation: string; // Abreviação (ex: 'BRT')
   offset: number;     // Deslocamento em minutos
+}
+
+// Novas interfaces para a Fase 3
+
+// Interface para preferências de data do usuário
+export interface UserDatePreferences {
+  timeZone: string;
+  locale: string;
+  dateFormat: string;
+  timeFormat: string;
+  firstDayOfWeek: number; // 0 = domingo, 1 = segunda, etc.
+  use24HourFormat: boolean;
+}
+
+// Interface para opções avançadas de formatação de datas
+export interface AdvancedDateFormatOptions extends DateDisplayOptions {
+  format?: string; // Formato personalizado (sobrescreve dateFormat/timeFormat)
+  relative?: boolean; // Usar formato relativo (hoje, ontem, há 3 dias)
+  includeTime?: boolean; // Incluir hora na formatação
+  longFormat?: boolean; // Usar formato longo (ex: "5 de Janeiro de 2023" vs "05/01/2023")
+  timeZone?: string; // Sobrescreve o timezone global para esta formatação específica
+}
+
+// Interface para resultado de comparação de datas
+export interface DateComparisonResult {
+  isEqual: boolean;
+  isBefore: boolean;
+  isAfter: boolean;
+  diffInDays: number;
+  diffInHours: number;
+  diffInMinutes: number;
+  diffInSeconds: number;
+  humanReadableDiff: string; // Diferença em formato legível (ex: "3 dias atrás")
 }

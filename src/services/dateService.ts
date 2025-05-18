@@ -1,4 +1,3 @@
-
 import {
   parse,
   format,
@@ -13,7 +12,10 @@ import {
   differenceInDays,
   isSameDay,
   isToday,
-  isYesterday
+  isYesterday,
+  formatRelative as fnsFormatRelative,
+  formatDistance,
+  Locale
 } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { 
@@ -168,6 +170,44 @@ export const dateService = {
   },
   
   /**
+   * Formata uma data para exibição relativa (hoje, ontem, etc)
+   */
+  formatRelative(date: Date | ISODateString | null | undefined): string {
+    if (!date) return '';
+    
+    try {
+      const parsedDate = this.parseDate(date);
+      if (!parsedDate || !isValid(parsedDate)) return '';
+      
+      if (this.isToday(parsedDate)) {
+        return 'Hoje';
+      }
+      
+      if (this.isYesterday(parsedDate)) {
+        return 'Ontem';
+      }
+      
+      // Para datas mais antigas (até 30 dias), usar formato relativo
+      const now = new Date();
+      const daysDiff = this.getDaysDifference(now, parsedDate);
+      
+      if (daysDiff !== null && daysDiff <= 30) {
+        // Usar formatDistance do date-fns para formato relativo
+        return formatDistance(parsedDate, now, { 
+          addSuffix: true,
+          locale: this.config.locale
+        });
+      }
+      
+      // Para datas mais antigas, usar formato padrão
+      return this.formatForDisplay(parsedDate);
+    } catch (error) {
+      console.error('Erro formatando data relativa:', error);
+      return '';
+    }
+  },
+  
+  /**
    * Formata uma data em um fuso horário específico para exibição
    * @param date Data a ser formatada
    * @param format Formato de saída (ex: 'dd/MM/yyyy HH:mm')
@@ -248,6 +288,139 @@ export const dateService = {
     } catch (error) {
       console.error('Erro obtendo deslocamento do fuso horário:', error);
       return 0;
+    }
+  },
+  
+  /**
+   * Compara duas datas e retorna informações detalhadas sobre a comparação
+   */
+  compareDates(date1: Date | ISODateString | null | undefined, date2: Date | ISODateString | null | undefined) {
+    if (!date1 || !date2) {
+      return {
+        isEqual: false,
+        isBefore: false,
+        isAfter: false,
+        diffInDays: 0,
+        diffInHours: 0,
+        diffInMinutes: 0,
+        diffInSeconds: 0,
+        humanReadableDiff: ''
+      };
+    }
+    
+    try {
+      const parsed1 = this.parseDate(date1);
+      const parsed2 = this.parseDate(date2);
+      
+      if (!parsed1 || !parsed2) {
+        return {
+          isEqual: false,
+          isBefore: false,
+          isAfter: false,
+          diffInDays: 0,
+          diffInHours: 0,
+          diffInMinutes: 0,
+          diffInSeconds: 0,
+          humanReadableDiff: ''
+        };
+      }
+      
+      const isEqual = isSameDay(parsed1, parsed2);
+      const isBefore = isBefore(parsed1, parsed2);
+      const isAfter = isAfter(parsed1, parsed2);
+      
+      const diffInMillis = Math.abs(parsed2.getTime() - parsed1.getTime());
+      const diffInSeconds = Math.floor(diffInMillis / 1000);
+      const diffInMinutes = Math.floor(diffInSeconds / 60);
+      const diffInHours = Math.floor(diffInMinutes / 60);
+      const diffInDays = Math.floor(diffInHours / 24);
+      
+      const humanReadableDiff = formatDistance(parsed1, parsed2, {
+        locale: this.config.locale
+      });
+      
+      return {
+        isEqual,
+        isBefore,
+        isAfter,
+        diffInDays,
+        diffInHours,
+        diffInMinutes,
+        diffInSeconds,
+        humanReadableDiff
+      };
+    } catch (error) {
+      console.error('Erro ao comparar datas:', error);
+      return {
+        isEqual: false,
+        isBefore: false,
+        isAfter: false,
+        diffInDays: 0,
+        diffInHours: 0,
+        diffInMinutes: 0,
+        diffInSeconds: 0,
+        humanReadableDiff: ''
+      };
+    }
+  },
+  
+  /**
+   * Valida uma data contra restrições específicas
+   * @param date Data a ser validada
+   * @param options Opções de validação
+   * @returns Objeto com resultado da validação e mensagem de erro
+   */
+  validateDate(date: Date | string | null, options?: {
+    minDate?: Date | string,
+    maxDate?: Date | string,
+    businessDaysOnly?: boolean,
+    allowNull?: boolean
+  }) {
+    // Se a data for nula e isso for permitido, retorna válido
+    if ((date === null || date === undefined) && options?.allowNull) {
+      return { isValid: true, message: '' };
+    }
+    
+    // Se a data for nula e não for permitido, retorna inválido
+    if (date === null || date === undefined) {
+      return { isValid: false, message: 'Data é obrigatória' };
+    }
+    
+    try {
+      const parsedDate = this.parseDate(date);
+      
+      // Verifica se a data é válida
+      if (!parsedDate || !isValid(parsedDate)) {
+        return { isValid: false, message: 'Data inválida' };
+      }
+      
+      // Verifica data mínima, se especificada
+      if (options?.minDate) {
+        const minDate = this.parseDate(options.minDate);
+        if (minDate && isBefore(parsedDate, minDate)) {
+          return { 
+            isValid: false, 
+            message: `Data não pode ser anterior a ${this.formatForDisplay(minDate)}`
+          };
+        }
+      }
+      
+      // Verifica data máxima, se especificada
+      if (options?.maxDate) {
+        const maxDate = this.parseDate(options.maxDate);
+        if (maxDate && isAfter(parsedDate, maxDate)) {
+          return { 
+            isValid: false, 
+            message: `Data não pode ser posterior a ${this.formatForDisplay(maxDate)}`
+          };
+        }
+      }
+      
+      // Se chegou até aqui, a data é válida
+      return { isValid: true, message: '' };
+    } catch (error) {
+      console.error('Erro ao validar data:', error);
+      return { isValid: false, message: 'Erro ao validar data' };
     }
   },
   
@@ -390,4 +563,12 @@ export const configureDateTime = (config: Partial<DateFormatConfig>) => {
  */
 export const setDefaultTimeZone = (timeZone: string) => {
   dateService.config.timeZone = timeZone;
+};
+
+/**
+ * Define o locale padrão para toda a aplicação
+ * @param locale Locale a ser usado (ex: ptBR)
+ */
+export const setDefaultLocale = (locale: Locale) => {
+  dateService.config.locale = locale;
 };
