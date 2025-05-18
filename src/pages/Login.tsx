@@ -58,7 +58,12 @@ const Login: React.FC = () => {
     if (loggedOutFromUrl || loggedOutFromState) {
       setIsJustLoggedOut(true);
       
+      // Certifique-se de limpar a flag de logout em andamento
       localStorage.removeItem('logout_in_progress');
+      
+      // Limpar tokens de autenticação por segurança
+      localStorage.removeItem('sb-wbvxnapruffchikhrqrs-auth-token');
+      localStorage.removeItem('supabase.auth.token');
       
       setTimeout(() => {
         setIsJustLoggedOut(false);
@@ -88,6 +93,12 @@ const Login: React.FC = () => {
   useEffect(() => {
     const checkLocalAuth = async () => {
       try {
+        // Não verificar se logout estiver em andamento
+        if (localStorage.getItem('logout_in_progress') === 'true') {
+          setLocalAuthCheck(false);
+          return;
+        }
+        
         const hasToken = !!localStorage.getItem('sb-wbvxnapruffchikhrqrs-auth-token');
         
         if (!hasToken) {
@@ -161,7 +172,7 @@ const Login: React.FC = () => {
   }
 
   // Use both authentication checks to determine if user is truly authenticated
-  const actuallyAuthenticated = isAuthenticated || (localAuthCheck === true);
+  const actuallyAuthenticated = isAuthenticated && !isJustLoggedOut && localAuthCheck === true;
 
   // If user is authenticated and not just logged out, show a temporary message
   if (actuallyAuthenticated && !isJustLoggedOut) {

@@ -27,6 +27,12 @@ export const PrivateRoute = () => {
   useEffect(() => {
     const checkLocalAuth = async () => {
       try {
+        // Se um logout estiver em andamento, não tente verificar autenticação
+        if (logoutInProgress) {
+          setLocalAuthCheck(false);
+          return;
+        }
+        
         // Check for token in localStorage
         const hasToken = !!localStorage.getItem('sb-wbvxnapruffchikhrqrs-auth-token');
         
@@ -46,7 +52,7 @@ export const PrivateRoute = () => {
     };
 
     checkLocalAuth();
-  }, []);
+  }, [logoutInProgress]);
 
   // Use effect to ensure we've completed at least one auth check
   useEffect(() => {
@@ -56,38 +62,29 @@ export const PrivateRoute = () => {
   }, [isLoading]);
 
   console.log(`[PrivateRoute] Verificando autenticação em ${location.pathname}, isAuthenticated: ${isAuthenticated}, isLoading: ${isLoading}, authChecked: ${authChecked}, logoutInProgress: ${logoutInProgress}, localAuthCheck: ${localAuthCheck}`);
-  console.log(`[PrivateRoute] DETALHES EM PORTUGUÊS: Verificando se o usuário está autenticado para acessar a rota ${location.pathname}`);
 
   // Show loading state while checking authentication
   if (isLoading || !authChecked || localAuthCheck === null) {
     console.log("[PrivateRoute] Ainda carregando estado de autenticação...");
-    console.log("[PrivateRoute] DETALHES EM PORTUGUÊS: O sistema está verificando se você está autenticado. Por favor, aguarde.");
     return <div className="flex items-center justify-center min-h-screen">
       <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
     </div>;
   }
 
-  // Log auth status and redirect if not authenticated
+  // Log auth status and redirect if not authenticated or logout in progress
   // Use both checks - from context AND from local storage
-  const actuallyAuthenticated = isAuthenticated || localAuthCheck === true;
+  const actuallyAuthenticated = isAuthenticated && !logoutInProgress && localAuthCheck === true;
   
-  if (!actuallyAuthenticated || logoutInProgress) {
-    const reason = !actuallyAuthenticated ? "não autenticado" : "logout em andamento";
+  if (!actuallyAuthenticated) {
+    const reason = logoutInProgress ? "logout em andamento" : "não autenticado";
     console.error(`[PrivateRoute] ERRO DE AUTENTICAÇÃO: Usuário ${reason} em ${location.pathname}`);
     console.error("[PrivateRoute] DETALHES TÉCNICOS: Redirecionando para /login");
-    console.error("[PrivateRoute] DETALHES EM PORTUGUÊS: Você não está logado e tentou acessar uma página protegida. Redirecionando para a página de login.");
-    console.error("[PrivateRoute] ESTADO DE AUTENTICAÇÃO:", { isAuthenticated, isLoading, localAuthCheck, path: location.pathname });
+    console.error("[PrivateRoute] ESTADO DE AUTENTICAÇÃO:", { isAuthenticated, isLoading, localAuthCheck, logoutInProgress, path: location.pathname });
     
     // Clear any lingering session data if we detect a logout in progress
     if (logoutInProgress) {
       localStorage.removeItem('sb-wbvxnapruffchikhrqrs-auth-token');
       localStorage.removeItem('supabase.auth.token');
-      
-      // Show toast before redirecting
-      toast({
-        title: "Sessão encerrada",
-        description: "Você foi desconectado do sistema",
-      });
       
       // Return a redirect to login with current location stored for later redirect back
       // Add a timestamp to avoid caching issues
@@ -105,7 +102,6 @@ export const PrivateRoute = () => {
 
   // User is authenticated, render the protected layout with sidebar
   console.log(`[PrivateRoute] Usuário está autenticado, renderizando conteúdo protegido em ${location.pathname}`);
-  console.log(`[PrivateRoute] DETALHES EM PORTUGUÊS: Autenticação confirmada. Exibindo conteúdo da página ${location.pathname}`);
   
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 flex">

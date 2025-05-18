@@ -8,25 +8,38 @@ import { mapSupabaseUser } from '@/context/auth/userProfileUtils';
 // Utility function to perform logout
 export const performLogout = async (navigate: any) => {
   try {
+    console.log("[AuthUtils] Iniciando processo completo de logout");
+    
     // Set a flag to prevent multiple logout attempts
     localStorage.setItem('logout_in_progress', 'true');
     
-    // Log the user out from Supabase
-    await supabase.auth.signOut();
-    
     // Clear any user-related data from localStorage
     localStorage.removeItem('app_user');
+    localStorage.removeItem('app_preferences');
+    localStorage.removeItem('sb-wbvxnapruffchikhrqrs-auth-token');
+    localStorage.removeItem('supabase.auth.token');
     
-    // Clear logout flag
-    localStorage.removeItem('logout_in_progress');
+    // Log the user out from Supabase
+    await supabase.auth.signOut({ scope: 'global' });
     
-    // Redirect to the login page
-    navigate('/login');
-    
-    toast({
-      title: "Logout realizado",
-      description: "Você foi desconectado com sucesso",
-    });
+    // Usando timeout para dar tempo ao Supabase para processar o logout
+    setTimeout(() => {
+      // Redirect to the login page with a forced parameter to ensure fresh state
+      const timestamp = new Date().getTime();
+      navigate(`/login?loggedOut=true&timestamp=${timestamp}`, { 
+        replace: true,
+        state: { 
+          loggedOut: true, 
+          timestamp: timestamp,
+          forceClear: true
+        } 
+      });
+      
+      toast({
+        title: "Logout realizado",
+        description: "Você foi desconectado com sucesso",
+      });
+    }, 100);
     
     return true;
   } catch (error) {

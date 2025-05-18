@@ -28,7 +28,7 @@ const SidebarUserProfile: React.FC<SidebarUserProfileProps> = ({ sidebarOpen }) 
         return;
       }
       
-      // Use the centralized logout function
+      // Método centralizado de logout
       await performLogout(navigate);
       
     } catch (error) {

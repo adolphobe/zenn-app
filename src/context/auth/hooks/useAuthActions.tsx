@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { toast } from '@/hooks/use-toast';
 import { processAuthError } from '@/utils/authErrorUtils';
@@ -67,20 +68,22 @@ export function useAuthActions({ setCurrentUser, setSession, setIsLoading }: Aut
   // Logout function
   const logout = async (): Promise<void> => {
     console.log("[AuthProvider] Iniciando processo completo de logout do usuário");
-    console.log("[AuthProvider] DETALHES EM PORTUGUÊS: Iniciando processo completo de logout no sistema");
-    
-    setIsLoading(true);
     
     try {
-      // First clear local states 
+      setIsLoading(true);
+      
+      // Primeiro marque que um logout está em andamento para evitar redirecionamentos indevidos
+      localStorage.setItem('logout_in_progress', 'true');
+      
+      // Primeiro limpar estados locais 
       setCurrentUser(null);
       setSession(null);
       
-      // Remove any locally stored auth data
+      // Remover quaisquer dados de autenticação armazenados localmente
       localStorage.removeItem('sb-wbvxnapruffchikhrqrs-auth-token');
       localStorage.removeItem('supabase.auth.token');
       
-      // Call Supabase signOut with explicit scope to ensure all devices are logged out
+      // Chamar signOut do Supabase com escopo explícito para garantir que todos os dispositivos sejam deslogados
       const { error } = await supabase.auth.signOut({ scope: 'global' });
       
       if (error) {
@@ -96,7 +99,6 @@ export function useAuthActions({ setCurrentUser, setSession, setIsLoading }: Aut
         });
       } else {
         console.log("[AuthProvider] Usuário deslogado com sucesso");
-        console.log("[AuthProvider] DETALHES EM PORTUGUÊS: Sessão encerrada com sucesso");
         
         toast({
           title: "Logout realizado",
@@ -109,10 +111,13 @@ export function useAuthActions({ setCurrentUser, setSession, setIsLoading }: Aut
       
       const errorDetails = processAuthError(error);
     } finally {
-      // Always clear user states and session when logging out
+      // Sempre limpar os estados do usuário e sessão ao fazer logout
       setCurrentUser(null);
       setSession(null);
       setIsLoading(false);
+      
+      // Remova a flag de logout quando terminar (isso será feito na rota de login)
+      // localStorage.removeItem('logout_in_progress');
     }
   };
 
