@@ -9,7 +9,7 @@ import {
   CONSTRUCTION_PHRASES 
 } from '../constants';
 import { useIsMobile } from '../hooks/use-mobile';
-import { safeParseDate } from '@/utils';
+import { dateService } from '@/services/dateService';
 
 interface TaskFormFieldsProps {
   formData: TaskFormData;
@@ -26,29 +26,6 @@ const TaskFormFields: React.FC<TaskFormFieldsProps> = ({
 }) => {
   const totalScore = formData.consequenceScore + formData.prideScore + formData.constructionScore;
   const isMobile = useIsMobile();
-  
-  // Enhanced function to format date for input - handles both string and Date
-  const formatDateForInput = (dateValue: Date | string | null): string => {
-    if (!dateValue) return '';
-    
-    try {
-      // Convert string to Date if needed
-      const date = typeof dateValue === 'string' ? safeParseDate(dateValue) : dateValue;
-      
-      // Check if the date is valid
-      if (!date || isNaN(date.getTime())) {
-        console.warn('Invalid date for input:', dateValue);
-        return '';
-      }
-      
-      // Adjust for timezone offset
-      const localDate = new Date(date.getTime() - (date.getTimezoneOffset() * 60000));
-      return localDate.toISOString().slice(0, 16);
-    } catch (error) {
-      console.error('Error formatting date for input:', error);
-      return '';
-    }
-  };
   
   // Mobile layout (vertical)
   if (isMobile) {
@@ -93,7 +70,7 @@ const TaskFormFields: React.FC<TaskFormFieldsProps> = ({
             type="datetime-local"
             id="idealDate"
             name="idealDate"
-            value={formData.idealDate ? formatDateForInput(formData.idealDate) : ''}
+            value={dateService.formatForDateTimeInput(formData.idealDate)}
             onChange={handleDateChange}
             className="w-full p-3 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
           />
@@ -160,7 +137,7 @@ const TaskFormFields: React.FC<TaskFormFieldsProps> = ({
               type="datetime-local"
               id="idealDate"
               name="idealDate"
-              value={formData.idealDate ? formatDateForInput(formData.idealDate) : ''}
+              value={dateService.formatForDateTimeInput(formData.idealDate)}
               onChange={handleDateChange}
               className="w-full p-3 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
             />

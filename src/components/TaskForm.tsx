@@ -8,6 +8,7 @@ import { AlwaysVisibleScrollArea } from '@/components/ui/always-visible-scroll-a
 import { useTabNavigation } from '../context/hooks/useTabNavigation';
 import { useIsMobile } from '../hooks/use-mobile';
 import { useTaskDataContext } from '@/context/TaskDataProvider';
+import { dateService } from '@/services/dateService';
 
 interface TaskFormProps {
   onClose: () => void;
@@ -59,9 +60,13 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, initialData, taskId, task,
       return;
     }
 
-    // Convert local datetime string to Date object
+    // Converter string datetime-local para objeto Date
     const date = new Date(e.target.value);
-    setFormData(prev => ({ ...prev, idealDate: date }));
+    if (!isNaN(date.getTime())) {
+      setFormData(prev => ({ ...prev, idealDate: date }));
+    } else {
+      console.warn('Data inválida fornecida no input:', e.target.value);
+    }
   };
 
   // Capture mousedown on backdrop to prevent the default click behavior

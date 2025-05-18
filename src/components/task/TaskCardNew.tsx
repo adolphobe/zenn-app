@@ -1,7 +1,9 @@
+
 import React, { useState, useEffect } from 'react';
 import { Task } from '@/types';
 import { useAppContext } from '@/context/AppContext';
-import { getTaskPriorityClass, isTaskOverdue, safeParseDate } from '@/utils';
+import { getTaskPriorityClass } from '@/utils';
+import { dateService } from '@/services/dateService';
 import TaskCardHeader from '../TaskCardHeader';
 import { motion, AnimatePresence } from 'framer-motion';
 import TaskCardExpanded from './TaskCardExpanded';
@@ -98,9 +100,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
   };
 
   // Determine if task is overdue
-  const parsedDate = task.idealDate ? safeParseDate(task.idealDate) : null;
-  // isTaskOverdue accepts string or Date, so this is safe
-  const isOverdue = task.idealDate ? isTaskOverdue(task.idealDate) : false;
+  const isOverdue = task.idealDate ? dateService.isTaskOverdue(task.idealDate) : false;
 
   // Collapse function to pass to TaskCardExpanded
   const handleCollapseTask = () => {

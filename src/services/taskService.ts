@@ -1,7 +1,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { Task, TaskFormData } from '@/types';
-import { safeParseDate } from '@/utils';
+import { dateService } from './dateService';
 
 // Helper function to map the response from Supabase to the Task type
 const mapToTask = (data: any): Task => ({
@@ -11,13 +11,13 @@ const mapToTask = (data: any): Task => ({
   prideScore: data.pride_score,
   constructionScore: data.construction_score,
   totalScore: data.total_score,
-  // Always try to parse dates to Date objects when mapping from the database
-  idealDate: data.ideal_date ? safeParseDate(data.ideal_date) : null,
+  // Usamos dateService para garantir datas consistentes
+  idealDate: dateService.parseDate(data.ideal_date),
   hidden: data.hidden,
   completed: data.completed,
-  completedAt: data.completed_at,
-  // Ensure createdAt is parsed as a Date
-  createdAt: safeParseDate(data.created_at),
+  completedAt: dateService.parseDate(data.completed_at),
+  // Garantir que createdAt seja sempre uma data válida
+  createdAt: dateService.parseDate(data.created_at) || new Date(),
   feedback: data.feedback,
   pillar: data.pillar,
   comments: data.comments || []
@@ -65,7 +65,7 @@ export const fetchTasks = async (userId: string, completed: boolean = false): Pr
     throw error;
   }
 
-  // Process dates consistently when fetching data
+  // Mapear dados com tratamento consistente de datas
   return (data || []).map(mapToTask);
 };
 
@@ -91,6 +91,9 @@ export const createTask = async (taskData: TaskFormData, userId: string): Promis
     (prev.value > current.value) ? prev : current
   ).name;
 
+  // Converter Date para ISO string para o banco de dados
+  const idealDateISO = dateService.toISOString(taskData.idealDate);
+
   const { data, error } = await supabase
     .from('tasks')
     .insert({
@@ -100,7 +103,7 @@ export const createTask = async (taskData: TaskFormData, userId: string): Promis
       pride_score: taskData.prideScore || 3,
       construction_score: taskData.constructionScore || 3,
       total_score: totalScore,
-      ideal_date: taskData.idealDate ? new Date(taskData.idealDate).toISOString() : null,
+      ideal_date: idealDateISO,
       pillar: dominantPillar,
       hidden: false,
       completed: false
@@ -131,7 +134,8 @@ export const updateTask = async (id: string, taskData: Partial<TaskFormData>): P
   if (taskData.prideScore !== undefined) updateData.pride_score = taskData.prideScore;
   if (taskData.constructionScore !== undefined) updateData.construction_score = taskData.constructionScore;
   if (taskData.idealDate !== undefined) {
-    updateData.ideal_date = taskData.idealDate ? new Date(taskData.idealDate).toISOString() : null;
+    // Converter Date para ISO string para o banco de dados
+    updateData.ideal_date = dateService.toISOString(taskData.idealDate);
   }
   
   // Calculate total score if any score component is updated

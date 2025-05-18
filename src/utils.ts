@@ -1,14 +1,16 @@
+
 import { Task, DateDisplayOptions, ViewMode, SortOption } from './types';
+import { dateService } from './services/dateService';
 
 export const formatDate = (date: Date | string | null, options?: DateDisplayOptions): string => {
   if (!date) return '';
   
-  // Convert string to Date if needed
-  const dateObj = typeof date === 'string' ? new Date(date) : date;
+  // Converter para Date se for string
+  const dateObj = dateService.parseDate(date);
   
-  // Ensure we have a valid Date object
-  if (!(dateObj instanceof Date) || isNaN(dateObj.getTime())) {
-    console.warn('Invalid date provided to formatDate:', date);
+  // Garantir que temos um objeto Date válido
+  if (!dateObj) {
+    console.warn('Data inválida fornecida para formatDate:', date);
     return '';
   }
   
@@ -53,51 +55,12 @@ export const getTaskPriorityClass = (score: number): string => {
   return 'task-light';
 };
 
-// Enhanced helper function to safely create a Date object
-export const safeParseDate = (dateInput: string | Date | null | undefined): Date | null => {
-  if (!dateInput) return null;
-  
-  try {
-    // If it's already a Date object with a valid time
-    if (dateInput instanceof Date && !isNaN(dateInput.getTime())) {
-      return dateInput;
-    }
-    
-    // If it's a string, try to parse it
-    if (typeof dateInput === 'string') {
-      // First, handle ISO strings directly
-      const parsedDate = new Date(dateInput);
-      if (!isNaN(parsedDate.getTime())) {
-        return parsedDate;
-      }
-      
-      // If standard parsing fails, try other formats
-      // Handle common date formats (e.g., DD/MM/YYYY)
-      if (dateInput.includes('/')) {
-        const parts = dateInput.split(/[\/\-\s:]/);
-        // Assuming DD/MM/YYYY format
-        if (parts.length >= 3) {
-          // Note: month is 0-indexed in JS Date
-          const newDate = new Date(
-            parseInt(parts[2]), // Year
-            parseInt(parts[1]) - 1, // Month
-            parseInt(parts[0]) // Day
-          );
-          if (!isNaN(newDate.getTime())) {
-            return newDate;
-          }
-        }
-      }
-    }
-    
-    // If we get here, the date is invalid
-    console.warn('Invalid date value:', dateInput);
-    return null;
-  } catch (error) {
-    console.error('Error parsing date:', error);
-    return null;
-  }
-};
+// Agora usamos o dateService para o parsing seguro de datas
+export const safeParseDate = dateService.parseDate;
+
+// Utilizamos o dateService para funcionalidades relacionadas a datas
+export const addDaysToDate = dateService.addDaysToDate;
+export const isTaskOverdue = dateService.isTaskOverdue;
 
 export const sortTasks = (
   tasks: Task[], 
@@ -106,75 +69,40 @@ export const sortTasks = (
 ): Task[] => {
   const { sortDirection, noDateAtEnd } = options;
   
-  // Create a safe copy of the tasks with validated dates but preserve original type structure
-  // Use temporary type for internal processing
-  type TaskWithParsedDates = {
-    id: string;
-    title: string;
-    consequenceScore: number;
-    prideScore: number;
-    constructionScore: number;
-    totalScore: number;
-    idealDate: Date | null;
-    hidden: boolean;
-    completed: boolean;
-    completedAt: Date | null;
-    createdAt: Date;
-    feedback: 'transformed' | 'relief' | 'obligation' | null;
-    comments: any[];
-    pillar?: string;
-    operationLoading?: {
-      [key: string]: boolean;
-    };
-  };
+  // Criar uma cópia das tarefas para ordenação
+  const tasksCopy = [...tasks];
   
-  // Parse dates for sorting while maintaining original task structure
-  const tasksWithParsedDates: TaskWithParsedDates[] = tasks.map(task => ({
-    ...task,
-    idealDate: task.idealDate ? safeParseDate(task.idealDate) : null,
-    createdAt: task.createdAt ? 
-      (task.createdAt instanceof Date ? task.createdAt : safeParseDate(task.createdAt)) : 
-      new Date(),
-    completedAt: task.completedAt ? safeParseDate(task.completedAt) : null
-  }));
-  
-  // Sort the parsed tasks
-  const sortedParsedTasks = tasksWithParsedDates.sort((a, b) => {
+  // Ordenar as tarefas copiadas
+  return tasksCopy.sort((a, b) => {
     const sortMultiplier = sortDirection === 'desc' ? -1 : 1;
     const now = new Date();
     
     if (viewMode === 'power') {
-      // Power mode - sort by score first
+      // Modo power - ordenar por pontuação primeiro
       if (a.totalScore !== b.totalScore) {
         return (a.totalScore - b.totalScore) * sortMultiplier;
       }
       
-      // Secondary sort by date if scores are equal
+      // Ordenação secundária por data se pontuações forem iguais
       if (a.idealDate && b.idealDate) return (a.idealDate.getTime() - b.idealDate.getTime());
       if (a.idealDate) return -1;
       if (b.idealDate) return 1;
       return 0;
       
     } else {
-      // Chronological mode
-      // Handle tasks without dates based on noDateAtEnd setting
+      // Modo cronológico
+      // Lidar com tarefas sem datas com base na configuração noDateAtEnd
       if (noDateAtEnd) {
         if (a.idealDate && !b.idealDate) return -1;
         if (!a.idealDate && b.idealDate) return 1;
       }
       
-      // Both have dates, sort by date value based on direction
+      // Ambas têm datas, ordenar por valor de data com base na direção
       if (a.idealDate && b.idealDate) {
         const aTime = a.idealDate.getTime();
         const bTime = b.idealDate.getTime();
         
-        // Para tarefas vencidas e não vencidas, usamos a mesma lógica de ordenação
-        // Se sortDirection for 'desc' (mais recente primeiro):
-        //   - Para tarefas futuras (não vencidas), o "mais recente" é a data mais próxima de hoje (19/05 vem antes de 25/05)
-        //   - Para tarefas passadas (vencidas), o "mais recente" é a data mais próxima de hoje (15/05 vem antes de 10/05)
-        // Se sortDirection for 'asc' (mais antigo primeiro), a lógica é invertida
-        
-        // No modo cronológico, tratamos a proximidade com o presente 
+        // No modo cronológico, tratamos a proximidade com o presente
         const nowTime = now.getTime();
         
         if (isTaskOverdue(a.idealDate) && isTaskOverdue(b.idealDate)) {
@@ -199,44 +127,12 @@ export const sortTasks = (
         }
       }
       
-      // If one has date and other doesn't
+      // Se uma tem data e outra não
       if (a.idealDate && !b.idealDate) return -1;
       if (!a.idealDate && b.idealDate) return 1;
       
-      // If both don't have dates, use score as secondary sort
+      // Se ambas não têm datas, usar pontuação como ordenação secundária
       return (b.totalScore - a.totalScore);
     }
   });
-  
-  // Return the original tasks in the new sorted order
-  // This preserves the original Task type structure including string-typed dates
-  return sortedParsedTasks.map(parsedTask => {
-    // Find the original task that matches this ID
-    const originalTask = tasks.find(t => t.id === parsedTask.id);
-    // We know it must exist since we created parsedTasks from tasks
-    return originalTask as Task;
-  });
-};
-
-// Adiciona ou subtrai dias a uma data
-export const addDaysToDate = (date: Date, days: number): Date => {
-  const result = new Date(date);
-  result.setDate(result.getDate() + days);
-  return result;
-};
-
-// Verifica se uma tarefa está vencida (antes da data/hora atual)
-export const isTaskOverdue = (date: Date | string | null): boolean => {
-  if (!date) return false;
-  
-  // Convert string to Date if necessary
-  const dateObj = typeof date === 'string' ? new Date(date) : date;
-  
-  // Ensure we have a valid Date object
-  if (!(dateObj instanceof Date) || isNaN(dateObj.getTime())) {
-    return false;
-  }
-  
-  const now = new Date();
-  return dateObj < now;
 };
