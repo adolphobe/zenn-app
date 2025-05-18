@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { Lock, Eye, EyeOff } from 'lucide-react';
@@ -33,6 +34,7 @@ const ResetPassword: React.FC = () => {
   const [resetError, setResetError] = useState<string | null>(null);
   const [resetSuccess, setResetSuccess] = useState<string | null>(null);
   const [hasToken, setHasToken] = useState<boolean>(false);
+  const [email, setEmail] = useState<string | null>(null);
 
   const form = useForm<ResetPasswordFormValues>({
     resolver: zodResolver(resetPasswordSchema),
@@ -60,38 +62,32 @@ const ResetPassword: React.FC = () => {
         console.log("[ResetPassword] DETALHES EM PORTUGUÊS: Token de redefinição detectado, o usuário pode prosseguir");
         
         try {
-          let sessionResult;
+          // Instead of manually trying to verify OTP, leverage Supabase's built-in session handling
+          // getSession will automatically use the token from the URL
+          const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
           
-          // If we have a code in query param format, we need to use the verifyOtp method
-          if (codeFromQueryParam) {
-            console.log("[ResetPassword] Processando token do parâmetro 'code':", codeFromQueryParam);
-            // CORREÇÃO: Usar 'token' ao invés de 'token_hash'
-            sessionResult = await supabase.auth.verifyOtp({
-              token: codeFromQueryParam,
-              type: 'recovery'
-            });
-          } else {
-            // Process the hash fragment (original implementation)
-            console.log("[ResetPassword] Processando token do hash da URL");
-            sessionResult = await supabase.auth.getSession();
-          }
-          
-          const { data, error } = sessionResult;
-          
-          if (error) {
-            console.error("[ResetPassword] Erro ao processar sessão:", error);
+          if (sessionError) {
+            console.error("[ResetPassword] Erro ao processar sessão:", sessionError);
             console.error("[ResetPassword] DETALHES EM PORTUGUÊS: Não foi possível validar o token de redefinição");
             setResetError("Link de redefinição inválido ou expirado. Solicite um novo link.");
-          } else if (!data.session) {
-            console.error("[ResetPassword] Sessão não encontrada após processar token");
+            return;
+          }
+          
+          // Check if we have a valid session
+          if (!sessionData.session) {
+            console.error("[ResetPassword] Sessão não encontrada após processar URL");
             console.error("[ResetPassword] DETALHES EM PORTUGUÊS: O token de redefinição não gerou uma sessão válida");
             setResetError("Link de redefinição inválido ou expirado. Solicite um novo link.");
-          } else {
-            // If we get here, we have a valid session
-            console.log("[ResetPassword] Sessão válida estabelecida com sucesso");
-            console.log("[ResetPassword] DETALHES EM PORTUGUÊS: Token de redefinição validado com sucesso");
-            setHasToken(true);
+            return;
           }
+          
+          // If we get here, we have a valid session
+          console.log("[ResetPassword] Sessão válida estabelecida com sucesso");
+          console.log("[ResetPassword] DETALHES EM PORTUGUÊS: Token de redefinição validado com sucesso");
+          
+          // Store the email from the session to display to the user
+          setEmail(sessionData.session.user?.email || null);
+          setHasToken(true);
         } catch (error) {
           console.error("[ResetPassword] Erro ao processar token:", error);
           console.error("[ResetPassword] DETALHES EM PORTUGUÊS: Ocorreu um erro ao tentar processar o link de redefinição");
@@ -182,7 +178,9 @@ const ResetPassword: React.FC = () => {
           <p className="text-muted-foreground mt-2">
             {resetSuccess 
               ? "Sua senha foi redefinida com sucesso."
-              : "Defina sua nova senha para acessar sua conta."}
+              : email 
+                ? `Defina uma nova senha para ${email}`
+                : "Defina sua nova senha para acessar sua conta."}
           </p>
         </div>
         
