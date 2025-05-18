@@ -7,6 +7,11 @@ interface LoginErrorDisplayProps {
 }
 
 const LoginErrorDisplay: React.FC<LoginErrorDisplayProps> = ({ error, suggestion }) => {
+  // Agora, adicionamos um log para debugging
+  console.log("[LoginErrorDisplay] Rendering with error:", error);
+  console.log("[LoginErrorDisplay] Rendering with suggestion:", suggestion);
+  
+  // Se não houver erro, não renderizamos nada
   if (!error) return null;
   
   return (

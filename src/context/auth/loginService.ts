@@ -20,14 +20,18 @@ export const login = async (email: string, password: string): Promise<{ success:
       console.error("[AuthService] Erro de login:", error.message);
       console.error("[AuthService] DETALHES EM PORTUGUÊS: Falha ao fazer login. Erro:", error.message);
       
-      const errorDetails = processAuthError(error);
+      // A principal mudança está aqui: não exibir toast para erros de credenciais para evitar duplicação
+      // já que o erro já será exibido no formulário
+      if (!error.message.includes('Invalid login credentials')) {
+        const errorDetails = processAuthError(error);
+        toast({
+          title: "Falha no login",
+          description: errorDetails.message,
+          variant: "destructive"
+        });
+      }
       
-      toast({
-        title: "Falha no login",
-        description: errorDetails.message,
-        variant: "destructive"
-      });
-      
+      // Retornar o erro explicitamente
       return { success: false, error };
     }
     

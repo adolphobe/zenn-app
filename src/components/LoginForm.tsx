@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Form } from "@/components/ui/form";
 import LoginErrorDisplay from './auth/LoginErrorDisplay';
 import LoginFormFields from './auth/LoginFormFields';
@@ -19,10 +19,20 @@ const LoginForm: React.FC<LoginFormProps> = ({
 }) => {
   const { form, isLoading, loginError, loginSuggestion, onSubmit } = useLoginForm(onSuccess);
 
+  // Adicionar efeito para logs quando os erros mudarem
+  useEffect(() => {
+    console.log("[LoginForm Component] Recebendo erro:", loginError);
+    console.log("[LoginForm Component] Recebendo sugestão:", loginSuggestion);
+  }, [loginError, loginSuggestion]);
+
   return (
     <Form {...form}>
       <form onSubmit={onSubmit} className="space-y-6">
-        <LoginErrorDisplay error={loginError} suggestion={loginSuggestion} />
+        {/* Certifique-se de que o componente de erro recebe as props corretamente */}
+        <LoginErrorDisplay 
+          error={loginError} 
+          suggestion={loginSuggestion} 
+        />
         
         <LoginFormFields form={form} />
 

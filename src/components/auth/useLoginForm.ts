@@ -35,9 +35,12 @@ export function useLoginForm(onSuccess?: () => void) {
   }, [location.state]);
 
   const onSubmit = async (values: LoginFormValues) => {
-    setIsLoading(true);
+    // 1. Limpar erros anteriores
     setLoginError(null);
     setLoginSuggestion(null);
+    
+    // 2. Definir loading
+    setIsLoading(true);
     
     try {
       console.log("[LoginForm] Tentando login com:", values.email);
@@ -51,6 +54,8 @@ export function useLoginForm(onSuccess?: () => void) {
         
         if (error) {
           const errorDetails = processAuthError(error);
+          
+          // 3. Definir erros explicitamente e garantir que seja executado antes de desativar loading
           setLoginError(errorDetails.message);
           setLoginSuggestion(errorDetails.suggestion || null);
           
@@ -78,14 +83,16 @@ export function useLoginForm(onSuccess?: () => void) {
       console.error("[LoginForm] DETALHES EM PORTUGUÊS: Ocorreu um erro técnico durante o processo de login. Verifique a conexão com o servidor.");
       
       const errorDetails = processAuthError(error);
+      // Definir erros explicitamente
       setLoginError(errorDetails.message);
       setLoginSuggestion(errorDetails.suggestion || null);
     } finally {
+      // 4. Desativar loading após todos os outros estados serem atualizados
       setIsLoading(false);
     }
   };
 
-  // Debug the error state to see if it's being set correctly
+  // Adicionar logs para verificar se os estados estão corretos
   console.log("[LoginForm] Estado atual do erro:", loginError);
   console.log("[LoginForm] Estado atual da sugestão:", loginSuggestion);
 
