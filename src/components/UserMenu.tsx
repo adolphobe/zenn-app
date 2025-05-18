@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useAuth } from '@/context/AuthContext'; // Direct import
 import { Button } from '@/components/ui/button';
 import { LogOut, User as UserIcon } from 'lucide-react';
@@ -8,18 +8,7 @@ import { toast } from '@/hooks/use-toast';
 const UserMenu: React.FC = () => {
   // Create instance ID for better tracking
   const instanceId = Math.random().toString(36).substring(2, 7);
-  const { currentUser, logout, isAuthenticated, session } = useAuth();
-
-  // Log de estado de autenticação para debugging
-  useEffect(() => {
-    console.log(`[UserMenu:${instanceId}] Estado de autenticação:`, isAuthenticated ? "Autenticado" : "Não autenticado");
-    console.log(`[UserMenu:${instanceId}] Usuário atual:`, currentUser?.email || "Nenhum usuário");
-    console.log(`[UserMenu:${instanceId}] Timestamp:`, new Date().toISOString());
-    
-    return () => {
-      console.log(`[UserMenu:${instanceId}] Componente desmontado em ${new Date().toISOString()}`);
-    };
-  }, [isAuthenticated, currentUser, instanceId]);
+  const { currentUser, logout, isAuthenticated } = useAuth();
 
   const handleLogout = async () => {
     try {

@@ -11,7 +11,7 @@ import { cn } from '@/lib/utils';
  * Enhanced with detailed logging and improved authentication handling
  */
 export const PrivateRoute = () => {
-  const { isAuthenticated, isLoading, currentUser, session } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
   const location = useLocation();
   const { isOpen: sidebarOpen, open: openSidebar, isMobile } = useSidebar();
   
@@ -22,15 +22,9 @@ export const PrivateRoute = () => {
   const timestamp = new Date().toISOString();
   console.log(`[PrivateRoute:${instanceId}] MONTADO em ${location.pathname} - ${timestamp}`);
   
-  // Log detailed authentication information 
+  // Log authentication information without session details to avoid serialization issues
   console.log(`[PrivateRoute:${instanceId}] Estado de autenticação: ${isAuthenticated ? 'Autenticado' : 'Não-autenticado'}, Carregando: ${isLoading}, Rota: ${location.pathname}`);
   
-  if (currentUser) {
-    console.log(`[PrivateRoute:${instanceId}] Usuário encontrado: ${currentUser.email}`);
-  } else {
-    console.log(`[PrivateRoute:${instanceId}] Nenhum usuário encontrado no contexto`);
-  }
-
   // Show loading state while checking authentication
   if (isLoading) {
     console.log(`[PrivateRoute:${instanceId}] Aguardando carregamento de autenticação...`);
