@@ -2,7 +2,7 @@
 import React from 'react';
 import { useAuth } from '@/context/auth';
 import { Button } from '@/components/ui/button';
-import { LogOut, User as UserIcon } from 'lucide-react';
+import { LogOut, User as UserIcon, Settings } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/hooks/use-toast';
 import { performLogout } from '@/utils/authUtils';
@@ -35,13 +35,21 @@ const UserMenu: React.FC = () => {
       });
     }
   };
+  
+  const goToSettings = () => {
+    navigate('/settings');
+  };
 
   if (!currentUser) return null;
 
   return (
     <div className="p-4 border-t border-gray-200 dark:border-gray-700 mt-auto">
       <div className="flex items-center justify-between mb-2">
-        <div className="flex items-center space-x-2">
+        <div 
+          className="flex items-center space-x-2 cursor-pointer hover:opacity-80 transition-opacity" 
+          onClick={goToSettings}
+          title="Ir para configurações"
+        >
           {currentUser.profileImage ? (
             <img
               src={currentUser.profileImage}

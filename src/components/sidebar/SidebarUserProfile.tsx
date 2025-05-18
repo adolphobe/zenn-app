@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { LogOut, User } from 'lucide-react';
+import { LogOut, User, Settings } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -41,13 +41,21 @@ const SidebarUserProfile: React.FC<SidebarUserProfileProps> = ({ sidebarOpen }) 
       });
     }
   };
+  
+  const goToSettings = () => {
+    navigate('/settings');
+  };
 
   return (
     <div className="mt-auto">
       <Separator className="mb-4" />
       <div className={`px-4 pb-4 ${sidebarOpen ? 'space-y-2' : 'flex flex-col items-center'}`}>
         {/* User profile with online indicator */}
-        <div className={`flex ${sidebarOpen ? 'items-start gap-3' : 'justify-center'}`}>
+        <div 
+          className={`flex ${sidebarOpen ? 'items-start gap-3' : 'justify-center'} cursor-pointer hover:opacity-80`}
+          onClick={goToSettings}
+          title="Ir para configurações"
+        >
           <div className="relative">
             <Avatar className={`${sidebarOpen ? 'h-12 w-12' : 'h-10 w-10'} border-2 border-white shadow-sm`}>
               <AvatarImage src={currentUser?.profileImage} />
@@ -71,16 +79,31 @@ const SidebarUserProfile: React.FC<SidebarUserProfileProps> = ({ sidebarOpen }) 
           )}
         </div>
         
-        {/* Logout button */}
-        <Button 
-          variant="outline"
-          size={sidebarOpen ? "default" : "icon"}
-          className={`mt-2 w-full border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 dark:border-red-900 dark:text-red-400 dark:hover:bg-red-950/20 dark:hover:text-red-300`}
-          onClick={handleLogout}
-        >
-          <LogOut size={18} />
-          {sidebarOpen && <span className="ml-2">Sair</span>}
-        </Button>
+        <div className="flex gap-2 mt-2">
+          {/* Settings button */}
+          {sidebarOpen && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex-1"
+              onClick={goToSettings}
+            >
+              <Settings size={18} className="mr-1" />
+              Configurar
+            </Button>
+          )}
+          
+          {/* Logout button */}
+          <Button 
+            variant="outline"
+            size={sidebarOpen ? "sm" : "icon"}
+            className={`${sidebarOpen ? 'flex-1' : 'w-full'} border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 dark:border-red-900 dark:text-red-400 dark:hover:bg-red-950/20 dark:hover:text-red-300`}
+            onClick={handleLogout}
+          >
+            <LogOut size={18} />
+            {sidebarOpen && <span className="ml-1">Sair</span>}
+          </Button>
+        </div>
       </div>
     </div>
   );

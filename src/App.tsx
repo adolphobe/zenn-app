@@ -16,6 +16,7 @@ import TaskHistory from './pages/TaskHistory';
 import StrategicReview from './pages/StrategicReview';
 import Dashboard2 from './components/Dashboard2';
 import ResetPassword from './pages/ResetPassword';
+import Settings from './pages/Settings';
 
 function App() {
   return (
@@ -34,6 +35,7 @@ function App() {
                   <Route path="/dashboard2" element={<Dashboard2 />} />
                   <Route path="/task-history" element={<TaskHistory />} />
                   <Route path="/strategic-review" element={<StrategicReview />} />
+                  <Route path="/settings" element={<Settings />} />
                 </Route>
                 <Route path="*" element={<NotFound />} />
               </Routes>
