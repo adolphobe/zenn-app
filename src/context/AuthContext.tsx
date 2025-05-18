@@ -91,6 +91,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     console.log("[AuthProvider] Inicializando estado de autenticação");
     console.log("[AuthProvider] DETALHES EM PORTUGUÊS: Verificando se existe uma sessão ativa");
     
+    // Check for logout in progress flag and clear it if it exists on page load
+    // This handles cases where the page was refreshed during logout
+    const logoutInProgress = localStorage.getItem('logout_in_progress');
+    if (logoutInProgress === 'true') {
+      console.log("[AuthProvider] Detectada flag de logout em andamento ao inicializar, limpando");
+      localStorage.removeItem('logout_in_progress');
+    }
+    
     // First check for existing session to set initial state
     const checkInitialSession = async () => {
       try {

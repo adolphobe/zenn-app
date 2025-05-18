@@ -15,7 +15,10 @@ export const PrivateRoute = () => {
   const location = useLocation();
   const { isOpen: sidebarOpen, open: openSidebar, isMobile } = useSidebar();
 
-  console.log(`[PrivateRoute] Verificando autenticação em ${location.pathname}, isAuthenticated: ${isAuthenticated}, isLoading: ${isLoading}`);
+  // Check if a logout is in progress to prevent login/logout loops
+  const logoutInProgress = localStorage.getItem('logout_in_progress') === 'true';
+
+  console.log(`[PrivateRoute] Verificando autenticação em ${location.pathname}, isAuthenticated: ${isAuthenticated}, isLoading: ${isLoading}, logoutInProgress: ${logoutInProgress}`);
   console.log(`[PrivateRoute] DETALHES EM PORTUGUÊS: Verificando se o usuário está autenticado para acessar a rota ${location.pathname}`);
 
   // Show loading state while checking authentication
@@ -28,11 +31,27 @@ export const PrivateRoute = () => {
   }
 
   // Log auth status and redirect if not authenticated
-  if (!isAuthenticated) {
-    console.error(`[PrivateRoute] ERRO DE AUTENTICAÇÃO: Usuário não autenticado em ${location.pathname}`);
+  if (!isAuthenticated || logoutInProgress) {
+    const reason = !isAuthenticated ? "não autenticado" : "logout em andamento";
+    console.error(`[PrivateRoute] ERRO DE AUTENTICAÇÃO: Usuário ${reason} em ${location.pathname}`);
     console.error("[PrivateRoute] DETALHES TÉCNICOS: Redirecionando para /login");
     console.error("[PrivateRoute] DETALHES EM PORTUGUÊS: Você não está logado e tentou acessar uma página protegida. Redirecionando para a página de login.");
     console.error("[PrivateRoute] ESTADO DE AUTENTICAÇÃO:", { isAuthenticated, isLoading, path: location.pathname });
+    
+    // Clear any lingering session data if we detect a logout in progress
+    if (logoutInProgress) {
+      localStorage.removeItem('sb-wbvxnapruffchikhrqrs-auth-token');
+      localStorage.removeItem('supabase.auth.token');
+      
+      // Return a redirect to login with current location stored for later redirect back
+      // Add a timestamp to avoid caching issues
+      return <Navigate to={`/login?loggedOut=true&_=${new Date().getTime()}`} state={{ 
+        from: location,
+        loggedOut: true,
+        timestamp: new Date().getTime(),
+        forceClear: true
+      }} replace />;
+    }
     
     // Return a redirect to login with current location stored for later redirect back
     return <Navigate to="/login" state={{ from: location }} replace />;

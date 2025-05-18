@@ -5,8 +5,9 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { useNavigate } from 'react-router-dom';
-import { toast } from '@/hooks/use-toast';
 import { useAuth } from '@/context/AuthContext';
+import { toast } from '@/hooks/use-toast';
+import { performLogout } from '@/utils/authUtils';
 
 interface SidebarUserProfileProps {
   sidebarOpen: boolean;
@@ -14,11 +15,11 @@ interface SidebarUserProfileProps {
 
 const SidebarUserProfile: React.FC<SidebarUserProfileProps> = ({ sidebarOpen }) => {
   const navigate = useNavigate();
-  const { currentUser, logout } = useAuth();
+  const { currentUser } = useAuth();
 
   const handleLogout = async () => {
     try {
-      console.log("[SidebarUserProfile] Iniciando processo completo de logout");
+      console.log("[SidebarUserProfile] Iniciando processo de logout");
       
       // Prevent any navigation while logout is in progress
       const inProgress = localStorage.getItem('logout_in_progress');
@@ -26,47 +27,12 @@ const SidebarUserProfile: React.FC<SidebarUserProfileProps> = ({ sidebarOpen }) 
         console.log("[SidebarUserProfile] Logout já em andamento, ignorando nova solicitação");
         return;
       }
-
-      // Set logout flag
-      localStorage.setItem('logout_in_progress', 'true');
       
-      // Force clear local storage first
-      localStorage.removeItem('sb-wbvxnapruffchikhrqrs-auth-token');
-      localStorage.removeItem('supabase.auth.token');
+      // Use the centralized logout function
+      await performLogout(navigate);
       
-      toast({
-        title: "Logout em andamento",
-        description: "Encerrando sua sessão...",
-      });
-      
-      // Call the AuthContext logout function
-      await logout();
-      
-      // Clear logout flag
-      localStorage.removeItem('logout_in_progress');
-      
-      console.log("[SidebarUserProfile] DETALHES EM PORTUGUÊS: Logout realizado com sucesso, redirecionando para página de login");
-      
-      toast({
-        title: "Logout realizado",
-        description: "Você foi desconectado com sucesso",
-      });
-      
-      // Navigate to login page after a small delay to ensure logout is complete
-      setTimeout(() => {
-        navigate('/login', { 
-          state: { 
-            loggedOut: true,
-            timestamp: new Date().getTime() // Add timestamp to prevent caching issues
-          } 
-        });
-      }, 500);
     } catch (error) {
-      // Clear logout flag on error
-      localStorage.removeItem('logout_in_progress');
-      
       console.error("[SidebarUserProfile] Erro durante logout:", error);
-      console.error("[SidebarUserProfile] DETALHES EM PORTUGUÊS: Ocorreu um erro ao tentar deslogar do sistema");
       
       toast({
         title: "Erro ao sair",

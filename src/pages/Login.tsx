@@ -22,6 +22,7 @@ const Login: React.FC = () => {
     const params = new URLSearchParams(location.search);
     const loggedOutFromUrl = params.get('loggedOut') === 'true';
     const loggedOutFromState = location.state?.loggedOut === true;
+    const forceClear = location.state?.forceClear === true;
     
     if (loggedOutFromUrl || loggedOutFromState) {
       console.log("[Login] Usuário acabou de deslogar conforme indicado por parâmetro");
@@ -31,10 +32,17 @@ const Login: React.FC = () => {
       // Clear any lingering logout flags
       localStorage.removeItem('logout_in_progress');
       
+      // Force clear any remaining auth tokens if flagged
+      if (forceClear) {
+        console.log("[Login] Limpando tokens de autenticação que podem ter persistido");
+        localStorage.removeItem('sb-wbvxnapruffchikhrqrs-auth-token');
+        localStorage.removeItem('supabase.auth.token');
+      }
+      
       // Reset the flag after a delay to allow re-login
       setTimeout(() => {
         setIsJustLoggedOut(false);
-      }, 1000);
+      }, 800);
     }
   }, [location]);
   
@@ -55,7 +63,7 @@ const Login: React.FC = () => {
       
       // Add a small delay before redirect to prevent loops
       const redirectTimer = setTimeout(() => {
-        navigate(from);
+        navigate(from, { replace: true });
       }, 200);
       
       return () => clearTimeout(redirectTimer);
@@ -81,7 +89,6 @@ const Login: React.FC = () => {
         <div className="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 mb-4 max-w-lg">
           <p className="font-bold">Já Autenticado</p>
           <p>Você já está logado. Redirecionando para {from.replace("/", "")}...</p>
-          <p className="mt-2 text-sm">Verifique o console para detalhes técnicos.</p>
         </div>
         
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mt-4"></div>
@@ -175,7 +182,7 @@ const Login: React.FC = () => {
               onSuccess={() => {
                 console.log("[Login] Login bem-sucedido, redirecionando para: ", from);
                 console.log("[Login] DETALHES EM PORTUGUÊS: Login realizado com sucesso, redirecionando automaticamente");
-                navigate(from);
+                navigate(from, { replace: true });
               }} 
             />
           )}

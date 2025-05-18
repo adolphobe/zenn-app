@@ -5,15 +5,16 @@ import { Button } from '@/components/ui/button';
 import { LogOut, User as UserIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/hooks/use-toast';
+import { performLogout } from '@/utils/authUtils';
 
 const UserMenu: React.FC = () => {
-  const { currentUser, logout } = useAuth();
+  const { currentUser } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
     try {
       // Log the logout attempt
-      console.log("[UserMenu] Iniciando processo completo de logout");
+      console.log("[UserMenu] Iniciando processo de logout");
       
       // Prevent any navigation while logout is in progress
       const inProgress = localStorage.getItem('logout_in_progress');
@@ -21,48 +22,12 @@ const UserMenu: React.FC = () => {
         console.log("[UserMenu] Logout já em andamento, ignorando nova solicitação");
         return;
       }
-
-      // Set logout flag
-      localStorage.setItem('logout_in_progress', 'true');
       
-      // Force clear local storage first
-      localStorage.removeItem('sb-wbvxnapruffchikhrqrs-auth-token');
-      localStorage.removeItem('supabase.auth.token');
+      // Use the centralized logout function
+      await performLogout(navigate);
       
-      toast({
-        title: "Logout em andamento",
-        description: "Encerrando sua sessão...",
-      });
-      
-      // Call the AuthContext logout function
-      await logout();
-      
-      // Clear logout flag
-      localStorage.removeItem('logout_in_progress');
-      
-      toast({
-        title: "Logout realizado",
-        description: "Você foi desconectado com sucesso",
-      });
-      
-      console.log("[UserMenu] DETALHES EM PORTUGUÊS: Logout realizado com sucesso, redirecionando para página de login");
-      
-      // Navigate to login page after a delay to ensure logout is complete
-      setTimeout(() => {
-        navigate('/login', { 
-          state: { 
-            loggedOut: true,
-            timestamp: new Date().getTime() // Add timestamp to prevent caching issues
-          } 
-        });
-      }, 500);
     } catch (error) {
-      // Clear logout flag on error
-      localStorage.removeItem('logout_in_progress');
-      
       console.error("[UserMenu] Erro ao fazer logout:", error);
-      console.error("[UserMenu] DETALHES EM PORTUGUÊS: Ocorreu um erro ao tentar deslogar do sistema");
-      
       toast({
         title: "Erro ao sair",
         description: "Não foi possível fazer logout",
