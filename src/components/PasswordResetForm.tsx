@@ -13,6 +13,9 @@ import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { processAuthError } from '@/utils/authErrorUtils';
 
+// Production URL for password reset
+const RESET_PASSWORD_URL = "https://zenn-app.lovable.app/reset-password";
+
 const resetSchema = z.object({
   email: z.string().email("Digite um e-mail válido"),
 });
@@ -46,7 +49,7 @@ const PasswordResetForm: React.FC<PasswordResetFormProps> = ({ onCancel, onReset
       console.log("[PasswordReset] DETALHES EM PORTUGUÊS: Iniciando processo de redefinição de senha");
       
       const { error } = await supabase.auth.resetPasswordForEmail(values.email, {
-        redirectTo: window.location.origin + '/reset-password',
+        redirectTo: RESET_PASSWORD_URL,
       });
       
       if (error) {

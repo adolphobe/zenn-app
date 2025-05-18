@@ -3,6 +3,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { processAuthError } from '@/utils/authErrorUtils';
 
+// Production URL for password reset
+const RESET_PASSWORD_URL = "https://zenn-app.lovable.app/reset-password";
+
 // Send password reset email
 export const sendPasswordResetEmail = async (email: string): Promise<{ success: boolean, error?: any }> => {
   try {
@@ -10,7 +13,7 @@ export const sendPasswordResetEmail = async (email: string): Promise<{ success: 
     console.log("[AuthService] DETALHES EM PORTUGUÊS: Enviando email de recuperação de senha");
     
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: window.location.origin + '/reset-password',
+      redirectTo: RESET_PASSWORD_URL,
     });
     
     if (error) {
