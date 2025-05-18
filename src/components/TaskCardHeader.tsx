@@ -141,7 +141,7 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
               {taskIsOverdue && (
                 <Bell size={14} className="text-red-400 mr-1" />
               )}
-              {formatDate(parsedDate, dateDisplayOptions)}
+              {formatDate(parsedDate!, dateDisplayOptions)}
             </div>
           )}
           {shouldShowScore && (

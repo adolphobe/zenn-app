@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '@/context/AppContext';
 import { useTaskDataContext } from '@/context/TaskDataProvider'; // Use the new context
@@ -158,7 +157,7 @@ const Dashboard: React.FC = () => {
     );
   }
   
-  // Enhanced animation variants for task cards
+  // Enhanced animation variants for task cards - updated to be more subtle
   const taskVariants = {
     hidden: { 
       opacity: 0,
@@ -266,8 +265,6 @@ const Dashboard: React.FC = () => {
                             animate="visible"
                             exit="exit"
                             variants={taskVariants}
-                            layout
-                            layoutId={`task-container-${task.id}`}
                           >
                             <TaskCard 
                               key={task.id} 
@@ -284,7 +281,7 @@ const Dashboard: React.FC = () => {
               </div>
             )}
 
-            {/* Non-overdue tasks with improved animations */}
+            {/* Non-overdue tasks with improved animations - removed layout animations */}
             <AnimatePresence initial={false} mode="popLayout">
               {sortedNonOverdueTasks.map(task => (
                 <motion.div
@@ -293,8 +290,6 @@ const Dashboard: React.FC = () => {
                   animate="visible"
                   exit="exit"
                   variants={taskVariants}
-                  layout
-                  layoutId={`task-container-${task.id}`}
                 >
                   <TaskCard 
                     task={task} 
