@@ -1,3 +1,4 @@
+
 export interface Task {
   id: string;
   title: string;
@@ -23,10 +24,15 @@ export interface Comment {
 
 export interface TaskFormData {
   title: string;
+  description?: string;
   consequenceScore: number;
   prideScore: number;
   constructionScore: number;
   idealDate?: Date | null;
+  completedAt?: string;
+  feedback?: 'transformed' | 'relief' | 'obligation';
+  pillar?: string;
+  date?: string;
 }
 
 export type ViewMode = 'power' | 'chronological' | 'strategic';
@@ -54,4 +60,3 @@ export interface AppState {
     chronological: SortOption;
   };
 }
-

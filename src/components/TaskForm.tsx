@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { Task } from '../types';
-import { TaskFormData } from '../context/types';
+import { TaskFormData } from '../types';  // Importar diretamente do arquivo types.ts principal
 import TaskFormTabs from './TaskFormTabs';
 import TaskFormActions from './TaskFormActions';
 import { X } from 'lucide-react';

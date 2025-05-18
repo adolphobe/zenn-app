@@ -1,5 +1,5 @@
 
-import { Task, DateDisplayOptions, ViewMode, SortOption } from '../types';
+import { Task, DateDisplayOptions, ViewMode, SortOption, TaskFormData as BaseTaskFormData } from '../types';
 import { Dispatch } from 'react';
 
 // Define ViewModeSettings to store mode-specific settings
@@ -70,11 +70,11 @@ export interface AppContextType {
   dispatch: AppDispatch;
   
   // Task actions
-  addTask: (task: TaskFormData) => void;
+  addTask: (task: BaseTaskFormData) => void;
   deleteTask: (id: string) => void;
   toggleTaskCompleted: (id: string) => void;
   toggleTaskHidden: (id: string) => void;
-  updateTask: (id: string, data: Partial<TaskFormData>) => void;
+  updateTask: (id: string, data: Partial<BaseTaskFormData>) => void;
   updateTaskTitle: (id: string, title: string) => void;
   setTaskFeedback: (id: string, feedback: 'transformed' | 'relief' | 'obligation') => void;
   restoreTask: (id: string) => void;
@@ -94,18 +94,8 @@ export interface AppContextType {
   setSortOptions: (options: SortOptionsUpdate) => void;
 }
 
-export type TaskFormData = {
-  title: string;
-  description?: string;
-  completedAt?: string;
-  feedback?: 'transformed' | 'relief' | 'obligation';
-  pillar?: string;
-  date?: string;
-  consequenceScore?: number;
-  prideScore?: number;
-  constructionScore?: number;
-  idealDate?: Date | null;
-};
+// Reuse TaskFormData from main types file
+export type TaskFormData = BaseTaskFormData;
 
 export type SortOptionsUpdate = {
   [key in 'power' | 'chronological']?: {
