@@ -63,6 +63,9 @@ export function useLoginForm(onSuccess?: () => void) {
     const values = form.getValues();
     setFormSubmitted(true);
     
+    console.log("[LoginForm] Formulário válido, processando submit");
+    console.log("[LoginForm] Form foi submetido:", true);
+    
     // 1. Limpar erros anteriores somente se não estamos resubmetendo com erro existente
     if (!loginError) {
       setLoginError(null);
@@ -97,6 +100,10 @@ export function useLoginForm(onSuccess?: () => void) {
       } else {
         console.log("[LoginForm] Login bem-sucedido para:", values.email);
         console.log("[LoginForm] DETALHES EM PORTUGUÊS: Login realizado com sucesso, redirecionando automaticamente");
+        
+        // Limpar qualquer erro anterior em caso de sucesso
+        setLoginError(null);
+        setLoginSuggestion(null);
         
         toast({
           title: "Login realizado com sucesso",

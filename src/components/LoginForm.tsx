@@ -26,22 +26,23 @@ const LoginForm: React.FC<LoginFormProps> = ({
     console.log("[LoginForm Component] Recebendo sugestão:", loginSuggestion);
   }, [loginError, loginSuggestion]);
 
-  // Manipular o submit do formulário para prevenir o comportamento padrão
-  const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault(); // Impedir o refresh da página
-    onSubmit(e);
-  };
-
   return (
     <Form {...form}>
-      <form ref={formRef} onSubmit={handleFormSubmit} className="space-y-6">
-        {/* Garantir que a mensagem de erro seja exibida com alta prioridade */}
-        {loginError && (
-          <LoginErrorDisplay 
-            error={loginError} 
-            suggestion={loginSuggestion} 
-          />
-        )}
+      {/* 
+        Importante: 
+        1. Usar onSubmit diretamente do useLoginForm 
+        2. Não adicionar onSubmit diretamente no form element nativo
+      */}
+      <form ref={formRef} onSubmit={onSubmit} className="space-y-6">
+        {/* Garantir que a mensagem de erro seja exibida com alta prioridade e local fixo */}
+        <div className="min-h-[80px]">  {/* Altura fixa para evitar saltos no layout */}
+          {loginError && (
+            <LoginErrorDisplay 
+              error={loginError} 
+              suggestion={loginSuggestion} 
+            />
+          )}
+        </div>
         
         <LoginFormFields form={form} />
 

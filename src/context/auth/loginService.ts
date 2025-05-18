@@ -38,10 +38,8 @@ export const login = async (email: string, password: string): Promise<{ success:
     console.log("[AuthService] Login bem-sucedido:", data.user?.email);
     console.log("[AuthService] DETALHES EM PORTUGUÊS: Login realizado com sucesso");
     
-    toast({
-      title: "Login realizado com sucesso",
-      description: "Bem-vindo de volta!",
-    });
+    // Não exibir toast de sucesso aqui, pois a página será redirecionada
+    // Isso evita flash de mensagens
     
     return { success: true, user: data.user, session: data.session };
   } catch (error: any) {
@@ -50,6 +48,7 @@ export const login = async (email: string, password: string): Promise<{ success:
     
     const errorDetails = processAuthError(error);
     
+    // Exibir toast apenas para erros técnicos/inesperados
     toast({
       title: "Erro no login",
       description: errorDetails.message,
