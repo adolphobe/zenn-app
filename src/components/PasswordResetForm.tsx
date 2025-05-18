@@ -151,7 +151,7 @@ const PasswordResetForm: React.FC<PasswordResetFormProps> = ({ onCancel, onReset
           <Button 
             type="button" 
             variant="outline"
-            className="w-full h-12 text-base transition-all duration-300 border-[#cfcfcf] hover:bg-[#fbfbfb] hover:text-gray-800"
+            className="w-full h-12 text-base transition-all duration-300 border-[#eee] hover:border-[#cfcfcf] hover:bg-[#fbfbfb] hover:text-gray-800"
             onClick={onCancel}
             disabled={isLoading}
           >
