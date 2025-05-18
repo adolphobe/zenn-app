@@ -1,7 +1,8 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { Task, TaskFormData } from '@/types';
 
-// Função auxiliar para mapear a resposta do Supabase para o formato Task
+// Helper function to map the response from Supabase to the Task type
 const mapToTask = (data: any): Task => ({
   id: data.id,
   title: data.title,
@@ -19,7 +20,33 @@ const mapToTask = (data: any): Task => ({
   comments: data.comments || []
 });
 
+/**
+ * Validates that a task ID exists in the database
+ * Returns the task if found, throws an error if not
+ */
+const validateTaskExists = async (taskId: string): Promise<any> => {
+  if (!taskId) throw new Error('Task ID is required');
+  
+  const { data, error } = await supabase
+    .from('tasks')
+    .select('id')
+    .eq('id', taskId)
+    .single();
+    
+  if (error || !data) {
+    console.error('Task validation error:', error || 'Task not found');
+    throw new Error(`Task with ID ${taskId} not found`);
+  }
+  
+  return data;
+};
+
+/**
+ * Fetches tasks from the database with error handling and validation
+ */
 export const fetchTasks = async (userId: string, completed: boolean = false): Promise<Task[]> => {
+  if (!userId) throw new Error('User ID is required');
+  
   const { data, error } = await supabase
     .from('tasks')
     .select(`
@@ -38,7 +65,13 @@ export const fetchTasks = async (userId: string, completed: boolean = false): Pr
   return (data || []).map(mapToTask);
 };
 
+/**
+ * Creates a new task with validation and error handling
+ */
 export const createTask = async (taskData: TaskFormData, userId: string): Promise<Task> => {
+  if (!userId) throw new Error('User ID is required');
+  if (!taskData.title) throw new Error('Task title is required');
+
   const totalScore = (taskData.consequenceScore || 0) + 
                     (taskData.prideScore || 0) + 
                     (taskData.constructionScore || 0);
@@ -79,8 +112,23 @@ export const createTask = async (taskData: TaskFormData, userId: string): Promis
   return mapToTask({...data, comments: []});
 };
 
+/**
+ * Updates a task with validation and error handling
+ */
 export const updateTask = async (id: string, taskData: Partial<TaskFormData>): Promise<Task> => {
-  let updateData: Record<string, any> = { ...taskData };
+  // First validate the task exists
+  await validateTaskExists(id);
+  
+  let updateData: Record<string, any> = {};
+  
+  // Map task data fields to database fields
+  if (taskData.title !== undefined) updateData.title = taskData.title;
+  if (taskData.consequenceScore !== undefined) updateData.consequence_score = taskData.consequenceScore;
+  if (taskData.prideScore !== undefined) updateData.pride_score = taskData.prideScore;
+  if (taskData.constructionScore !== undefined) updateData.construction_score = taskData.constructionScore;
+  if (taskData.idealDate !== undefined) {
+    updateData.ideal_date = taskData.idealDate ? new Date(taskData.idealDate).toISOString() : null;
+  }
   
   // Calculate total score if any score component is updated
   if (taskData.consequenceScore !== undefined || taskData.prideScore !== undefined || taskData.constructionScore !== undefined) {
@@ -110,11 +158,6 @@ export const updateTask = async (id: string, taskData: Partial<TaskFormData>): P
       ).name;
     }
   }
-  
-  // Format idealDate if it exists
-  if (taskData.idealDate) {
-    updateData.ideal_date = new Date(taskData.idealDate).toISOString();
-  }
 
   const { data, error } = await supabase
     .from('tasks')
@@ -134,7 +177,13 @@ export const updateTask = async (id: string, taskData: Partial<TaskFormData>): P
   return mapToTask(data);
 };
 
+/**
+ * Deletes a task with validation and error handling
+ */
 export const deleteTask = async (id: string): Promise<void> => {
+  // First validate the task exists
+  await validateTaskExists(id);
+  
   const { error } = await supabase
     .from('tasks')
     .delete()
@@ -146,7 +195,13 @@ export const deleteTask = async (id: string): Promise<void> => {
   }
 };
 
+/**
+ * Toggles a task's completion status with validation and error handling
+ */
 export const toggleTaskCompletion = async (id: string, currentStatus: boolean): Promise<Task> => {
+  // First validate the task exists
+  await validateTaskExists(id);
+  
   const completionData = currentStatus ? 
     { completed: false, completed_at: null } : 
     { completed: true, completed_at: new Date().toISOString() };
@@ -169,58 +224,58 @@ export const toggleTaskCompletion = async (id: string, currentStatus: boolean): 
   return mapToTask(data);
 };
 
+/**
+ * Toggles a task's hidden status with validation and error handling
+ */
 export const toggleTaskHidden = async (id: string): Promise<Task> => {
-  console.log(`Verificando e atualizando tarefa com ID ${id}`);
+  // First validate the task exists
+  const existingTask = await validateTaskExists(id);
   
-  try {
-    // First fetch the current state to ensure it exists and to get accurate hidden status
-    const { data: existingTask, error: fetchError } = await supabase
-      .from('tasks')
-      .select('id, hidden')
-      .eq('id', id)
-      .single();
+  if (!existingTask) {
+    throw new Error(`Tarefa com ID ${id} não foi encontrada no banco de dados`);
+  }
+  
+  // Fetch current hidden status
+  const { data: taskData, error: fetchError } = await supabase
+    .from('tasks')
+    .select('hidden')
+    .eq('id', id)
+    .single();
     
-    if (fetchError) {
-      console.error(`Erro ao buscar tarefa ${id}:`, fetchError);
-      throw new Error(`Não foi possível encontrar a tarefa: ${fetchError.message}`);
-    }
-    
-    if (!existingTask) {
-      console.error(`Tarefa com ID ${id} não existe no banco de dados`);
-      throw new Error(`Tarefa com ID ${id} não foi encontrada no banco de dados`);
-    }
-    
-    console.log(`Tarefa encontrada: ${existingTask.id}, estado atual hidden: ${existingTask.hidden}`);
-    
-    // Now update with the confirmed current state
-    const { data, error } = await supabase
-      .from('tasks')
-      .update({ hidden: !existingTask.hidden })
-      .eq('id', id)
-      .select(`
-        *,
-        comments:task_comments(*)
-      `)
-      .single();
+  if (fetchError || !taskData) {
+    console.error('Error fetching task hidden status:', fetchError || 'Task not found');
+    throw new Error('Could not determine current task visibility status');
+  }
+  
+  // Update with confirmed current state
+  const { data, error } = await supabase
+    .from('tasks')
+    .update({ hidden: !taskData.hidden })
+    .eq('id', id)
+    .select(`
+      *,
+      comments:task_comments(*)
+    `)
+    .single();
 
-    if (error) {
-      console.error('Erro ao alterar visibilidade da tarefa:', error);
-      throw error;
-    }
-
-    console.log('Tarefa atualizada com sucesso:', data);
-
-    return mapToTask(data);
-  } catch (error) {
-    console.error(`Falha ao processar alteração de visibilidade para tarefa ${id}:`, error);
+  if (error) {
+    console.error('Error toggling task hidden status:', error);
     throw error;
   }
+
+  return mapToTask(data);
 };
 
+/**
+ * Sets a task's feedback with validation and error handling
+ */
 export const setTaskFeedback = async (
   id: string, 
   feedback: 'transformed' | 'relief' | 'obligation'
 ): Promise<Task> => {
+  // First validate the task exists
+  await validateTaskExists(id);
+  
   const { data, error } = await supabase
     .from('tasks')
     .update({ feedback })
@@ -239,7 +294,16 @@ export const setTaskFeedback = async (
   return mapToTask(data);
 };
 
+/**
+ * Adds a comment to a task with validation and error handling
+ */
 export const addComment = async (taskId: string, userId: string, text: string): Promise<any> => {
+  // First validate the task exists
+  await validateTaskExists(taskId);
+  
+  if (!userId) throw new Error('User ID is required');
+  if (!text) throw new Error('Comment text is required');
+  
   const { data, error } = await supabase
     .from('task_comments')
     .insert({
@@ -258,7 +322,12 @@ export const addComment = async (taskId: string, userId: string, text: string): 
   return data;
 };
 
+/**
+ * Deletes a comment with validation and error handling
+ */
 export const deleteComment = async (commentId: string): Promise<void> => {
+  if (!commentId) throw new Error('Comment ID is required');
+  
   const { error } = await supabase
     .from('task_comments')
     .delete()
@@ -270,7 +339,13 @@ export const deleteComment = async (commentId: string): Promise<void> => {
   }
 };
 
+/**
+ * Restores a completed task with validation and error handling
+ */
 export const restoreTask = async (id: string): Promise<Task> => {
+  // First validate the task exists
+  await validateTaskExists(id);
+  
   const { data, error } = await supabase
     .from('tasks')
     .update({

@@ -1,14 +1,13 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
-import { useAppContext } from '../context/AppContext';
 import { Task } from '../types';
-import { TaskFormData } from '../types';  // Importar diretamente do arquivo types.ts principal
+import { TaskFormData } from '../types';
 import TaskFormTabs from './TaskFormTabs';
 import TaskFormActions from './TaskFormActions';
 import { X } from 'lucide-react';
 import { AlwaysVisibleScrollArea } from '@/components/ui/always-visible-scroll-area';
 import { useTabNavigation } from '../context/hooks/useTabNavigation';
 import { useIsMobile } from '../hooks/use-mobile';
+import { useTaskDataContext } from '@/context/TaskDataProvider';
 
 interface TaskFormProps {
   onClose: () => void;
@@ -28,7 +27,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, initialData, taskId, task,
     idealDate: null
   });
   
-  const { addTask, updateTask } = useAppContext();
+  const { addTask, updateTask } = useTaskDataContext();
   const { activeTab, setActiveTab } = useTabNavigation('levels');
   const isMobile = useIsMobile();
 

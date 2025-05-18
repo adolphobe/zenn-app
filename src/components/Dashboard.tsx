@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '@/context/AppContext';
+import { useTaskDataContext } from '@/context/TaskDataProvider'; // Use the new context
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useAuth } from '@/context/auth';
 import TaskForm from './TaskForm';
@@ -14,8 +15,14 @@ import { Button } from './ui/button';
 import { toast } from '@/hooks/use-toast';
 
 const Dashboard: React.FC = () => {
-  const { state, syncTasksWithDatabase } = useAppContext();
-  const { tasks, viewMode, showHiddenTasks, sortOptions, syncStatus } = state;
+  const { state } = useAppContext();
+  const { viewMode, showHiddenTasks, sortOptions, syncStatus } = state;
+  const { 
+    tasks, 
+    isLoading: tasksLoading, 
+    forceSynchronize,
+    operationsLoading
+  } = useTaskDataContext(); // Use our new hook
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const isMobile = useIsMobile();
   const [isTaskFormOpen, setIsTaskFormOpen] = useState(false);
@@ -33,8 +40,7 @@ const Dashboard: React.FC = () => {
   
   // Set loading state based on tasks and auth loading
   useEffect(() => {
-    // Set initial loading state
-    if (authLoading) {
+    if (authLoading || tasksLoading) {
       setIsLoading(true);
     } else {
       // Small delay to avoid flicker for quick loads
@@ -44,7 +50,7 @@ const Dashboard: React.FC = () => {
       
       return () => clearTimeout(timer);
     }
-  }, [authLoading, tasks]);
+  }, [authLoading, tasksLoading, tasks]);
   
   useEffect(() => {
     // Update current time every minute to check for newly overdue tasks
@@ -68,7 +74,7 @@ const Dashboard: React.FC = () => {
     task => !task.completed && (shouldShowHiddenTasks || !task.hidden)
   );
   
-  // Primeiro separamos as tarefas em vencidas e não vencidas
+  // First separate overdue tasks from non-overdue tasks
   const overdueTasksChronological = viewMode === 'chronological'
     ? filteredTasks.filter(task => task.idealDate && isTaskOverdue(task.idealDate))
     : [];
@@ -77,7 +83,7 @@ const Dashboard: React.FC = () => {
     ? filteredTasks.filter(task => !task.idealDate || !isTaskOverdue(task.idealDate))
     : filteredTasks;
     
-  // Depois aplicamos a ordenação a cada grupo separadamente
+  // Apply sorting to each group separately
   const sortedOverdueTasks = viewMode === 'chronological'
     ? sortTasks(overdueTasksChronological, viewMode, sortOptions[viewMode])
     : [];
@@ -107,11 +113,23 @@ const Dashboard: React.FC = () => {
   };
   
   const handleSyncTasks = async () => {
-    if (syncStatus === 'syncing') return;
+    if (operationsLoading.update) return; // Don't sync if already updating
     
-    await syncTasksWithDatabase(true);
-    
-    // Toast is now managed in the syncTasksWithDatabase function
+    try {
+      await forceSynchronize();
+      
+      toast({
+        title: "Sincronização concluída",
+        description: "Suas tarefas foram sincronizadas com sucesso.",
+      });
+    } catch (error) {
+      console.error('Error synchronizing tasks:', error);
+      toast({
+        title: "Erro ao sincronizar",
+        description: "Não foi possível sincronizar suas tarefas. Tente novamente mais tarde.",
+        variant: "destructive",
+      });
+    }
   };
   
   if (isLoading || authLoading) {
@@ -152,12 +170,12 @@ const Dashboard: React.FC = () => {
                   variant="outline"
                   size="sm"
                   onClick={handleSyncTasks}
-                  disabled={syncStatus === 'syncing'}
+                  disabled={operationsLoading.update}
                   className={`flex items-center gap-1 ${
                     syncStatus === 'error' ? 'border-red-500 text-red-500 hover:bg-red-50' : ''
                   }`}
                 >
-                  {syncStatus === 'syncing' ? (
+                  {operationsLoading.update ? (
                     <Loader2 size={16} className="animate-spin" />
                   ) : syncStatus === 'error' ? (
                     <RefreshCw size={16} className="text-red-500" />
@@ -165,7 +183,7 @@ const Dashboard: React.FC = () => {
                     <RefreshCw size={16} className={syncStatus === 'synced' ? "text-green-500" : ""} />
                   )}
                   <span className="ml-1">
-                    {syncStatus === 'syncing' ? 'Sincronizando...' : 
+                    {operationsLoading.update ? 'Sincronizando...' : 
                      syncStatus === 'error' ? 'Tentar novamente' : 
                      syncStatus === 'synced' ? 'Sincronizado' : 'Sincronizar'}
                   </span>

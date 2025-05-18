@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Landing from './pages/Landing';
@@ -17,34 +16,51 @@ import StrategicReview from './pages/StrategicReview';
 import Dashboard2 from './components/Dashboard2';
 import ResetPassword from './pages/ResetPassword';
 import Settings from './pages/Settings';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { TaskDataProvider } from './context/TaskDataProvider';
+
+// Create a client
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 30000, // Consider data fresh for 30 seconds
+      retry: 1, // Retry failed queries once
+      refetchOnWindowFocus: true,
+    },
+  },
+});
 
 function App() {
   return (
-    <ThemeProvider defaultTheme="light" storageKey="acto-theme">
-      <AuthProvider>
-        <UserProvider>
-          <AppProvider>
-            <Router>
-              <Routes>
-                <Route path="/" element={<Landing />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/reset-password" element={<ResetPassword />} />
-                <Route path="/app" element={<ActoApp />} />
-                <Route element={<PrivateRoute />}>
-                  <Route path="/dashboard" element={<Dashboard />} />
-                  <Route path="/dashboard2" element={<Dashboard2 />} />
-                  <Route path="/task-history" element={<TaskHistory />} />
-                  <Route path="/strategic-review" element={<StrategicReview />} />
-                  <Route path="/settings" element={<Settings />} />
-                </Route>
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </Router>
-            <Toaster />
-          </AppProvider>
-        </UserProvider>
-      </AuthProvider>
-    </ThemeProvider>
+    <div className="App">
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
+          <Toaster />
+          <AuthProvider>
+            <AppProvider>
+              <TaskDataProvider>
+                <Router>
+                  <Routes>
+                    <Route path="/" element={<Landing />} />
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/reset-password" element={<ResetPassword />} />
+                    <Route path="/app" element={<ActoApp />} />
+                    <Route element={<PrivateRoute />}>
+                      <Route path="/dashboard" element={<Dashboard />} />
+                      <Route path="/dashboard2" element={<Dashboard2 />} />
+                      <Route path="/task-history" element={<TaskHistory />} />
+                      <Route path="/strategic-review" element={<StrategicReview />} />
+                      <Route path="/settings" element={<Settings />} />
+                    </Route>
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </Router>
+              </TaskDataProvider>
+            </AppProvider>
+          </AuthProvider>
+        </ThemeProvider>
+      </QueryClientProvider>
+    </div>
   );
 }
 
