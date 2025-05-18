@@ -2,16 +2,7 @@
 import * as React from "react"
 import { ToastContext } from "@/hooks/use-toast-context"
 import { v4 as uuidv4 } from "uuid"
-
-type ToastProps = {
-  id?: string
-  title?: React.ReactNode
-  description?: React.ReactNode
-  action?: React.ReactNode
-  variant?: "default" | "destructive"
-}
-
-type ToastActionElement = React.ReactElement
+import { ExtendedToastProps, ToastActionElement } from "@/types/toast"
 
 function useToast() {
   const context = React.useContext(ToastContext);
@@ -19,7 +10,7 @@ function useToast() {
   if (!context) {
     const toasts: any[] = [];
     
-    const addToast = (toast: ToastProps) => {
+    const addToast = (toast: ExtendedToastProps) => {
       // This is just a stub to prevent errors when useToast is imported directly
       console.log('Toast created in stub:', toast);
     };
@@ -28,7 +19,7 @@ function useToast() {
       // This is just a stub
     };
     
-    const updateToast = (id: string, toast: Partial<ToastProps>) => {
+    const updateToast = (id: string, toast: Partial<ExtendedToastProps>) => {
       // This is just a stub
     };
     
@@ -43,7 +34,7 @@ function useToast() {
   return context;
 }
 
-function toast(props: ToastProps) {
+function toast(props: ExtendedToastProps) {
   const { addToast } = useToast();
   // Ensure there is an ID by generating one if not provided
   addToast({
@@ -53,7 +44,7 @@ function toast(props: ToastProps) {
 }
 
 export {
-  type ToastProps,
+  type ExtendedToastProps as ToastProps,
   type ToastActionElement,
   useToast,
   toast,

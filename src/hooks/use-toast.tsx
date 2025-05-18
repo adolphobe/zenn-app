@@ -1,6 +1,6 @@
 
 import * as React from "react"
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { cn } from "@/lib/utils"
 import { v4 as uuidv4 } from "uuid"
 
@@ -13,12 +13,9 @@ import {
   ToastViewport,
 } from "@/components/ui/toast"
 
-import {
-  type ToastProps,
-  type ToastActionElement,
-} from "@/components/ui/use-toast"
+import { ExtendedToastProps, ToastActionElement } from "@/types/toast"
 
-type ToasterToastProps = ToastProps & {
+type ToasterToastProps = ExtendedToastProps & {
   id: string
   open: boolean
   promise: boolean
@@ -27,16 +24,16 @@ type ToasterToastProps = ToastProps & {
 // Create the context
 const ToastContext = React.createContext<{
   toasts: ToasterToastProps[];
-  addToast: (props: ToastProps) => void;
+  addToast: (props: ExtendedToastProps) => void;
   removeToast: (id: string) => void;
-  updateToast: (id: string, data: Partial<ToastProps>) => void;
+  updateToast: (id: string, data: Partial<ExtendedToastProps>) => void;
 } | null>(null);
 
 export function Toaster() {
   const [toasts, setToasts] = useState<ToasterToastProps[]>([])
 
   // Custom toast handler implementation
-  const addToast = React.useCallback((data: ToastProps) => {
+  const addToast = React.useCallback((data: ExtendedToastProps) => {
     const id = data.id || uuidv4()
     
     setToasts((prevToasts) => {
@@ -58,7 +55,7 @@ export function Toaster() {
     )
   }, [])
 
-  const updateToast = React.useCallback((id: string, data: Partial<ToastProps>) => {
+  const updateToast = React.useCallback((id: string, data: Partial<ExtendedToastProps>) => {
     setToasts((prevToasts) => 
       prevToasts.map((toast) => 
         toast.id === id ? { ...toast, ...data } : toast
@@ -75,11 +72,12 @@ export function Toaster() {
   }), [toasts, addToast, removeToast, updateToast])
 
   return (
-    <ToastProvider>
-      {toasts.map(function ({ id, title, description, action, ...props }) {
+    <ToastContext.Provider value={contextValue}>
+      {toasts.map(function ({ id, title, description, action, icon, ...props }) {
         return (
           <Toast key={id} {...props}>
             <div className="grid gap-1">
+              {icon && <span className="inline-flex mr-2">{icon}</span>}
               {title && <ToastTitle>{title}</ToastTitle>}
               {description && (
                 <ToastDescription>{description}</ToastDescription>
@@ -91,7 +89,7 @@ export function Toaster() {
         )
       })}
       <ToastViewport />
-    </ToastProvider>
+    </ToastContext.Provider>
   )
 }
 
@@ -103,12 +101,12 @@ export function useToast() {
   if (!context) {
     return {
       toasts: [],
-      addToast: (props: ToastProps) => {
+      addToast: (props: ExtendedToastProps) => {
         const id = props.id || uuidv4();
         console.log(`Toast created: ${id}`, props);
       },
       removeToast: (id: string) => {},
-      updateToast: (id: string, props: Partial<ToastProps>) => {},
+      updateToast: (id: string, props: Partial<ExtendedToastProps>) => {},
     };
   }
   
@@ -116,7 +114,7 @@ export function useToast() {
 }
 
 // Helper function for creating toasts
-export const toast = (props: ToastProps) => {
+export const toast = (props: ExtendedToastProps) => {
   // We have to create a dummy implementation for the toast function
   // that can be imported directly. In actual usage, components should
   // use the useToast hook instead
@@ -124,6 +122,6 @@ export const toast = (props: ToastProps) => {
 };
 
 export {
-  type ToastProps,
+  type ExtendedToastProps as ToastProps,
   type ToastActionElement,
 }

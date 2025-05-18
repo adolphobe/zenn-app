@@ -1,0 +1,42 @@
+
+/* Estilos para os cartões de tarefas com base no nível de prioridade */
+.task-card {
+  @apply relative border rounded-lg p-4 shadow-sm transition-all duration-300;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+}
+
+/* Estilos de cores para o modo Potência baseado na pontuação total */
+.task-critical {
+  @apply bg-acto-critical text-acto-critical-text border-red-300;
+}
+
+.task-important {
+  @apply bg-acto-important text-acto-important-text border-orange-300;
+}
+
+.task-moderate {
+  @apply bg-acto-moderate text-acto-moderate-text border-blue-300;
+}
+
+.task-light {
+  @apply bg-acto-light text-acto-light-text border-gray-300;
+}
+
+/* Animações para mostrar/ocultar tarefas */
+.task-card[data-animation-state="hiding"] {
+  animation: fadeOut 0.4s ease-in-out forwards;
+}
+
+.task-card[data-animation-state="showing"] {
+  animation: fadeIn 0.4s ease-in-out forwards;
+}
+
+.task-card[data-pending-update="true"] {
+  pointer-events: none;
+}
+
+/* Efeito de hover para cartões não animados */
+.task-card:not([data-pending-update="true"]):hover {
+  @apply shadow-md transform scale-[1.01];
+}

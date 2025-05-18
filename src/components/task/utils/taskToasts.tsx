@@ -4,6 +4,7 @@ import { toast } from '@/hooks/use-toast';
 import { v4 as uuidv4 } from 'uuid';
 import { Task } from '@/types';
 import { Eye, EyeOff, Check } from 'lucide-react';
+import { ToastProps } from '@/types/toast';
 
 // Create context for the toast functions
 type TaskToastContextType = {
@@ -24,7 +25,7 @@ export const TaskToastProvider = ({ children }: { children: ReactNode }) => {
       description: task.hidden 
         ? "A tarefa foi ocultada e só será visível com o filtro ativado." 
         : "A tarefa agora está visível.",
-      // Icon as separate JSX element to avoid type error
+      // Icon as separate JSX element now works with our extended type
       icon: task.hidden ? <EyeOff size={16} /> : <Eye size={16} />
     });
   };
@@ -35,7 +36,7 @@ export const TaskToastProvider = ({ children }: { children: ReactNode }) => {
       id: `task-completed-${task.id}-${Date.now()}`,
       title: "Tarefa concluída",
       description: `"${task.title}" foi marcada como concluída.`,
-      // Type-safe variant and use icon in separate element
+      // Type-safe variant and use icon with our extended type
       variant: "default",
       icon: <Check size={16} />
     });

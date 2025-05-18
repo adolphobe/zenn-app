@@ -10,6 +10,7 @@ import { useAppContext } from '@/context/AppContext';
 import { useTaskDataContext } from '@/context/TaskDataProvider';
 import { useTaskToasts } from './utils/taskToasts';
 import useTaskAnimations from '@/hooks/useTaskAnimations';
+import './task-card.css'; // Importamos o arquivo CSS
 
 interface TaskCardProps {
   task: Task;
@@ -37,7 +38,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
   
   // Apply priority class only in power mode
   const cardClass = viewMode === 'chronological' 
-    ? 'bg-white text-gray-800 border-gray-200' 
+    ? 'bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 border-gray-200 dark:border-gray-700' 
     : getTaskPriorityClass(task.totalScore);
   
   // Card expansion handler
@@ -58,7 +59,6 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
 
   const handleTitleBlur = () => {
     if (titleValue.trim() !== task.title) {
-      // Use updateTask instead of updateTaskTitle
       updateTask(task.id, { title: titleValue.trim() });
     }
     setIsEditingTitle(false);
@@ -67,7 +67,6 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
   const handleTitleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       if (titleValue.trim() !== task.title) {
-        // Use updateTask instead of updateTaskTitle
         updateTask(task.id, { title: titleValue.trim() });
       }
       setIsEditingTitle(false);
@@ -89,7 +88,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
   const handleToggleHidden = (e: React.MouseEvent) => {
     e.stopPropagation();
     toggleTaskHidden(task.id);
-    showToggleHiddenToast(task);
+    // O toast será mostrado pela mutação após a operação bem-sucedida
   };
 
   const handleEditTask = (e: React.MouseEvent) => {
