@@ -1,6 +1,8 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAppContext } from '../context/AppContext';
-import { TaskFormData, Task } from '../types';
+import { Task } from '../types';
+import { TaskFormData } from '../context/types';
 import TaskFormTabs from './TaskFormTabs';
 import TaskFormActions from './TaskFormActions';
 import { X } from 'lucide-react';
@@ -19,6 +21,7 @@ interface TaskFormProps {
 const TaskForm: React.FC<TaskFormProps> = ({ onClose, initialData, taskId, task, isEditing = false }) => {
   const [formData, setFormData] = useState<TaskFormData>(initialData || {
     title: '',
+    description: '',
     consequenceScore: 3,
     prideScore: 3,
     constructionScore: 3,

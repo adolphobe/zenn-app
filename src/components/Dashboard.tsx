@@ -11,6 +11,7 @@ import { useExpandedTask } from '@/context/hooks';
 import { Badge } from './ui/badge';
 import { Alert, AlertTitle, AlertDescription } from './ui/alert';
 import { Button } from './ui/button';
+import { toast } from '@/hooks/use-toast';
 
 const Dashboard: React.FC = () => {
   const { state, syncTasksWithDatabase } = useAppContext();

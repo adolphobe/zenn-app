@@ -1,3 +1,4 @@
+
 import { Task, DateDisplayOptions, ViewMode, SortOption } from '../types';
 import { Dispatch } from 'react';
 
@@ -95,14 +96,20 @@ export interface AppContextType {
 
 export type TaskFormData = {
   title: string;
-  description: string;
+  description?: string;
   completedAt?: string;
   feedback?: 'transformed' | 'relief' | 'obligation';
   pillar?: string;
   date?: string;
+  consequenceScore?: number;
+  prideScore?: number;
+  constructionScore?: number;
+  idealDate?: Date | null;
 };
 
 export type SortOptionsUpdate = {
-  power: SortOption;
-  chronological: SortOption;
+  [key in 'power' | 'chronological']?: {
+    sortDirection: 'asc' | 'desc';
+    noDateAtEnd?: boolean;
+  };
 };

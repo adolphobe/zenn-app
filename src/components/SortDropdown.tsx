@@ -22,7 +22,11 @@ const SortDropdown: React.FC = () => {
   const sortDirection = currentSortOptions.sortDirection;
   
   const handleSortDirectionChange = (direction: SortDirection) => {
-    setSortOptions({ sortDirection: direction });
+    setSortOptions({
+      [viewMode]: {
+        sortDirection: direction
+      }
+    });
   };
   
   return (

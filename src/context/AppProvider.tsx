@@ -1,7 +1,6 @@
-
 import React, { useReducer, useEffect, useCallback, useState } from 'react';
 import { AppContext } from './AppContext';
-import { AppContextType } from './types';
+import { AppContextType, SortOptionsUpdate } from './types';
 import { appReducer } from './appReducer';
 import { initialState } from './initialState';
 import * as taskActions from './tasks/taskActions';
