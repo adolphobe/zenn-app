@@ -1,4 +1,3 @@
-
 //src/components/TaskCard.tsx
 import React, { useState, useEffect, useRef } from 'react';
 import { Task } from '@/types';
@@ -87,13 +86,10 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
       setTimeout(() => {
         setShowBorderAnimation(false);
       }, 1200); // Animação dura 1.2 segundos
-      
-      // Usar o método do TaskDataProvider que tem atualização otimista
-      toggleTaskHidden(task.id);
-    } else {
-      // Para outras situações, apenas alternar a visibilidade
-      toggleTaskHidden(task.id);
     }
+    
+    // Usar o método do TaskDataProvider que tem atualização otimista
+    toggleTaskHidden(task.id);
   };
 
   const handleEditTask = (e: React.MouseEvent) => {

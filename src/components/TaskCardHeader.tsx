@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { formatDate, isTaskOverdue, safeParseDate } from '@/utils';
 import { DateDisplayOptions } from '@/types';
@@ -136,12 +135,12 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
         </div>
         
         <div className="flex items-center">
-          {idealDate && shouldShowDate && (
+          {idealDate && shouldShowDate && parsedDate && (
             <div className="text-xs text-right ml-3 flex items-center">
               {taskIsOverdue && (
                 <Bell size={14} className="text-red-400 mr-1" />
               )}
-              {formatDate(parsedDate!, dateDisplayOptions)}
+              {formatDate(parsedDate, dateDisplayOptions)}
             </div>
           )}
           {shouldShowScore && (

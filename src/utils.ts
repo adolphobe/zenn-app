@@ -215,4 +215,3 @@ export const isTaskOverdue = (date: Date | null): boolean => {
   const now = new Date();
   return date < now;
 };
-
