@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { PieChart, Pie, ResponsiveContainer, Cell, Tooltip } from 'recharts';
+import { PieChart, Pie, ResponsiveContainer, Cell, Tooltip, TooltipProps } from 'recharts';
 import { format, subMonths } from 'date-fns';
 import { Tooltip as UITooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
@@ -49,8 +49,17 @@ const calculatePieData = (data) => {
 
 const pieData = calculatePieData(chartData);
 
-// Custom tooltip component for pie chart
-const CustomTooltip = ({ active, payload }) => {
+// Custom tooltip component for pie chart with proper typing
+type CustomTooltipProps = {
+  active?: boolean;
+  payload?: Array<{
+    name: string;
+    value: number;
+    payload: any;
+  }>;
+};
+
+const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
   if (active && payload && payload.length) {
     return (
       <div className="bg-white p-2 shadow-md rounded-md border border-gray-100 text-xs">
