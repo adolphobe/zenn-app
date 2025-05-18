@@ -11,7 +11,6 @@ import { toast } from '@/hooks/use-toast';
 import { useAuth } from '@/context/auth';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { processAuthError } from '@/utils/authErrorUtils';
-import { InvalidLoginMessage } from './InvalidLoginMessage';
 
 const loginSchema = z.object({
   email: z.string().email("Digite um e-mail válido"),
@@ -117,12 +116,14 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onSwitchToSignup, onFo
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        {/* Render error message if there is one */}
+        {/* Mostramos o erro acima do campo de email */}
         {loginError && (
-          <InvalidLoginMessage 
-            message={loginError} 
-            suggestion={loginSuggestion} 
-          />
+          <div className="bg-red-50 text-red-700 px-3 py-2 rounded-md mb-2 animate-in fade-in slide-in-from-top-5 duration-300">
+            <p className="text-sm font-medium">{loginError}</p>
+            {loginSuggestion && (
+              <p className="text-xs mt-1">{loginSuggestion}</p>
+            )}
+          </div>
         )}
       
         <FormField
