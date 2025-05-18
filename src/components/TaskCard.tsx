@@ -1,4 +1,3 @@
-
 //src/components/TaskCard.tsx
 import React, { useState, useEffect } from 'react';
 import { Task } from '@/types';
@@ -66,8 +65,10 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
     setFeedbackModalOpen(true);
   };
 
+  // Handle toggle hidden
   const handleToggleHidden = (e: React.MouseEvent) => {
     e.stopPropagation();
+    console.log('Ocultar/Mostrar tarefa clicado:', task.id, 'Status atual:', task.hidden);
     toggleTaskHidden(task.id);
   };
 

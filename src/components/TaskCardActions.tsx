@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Eye, EyeOff, Edit2, CheckSquare, Trash2 } from 'lucide-react';
 import { Button } from './ui/button';
@@ -45,6 +46,7 @@ const TaskCardActions: React.FC<TaskCardActionsProps> = ({
             onClick={onToggleHidden}
             title={isHidden ? "Mostrar" : "Ocultar"}
             className={buttonStyles}
+            data-task-action="toggle-hidden"
           >
             {isHidden ? <Eye size={16} /> : <EyeOff size={16} />}
             <span className="ml-1">{isHidden ? "Mostrar" : "Ocultar"}</span>

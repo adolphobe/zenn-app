@@ -107,13 +107,25 @@ export const toggleTaskHidden = async (dispatch: AppDispatch, id: string) => {
     const tasks = taskStore ? JSON.parse(taskStore.getAttribute('data-tasks') || '[]') : [];
     const task = tasks.find((t: any) => t.id === id);
     
-    if (!task) return;
+    if (!task) {
+      console.error('Tarefa não encontrada no armazenamento local:', id);
+      return;
+    }
+    
+    console.log('Antes de chamar o serviço - Tarefa:', task);
     
     // Toggle in database
-    await toggleTaskHiddenService(id, task.hidden);
+    const updatedTask = await toggleTaskHiddenService(id, task.hidden);
+    console.log('Tarefa atualizada com sucesso:', updatedTask);
     
     // Update local state
     dispatch({ type: 'TOGGLE_TASK_HIDDEN', payload: id });
+    
+    toast({
+      id: uuidv4(),
+      title: task.hidden ? "Tarefa visível" : "Tarefa oculta",
+      description: task.hidden ? "A tarefa agora está visível." : "A tarefa foi ocultada.",
+    });
   } catch (error) {
     console.error('Error toggling task hidden status:', error);
     toast({

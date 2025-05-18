@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { Task, TaskFormData } from '@/types';
 
@@ -171,6 +170,8 @@ export const toggleTaskCompletion = async (id: string, currentStatus: boolean): 
 };
 
 export const toggleTaskHidden = async (id: string, currentStatus: boolean): Promise<Task> => {
+  console.log(`Tentando atualizar tarefa com ID ${id}, status atual hidden: ${currentStatus}`);
+  
   const { data, error } = await supabase
     .from('tasks')
     .update({ hidden: !currentStatus })
@@ -185,6 +186,8 @@ export const toggleTaskHidden = async (id: string, currentStatus: boolean): Prom
     console.error('Error toggling task hidden status:', error);
     throw error;
   }
+
+  console.log('Tarefa atualizada com sucesso:', data);
 
   return mapToTask(data);
 };
