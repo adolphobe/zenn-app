@@ -1,45 +1,42 @@
 
-/* Task card priority styles */
+/* Estilos para os cartões de tarefas com base no nível de prioridade */
+.task-card {
+  @apply relative border rounded-lg p-4 shadow-sm transition-all duration-300;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+}
+
+/* Estilos de cores para o modo Potência baseado na pontuação total */
 .task-critical {
-  @apply border-l-4 border-red-500 bg-gradient-to-br from-red-50 to-white dark:from-red-950/20 dark:to-gray-800;
+  @apply bg-acto-critical text-acto-critical-text border-red-300;
 }
 
 .task-important {
-  @apply border-l-4 border-orange-500 bg-gradient-to-br from-orange-50 to-white dark:from-orange-950/20 dark:to-gray-800;
+  @apply bg-acto-important text-acto-important-text border-orange-300;
 }
 
 .task-moderate {
-  @apply border-l-4 border-blue-500 bg-gradient-to-br from-blue-50 to-white dark:from-blue-950/20 dark:to-gray-800;
+  @apply bg-acto-moderate text-acto-moderate-text border-blue-300;
 }
 
 .task-light {
-  @apply border-l-4 border-gray-300 bg-gradient-to-br from-gray-50 to-white dark:from-gray-900/30 dark:to-gray-800;
+  @apply bg-acto-light text-acto-light-text border-gray-300;
 }
 
-/* Visibility animation states */
-.task-hiding {
-  animation: fade-out 0.4s ease-out forwards;
+/* Animações para mostrar/ocultar tarefas */
+.task-card[data-animation-state="hiding"] {
+  animation: fadeOut 0.4s ease-in-out forwards;
+}
+
+.task-card[data-animation-state="showing"] {
+  animation: fadeIn 0.4s ease-in-out forwards;
+}
+
+.task-card[data-pending-update="true"] {
   pointer-events: none;
 }
 
-.task-showing {
-  animation: fade-in 0.4s ease-in forwards;
-}
-
-.task-hidden {
-  display: none;
-}
-
-.task-visible {
-  display: block;
-}
-
-@keyframes fade-out {
-  from { opacity: 1; transform: translateY(0); }
-  to { opacity: 0; transform: translateY(-10px); }
-}
-
-@keyframes fade-in {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+/* Efeito de hover para cartões não animados */
+.task-card:not([data-pending-update="true"]):hover {
+  @apply shadow-md transform scale-[1.01];
 }

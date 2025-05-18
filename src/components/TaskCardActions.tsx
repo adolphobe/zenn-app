@@ -21,13 +21,8 @@ const TaskCardActions: React.FC<TaskCardActionsProps> = ({
   onDeleteTask,
   viewMode = 'power'
 }) => {
-  // Base style for all action buttons (excluding the complete button)
+  // Estilo base para todos os botões de ação (excluindo o de completar)
   const buttonStyles = "bg-white text-gray-700 hover:text-gray-900 border-gray-200 hover:bg-gray-50 hover:border-gray-300 dark:bg-gray-800 dark:text-gray-300 dark:hover:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-750 dark:hover:border-gray-600";
-  
-  // Special style for the show/hide toggle button when task is hidden
-  const toggleButtonStyles = isHidden 
-    ? `${buttonStyles} border-green-200 hover:border-green-300 hover:bg-green-50 dark:border-green-900 dark:hover:border-green-800 transition-colors duration-200`
-    : buttonStyles;
   
   return (
     <div className="flex justify-between space-x-2 mt-4">
@@ -50,7 +45,7 @@ const TaskCardActions: React.FC<TaskCardActionsProps> = ({
             size="sm"
             onClick={onToggleHidden}
             title={isHidden ? "Mostrar" : "Ocultar"}
-            className={toggleButtonStyles}
+            className={`${buttonStyles} ${isHidden ? 'border-green-200 hover:border-green-300 hover:bg-green-50 dark:border-green-900 dark:hover:border-green-800' : ''} transition-colors duration-200`}
             data-task-action="toggle-hidden"
             data-hidden={isHidden ? "true" : "false"}
           >

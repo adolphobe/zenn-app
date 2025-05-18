@@ -89,24 +89,25 @@ const Dashboard: React.FC = () => {
     }
   };
   
-  // Determine whether to show hidden tasks based on view mode and user preference
+  // Filtered logic with enhanced animation support
   const shouldShowHiddenTasks = viewMode === 'chronological' || showHiddenTasks;
   
-  // IMPROVED: Filter tasks with better visibility handling
+  // Filter non-completed and visible tasks according to settings
   const filteredTasks = tasks.filter(task => {
     // First check if it's not completed
     const isNotCompleted = !task.completed;
     
-    // Check visibility based on preferences - show if:
-    // 1. It's not hidden, OR
-    // 2. We should show hidden tasks (based on filter), OR
-    // 3. It's currently animating (has a _pendingVisibilityUpdate flag)
-    const isVisible = 
-      !task.hidden || 
-      shouldShowHiddenTasks || 
-      task._pendingVisibilityUpdate === true;
+    // Next check visibility based on preferences
+    const isVisible = shouldShowHiddenTasks || !task.hidden;
     
-    return isNotCompleted && isVisible;
+    // Filter for tasks with pending visibility updates
+    const isPendingVisibilityUpdate = task._pendingVisibilityUpdate === true;
+    const animationState = task._animationState || '';
+    
+    // Include tasks that:
+    // 1. Are not completed AND
+    // 2. (Are visible according to settings OR have a pending update)
+    return isNotCompleted && (isVisible || isPendingVisibilityUpdate);
   });
   
   // First separate overdue tasks from non-overdue tasks
