@@ -183,26 +183,27 @@ export function formatWithOptions(
   }
 }
 
-/**
- * Formata uma data em um fuso horário específico
- */
-export function formatDateInTimeZone(
-  date: Date | string | null | undefined,
-  formatStr: string,
-  timeZone: string,
-  options?: { locale?: any }
-): string {
-  if (!date) return '';
-  
-  try {
-    const parsedDate = parseDate(date);
-    if (!parsedDate) return '';
-    
-    return formatInTimeZone(parsedDate, timeZone, formatStr, {
-      locale: options?.locale || defaultLocale
-    });
-  } catch (error) {
-    console.error('Erro formatando data no fuso horário:', error);
-    return '';
-  }
-}
+// Removendo esta função que duplicava a do dateTimezone.ts
+// /**
+//  * Formata uma data em um fuso horário específico
+//  */
+// export function formatDateInTimeZone(
+//   date: Date | string | null | undefined,
+//   formatStr: string,
+//   timeZone: string,
+//   options?: { locale?: any }
+// ): string {
+//   if (!date) return '';
+//   
+//   try {
+//     const parsedDate = parseDate(date);
+//     if (!parsedDate) return '';
+//     
+//     return formatInTimeZone(parsedDate, timeZone, formatStr, {
+//       locale: options?.locale || defaultLocale
+//     });
+//   } catch (error) {
+//     console.error('Erro formatando data no fuso horário:', error);
+//     return '';
+//   }
+// }

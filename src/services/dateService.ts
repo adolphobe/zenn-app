@@ -1,4 +1,3 @@
-
 import { Locale } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { ISODateString, DateDisplayOptions, DateFormatConfig } from '@/types/dates';
@@ -12,7 +11,6 @@ import {
   formatToISOString,
   formatForDateTimeInput,
   formatWithOptions,
-  formatDateInTimeZone,
   setDefaultFormatLocale,
   setDefaultFormats
 } from './dateModules/dateFormatter';
