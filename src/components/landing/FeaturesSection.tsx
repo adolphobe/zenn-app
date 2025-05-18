@@ -14,7 +14,7 @@ const FeaturesSection: React.FC<FeaturesSectionProps> = ({ openExplanationModal 
       <div className="blob-animation w-64 h-64 top-20 left-10" style={{ animation: 'float-around 25s infinite ease-in-out' }}></div>
       <div className="blob-animation w-96 h-96 bottom-40 right-20" style={{ animation: 'float-around 30s infinite ease-in-out reverse' }}></div>
       <div className="container mx-auto px-8 relative">
-        <div className="text-center mb-24 animate-on-scroll">
+        <div className="text-center mb-24">
           <span className="inline-block px-4 py-2 rounded-full bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-300 text-sm font-medium mb-4">Uma lista de tarefas diferente</span>
           <h2 className="text-4xl md:text-5xl font-semibold mb-8 text-gray-900 dark:text-white">
             Não se trata apenas de <span className="text-blue-600 dark:text-blue-400">fazer</span>.<br />
@@ -25,7 +25,7 @@ const FeaturesSection: React.FC<FeaturesSectionProps> = ({ openExplanationModal 
           </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-          <div className="animate-on-scroll" style={{ transitionDelay: '0.1s' }}>
+          <div>
             <Card className="gradient-card-hover bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-none h-full rounded-xl overflow-hidden transition-all duration-300">
               <CardContent className="p-10 flex flex-col h-full">
                 <div className="rounded-full bg-blue-50 dark:bg-blue-900/50 w-16 h-16 flex items-center justify-center mb-8 transition-transform duration-300 group-hover:scale-110">
@@ -42,7 +42,7 @@ const FeaturesSection: React.FC<FeaturesSectionProps> = ({ openExplanationModal 
               </CardContent>
             </Card>
           </div>
-          <div className="animate-on-scroll" style={{ transitionDelay: '0.3s' }}>
+          <div>
             <Card className="gradient-card-hover bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-none h-full rounded-xl overflow-hidden transition-all duration-300">
               <CardContent className="p-10 flex flex-col h-full">
                 <div className="rounded-full bg-blue-50 dark:bg-blue-900/50 w-16 h-16 flex items-center justify-center mb-8">
@@ -59,7 +59,7 @@ const FeaturesSection: React.FC<FeaturesSectionProps> = ({ openExplanationModal 
               </CardContent>
             </Card>
           </div>
-          <div className="animate-on-scroll" style={{ transitionDelay: '0.5s' }}>
+          <div>
             <Card className="gradient-card-hover bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-none h-full rounded-xl overflow-hidden transition-all duration-300">
               <CardContent className="p-10 flex flex-col h-full">
                 <div className="rounded-full bg-blue-50 dark:bg-blue-900/50 w-16 h-16 flex items-center justify-center mb-8">

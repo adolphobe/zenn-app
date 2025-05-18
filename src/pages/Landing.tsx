@@ -5,7 +5,6 @@ import { useAuth } from '@/context/auth';
 import { throttledLog } from '@/utils/logUtils';
 import { modalDataContent } from '@/components/landing/ExplanationModal';
 import useImagePreloader from '@/hooks/useImagePreloader';
-import useAnimationObserver from '@/hooks/useAnimationObserver';
 import '../styles/animations.css';
 import { SupabaseTest } from '@/components/SupabaseTest';
 
@@ -47,13 +46,6 @@ const Landing: React.FC = () => {
     }
   }, [isAuthenticated, isLoading, navigate]);
 
-  // Configurar o observador de animação quando o conteúdo estiver carregado
-  useAnimationObserver({ 
-    enabled: contentLoaded, 
-    threshold: 0.1, 
-    animationDelay: 100 
-  });
-
   // Combinando os efeitos de carregamento para garantir uma inicialização suave
   useEffect(() => {
     // Só inicializa a carga quando as imagens principais tiverem sido carregadas
@@ -67,12 +59,12 @@ const Landing: React.FC = () => {
         // Adicionar um pequeno delay para o conteúdo após o hero
         const contentTimer = setTimeout(() => {
           setContentLoaded(true);
-        }, 800);
+        }, 300);
         
         return () => {
           clearTimeout(contentTimer);
         };
-      }, 300);
+      }, 100);
       
       return () => {
         clearTimeout(loadTimer);
