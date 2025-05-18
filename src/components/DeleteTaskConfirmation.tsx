@@ -2,6 +2,7 @@
 import React from 'react';
 import { Task } from '@/types';
 import { useAppContext } from '@/context/AppContext';
+import { useTaskDataContext } from '@/context/TaskDataProvider';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,7 +25,8 @@ const DeleteTaskConfirmation: React.FC<DeleteTaskConfirmationProps> = ({
   isOpen,
   onClose,
 }) => {
-  const { deleteTask } = useAppContext();
+  // Use TaskDataContext instead of AppContext for immediate UI updates
+  const { deleteTask } = useTaskDataContext();
 
   const handleConfirm = () => {
     if (deleteTask) {

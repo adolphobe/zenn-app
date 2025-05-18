@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Task, TaskFormData } from '@/types';
@@ -83,30 +82,52 @@ export const useTaskOperations = (completed: boolean = false) => {
     }
   });
   
-  // Delete task mutation
+  // Delete task mutation with optimistic updates
   const deleteTaskMutation = useMutation({
     mutationFn: (id: string) => {
       return deleteTaskService(id);
     },
-    onMutate: (id) => {
+    onMutate: async (id) => {
       setTaskOperationLoading(id, 'delete', true);
+      
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey: ['tasks'] });
+      
+      // Snapshot the previous value
+      const previousTasks = queryClient.getQueryData(['tasks', { completed }]);
+      
+      // Optimistically update to the new value
+      queryClient.setQueryData(['tasks', { completed }], (old: Task[] = []) => {
+        return old.filter(task => task.id !== id);
+      });
+      
+      return { previousTasks };
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tasks'] });
       toast({
         id: uuidv4(),
         title: "Tarefa excluída",
         description: "A tarefa foi excluída com sucesso."
       });
     },
-    onError: (error: any) => {
+    onError: (error: any, id, context) => {
       console.error('Error deleting task:', error);
+      
+      // Restore previous state if something went wrong
+      if (context?.previousTasks) {
+        queryClient.setQueryData(['tasks', { completed }], context.previousTasks);
+      }
+      
       toast({
         id: uuidv4(),
         title: "Erro ao excluir tarefa",
         description: "Não foi possível excluir a tarefa. Tente novamente.",
         variant: "destructive",
       });
+    },
+    onSettled: (_, __, id) => {
+      setTaskOperationLoading(id, 'delete', false);
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
     }
   });
   

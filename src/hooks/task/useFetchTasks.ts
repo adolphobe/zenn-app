@@ -1,36 +1,73 @@
-
-import { useQuery } from '@tanstack/react-query';
+import { useState, useCallback } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Task } from '@/types';
 import { fetchTasks } from '@/services/taskService';
 import { useAuth } from '@/context/auth';
 
+type SyncStatus = 'idle' | 'syncing' | 'synced' | 'error';
+
 export const useFetchTasks = (completed: boolean = false) => {
   const { currentUser, isAuthenticated } = useAuth();
+  const queryClient = useQueryClient();
+  const [isSyncing, setIsSyncing] = useState<boolean>(false);
+  const [syncStatus, setSyncStatus] = useState<SyncStatus>('idle');
   
-  // Main query for fetching tasks with proper caching
-  const { 
-    data: tasks = [], 
-    isLoading,
-    error,
-    refetch 
-  } = useQuery({
-    queryKey: ['tasks', currentUser?.id, completed],
-    queryFn: () => currentUser?.id ? fetchTasks(currentUser.id, completed) : Promise.resolve([]),
+  const fetchTasksData = useCallback(async () => {
+    if (!currentUser?.id || !isAuthenticated) {
+      return [];
+    }
+    
+    try {
+      setSyncStatus('syncing');
+      const tasks = await fetchTasks(currentUser.id, completed);
+      setSyncStatus('synced');
+      return tasks;
+    } catch (error) {
+      console.error('Error fetching tasks:', error);
+      setSyncStatus('error');
+      return [];
+    }
+  }, [currentUser?.id, isAuthenticated, completed]);
+  
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['tasks', { completed }],
+    queryFn: fetchTasksData,
     enabled: !!currentUser?.id && isAuthenticated,
-    staleTime: 30000, // Consider data fresh for 30 seconds
-    refetchOnWindowFocus: true
+    staleTime: 60000, // 60 seconds
+    refetchOnWindowFocus: false,
   });
+
+  // Add a function to force synchronization from the database
+  const forceSynchronize = useCallback(async () => {
+    if (!currentUser?.id || !isAuthenticated || isSyncing) {
+      return;
+    }
+
+    try {
+      setIsSyncing(true);
+      setSyncStatus('syncing');
+      
+      const tasksFromDB = await fetchTasks(currentUser.id, completed);
+      
+      // Update the query cache with the new data immediately
+      queryClient.setQueryData(['tasks', { completed }], tasksFromDB);
+      
+      setSyncStatus('synced');
+      return tasksFromDB;
+    } catch (error) {
+      console.error('Error synchronizing tasks:', error);
+      setSyncStatus('error');
+      throw error;
+    } finally {
+      setIsSyncing(false);
+    }
+  }, [currentUser?.id, isAuthenticated, completed, isSyncing, queryClient]);
   
-  // Force manual synchronization
-  const forceSynchronize = async () => {
-    return refetch();
-  };
-  
-  return {
-    tasks,
+  return { 
+    tasks: data || [],
     isLoading,
     error,
-    refetch,
-    forceSynchronize
+    forceSynchronize,
+    syncStatus
   };
 };

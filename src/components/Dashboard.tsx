@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '@/context/AppContext';
 import { useTaskDataContext } from '@/context/TaskDataProvider'; // Use the new context
@@ -158,7 +157,7 @@ const Dashboard: React.FC = () => {
     );
   }
   
-  // Enhanced animation variants for task cards
+  // Enhanced animation variants for task cards with improved exit animation
   const taskVariants = {
     hidden: { 
       opacity: 0,
@@ -174,9 +173,9 @@ const Dashboard: React.FC = () => {
     },
     exit: { 
       opacity: 0,
-      scale: 0.95,
-      y: -10,
-      transition: { duration: 0.15, ease: "easeInOut" }
+      scale: 0.9,
+      y: -20,
+      transition: { duration: 0.2, ease: "easeInOut" }
     }
   };
   
@@ -261,7 +260,7 @@ const Dashboard: React.FC = () => {
                       <AnimatePresence initial={false} mode="popLayout">
                         {sortedOverdueTasks.map(task => (
                           <motion.div
-                            key={`${task.id}-${task.hidden ? 1 : 0}`}
+                            key={`${task.id}-${task.hidden ? 1 : 0}-${task._optimisticUpdateTime || 0}`}
                             initial="hidden"
                             animate="visible"
                             exit="exit"
@@ -288,7 +287,7 @@ const Dashboard: React.FC = () => {
             <AnimatePresence initial={false} mode="popLayout">
               {sortedNonOverdueTasks.map(task => (
                 <motion.div
-                  key={`${task.id}-${task.hidden ? 1 : 0}-${task._optimisticUpdateTime || 0}`}
+                  key={`task-${task.id}-${task.hidden ? 1 : 0}-${task._optimisticUpdateTime || 0}`}
                   initial="hidden"
                   animate="visible"
                   exit="exit"
