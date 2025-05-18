@@ -7,7 +7,7 @@ import { useAuth } from '@/context/auth';
 import TaskForm from './TaskForm';
 import TaskCard from './TaskCard';
 import SortDropdown from './SortDropdown';
-import { sortTasks, isTaskOverdue, safeParseDate } from '@/utils';
+import { sortTasks, isTaskOverdue } from '@/utils';
 import { Plus, Bell, ChevronDown, ChevronUp, Loader2, RefreshCw } from 'lucide-react';
 import { useExpandedTask } from '@/context/hooks';
 import { Badge } from './ui/badge';
