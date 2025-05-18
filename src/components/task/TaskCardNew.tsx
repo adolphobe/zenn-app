@@ -102,37 +102,66 @@ const TaskCardNew: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand
   const parsedDate = task.idealDate ? safeParseDate(task.idealDate) : null;
   const isOverdue = parsedDate ? isTaskOverdue(parsedDate) : false;
   
-  // Dynamic border and background styles
-  const getBorderStyle = () => {
+  // Get the appropriate background and border styles based on score and mode
+  const getStyles = () => {
+    // For hidden tasks
     if (task.hidden && showHiddenTasks) {
-      return 'border-gray-300/30 dark:border-gray-700/30';
+      return {
+        border: 'border-gray-300/30 dark:border-gray-700/30',
+        background: 'bg-gray-50/80 dark:bg-gray-900/30'
+      };
     }
     
+    // For overdue tasks in chronological mode
     if (viewMode === 'chronological' && isOverdue) {
-      return 'border-red-200/50 dark:border-red-900/30';
+      return {
+        border: 'border-red-200/50 dark:border-red-900/30',
+        background: 'bg-red-50/30 dark:bg-red-950/10'
+      };
     }
     
-    return 'border-gray-200/50 dark:border-gray-800/50';
+    // For power mode, use color based on total score
+    if (viewMode === 'power') {
+      if (task.totalScore >= 8) {
+        return {
+          border: 'border-red-200/70 dark:border-red-900/50',
+          background: 'bg-[#FFEEEE] dark:bg-red-950/20'
+        };
+      } else if (task.totalScore >= 6) {
+        return {
+          border: 'border-orange-200/70 dark:border-orange-900/50',
+          background: 'bg-[#FFFAEA] dark:bg-orange-950/20'
+        };
+      } else if (task.totalScore >= 3) {
+        return {
+          border: 'border-blue-200/70 dark:border-blue-900/50',
+          background: 'bg-[#F0F7FF] dark:bg-blue-950/20'
+        };
+      }
+    }
+    
+    // Default style
+    return {
+      border: 'border-gray-200/50 dark:border-gray-800/50',
+      background: 'bg-white/40 dark:bg-gray-950/40'
+    };
   };
   
-  const getBackgroundStyle = () => {
-    if (task.hidden && showHiddenTasks) {
-      return 'bg-gray-50/80 dark:bg-gray-900/30';
-    }
-    
-    if (viewMode === 'chronological' && isOverdue) {
-      return 'bg-red-50/30 dark:bg-red-950/10';
-    }
-    
-    return 'bg-white/40 dark:bg-gray-950/40 backdrop-blur-[2px]';
+  const styles = getStyles();
+
+  // Simplified animation variants
+  const cardAnimationProps = {
+    whileHover: { scale: 1.005, transition: { duration: 0.2 } },
+    whileTap: { scale: 0.995 },
+    initial: { opacity: 0, y: 10 },
+    animate: { opacity: 1, y: 0, transition: { duration: 0.3 } }
   };
 
   return (
     <motion.div 
-      className={`rounded-[10px] border ${getBorderStyle()} ${getBackgroundStyle()} 
-                shadow-sm hover:shadow-md transition-shadow duration-200 cursor-pointer p-4`}
-      whileHover={{ scale: 1.005 }}
-      whileTap={{ scale: 0.995 }}
+      className={`rounded-[10px] border ${styles.border} ${styles.background} 
+                shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer p-4`}
+      {...cardAnimationProps}
       onClick={handleCardClick}
       layoutId={`task-card-${task.id}`}
     >
