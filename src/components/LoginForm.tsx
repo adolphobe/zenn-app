@@ -17,20 +17,27 @@ const LoginForm: React.FC<LoginFormProps> = ({
   onSwitchToSignup, 
   onForgotPassword 
 }) => {
-  const { form, isLoading, loginError, loginSuggestion, onSubmit } = useLoginForm(onSuccess);
+  const { 
+    form, 
+    isLoading, 
+    loginError, 
+    loginSuggestion, 
+    onSubmit,
+    setupErrorClearing 
+  } = useLoginForm(onSuccess);
 
-  // Debug log para verificar quando o componente renderiza com erro
+  // Configurar limpeza de erros ao digitar
   useEffect(() => {
-    console.log("[LoginForm Component] Renderizando com erro:", loginError);
-    
-    // Este log vai confirmar se o DOM está sendo atualizado com o novo valor de erro
+    const unsubscribe = setupErrorClearing();
+    return unsubscribe;
+  }, [setupErrorClearing]);
+
+  // Este log ajuda a confirmar se o componente está recebendo o erro
+  useEffect(() => {
     if (loginError) {
-      console.log("[LoginForm Component] DOM deve ser atualizado para mostrar o erro:", loginError);
+      console.log("[LoginForm Component] Renderizado com erro:", loginError);
     }
   }, [loginError]);
-
-  // Este log confirma cada renderização do componente
-  console.log("[LoginForm Component] Renderizando componente, estado atual do erro:", loginError);
 
   return (
     <Form {...form}>

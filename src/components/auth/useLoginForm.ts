@@ -1,10 +1,9 @@
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAuth } from '@/context/auth';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { toast } from '@/hooks/use-toast';
 import { processAuthError } from '@/utils/authErrorUtils';
 import { loginSchema, LoginFormValues } from './LoginFormFields';
 
@@ -15,60 +14,38 @@ export function useLoginForm(onSuccess?: () => void) {
   const [isLoading, setIsLoading] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
   const [loginSuggestion, setLoginSuggestion] = useState<string | null>(null);
-  const [formSubmissionAttempted, setFormSubmissionAttempted] = useState(false);
 
+  // Configuração do formulário com React Hook Form
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
       email: "",
       password: "",
     },
-    mode: "onChange", // Valida ao digitar para feedback imediato
+    mode: "onChange", // Validação ao digitar
   });
 
-  // Check if user just reset their password
-  useEffect(() => {
-    if (location.state?.passwordReset) {
-      toast({
-        title: "Senha redefinida com sucesso",
-        description: "Você pode fazer login com sua nova senha agora.",
-      });
+  // Função para limpar erros quando o usuário começa a digitar novamente
+  const clearErrors = () => {
+    if (loginError) {
+      setLoginError(null);
+      setLoginSuggestion(null);
     }
-  }, [location.state]);
+  };
 
-  // Clear errors when user starts typing again, but only after first submission attempt
-  useEffect(() => {
-    if (!formSubmissionAttempted) return;
-    
-    const subscription = form.watch(() => {
-      if (loginError) {
-        console.log("[LoginForm] Usuário está digitando, limpando erros anteriores");
-        setLoginError(null);
-        setLoginSuggestion(null);
-      }
-    });
-    return () => subscription.unsubscribe();
-  }, [form, loginError, formSubmissionAttempted]);
-
-  // Debug logs para monitorar o estado do erro
-  useEffect(() => {
-    console.log("[LoginForm] Estado atual do erro:", loginError);
-    console.log("[LoginForm] Estado atual da sugestão:", loginSuggestion);
-    console.log("[LoginForm] Estado atual de carregamento:", isLoading);
-  }, [loginError, loginSuggestion, isLoading]);
+  // Criar uma função de observação única para limpar erros ao digitar
+  const setupErrorClearing = () => {
+    const subscription = form.watch(() => clearErrors());
+    return subscription.unsubscribe;
+  };
 
   // Memoized login function to prevent unnecessary re-renders
-  const handleLogin = useCallback(async (values: LoginFormValues) => {
-    // Prevent login while already loading
-    if (isLoading) {
-      console.log("[LoginForm] Já existe um login em andamento, ignorando tentativa");
-      return;
-    }
+  const handleLogin = async (values: LoginFormValues) => {
+    // Prevenção de múltiplas tentativas
+    if (isLoading) return;
     
     console.log("[LoginForm] Iniciando processo de login");
     setIsLoading(true);
-    setLoginError(null);
-    setLoginSuggestion(null);
     
     try {
       console.log("[LoginForm] Tentando login com:", values.email);
@@ -76,68 +53,48 @@ export function useLoginForm(onSuccess?: () => void) {
       
       if (!success) {
         console.error("[LoginForm] Falha no login para:", values.email);
-        console.error("[LoginForm] Erro detectado:", error);
         
         if (error) {
           const errorDetails = processAuthError(error);
           console.log("[LoginForm] Erro processado:", errorDetails.message);
+          
+          // Definir erro e sugestão de forma definitiva
           setLoginError(errorDetails.message);
           setLoginSuggestion(errorDetails.suggestion || null);
-          
-          // Log para confirmar que o estado foi atualizado
-          console.log("[LoginForm] Estado de erro atualizado para:", errorDetails.message);
         } else {
           setLoginError("Usuário não encontrado ou senha incorreta. Por favor, verifique suas credenciais.");
-          console.log("[LoginForm] Estado de erro definido para mensagem padrão (credenciais inválidas)");
         }
-      } else {
-        console.log("[LoginForm] Login bem-sucedido para:", values.email);
-        
-        if (onSuccess) {
-          onSuccess();
-        }
+      } else if (onSuccess) {
+        onSuccess();
       }
     } catch (error) {
       console.error("[LoginForm] Erro de login não tratado:", error);
       
       const errorDetails = processAuthError(error);
+      // Definir erro e sugestão
       setLoginError(errorDetails.message);
       setLoginSuggestion(errorDetails.suggestion || null);
-      
-      console.log("[LoginForm] Estado de erro atualizado após exceção:", errorDetails.message);
     } finally {
       setIsLoading(false);
-      console.log("[LoginForm] Processo de login finalizado, isLoading =", false);
     }
-  }, [isLoading, login, onSuccess]);
+  };
   
-  // Submission handler that properly prevents default form behavior
-  const onSubmit = useCallback((e: React.FormEvent<HTMLFormElement>) => {
-    // Critical: prevent form from refreshing page
-    e.preventDefault();
+  // Submission handler with proper error handling
+  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault(); // Crucial: prevenir o comportamento padrão
     console.log("[LoginForm] Formulário submetido, prevenindo comportamento padrão");
     
-    // Mark that a submission was attempted
-    setFormSubmissionAttempted(true);
-    
-    // Validate form and handle submission
-    form.trigger().then(valid => {
-      console.log("[LoginForm] Validação do formulário:", valid ? "válido" : "inválido");
-      
-      if (valid) {
-        const values = form.getValues();
-        handleLogin(values);
-      } else {
-        console.log("[LoginForm] Formulário inválido, não prosseguindo com login");
-      }
-    });
-  }, [form, handleLogin]);
+    form.handleSubmit(async (values) => {
+      await handleLogin(values);
+    })(e);
+  };
 
   return {
     form,
     isLoading,
     loginError,
     loginSuggestion,
-    onSubmit
+    onSubmit,
+    setupErrorClearing
   };
 }
