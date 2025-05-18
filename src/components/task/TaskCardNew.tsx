@@ -1,10 +1,10 @@
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Task } from '@/types';
 import { isTaskOverdue, safeParseDate } from '@/utils';
 import { useAppContext } from '@/context/AppContext';
 import TaskCardHeader from '../TaskCardHeader';
-import TaskCardExpanded from '../TaskCardExpanded';
+import TaskCardExpanded from '../task/TaskCardExpanded';
 import { useTaskDataContext } from '@/context/TaskDataProvider';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -16,8 +16,8 @@ interface TaskCardProps {
 
 const TaskCardNew: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand }) => {
   const { 
-    deleteTask, 
-    updateTaskTitle, 
+    deleteTask,
+    updateTask,
     toggleTaskCompleted, 
     toggleTaskHidden 
   } = useTaskDataContext();
@@ -55,7 +55,7 @@ const TaskCardNew: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand
 
   const handleTitleBlur = () => {
     if (titleValue.trim() !== '' && titleValue !== task.title) {
-      updateTaskTitle(task.id, titleValue);
+      updateTask(task.id, { title: titleValue });
     } else {
       setTitleValue(task.title); // Reset to original if empty or unchanged
     }
@@ -65,7 +65,7 @@ const TaskCardNew: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand
   const handleTitleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       if (titleValue.trim() !== '' && titleValue !== task.title) {
-        updateTaskTitle(task.id, titleValue);
+        updateTask(task.id, { title: titleValue });
       } else {
         setTitleValue(task.title);
       }
