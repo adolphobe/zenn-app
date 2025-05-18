@@ -20,7 +20,6 @@ import ExplanationModal from '@/components/landing/ExplanationModal';
 const Landing: React.FC = () => {
   const navigate = useNavigate();
   const [loaded, setLoaded] = useState(false);
-  const [contentLoaded, setContentLoaded] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
   const [activeTestimonial, setActiveTestimonial] = useState(0);
   const [circlesKey, setCirclesKey] = useState(Date.now());
@@ -55,15 +54,6 @@ const Landing: React.FC = () => {
       // Usar setTimeout para garantir que o DOM tenha tempo de renderizar completamente
       const loadTimer = setTimeout(() => {
         setLoaded(true);
-        
-        // Adicionar um pequeno delay para o conteúdo após o hero
-        const contentTimer = setTimeout(() => {
-          setContentLoaded(true);
-        }, 300);
-        
-        return () => {
-          clearTimeout(contentTimer);
-        };
       }, 100);
       
       return () => {
@@ -137,18 +127,13 @@ const Landing: React.FC = () => {
         setShowLogin={setShowLogin}
       />
 
-      {contentLoaded && (
-        <>
-          <FeaturesSection openExplanationModal={openExplanationModal} />
-          <HowItWorksSection />
-          <TestimonialsSection 
-            activeTestimonial={activeTestimonial} 
-            setActiveTestimonial={setActiveTestimonial} 
-          />
-          <CTASection handleGetStarted={handleGetStarted} />
-        </>
-      )}
-      
+      <FeaturesSection openExplanationModal={openExplanationModal} />
+      <HowItWorksSection />
+      <TestimonialsSection 
+        activeTestimonial={activeTestimonial} 
+        setActiveTestimonial={setActiveTestimonial} 
+      />
+      <CTASection handleGetStarted={handleGetStarted} />
       <Footer />
 
       {/* Modal de explicação */}

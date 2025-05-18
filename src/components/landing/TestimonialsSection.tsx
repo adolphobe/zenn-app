@@ -37,7 +37,7 @@ const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({
       <div className="blob-animation w-72 h-72 top-40 right-20 opacity-50" style={{ animation: 'float-around 20s infinite ease-in-out' }}></div>
       <div className="blob-animation w-80 h-80 bottom-40 left-10 opacity-40" style={{ animation: 'float-around 25s infinite ease-in-out reverse' }}></div>
       <div className="container mx-auto px-8 relative z-10">
-        <div className="text-center mb-20 animate-on-scroll">
+        <div className="text-center mb-20">
           <span className="inline-block px-4 py-2 rounded-full bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-300 text-sm font-medium mb-4">Experiências Reais</span>
           <h2 className="text-4xl md:text-5xl font-semibold mb-8 text-gray-900 dark:text-white">O que nossos usuários dizem</h2>
           <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">Pessoas que encontraram clareza e propósito em suas tarefas diárias com o Zenn</p>
