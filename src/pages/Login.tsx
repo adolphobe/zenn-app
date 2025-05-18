@@ -43,7 +43,7 @@ const Login: React.FC = () => {
   useEffect(() => {
     if (isAuthenticated && !isLoading && !isJustLoggedOut) {
       console.log("[Login] Usuário autenticado, redirecionando para:", from);
-      console.log("[Login] DETALHES EM PORTUGUÊS: Autenticação verificada. Redirecionando para dashboard");
+      console.log("[Login] DETALHES EM PORTUGUÊS: Autenticação verificada. Redirecionando para " + from);
       navigate(from);
     }
   }, [isAuthenticated, isLoading, from, navigate, isJustLoggedOut]);
@@ -66,7 +66,7 @@ const Login: React.FC = () => {
       <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gray-50">
         <div className="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 mb-4 max-w-lg">
           <p className="font-bold">Já Autenticado</p>
-          <p>Você já está logado. Redirecionando para o dashboard...</p>
+          <p>Você já está logado. Redirecionando para {from.replace("/", "")}...</p>
           <p className="mt-2 text-sm">Verifique o console para detalhes técnicos.</p>
         </div>
         
@@ -159,9 +159,9 @@ const Login: React.FC = () => {
             <LoginForm 
               onSwitchToSignup={toggleSignup} 
               onSuccess={() => {
-                console.log("[Login] Login bem-sucedido, redirecionando para dashboard");
+                console.log("[Login] Login bem-sucedido, redirecionando para: ", from);
                 console.log("[Login] DETALHES EM PORTUGUÊS: Login realizado com sucesso, redirecionando automaticamente");
-                navigate('/dashboard');
+                navigate(from);
               }} 
             />
           )}
