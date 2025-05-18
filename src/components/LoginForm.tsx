@@ -110,9 +110,14 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onSwitchToSignup, onFo
   const iconColor = "text-gray-800 dark:text-gray-200"; 
   const eyeIconColor = "text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-100";
 
+  // Debug the error state to see if it's being set correctly
+  console.log("[LoginForm] Estado atual do erro:", loginError);
+  console.log("[LoginForm] Estado atual da sugestão:", loginSuggestion);
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        {/* Render error message if there is one */}
         {loginError && (
           <InvalidLoginMessage 
             message={loginError} 

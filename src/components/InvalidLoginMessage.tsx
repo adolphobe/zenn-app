@@ -9,6 +9,10 @@ interface InvalidLoginMessageProps {
 }
 
 export const InvalidLoginMessage: React.FC<InvalidLoginMessageProps> = ({ message, suggestion }) => {
+  // Add debug log to verify component rendering
+  console.log("[InvalidLoginMessage] Rendering with message:", message);
+  console.log("[InvalidLoginMessage] Suggestion:", suggestion);
+  
   return (
     <Alert variant="destructive" className="py-2 animate-in fade-in slide-in-from-top-5 duration-300">
       <div className="flex flex-col gap-1">
