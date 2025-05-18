@@ -85,15 +85,40 @@ export const sortTasks = (
 ): Task[] => {
   const { sortDirection, noDateAtEnd } = options;
   
-  // Create a safe copy of the tasks with validated dates
-  const safeTasks = tasks.map(task => ({
+  // Create a safe copy of the tasks with validated dates but preserve original type structure
+  // Use temporary type for internal processing
+  type TaskWithParsedDates = {
+    id: string;
+    title: string;
+    consequenceScore: number;
+    prideScore: number;
+    constructionScore: number;
+    totalScore: number;
+    idealDate: Date | null;
+    hidden: boolean;
+    completed: boolean;
+    completedAt: Date | null;
+    createdAt: Date;
+    feedback: 'transformed' | 'relief' | 'obligation' | null;
+    comments: any[];
+    pillar?: string;
+    operationLoading?: {
+      [key: string]: boolean;
+    };
+  };
+  
+  // Parse dates for sorting while maintaining original task structure
+  const tasksWithParsedDates: TaskWithParsedDates[] = tasks.map(task => ({
     ...task,
     idealDate: task.idealDate ? safeParseDate(task.idealDate) : null,
-    createdAt: task.createdAt ? safeParseDate(task.createdAt) : new Date(),
+    createdAt: task.createdAt ? 
+      (task.createdAt instanceof Date ? task.createdAt : safeParseDate(task.createdAt)) : 
+      new Date(),
     completedAt: task.completedAt ? safeParseDate(task.completedAt) : null
   }));
   
-  return safeTasks.sort((a, b) => {
+  // Sort the parsed tasks
+  const sortedParsedTasks = tasksWithParsedDates.sort((a, b) => {
     const sortMultiplier = sortDirection === 'desc' ? -1 : 1;
     const now = new Date();
     
@@ -161,6 +186,15 @@ export const sortTasks = (
       return (b.totalScore - a.totalScore);
     }
   });
+  
+  // Return the original tasks in the new sorted order
+  // This preserves the original Task type structure including string-typed dates
+  return sortedParsedTasks.map(parsedTask => {
+    // Find the original task that matches this ID
+    const originalTask = tasks.find(t => t.id === parsedTask.id);
+    // We know it must exist since we created parsedTasks from tasks
+    return originalTask as Task;
+  });
 };
 
 // Adiciona ou subtrai dias a uma data
@@ -182,3 +216,4 @@ export const isTaskOverdue = (date: Date | null): boolean => {
   const now = new Date();
   return date < now;
 };
+
