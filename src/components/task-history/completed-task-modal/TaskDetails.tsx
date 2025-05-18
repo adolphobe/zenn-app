@@ -3,25 +3,37 @@ import React from 'react';
 import { Task } from '@/types';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { safeParseDate } from '@/utils';
 
 interface TaskDetailsProps {
   task: Task;
 }
 
 const TaskDetails: React.FC<TaskDetailsProps> = ({ task }) => {
-  const formatDateTime = (date: Date | null | undefined) => {
-    if (!date) return '';
-    return format(date, 'dd/MM/yyyy HH:mm', { locale: ptBR });
+  const formatDateTime = (date: Date | string | null | undefined) => {
+    if (!date) return '-';
+    
+    try {
+      // Ensure we have a valid Date object
+      const dateObj = date instanceof Date ? date : safeParseDate(date);
+      if (!dateObj || isNaN(dateObj.getTime())) {
+        return '-';
+      }
+      return format(dateObj, 'dd/MM/yyyy HH:mm', { locale: ptBR });
+    } catch (error) {
+      console.error('Error formatting date:', error);
+      return '-';
+    }
   };
   
   // Format the completion date and time in Brazilian format
   const completedDateTime = task.completedAt 
-    ? formatDateTime(new Date(task.completedAt))
+    ? formatDateTime(task.completedAt)
     : '-';
   
   // Format the ideal date in Brazilian format
   const idealDate = task.idealDate 
-    ? formatDateTime(new Date(task.idealDate))
+    ? formatDateTime(task.idealDate)
     : '-';
 
   return (

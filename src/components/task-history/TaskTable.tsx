@@ -54,9 +54,15 @@ export const CompletedTaskRow: React.FC<{ task: Task }> = ({ task }) => {
   const formatCompletionDateTime = (dateString: string | null | undefined) => {
     if (!dateString) return '-';
     try {
+      // Make sure we have a valid date string
       const date = parseISO(dateString);
+      if (isNaN(date.getTime())) {
+        console.warn('Invalid date:', dateString);
+        return '-';
+      }
       return format(date, 'dd/MM/yyyy HH:mm', { locale: ptBR });
     } catch (e) {
+      console.error('Error formatting date:', e, dateString);
       return '-';
     }
   };

@@ -2,6 +2,7 @@
 import React, { createContext, useContext } from 'react';
 import { useTaskData } from '@/hooks/useTaskData';
 import { Task, TaskFormData } from '@/types';
+import { safeParseDate } from '@/utils';
 
 // Define the context type
 type TaskDataContextType = ReturnType<typeof useTaskData> & {
@@ -23,7 +24,12 @@ export const TaskDataProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   // Create context value with both active and completed tasks
   const contextValue: TaskDataContextType = {
     ...activeTasksData,
-    completedTasks: completedTasksData.tasks,
+    completedTasks: completedTasksData.tasks.map(task => ({
+      ...task,
+      idealDate: task.idealDate ? safeParseDate(task.idealDate) : null,
+      createdAt: task.createdAt ? safeParseDate(task.createdAt) : new Date(),
+      completedAt: task.completedAt ? safeParseDate(task.completedAt) : null
+    })),
     completedTasksLoading: completedTasksData.isLoading,
   };
 

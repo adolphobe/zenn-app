@@ -4,6 +4,12 @@ import { Task, DateDisplayOptions, ViewMode, SortOption } from './types';
 export const formatDate = (date: Date | null, options?: DateDisplayOptions): string => {
   if (!date) return '';
   
+  // Ensure we have a valid Date object
+  if (!(date instanceof Date) || isNaN(date.getTime())) {
+    console.warn('Invalid date provided to formatDate:', date);
+    return '';
+  }
+  
   const { hideYear = false, hideTime = false, hideDate = false } = options || {};
   
   if (hideDate) return '';
@@ -45,6 +51,33 @@ export const getTaskPriorityClass = (score: number): string => {
   return 'task-light';
 };
 
+// Helper function to safely create a Date object
+export const safeParseDate = (dateInput: string | Date | null | undefined): Date | null => {
+  if (!dateInput) return null;
+  
+  try {
+    // If it's already a Date object with a valid time
+    if (dateInput instanceof Date && !isNaN(dateInput.getTime())) {
+      return dateInput;
+    }
+    
+    // If it's a string, try to parse it
+    if (typeof dateInput === 'string') {
+      const parsedDate = new Date(dateInput);
+      if (!isNaN(parsedDate.getTime())) {
+        return parsedDate;
+      }
+    }
+    
+    // If we get here, the date is invalid
+    console.warn('Invalid date value:', dateInput);
+    return null;
+  } catch (error) {
+    console.error('Error parsing date:', error);
+    return null;
+  }
+};
+
 export const sortTasks = (
   tasks: Task[], 
   viewMode: ViewMode, 
@@ -52,7 +85,15 @@ export const sortTasks = (
 ): Task[] => {
   const { sortDirection, noDateAtEnd } = options;
   
-  return [...tasks].sort((a, b) => {
+  // Create a safe copy of the tasks with validated dates
+  const safeTasks = tasks.map(task => ({
+    ...task,
+    idealDate: task.idealDate ? safeParseDate(task.idealDate) : null,
+    createdAt: task.createdAt ? safeParseDate(task.createdAt) : new Date(),
+    completedAt: task.completedAt ? safeParseDate(task.completedAt) : null
+  }));
+  
+  return safeTasks.sort((a, b) => {
     const sortMultiplier = sortDirection === 'desc' ? -1 : 1;
     const now = new Date();
     
@@ -132,6 +173,12 @@ export const addDaysToDate = (date: Date, days: number): Date => {
 // Verifica se uma tarefa está vencida (antes da data/hora atual)
 export const isTaskOverdue = (date: Date | null): boolean => {
   if (!date) return false;
+  
+  // Ensure we have a valid Date object
+  if (!(date instanceof Date) || isNaN(date.getTime())) {
+    return false;
+  }
+  
   const now = new Date();
   return date < now;
 };

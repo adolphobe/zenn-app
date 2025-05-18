@@ -26,6 +26,26 @@ const TaskFormFields: React.FC<TaskFormFieldsProps> = ({
   const totalScore = formData.consequenceScore + formData.prideScore + formData.constructionScore;
   const isMobile = useIsMobile();
   
+  // Safe function to format date for datetime-local input
+  const formatDateForInput = (date: Date | null): string => {
+    if (!date) return '';
+    
+    try {
+      // Check if the date is valid
+      if (isNaN(date.getTime())) {
+        console.warn('Invalid date for input:', date);
+        return '';
+      }
+      
+      // Adjust for timezone offset
+      const localDate = new Date(date.getTime() - (date.getTimezoneOffset() * 60000));
+      return localDate.toISOString().slice(0, 16);
+    } catch (error) {
+      console.error('Error formatting date for input:', error);
+      return '';
+    }
+  };
+  
   // Mobile layout (vertical)
   if (isMobile) {
     return (
@@ -69,7 +89,7 @@ const TaskFormFields: React.FC<TaskFormFieldsProps> = ({
             type="datetime-local"
             id="idealDate"
             name="idealDate"
-            value={formData.idealDate ? new Date(formData.idealDate.getTime() - (formData.idealDate.getTimezoneOffset() * 60000)).toISOString().slice(0, 16) : ''}
+            value={formData.idealDate ? formatDateForInput(formData.idealDate) : ''}
             onChange={handleDateChange}
             className="w-full p-3 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
           />
@@ -136,7 +156,7 @@ const TaskFormFields: React.FC<TaskFormFieldsProps> = ({
               type="datetime-local"
               id="idealDate"
               name="idealDate"
-              value={formData.idealDate ? new Date(formData.idealDate.getTime() - (formData.idealDate.getTimezoneOffset() * 60000)).toISOString().slice(0, 16) : ''}
+              value={formData.idealDate ? formatDateForInput(formData.idealDate) : ''}
               onChange={handleDateChange}
               className="w-full p-3 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
             />
