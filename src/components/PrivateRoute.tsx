@@ -62,7 +62,7 @@ export const PrivateRoute = () => {
           "transition-all duration-300 p-4 md:p-6 lg:p-8 flex-grow",
           sidebarOpen 
             ? isMobile ? "ml-0" : "md:ml-64" 
-            : iMobile ? "ml-0" : "md:ml-20",
+            : isMobile ? "ml-0" : "md:ml-20",
           "flex justify-center"
         )}
       >
