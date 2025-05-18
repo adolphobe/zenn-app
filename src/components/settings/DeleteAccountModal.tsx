@@ -25,7 +25,7 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({ isOpen, onClose
   const [confirmText, setConfirmText] = useState('');
   const [error, setError] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
-  const { signOut } = useAuth();
+  const { logout } = useAuth();
   
   const handleNext = () => {
     if (step === 1) {
@@ -53,7 +53,7 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({ isOpen, onClose
       if (error) throw error;
       
       // Log the user out
-      await signOut();
+      await logout();
       
       toast({
         title: "Conta apagada",

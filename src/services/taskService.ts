@@ -2,6 +2,24 @@
 import { supabase } from '@/integrations/supabase/client';
 import { Task, TaskFormData } from '@/types';
 
+// Função auxiliar para mapear a resposta do Supabase para o formato Task
+const mapToTask = (data: any): Task => ({
+  id: data.id,
+  title: data.title,
+  consequenceScore: data.consequence_score,
+  prideScore: data.pride_score,
+  constructionScore: data.construction_score,
+  totalScore: data.total_score,
+  idealDate: data.ideal_date ? new Date(data.ideal_date) : null,
+  hidden: data.hidden,
+  completed: data.completed,
+  completedAt: data.completed_at,
+  createdAt: new Date(data.created_at),
+  feedback: data.feedback,
+  pillar: data.pillar,
+  comments: data.comments || []
+});
+
 export const fetchTasks = async (userId: string, completed: boolean = false): Promise<Task[]> => {
   const { data, error } = await supabase
     .from('tasks')
@@ -18,7 +36,7 @@ export const fetchTasks = async (userId: string, completed: boolean = false): Pr
     throw error;
   }
 
-  return data || [];
+  return (data || []).map(mapToTask);
 };
 
 export const createTask = async (taskData: TaskFormData, userId: string): Promise<Task> => {
@@ -59,7 +77,7 @@ export const createTask = async (taskData: TaskFormData, userId: string): Promis
     throw error;
   }
 
-  return { ...data, comments: [] };
+  return mapToTask({...data, comments: []});
 };
 
 export const updateTask = async (id: string, taskData: Partial<TaskFormData>): Promise<Task> => {
@@ -114,7 +132,7 @@ export const updateTask = async (id: string, taskData: Partial<TaskFormData>): P
     throw error;
   }
 
-  return data;
+  return mapToTask(data);
 };
 
 export const deleteTask = async (id: string): Promise<void> => {
@@ -149,7 +167,7 @@ export const toggleTaskCompletion = async (id: string, currentStatus: boolean): 
     throw error;
   }
 
-  return data;
+  return mapToTask(data);
 };
 
 export const toggleTaskHidden = async (id: string, currentStatus: boolean): Promise<Task> => {
@@ -168,7 +186,7 @@ export const toggleTaskHidden = async (id: string, currentStatus: boolean): Prom
     throw error;
   }
 
-  return data;
+  return mapToTask(data);
 };
 
 export const setTaskFeedback = async (
@@ -190,7 +208,7 @@ export const setTaskFeedback = async (
     throw error;
   }
 
-  return data;
+  return mapToTask(data);
 };
 
 export const addComment = async (taskId: string, userId: string, text: string): Promise<any> => {
@@ -243,5 +261,5 @@ export const restoreTask = async (id: string): Promise<Task> => {
     throw error;
   }
 
-  return data;
+  return mapToTask(data);
 };
