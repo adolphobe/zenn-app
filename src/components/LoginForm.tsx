@@ -33,29 +33,29 @@ const LoginForm: React.FC<LoginFormProps> = ({
     return unsubscribe;
   }, [setupErrorClearing]);
 
-  // Este log ajuda a confirmar se o componente está recebendo o erro
   useEffect(() => {
     console.log("[LoginForm Component] Renderizado com erro:", loginError);
   }, [loginError]);
 
   return (
-    <Form {...form}>
-      <form onSubmit={onSubmit} className="space-y-4" noValidate>
-        {/* O componente de erro ACIMA dos campos para melhor visibilidade */}
-        <LoginErrorDisplay 
-          error={loginError} 
-          suggestion={loginSuggestion} 
-        />
-        
-        <LoginFormFields form={form} />
+    <div className="w-full">
+      <Form {...form}>
+        <form onSubmit={onSubmit} className="space-y-4" noValidate>
+          <LoginErrorDisplay 
+            error={loginError} 
+            suggestion={loginSuggestion} 
+          />
+          
+          <LoginFormFields form={form} />
 
-        <LoginActions 
-          isLoading={isLoading}
-          onForgotPassword={onForgotPassword}
-          onSwitchToSignup={onSwitchToSignup}
-        />
-      </form>
-    </Form>
+          <LoginActions 
+            isLoading={isLoading}
+            onForgotPassword={onForgotPassword}
+            onSwitchToSignup={onSwitchToSignup}
+          />
+        </form>
+      </Form>
+    </div>
   );
 };
 
