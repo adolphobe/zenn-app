@@ -1,6 +1,6 @@
 
 import React, { useRef, useEffect } from 'react';
-import { isTaskOverdue } from '@/utils';
+import { isTaskOverdue, safeParseDate } from '@/utils';
 import { ViewMode } from '@/types';
 
 interface TaskCardTitleProps {
@@ -11,7 +11,7 @@ interface TaskCardTitleProps {
   onTitleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onTitleBlur: () => void;
   onTitleKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void;
-  idealDate?: Date | null;
+  idealDate?: Date | string | null;
   viewMode?: ViewMode;
 }
 
@@ -29,7 +29,8 @@ const TaskCardTitle: React.FC<TaskCardTitleProps> = ({
   const titleInputRef = useRef<HTMLInputElement>(null);
   
   // Determine if task is overdue and should have red text
-  const isOverdue = idealDate && isTaskOverdue(idealDate);
+  const parsedDate = idealDate ? safeParseDate(idealDate) : null;
+  const isOverdue = parsedDate ? isTaskOverdue(parsedDate) : false;
   const showOverdueStyle = viewMode === 'chronological' && isOverdue;
 
   useEffect(() => {

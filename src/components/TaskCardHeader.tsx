@@ -71,10 +71,10 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
     }
   };
   
-  // Garantir que temos uma data válida - primeiro converte idealDate para Date usando safeParseDate
-  const parsedDate = safeParseDate(idealDate);
+  // Garantir que temos uma data válida - primeiro converte idealDate para Date ou null
+  const parsedDate = idealDate ? safeParseDate(idealDate) : null;
   
-  // Check if task is overdue (before current date and time), usando apenas parsedDate que é Date | null
+  // Check if task is overdue (before current date and time)
   const taskIsOverdue = parsedDate ? isTaskOverdue(parsedDate) : false;
   
   // In chronological mode, always show dates regardless of showDates setting
