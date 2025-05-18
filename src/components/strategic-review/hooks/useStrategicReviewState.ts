@@ -11,8 +11,23 @@ export const useStrategicReviewState = (tasks: Task[]) => {
   const [customEndDate, setCustomEndDate] = useState<Date | undefined>(undefined);
   const [showCustomDatePicker, setShowCustomDatePicker] = useState(false);
   
+  // Log inicial das tarefas recebidas
+  useEffect(() => {
+    console.log("useStrategicReviewState: Total de tarefas recebidas:", tasks?.length || 0);
+    
+    // Log detalhado para verificar se as tarefas possuem dados de conclusão
+    const completedWithDate = tasks?.filter(t => t.completed && t.completedAt)?.length || 0;
+    console.log(`useStrategicReviewState: ${completedWithDate} tarefas concluídas com data de conclusão`);
+    
+    if (tasks?.length > 0 && completedWithDate === 0) {
+      console.warn("useStrategicReviewState: ALERTA - Tarefas sem datas de conclusão podem não aparecer na análise");
+    }
+  }, [tasks]);
+  
   // Reset custom dates when changing to a non-custom period
   useEffect(() => {
+    console.log("useStrategicReviewState: Período alterado para:", period);
+    
     if (period !== 'custom-range') {
       setShowCustomDatePicker(false);
     } else {
@@ -34,10 +49,34 @@ export const useStrategicReviewState = (tasks: Task[]) => {
     return getDateRangeByPeriod(period);
   }, [period, customStartDate, customEndDate]);
   
+  // Log do intervalo de datas calculado
+  useEffect(() => {
+    if (dateRange && dateRange.length === 2) {
+      console.log(`useStrategicReviewState: Intervalo de datas: ${dateRange[0].toISOString()} até ${dateRange[1].toISOString()}`);
+    }
+  }, [dateRange]);
+  
   // Filter tasks based on date range
   const filteredTasks = useMemo(() => {
-    const filtered = filterTasksByDateRange(tasks, dateRange);
-    console.log(`Filtered ${filtered.length} completed tasks for analysis`);
+    const tasksSafe = Array.isArray(tasks) ? tasks : [];
+    const filtered = filterTasksByDateRange(tasksSafe, dateRange);
+    
+    console.log(`useStrategicReviewState: Filtrado ${filtered.length} de ${tasksSafe.length} tarefas para análise`);
+    
+    // Log detalhado sobre as tarefas filtradas
+    if (filtered.length === 0 && tasksSafe.length > 0) {
+      console.warn("useStrategicReviewState: ALERTA - Nenhuma tarefa filtrada apesar de existirem tarefas. Verificando datas:");
+      
+      const completedTasks = tasksSafe.filter(t => t.completed);
+      console.log(`useStrategicReviewState: Total de tarefas concluídas: ${completedTasks.length}`);
+      
+      completedTasks.forEach((task, idx) => {
+        if (idx < 5) { // Limita o log às primeiras 5 tarefas
+          console.log(`Tarefa #${idx + 1}: "${task.title}" - Concluída: ${task.completed}, Data: ${task.completedAt}`);
+        }
+      });
+    }
+    
     return filtered;
   }, [tasks, dateRange]);
   
@@ -66,6 +105,7 @@ export const useStrategicReviewState = (tasks: Task[]) => {
 
   // Handler for period changes
   const handlePeriodChange = (newPeriod: PeriodType) => {
+    console.log("useStrategicReviewState: Alterando período para:", newPeriod);
     setPeriod(newPeriod);
   };
   

@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 
 interface PillarTooltipProps {
   active?: boolean;
@@ -7,7 +7,20 @@ interface PillarTooltipProps {
 }
 
 const PillarTooltip: React.FC<PillarTooltipProps> = ({ active, payload }) => {
-  if (!active || !payload || !payload.length || !payload[0]?.payload) {
+  // Adicionar log para rastrear valores recebidos
+  useEffect(() => {
+    if (active && payload && payload.length > 0) {
+      console.log("PillarTooltip: Payload recebido:", payload[0]?.payload);
+    }
+  }, [active, payload]);
+
+  if (!active || !payload || !payload.length) {
+    return null;
+  }
+  
+  // Verificar se payload[0] existe antes de acessar payload
+  if (!payload[0]) {
+    console.warn("PillarTooltip: payload[0] é undefined");
     return null;
   }
   
@@ -15,6 +28,7 @@ const PillarTooltip: React.FC<PillarTooltipProps> = ({ active, payload }) => {
   
   // Check if the necessary data exists before accessing it
   if (!data || !data.id || typeof data.value !== 'number') {
+    console.warn("PillarTooltip: Dados inválidos no payload:", data);
     return null;
   }
   

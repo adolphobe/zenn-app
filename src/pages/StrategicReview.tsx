@@ -14,7 +14,7 @@ import { useToast } from '@/hooks/use-toast';
 const StrategicReview: React.FC = () => {
   const { state } = useAppContext();
   const { isAuthenticated } = useAuth();
-  const { toast } = useToast();
+  const { toasts, addToast } = useToast(); // Corrigido para usar addToast, não toast diretamente
   const isFirstRender = useRef(true);
   
   // Verificação simples de autenticação
@@ -37,25 +37,35 @@ const StrategicReview: React.FC = () => {
     setCustomEndDate,
     handlePeriodChange
   } = useStrategicReviewState(state.tasks);
+
+  // Adicionar logs para diagnóstico
+  useEffect(() => {
+    console.log("StrategicReview: Total de tarefas disponíveis:", state.tasks.length);
+    console.log("StrategicReview: Tarefas filtradas para análise:", filteredTasks.length);
+    console.log("StrategicReview: Período selecionado:", period);
+    console.log("StrategicReview: Data range:", dateRangeDisplay);
+  }, [state.tasks, filteredTasks, period, dateRangeDisplay]);
   
   useEffect(() => {
     // Ensure all tasks have pillars assigned - explicitly call this
     assignMissingPillars();
+    console.log("StrategicReview: assignMissingPillars() executado");
     
     // Show a toast to indicate the page is loaded - only on first render
     if (isFirstRender.current) {
-      // Use toast from the hook context
+      // Use addToast from the hook context
       try {
-        toast({
+        addToast({
           title: "Revisão Estratégica",
           description: "Mostrando análise das tarefas concluídas."
         });
+        console.log("StrategicReview: Toast de boas-vindas exibido");
       } catch (error) {
         console.error("Error showing toast:", error);
       }
       isFirstRender.current = false;
     }
-  }, [assignMissingPillars, toast]);
+  }, [assignMissingPillars, addToast]);
   
   return (
     <div className="w-full">

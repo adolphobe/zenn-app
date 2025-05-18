@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Task } from '@/types';
 import { useInsightsAnalysis } from './hooks/useInsightsAnalysis';
@@ -12,8 +12,19 @@ interface PillarsAnalysisCardProps {
 }
 
 const PillarsAnalysisCard: React.FC<PillarsAnalysisCardProps> = ({ tasks }) => {
+  // Log de diagnóstico
+  useEffect(() => {
+    console.log("PillarsAnalysisCard: Recebeu tasks:", tasks?.length || 0);
+  }, [tasks]);
+  
   // Use the insights analysis hook to get pillar data with proper fallbacks
   const pillarData = useInsightsAnalysis(tasks || []);
+  
+  // Log para diagnóstico dos dados processados
+  useEffect(() => {
+    console.log("PillarsAnalysisCard: Dados de pilares:", 
+      pillarData ? `Averages: ${pillarData.averages?.length || 0}, Insights: ${pillarData.insights?.length || 0}` : "Dados não disponíveis");
+  }, [pillarData]);
   
   // Use the pillar hover hook to handle dynamic insights with fallbacks
   const { activeInsight, handlePillarHover } = usePillarHover(
@@ -21,9 +32,14 @@ const PillarsAnalysisCard: React.FC<PillarsAnalysisCardProps> = ({ tasks }) => {
     'consequence'
   );
   
+  // Log para diagnóstico de insights ativos
+  useEffect(() => {
+    console.log("PillarsAnalysisCard: Insight ativo:", activeInsight?.id || "nenhum");
+  }, [activeInsight]);
+  
   // Safety check for missing data
   if (!pillarData || !pillarData.averages) {
-    console.error("Missing pillar data in PillarsAnalysisCard");
+    console.warn("PillarsAnalysisCard: Dados de pilares ausentes ou incompletos");
     return (
       <Card>
         <CardHeader>
@@ -55,10 +71,16 @@ const PillarsAnalysisCard: React.FC<PillarsAnalysisCardProps> = ({ tasks }) => {
       </CardHeader>
       <CardContent>
         <div className="h-64 mb-6">
-          <PillarChart 
-            data={pillarData.averages}
-            onPillarHover={handlePillarHover}
-          />
+          {pillarData.averages.length > 0 ? (
+            <PillarChart 
+              data={pillarData.averages}
+              onPillarHover={handlePillarHover}
+            />
+          ) : (
+            <div className="h-full flex items-center justify-center">
+              <p className="text-muted-foreground">Não há dados de pilares disponíveis para análise</p>
+            </div>
+          )}
         </div>
         
         {/* Dynamic Insight Box - with safety check */}

@@ -35,6 +35,7 @@ export function Toaster() {
   // Custom toast handler implementation
   const addToast = React.useCallback((data: ExtendedToastProps) => {
     const id = data.id || uuidv4()
+    console.log("Toast: Adicionando novo toast com ID:", id);
     
     setToasts((prevToasts) => {
       return [
@@ -47,15 +48,19 @@ export function Toaster() {
         }
       ]
     })
+    
+    return id;
   }, [])
 
   const removeToast = React.useCallback((id: string) => {
+    console.log("Toast: Removendo toast com ID:", id);
     setToasts((prevToasts) => 
       prevToasts.filter((toast) => toast.id !== id)
     )
   }, [])
 
   const updateToast = React.useCallback((id: string, data: Partial<ExtendedToastProps>) => {
+    console.log("Toast: Atualizando toast com ID:", id);
     setToasts((prevToasts) => 
       prevToasts.map((toast) => 
         toast.id === id ? { ...toast, ...data } : toast
@@ -99,14 +104,20 @@ export function useToast() {
   
   // Fallback if used outside provider
   if (!context) {
+    console.warn("useToast: O hook está sendo usado fora do ToastProvider");
     return {
       toasts: [],
       addToast: (props: ExtendedToastProps) => {
         const id = props.id || uuidv4();
-        console.log(`Toast created: ${id}`, props);
+        console.log(`Toast criado (fallback): ${id}`, props);
+        return id;
       },
-      removeToast: (id: string) => {},
-      updateToast: (id: string, props: Partial<ExtendedToastProps>) => {},
+      removeToast: (id: string) => {
+        console.log(`Toast removido (fallback): ${id}`);
+      },
+      updateToast: (id: string, props: Partial<ExtendedToastProps>) => {
+        console.log(`Toast atualizado (fallback): ${id}`, props);
+      },
     };
   }
   
@@ -115,11 +126,13 @@ export function useToast() {
 
 // Helper function for creating toasts
 export const toast = (props: ExtendedToastProps) => {
-  const { addToast } = useToast();
-  addToast({
-    ...props,
-    id: props.id || uuidv4()
-  });
+  // Em um módulo, não podemos chamar hooks diretamente
+  // Esta função deve ser usada dentro de componentes
+  console.log("toast(): Esta função é apenas um proxy e deve ser usada dentro de componentes");
+  console.log("toast(): Dados recebidos:", props);
+  
+  // Esta implementação será substituída quando usada dentro de componentes
+  return props.id || uuidv4();
 };
 
 export {
