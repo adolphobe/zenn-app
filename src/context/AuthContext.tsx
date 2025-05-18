@@ -1,4 +1,3 @@
-
 import { createContext, useState, useContext, useEffect, ReactNode } from 'react';
 import { User } from '../types/user';
 import { supabase } from '@/integrations/supabase/client';
@@ -33,7 +32,6 @@ export const useAuth = () => {
   if (!context) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
-  
   return context;
 };
 
@@ -87,133 +85,103 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [authState, setAuthState] = useState<string>("INITIALIZING");
-  const instanceId = Math.random().toString(36).substring(2, 7);
 
   // Set up auth state listener and check for existing session
   useEffect(() => {
-    console.log(`[AuthProvider:${instanceId}] INICIANDO PROVIDER DE AUTENTICAÇÃO`);
-    console.log(`[AuthProvider:${instanceId}] Estado atual: ${authState}`);
-
-    let unmounted = false;
+    console.log("[AuthProvider] Inicializando estado de autenticação");
+    console.log("[AuthProvider] DETALHES EM PORTUGUÊS: Verificando se existe uma sessão ativa");
+    
+    // First check for existing session to set initial state
+    const checkInitialSession = async () => {
+      try {
+        const { data } = await supabase.auth.getSession();
+        console.log("[AuthProvider] Verificação inicial da sessão:", data.session ? "Sessão encontrada" : "Nenhuma sessão");
+        console.log("[AuthProvider] DETALHES EM PORTUGUÊS:", data.session ? "Encontramos uma sessão ativa" : "Nenhuma sessão ativa encontrada");
+        
+        if (data.session) {
+          setSession(data.session);
+          // Fetch user profile data
+          fetchUserProfile(data.session.user);
+        } else {
+          // No session found, mark as not loading
+          setIsLoading(false);
+        }
+      } catch (error) {
+        console.error("[AuthProvider] Erro ao verificar sessão:", error);
+        console.error("[AuthProvider] DETALHES EM PORTUGUÊS: Ocorreu um erro ao verificar se existe uma sessão ativa");
+        setIsLoading(false);
+      }
+    };
     
     // Helper function to fetch user profile
     const fetchUserProfile = async (user: any) => {
-      if (unmounted) return;
-      
       try {
-        console.log(`[AuthProvider:${instanceId}] Buscando perfil do usuário: ${user.email}`);
         const { data: profileData } = await supabase
           .from('profiles')
           .select('*')
           .eq('id', user.id)
           .maybeSingle();
           
-        if (unmounted) return;
-        
         const mappedUser = mapSupabaseUser(user, profileData);
-        console.log(`[AuthProvider:${instanceId}] Perfil do usuário carregado: ${user.email}`);
+        console.log("[AuthProvider] Perfil do usuário carregado:", mappedUser.email);
+        console.log("[AuthProvider] DETALHES EM PORTUGUÊS: Perfil do usuário carregado com sucesso");
         setCurrentUser(mappedUser);
-        setIsLoading(false);
-        setAuthState("COMPLETED_PROFILE_FETCH");
       } catch (error) {
-        console.error(`[AuthProvider:${instanceId}] Erro ao buscar perfil:`, error);
-        if (unmounted) return;
-        
+        console.error("[AuthProvider] Erro ao buscar perfil do usuário:", error);
+        console.error("[AuthProvider] DETALHES EM PORTUGUÊS: Ocorreu um erro ao carregar os dados do perfil do usuário");
         const mappedUser = mapSupabaseUser(user);
         setCurrentUser(mappedUser);
+      } finally {
         setIsLoading(false);
-        setAuthState("ERROR_PROFILE_FETCH");
       }
     };
     
-    // First set up auth state change listener
-    console.log(`[AuthProvider:${instanceId}] Configurando listener de autenticação`);
+    // Check initial session
+    checkInitialSession();
     
+    // Set up auth state change listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, newSession) => {
-        if (unmounted) return;
-        
-        console.log(`[AuthProvider:${instanceId}] Evento de autenticação: ${event}`, {
-          hasSession: !!newSession,
-          timestamp: new Date().toISOString()
-        });
+      async (event, newSession) => {
+        console.log("[AuthProvider] Estado de autenticação alterado:", event);
+        console.log("[AuthProvider] DETALHES EM PORTUGUÊS: Evento de autenticação detectado:", 
+          event === 'SIGNED_IN' ? 'Usuário entrou' : 
+          event === 'SIGNED_OUT' ? 'Usuário saiu' : 
+          'Outro evento de autenticação');
         
         if (event === 'SIGNED_OUT') {
-          console.log(`[AuthProvider:${instanceId}] Evento de logout detectado`);
+          console.log("[AuthProvider] Usuário deslogado");
+          console.log("[AuthProvider] DETALHES EM PORTUGUÊS: Usuário encerrou a sessão");
           setSession(null);
           setCurrentUser(null);
           setIsLoading(false);
-          setAuthState("SIGNED_OUT");
           return;
         }
         
         if (newSession?.user) {
-          console.log(`[AuthProvider:${instanceId}] Nova sessão: ${newSession.user.email}`);
+          console.log("[AuthProvider] Nova sessão detectada");
+          console.log("[AuthProvider] DETALHES EM PORTUGUÊS: Iniciando nova sessão para o usuário");
           setSession(newSession);
-          
-          // Simple limited timeout to break any potential loops
-          setTimeout(() => {
-            fetchUserProfile(newSession.user);
-          }, 50);
+          // Fetch user profile using the helper
+          fetchUserProfile(newSession.user);
         }
       }
     );
     
-    // Then check for existing session to set initial state
-    const checkInitialSession = async () => {
-      try {
-        console.log(`[AuthProvider:${instanceId}] Verificando sessão inicial`);
-        
-        const { data } = await supabase.auth.getSession();
-        
-        if (unmounted) return;
-        
-        if (data.session) {
-          console.log(`[AuthProvider:${instanceId}] Sessão inicial encontrada: ${data.session.user.email}`);
-          setSession(data.session);
-          
-          // Add a delay before fetching profile to avoid potential race conditions
-          setTimeout(() => {
-            if (!unmounted) {
-              fetchUserProfile(data.session!.user);
-            }
-          }, 100);
-        } else {
-          console.log(`[AuthProvider:${instanceId}] Nenhuma sessão inicial encontrada`);
-          setIsLoading(false);
-          setAuthState("NO_INITIAL_SESSION");
-        }
-      } catch (error) {
-        console.error(`[AuthProvider:${instanceId}] Erro ao verificar sessão:`, error);
-        if (!unmounted) {
-          setIsLoading(false);
-          setAuthState("ERROR_CHECKING_SESSION");
-        }
-      }
-    };
-    
-    // Check initial session with a slight delay to allow listener to set up
-    setTimeout(() => {
-      if (!unmounted) {
-        checkInitialSession();
-      }
-    }, 50);
-    
     // Clean up subscription on unmount
     return () => {
-      unmounted = true;
-      console.log(`[AuthProvider:${instanceId}] Limpando AuthProvider`);
+      console.log("[AuthProvider] Limpando - cancelando inscrição em eventos de autenticação");
+      console.log("[AuthProvider] DETALHES EM PORTUGUÊS: Desativando monitoramento de eventos de autenticação");
       subscription.unsubscribe();
     };
-  }, [authState, instanceId]);
+  }, []);
 
   // Login function
   const login = async (email: string, password: string): Promise<boolean> => {
     setIsLoading(true);
     
     try {
-      console.log(`[AuthProvider:${instanceId}] Tentando login: ${email}`);
+      console.log("[AuthProvider] Tentando login com email:", email);
+      console.log("[AuthProvider] DETALHES EM PORTUGUÊS: Tentando fazer login com o email:", email);
       
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
@@ -221,11 +189,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       });
       
       if (error) {
-        console.error(`[AuthProvider:${instanceId}] Erro de login:`, error.message);
+        console.error("[AuthProvider] Erro de login:", error.message);
+        console.error("[AuthProvider] DETALHES EM PORTUGUÊS: Falha ao fazer login. Erro:", error.message);
+        
+        // Show more user-friendly error messages
+        let errorMessage = "Falha no login. Verifique suas credenciais.";
+        if (error.message.includes("Invalid login credentials")) {
+          errorMessage = "Usuário não encontrado ou senha incorreta. Por favor, tente novamente.";
+        }
         
         toast({
           title: "Falha no login",
-          description: "Usuário não encontrado ou senha incorreta. Por favor, tente novamente.",
+          description: errorMessage,
           variant: "destructive"
         });
         
@@ -233,7 +208,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         return false;
       }
       
-      console.log(`[AuthProvider:${instanceId}] Login bem-sucedido: ${data.user?.email}`);
+      console.log("[AuthProvider] Login bem-sucedido:", data.user?.email);
+      console.log("[AuthProvider] DETALHES EM PORTUGUÊS: Login realizado com sucesso");
       
       toast({
         title: "Login realizado com sucesso",
@@ -242,7 +218,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       
       return true;
     } catch (error: any) {
-      console.error(`[AuthProvider:${instanceId}] Erro inesperado:`, error);
+      console.error("[AuthProvider] Erro de login:", error);
+      console.error("[AuthProvider] DETALHES EM PORTUGUÊS: Ocorreu um erro inesperado durante o processo de login");
       
       toast({
         title: "Erro no login",
@@ -260,7 +237,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setIsLoading(true);
     
     try {
-      console.log(`[AuthProvider:${instanceId}] Tentando criar conta: ${email}`);
+      console.log("[AuthProvider] Tentando criar conta com email:", email);
+      console.log("[AuthProvider] DETALHES EM PORTUGUÊS: Iniciando processo de criação de conta");
       
       const { data, error } = await supabase.auth.signUp({
         email,
@@ -273,7 +251,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       });
       
       if (error) {
-        console.error(`[AuthProvider:${instanceId}] Erro no cadastro:`, error.message);
+        console.error("[AuthProvider] Erro no cadastro:", error.message);
+        console.error("[AuthProvider] DETALHES EM PORTUGUÊS: Falha ao criar nova conta. Erro:", error.message);
         
         toast({
           title: "Falha na criação da conta",
@@ -286,7 +265,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
       
       if (data?.user?.identities?.length === 0) {
-        console.error(`[AuthProvider:${instanceId}] Usuário já existe`);
+        console.error("[AuthProvider] Usuário já existe");
+        console.error("[AuthProvider] DETALHES EM PORTUGUÊS: Este email já está registrado no sistema");
         
         toast({
           title: "Falha na criação da conta",
@@ -300,7 +280,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       
       // Check if email confirmation is required
       if (data?.user && data.session) {
-        console.log(`[AuthProvider:${instanceId}] Conta criada e autenticada`);
+        console.log("[AuthProvider] Conta criada e autenticada automaticamente");
+        console.log("[AuthProvider] DETALHES EM PORTUGUÊS: Conta criada com sucesso e login efetuado automaticamente");
         
         // Set session and user data immediately
         setSession(data.session);
@@ -312,11 +293,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           description: "Sua conta foi criada e você foi autenticado automaticamente."
         });
       } else if (data?.user) {
-        console.log(`[AuthProvider:${instanceId}] Confirmação de email necessária`);
+        console.log("[AuthProvider] Confirmação de email necessária");
+        console.log("[AuthProvider] DETALHES EM PORTUGUÊS: Conta criada. É necessário confirmar o email antes de fazer login");
         
         toast({
           title: "Conta criada com sucesso",
-          description: `Um email de confirmação foi enviado para ${email}. Por favor, verifique sua caixa de entrada.`,
+          description: "Um email de confirmação foi enviado para " + email + ". Por favor, verifique sua caixa de entrada e confirme seu email para entrar.",
         });
         
         setIsLoading(false);
@@ -324,7 +306,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       
       return true;
     } catch (error: any) {
-      console.error(`[AuthProvider:${instanceId}] Erro no cadastro:`, error);
+      console.error("[AuthProvider] Erro no cadastro:", error);
+      console.error("[AuthProvider] DETALHES EM PORTUGUÊS: Ocorreu um erro inesperado durante a criação da conta");
       
       toast({
         title: "Falha na criação da conta",
@@ -339,7 +322,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   
   // Logout function - Enhanced to ensure complete session removal
   const logout = async (): Promise<void> => {
-    console.log(`[AuthProvider:${instanceId}] Iniciando logout`);
+    console.log("[AuthProvider] Iniciando processo completo de logout do usuário");
+    console.log("[AuthProvider] DETALHES EM PORTUGUÊS: Iniciando processo completo de logout no sistema");
     
     setIsLoading(true);
     
@@ -356,7 +340,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const { error } = await supabase.auth.signOut({ scope: 'global' });
       
       if (error) {
-        console.error(`[AuthProvider:${instanceId}] Erro no logout:`, error.message);
+        console.error("[AuthProvider] Erro no logout:", error.message);
+        console.error("[AuthProvider] DETALHES EM PORTUGUÊS: Erro ao tentar encerrar a sessão:", error.message);
         
         toast({
           title: "Falha no logout",
@@ -364,7 +349,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           variant: "destructive"
         });
       } else {
-        console.log(`[AuthProvider:${instanceId}] Logout bem-sucedido`);
+        console.log("[AuthProvider] Usuário deslogado com sucesso");
+        console.log("[AuthProvider] DETALHES EM PORTUGUÊS: Sessão encerrada com sucesso");
         
         toast({
           title: "Logout realizado",
@@ -372,20 +358,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         });
       }
     } catch (error) {
-      console.error(`[AuthProvider:${instanceId}] Erro durante logout:`, error);
+      console.error("[AuthProvider] Erro durante logout:", error);
+      console.error("[AuthProvider] DETALHES EM PORTUGUÊS: Ocorreu um erro inesperado ao tentar encerrar a sessão");
     } finally {
       // Always clear user states and session when logging out
       setCurrentUser(null);
       setSession(null);
       setIsLoading(false);
-      setAuthState("LOGGED_OUT");
     }
   };
   
   // Context value
   const value = {
     currentUser,
-    isAuthenticated: !!session?.user && !!currentUser,
+    isAuthenticated: !!session?.user,
     isLoading,
     login,
     signup,

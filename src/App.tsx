@@ -26,41 +26,34 @@ const queryClient = new QueryClient({
   },
 });
 
-const App = () => {
-  // Add a unique identifier for logging
-  const instanceId = Math.random().toString(36).substring(2, 9);
-  console.log(`[App:${instanceId}] Inicializando App em ${new Date().toISOString()}`);
-  
-  return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        {/* AuthProvider comes first and is separate from other context */}
-        <AuthProvider>
-          <AppProvider>
-            <ToastProvider>
-              <Toaster />
-              <Sonner />
-              <Routes>
-                {/* Public routes */}
-                <Route path="/" element={<Landing />} />
-                <Route path="/login" element={<Login />} />
-                
-                {/* Protected routes */}
-                <Route element={<PrivateRoute />}>
-                  <Route path="/dashboard" element={<Dashboard />} />
-                  <Route path="/strategic-review" element={<StrategicReview />} />
-                  <Route path="/history" element={<TaskHistory />} />
-                </Route>
-                
-                {/* Fallback route */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </ToastProvider>
-          </AppProvider>
-        </AuthProvider>
-      </TooltipProvider>
-    </QueryClientProvider>
-  );
-};
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <TooltipProvider>
+      <AuthProvider>
+        <AppProvider>
+          <ToastProvider>
+            <Toaster />
+            <Sonner />
+            <Routes>
+              {/* Public routes */}
+              <Route path="/" element={<Landing />} />
+              <Route path="/login" element={<Login />} />
+              
+              {/* Protected routes */}
+              <Route element={<PrivateRoute />}>
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/strategic-review" element={<StrategicReview />} />
+                <Route path="/history" element={<TaskHistory />} />
+              </Route>
+              
+              {/* Fallback route */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </ToastProvider>
+        </AppProvider>
+      </AuthProvider>
+    </TooltipProvider>
+  </QueryClientProvider>
+);
 
 export default App;

@@ -1,7 +1,7 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { useAppContext } from '@/context/AppContext';
-import { useAuth } from '@/context/AuthContext'; // Mantemos o import para fins de log
+import { useAuth } from '@/context/AuthContext';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Calendar } from '@/components/ui/calendar';
 import { format, isSameDay, startOfDay, endOfDay } from 'date-fns';
@@ -12,46 +12,30 @@ import PillarsAnalysisCard from '@/components/strategic-review/PillarsAnalysisCa
 import FeedbackAnalysisCard from '@/components/strategic-review/FeedbackAnalysisCard';
 import { toast } from '@/hooks/use-toast';
 import { useTaskPillars } from '@/context/hooks';
+import { ResizablePanelGroup, ResizablePanel } from '@/components/ui/resizable';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { CalendarIcon, CalendarRange } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-/**
- * Strategic Review Page Component
- * Simplified - removed authentication checks
- */
+// Main Strategic Review Page Component
 const StrategicReview: React.FC = () => {
-  // Create instance ID for better tracking
-  const instanceId = Math.random().toString(36).substring(2, 7);
-  const timestamp = new Date().toISOString();
-  
-  // Log component initialization
-  console.log(`[StrategicReview:${instanceId}] INICIALIZADO em ${timestamp}`);
-  
   const { state } = useAppContext();
-  const { currentUser } = useAuth(); // Mantemos para mostrar informações, mas não bloqueamos acesso
+  const { isAuthenticated } = useAuth();
   const [period, setPeriod] = useState<PeriodType>('week');
   const [customStartDate, setCustomStartDate] = useState<Date | undefined>(undefined);
   const [customEndDate, setCustomEndDate] = useState<Date | undefined>(undefined);
   const [showCustomDatePicker, setShowCustomDatePicker] = useState(false);
   
-  // Registro simplificado de usuário atual (apenas para diagnóstico)
+  // Verificação simples de autenticação
   useEffect(() => {
-    console.log(`[StrategicReview:${instanceId}] Usuário atual: ${currentUser?.email || "Nenhum usuário"}`);
-    
-    return () => {
-      console.log(`[StrategicReview:${instanceId}] Componente será desmontado em ${new Date().toISOString()}`);
-    };
-  }, [currentUser, instanceId]);
+    console.log("StrategicReview: Estado de autenticação =>", isAuthenticated ? "Autenticado" : "Não autenticado");
+  }, [isAuthenticated]);
   
   // Use the task pillars hook to ensure all tasks have pillars assigned
   const { assignMissingPillars } = useTaskPillars();
   
   useEffect(() => {
-    // Log that we're initializing tasks
-    console.log(`[StrategicReview:${instanceId}] Inicializando tarefas do componente em ${new Date().toISOString()}`);
-    
     // Ensure all tasks have pillars assigned - explicitly call this
     assignMissingPillars();
     
@@ -60,10 +44,7 @@ const StrategicReview: React.FC = () => {
       title: "Revisão Estratégica",
       description: "Mostrando análise das tarefas concluídas."
     });
-    
-    // Log tasks data
-    console.log(`[StrategicReview:${instanceId}] Total de tarefas disponíveis: ${state.tasks.length}`);
-  }, [assignMissingPillars, state.tasks.length, instanceId]);
+  }, [assignMissingPillars]);
   
   // Reset custom dates when changing to a non-custom period
   useEffect(() => {
@@ -91,9 +72,9 @@ const StrategicReview: React.FC = () => {
   // Filter tasks based on date range
   const filteredTasks = useMemo(() => {
     const filtered = filterTasksByDateRange(state.tasks, dateRange);
-    console.log(`[StrategicReview:${instanceId}] Filtradas ${filtered.length} tarefas para análise`);
+    console.log(`Filtered ${filtered.length} completed tasks for analysis`);
     return filtered;
-  }, [state.tasks, dateRange, instanceId]);
+  }, [state.tasks, dateRange]);
   
   // Format date range for display
   const dateRangeDisplay = useMemo(() => {
@@ -120,23 +101,11 @@ const StrategicReview: React.FC = () => {
 
   const hasCompletedTasks = filteredTasks.length > 0;
   
-  // Já não fazemos verificações de autenticação - essa é a principal alteração
-  console.log(`[StrategicReview:${instanceId}] RENDERIZANDO CONTEÚDO PRINCIPAL em ${new Date().toISOString()}`);
-  
   return (
     <div className="w-full">
       <div className="mb-6">
         <h1 className="text-3xl font-bold tracking-tight">Insights das suas tarefas</h1>
         <p className="text-muted-foreground">Período: {dateRangeDisplay}</p>
-      </div>
-      
-      {/* Painel de status de autenticação - somente para diagnóstico */}
-      <div className="mb-4 px-4 py-2 bg-blue-50 text-blue-800 rounded-md">
-        <p className="font-medium">Painel de diagnóstico:</p>
-        <p>Status: Este componente não verifica mais autenticação</p>
-        <p>Usuário atual: {currentUser?.email || "Nenhum"}</p>
-        <p className="text-xs">ID da instância: {instanceId}</p>
-        <p className="text-xs">Hora de renderização: {timestamp}</p>
       </div>
       
       <Tabs defaultValue="week" value={period} onValueChange={(value) => setPeriod(value as PeriodType)} className="space-y-6">
@@ -253,10 +222,12 @@ const StrategicReview: React.FC = () => {
           {/* Only show analysis cards if there are tasks */}
           {hasCompletedTasks && (
             <div className="grid gap-6 md:grid-cols-2">
+              {/* Making each card have the same height with matching flex */}
               <div className="flex">
                 <FeedbackAnalysisCard tasks={filteredTasks} />
               </div>
               
+              {/* Right column */}
               <div className="flex">
                 <PillarsAnalysisCard tasks={filteredTasks} />
               </div>

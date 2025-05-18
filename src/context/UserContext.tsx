@@ -19,10 +19,6 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Usar o contexto de autenticação diretamente
   const auth = useAuth();
   
-  // Log da renderização do provider
-  const instanceId = Math.random().toString(36).substring(2, 7);
-  console.log(`[UserProvider:${instanceId}] Renderizando em ${new Date().toISOString()}`);
-  
   // Simplificar e passar diretamente do AuthContext
   const value = {
     currentUser: auth.currentUser,

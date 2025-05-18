@@ -1,19 +1,19 @@
 
 import React from 'react';
-import { useAuth } from '@/context/AuthContext'; // Direct import
+import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 import { LogOut, User as UserIcon } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { toast } from '@/hooks/use-toast';
 
 const UserMenu: React.FC = () => {
-  // Create instance ID for better tracking
-  const instanceId = Math.random().toString(36).substring(2, 7);
-  const { currentUser, logout, isAuthenticated } = useAuth();
+  const { currentUser, logout } = useAuth();
+  const navigate = useNavigate();
 
   const handleLogout = async () => {
     try {
       // Log the logout attempt
-      console.log(`[UserMenu:${instanceId}] Iniciando processo de logout em ${new Date().toISOString()}`);
+      console.log("[UserMenu] Iniciando processo completo de logout");
       
       // Force clear local storage first
       localStorage.removeItem('sb-wbvxnapruffchikhrqrs-auth-token');
@@ -24,14 +24,20 @@ const UserMenu: React.FC = () => {
       
       toast({
         title: "Logout realizado",
-        description: "Você foi desconectado com sucesso. Redirecionamento automático desativado.",
+        description: "Você foi desconectado com sucesso",
       });
       
-      console.log(`[UserMenu:${instanceId}] Logout realizado com sucesso - ${new Date().toISOString()}`);
+      console.log("[UserMenu] DETALHES EM PORTUGUÊS: Logout realizado com sucesso, redirecionando para página de login");
       
-      // No automatic redirect
+      // Navigate to login page after a delay to ensure logout is complete
+      setTimeout(() => {
+        navigate('/login', { 
+          state: { loggedOut: true } 
+        });
+      }, 300);
     } catch (error) {
-      console.error(`[UserMenu:${instanceId}] Erro ao fazer logout:`, error);
+      console.error("[UserMenu] Erro ao fazer logout:", error);
+      console.error("[UserMenu] DETALHES EM PORTUGUÊS: Ocorreu um erro ao tentar deslogar do sistema");
       
       toast({
         title: "Erro ao sair",
@@ -41,10 +47,7 @@ const UserMenu: React.FC = () => {
     }
   };
 
-  if (!currentUser) {
-    console.log(`[UserMenu:${instanceId}] UserMenu não renderizado - usuário não encontrado`);
-    return null;
-  }
+  if (!currentUser) return null;
 
   return (
     <div className="p-4 border-t border-gray-200 dark:border-gray-700 mt-auto">

@@ -1,12 +1,13 @@
 
 import React, { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import LoginForm from '../components/LoginForm';
 import SignupForm from '../components/SignupForm';
 
 const Login: React.FC = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { isAuthenticated, isLoading } = useAuth();
   const [isSignup, setIsSignup] = useState(false);
   const [loaded, setLoaded] = useState(false);
@@ -38,14 +39,14 @@ const Login: React.FC = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  // Logged user detection - just log, don't redirect
+  // Redirect automatically if authenticated and not just logged out
   useEffect(() => {
-    if (isAuthenticated && !isLoading) {
-      console.log("[Login] Usuário autenticado detectado em página de login, redirecionamento DESATIVADO");
-      console.log("[Login] DETALHES EM PORTUGUÊS: Normalmente seria redirecionado para:", from);
-      console.log("[Login] DETALHES DE DEBUG: Estado de autenticação:", { isAuthenticated, isLoading, from });
+    if (isAuthenticated && !isLoading && !isJustLoggedOut) {
+      console.log("[Login] Usuário autenticado, redirecionando para:", from);
+      console.log("[Login] DETALHES EM PORTUGUÊS: Autenticação verificada. Redirecionando para dashboard");
+      navigate(from);
     }
-  }, [isAuthenticated, isLoading, from]);
+  }, [isAuthenticated, isLoading, from, navigate, isJustLoggedOut]);
 
   // Toggle between login and signup
   const toggleSignup = () => {
@@ -59,24 +60,17 @@ const Login: React.FC = () => {
     </div>;
   }
 
-  // If user is authenticated, show a message
-  if (isAuthenticated) {
+  // If user is authenticated and not just logged out, show a temporary message
+  if (isAuthenticated && !isJustLoggedOut) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gray-50">
         <div className="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 mb-4 max-w-lg">
           <p className="font-bold">Já Autenticado</p>
-          <p>Você já está logado. Em um fluxo normal, seria redirecionado para o dashboard.</p>
-          <p className="mt-2 text-sm">Redirecionamento automático desativado. Para ir para o dashboard, use a navegação manualmente.</p>
+          <p>Você já está logado. Redirecionando para o dashboard...</p>
+          <p className="mt-2 text-sm">Verifique o console para detalhes técnicos.</p>
         </div>
         
-        <div className="mt-6">
-          <a 
-            href="/dashboard" 
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-          >
-            Ir para Dashboard manualmente
-          </a>
-        </div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mt-4"></div>
       </div>
     );
   }
@@ -165,9 +159,9 @@ const Login: React.FC = () => {
             <LoginForm 
               onSwitchToSignup={toggleSignup} 
               onSuccess={() => {
-                console.log("[Login] Login bem-sucedido, redirecionamento automático DESATIVADO");
-                console.log("[Login] DETALHES EM PORTUGUÊS: Em um fluxo normal, seria redirecionado para:", from);
-                console.log("[Login] DETALHES DE DEBUG: Para ir para o dashboard, use a navegação manualmente");
+                console.log("[Login] Login bem-sucedido, redirecionando para dashboard");
+                console.log("[Login] DETALHES EM PORTUGUÊS: Login realizado com sucesso, redirecionando automaticamente");
+                navigate('/dashboard');
               }} 
             />
           )}
