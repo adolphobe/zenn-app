@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/auth';
@@ -193,7 +192,7 @@ const Login: React.FC = () => {
               {isSignup 
                 ? "Cadastre-se para começar sua jornada conosco." 
                 : isForgotPassword
-                  ? "Enviaremos um link para você redefinir sua senha."
+                  ? "Digite seu email abaixo e nós enviaremos um link para redefinir sua senha."
                   : "Um novo dia chegou. É hora de continuar sua jornada."}
             </p>
           </div>
