@@ -1,10 +1,38 @@
 
-import { ISODateString } from '@/types/dates';
+import {
+  parse,
+  format,
+  isValid,
+  parseISO,
+  formatISO,
+  isAfter,
+  isBefore,
+  startOfDay,
+  endOfDay,
+  addDays,
+  differenceInDays,
+  isSameDay,
+  isToday,
+  isYesterday
+} from 'date-fns';
+import { ptBR } from 'date-fns/locale';
+import { ISODateString, DateDisplayOptions } from '@/types/dates';
+
+// Configuração padrão para formatação de datas
+const DEFAULT_CONFIG = {
+  locale: ptBR,
+  dateFormat: 'dd/MM/yyyy',
+  timeFormat: 'HH:mm',
+  dateTimeFormat: 'dd/MM/yyyy HH:mm',
+  hideSeconds: true
+};
 
 /**
  * Serviço centralizado para manipulação de datas e conversões
  */
 export const dateService = {
+  config: DEFAULT_CONFIG,
+
   /**
    * Converte uma string ISO ou objeto Date para um objeto Date
    * @returns Date objeto ou null se inválido
@@ -15,30 +43,30 @@ export const dateService = {
     try {
       // Se já for um Date, verificamos se é válido
       if (date instanceof Date) {
-        return isNaN(date.getTime()) ? null : date;
+        return isValid(date) ? date : null;
       }
       
       // Se for string, tentamos converter para Date
       if (typeof date === 'string') {
         // Tenta padrão ISO primeiro
-        const parsedDate = new Date(date);
-        if (!isNaN(parsedDate.getTime())) {
-          return parsedDate;
+        try {
+          const parsedDate = parseISO(date);
+          if (isValid(parsedDate)) {
+            return parsedDate;
+          }
+        } catch (err) {
+          console.debug('Não foi possível converter como ISO:', date);
         }
         
         // Tenta formatos alternativos (DD/MM/YYYY)
         if (date.includes('/')) {
-          const parts = date.split(/[\/\-\s:]/);
-          if (parts.length >= 3) {
-            // Nota: mês é 0-indexado no JS Date
-            const newDate = new Date(
-              parseInt(parts[2]), // Ano
-              parseInt(parts[1]) - 1, // Mês
-              parseInt(parts[0]) // Dia
-            );
-            if (!isNaN(newDate.getTime())) {
-              return newDate;
+          try {
+            const parsedDate = parse(date, 'dd/MM/yyyy', new Date());
+            if (isValid(parsedDate)) {
+              return parsedDate;
             }
+          } catch (err) {
+            console.debug('Não foi possível converter como dd/MM/yyyy:', date);
           }
         }
       }
@@ -62,13 +90,13 @@ export const dateService = {
     try {
       // Se já for string, verifica se está em formato ISO
       if (typeof date === 'string') {
-        // Tenta converter para Date e depois de volta para ISO para validar
-        const parsedDate = new Date(date);
-        return !isNaN(parsedDate.getTime()) ? parsedDate.toISOString() : null;
+        // Converte para Date e depois para ISO para validar
+        const parsedDate = this.parseDate(date);
+        return parsedDate ? formatISO(parsedDate) : null;
       }
       
       // Se for Date, converte para ISO
-      return date.toISOString();
+      return isValid(date) ? formatISO(date) : null;
     } catch (error) {
       console.error('Erro ao converter para ISO:', error);
       return null;
@@ -84,11 +112,11 @@ export const dateService = {
     try {
       const parsedDate = this.parseDate(date);
       
-      if (!parsedDate) return '';
+      if (!parsedDate || !isValid(parsedDate)) return '';
       
       // Ajustar para o fuso horário local (para inputs datetime-local)
       const localDate = new Date(parsedDate.getTime() - (parsedDate.getTimezoneOffset() * 60000));
-      return localDate.toISOString().slice(0, 16);
+      return formatISO(localDate).slice(0, 16);
     } catch (error) {
       console.error('Erro formatando data para input:', error);
       return '';
@@ -96,28 +124,35 @@ export const dateService = {
   },
   
   /**
-   * Formata uma data para exibição na interface do usuário (formato brasileiro)
+   * Formata uma data para exibição na interface do usuário
    */
-  formatForDisplay(date: Date | ISODateString | null | undefined, includeTime: boolean = true): string {
+  formatForDisplay(
+    date: Date | ISODateString | null | undefined, 
+    options?: DateDisplayOptions
+  ): string {
     if (!date) return '';
     
     try {
       const parsedDate = this.parseDate(date);
-      if (!parsedDate) return '';
+      if (!parsedDate || !isValid(parsedDate)) return '';
       
-      const day = parsedDate.getDate().toString().padStart(2, '0');
-      const month = (parsedDate.getMonth() + 1).toString().padStart(2, '0');
-      const year = parsedDate.getFullYear();
+      const { hideYear = false, hideTime = false, hideDate = false } = options || {};
       
-      let result = `${day}/${month}/${year}`;
+      if (hideDate) return '';
       
-      if (includeTime) {
-        const hours = parsedDate.getHours().toString().padStart(2, '0');
-        const minutes = parsedDate.getMinutes().toString().padStart(2, '0');
-        result += ` ${hours}:${minutes}`;
+      let formatString = '';
+      
+      // Construir string de formato baseada nas opções
+      if (!hideDate) {
+        formatString = hideYear ? 'dd/MM' : this.config.dateFormat;
       }
       
-      return result;
+      if (!hideTime) {
+        if (formatString) formatString += ' ';
+        formatString += this.config.timeFormat;
+      }
+      
+      return format(parsedDate, formatString, { locale: this.config.locale });
       
     } catch (error) {
       console.error('Erro formatando data para exibição:', error);
@@ -128,7 +163,7 @@ export const dateService = {
   /**
    * Converte os campos de data de DTO para formato interno (Date)
    */
-  fromDTO(dto: Partial<any>): Partial<any> {
+  fromDTO(dto: any): Partial<any> {
     return {
       ...(dto.ideal_date !== undefined && { idealDate: this.parseDate(dto.ideal_date) }),
       ...(dto.created_at !== undefined && { createdAt: this.parseDate(dto.created_at) || new Date() }),
@@ -139,7 +174,7 @@ export const dateService = {
   /**
    * Converte os campos de data do formato interno (Date) para DTO
    */
-  toDTO(fields: Partial<any>): Partial<any> {
+  toDTO(fields: any): Partial<any> {
     return {
       ...(fields.idealDate !== undefined && { ideal_date: this.toISOString(fields.idealDate) }),
       ...(fields.createdAt !== undefined && { created_at: this.toISOString(fields.createdAt) || new Date().toISOString() }),
@@ -148,7 +183,7 @@ export const dateService = {
   },
   
   /**
-   * Verifica se uma tarefa está vencida (antes da data/hora atual)
+   * Verifica se uma data é anterior à data atual
    */
   isTaskOverdue(date: Date | string | null): boolean {
     if (!date) return false;
@@ -156,11 +191,11 @@ export const dateService = {
     try {
       const dateToCompare = this.parseDate(date);
       
-      if (!dateToCompare) {
+      if (!dateToCompare || !isValid(dateToCompare)) {
         return false;
       }
       
-      return dateToCompare < new Date();
+      return isBefore(dateToCompare, new Date());
     } catch (error) {
       console.error('Erro ao verificar se tarefa está vencida:', error);
       return false;
@@ -170,14 +205,16 @@ export const dateService = {
   /**
    * Adiciona ou subtrai dias a uma data
    */
-  addDaysToDate(date: Date, days: number): Date {
-    const result = new Date(date);
-    result.setDate(result.getDate() + days);
-    return result;
+  addDaysToDate(date: Date | null | undefined, days: number): Date | null {
+    if (!date) return null;
+    const parsedDate = this.parseDate(date);
+    if (!parsedDate) return null;
+    
+    return addDays(parsedDate, days);
   },
   
   /**
-   * Verifica se duas datas são iguais (mesmo dia, mês, ano)
+   * Verifica se duas datas são no mesmo dia (ignorando hora)
    */
   isSameDate(date1: Date | null | undefined, date2: Date | null | undefined): boolean {
     if (!date1 || !date2) return false;
@@ -187,10 +224,71 @@ export const dateService = {
     
     if (!parsed1 || !parsed2) return false;
     
-    return (
-      parsed1.getDate() === parsed2.getDate() &&
-      parsed1.getMonth() === parsed2.getMonth() &&
-      parsed1.getFullYear() === parsed2.getFullYear()
-    );
+    return isSameDay(parsed1, parsed2);
+  },
+  
+  /**
+   * Obtém a diferença em dias entre duas datas
+   */
+  getDaysDifference(date1: Date | null | undefined, date2: Date | null | undefined): number | null {
+    if (!date1 || !date2) return null;
+    
+    const parsed1 = this.parseDate(date1);
+    const parsed2 = this.parseDate(date2);
+    
+    if (!parsed1 || !parsed2) return null;
+    
+    return differenceInDays(parsed1, parsed2);
+  },
+  
+  /**
+   * Verifica se a data é hoje
+   */
+  isToday(date: Date | null | undefined): boolean {
+    if (!date) return false;
+    const parsedDate = this.parseDate(date);
+    if (!parsedDate) return false;
+    
+    return isToday(parsedDate);
+  },
+  
+  /**
+   * Verifica se a data é ontem
+   */
+  isYesterday(date: Date | null | undefined): boolean {
+    if (!date) return false;
+    const parsedDate = this.parseDate(date);
+    if (!parsedDate) return false;
+    
+    return isYesterday(parsedDate);
+  },
+  
+  /**
+   * Retorna o início do dia (00:00:00)
+   */
+  startOfDay(date: Date | null | undefined): Date | null {
+    if (!date) return null;
+    const parsedDate = this.parseDate(date);
+    if (!parsedDate) return null;
+    
+    return startOfDay(parsedDate);
+  },
+  
+  /**
+   * Retorna o fim do dia (23:59:59)
+   */
+  endOfDay(date: Date | null | undefined): Date | null {
+    if (!date) return null;
+    const parsedDate = this.parseDate(date);
+    if (!parsedDate) return null;
+    
+    return endOfDay(parsedDate);
   }
+};
+
+/**
+ * Exporta uma função helper para configurar o serviço de data
+ */
+export const configureDateTime = (config: Partial<typeof DEFAULT_CONFIG>) => {
+  dateService.config = { ...dateService.config, ...config };
 };

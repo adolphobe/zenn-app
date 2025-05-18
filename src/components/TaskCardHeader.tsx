@@ -1,12 +1,13 @@
 
 import React from 'react';
-import { formatDate, isTaskOverdue, safeParseDate } from '@/utils';
-import { DateDisplayOptions } from '@/types';
+import { formatDate } from '@/utils';
+import { DateDisplayOptions } from '@/types/dates';
 import TaskCardTitle from './TaskCardTitle';
 import { Bell, Hash } from 'lucide-react';
 import { useAppContext } from '@/context/AppContext';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { motion, AnimatePresence } from 'framer-motion';
+import { dateService } from '@/services/dateService';
 
 interface TaskCardHeaderProps {
   title: string;
@@ -71,11 +72,11 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
     }
   };
   
-  // Convert idealDate to Date object using safeParseDate 
-  const parsedDate = idealDate ? safeParseDate(idealDate) : null;
+  // Convert idealDate to Date object using dateService 
+  const parsedDate = dateService.parseDate(idealDate);
   
   // Check if task is overdue (before current date and time)
-  const taskIsOverdue = parsedDate ? isTaskOverdue(parsedDate) : false;
+  const taskIsOverdue = dateService.isTaskOverdue(parsedDate);
   
   // In chronological mode, always show dates regardless of showDates setting
   const shouldShowDate = viewMode === 'chronological' || showDates;

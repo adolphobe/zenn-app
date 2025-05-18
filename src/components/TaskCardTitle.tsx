@@ -1,7 +1,7 @@
 
 import React, { useRef, useEffect } from 'react';
-import { isTaskOverdue } from '@/utils';
 import { ViewMode } from '@/types';
+import { dateService } from '@/services/dateService';
 
 interface TaskCardTitleProps {
   title: string;
@@ -29,7 +29,7 @@ const TaskCardTitle: React.FC<TaskCardTitleProps> = ({
   const titleInputRef = useRef<HTMLInputElement>(null);
   
   // Determine if task is overdue and should have red text
-  const isOverdue = idealDate && isTaskOverdue(idealDate);
+  const isOverdue = idealDate && dateService.isTaskOverdue(idealDate);
   const showOverdueStyle = viewMode === 'chronological' && isOverdue;
 
   useEffect(() => {

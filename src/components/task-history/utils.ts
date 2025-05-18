@@ -1,6 +1,6 @@
 
 import { Task } from '@/types';
-import { format, isToday, isYesterday, startOfWeek, startOfMonth, parseISO, differenceInMonths } from 'date-fns';
+import { format, startOfWeek, startOfMonth, differenceInMonths } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { dateService } from '@/services/dateService';
 
@@ -36,7 +36,7 @@ export const groupTasksByTimeline = (tasks: Task[], periodFilter: string = 'all'
     if (!task.completedAt) return;
     
     try {
-      // Garantir que completedAt seja um objeto Date
+      // Garantir que completedAt seja um objeto Date usando dateService
       const completedDate = dateService.parseDate(task.completedAt);
       
       if (!completedDate) {
@@ -44,9 +44,9 @@ export const groupTasksByTimeline = (tasks: Task[], periodFilter: string = 'all'
         return;
       }
       
-      if (isToday(completedDate)) {
+      if (dateService.isToday(completedDate)) {
         groups.today.tasks.push(task);
-      } else if (isYesterday(completedDate)) {
+      } else if (dateService.isYesterday(completedDate)) {
         groups.yesterday.tasks.push(task);
       } else if (completedDate >= thisWeekStart && completedDate < today) {
         groups.thisWeek.tasks.push(task);

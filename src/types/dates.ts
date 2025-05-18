@@ -20,3 +20,19 @@ export interface DateFieldsDTO {
   created_at: ISODateString;
   completed_at: ISODateString | null;
 }
+
+// Configuração global para exibição de datas na interface
+export interface DateFormatConfig {
+  locale: string;
+  dateFormat: string;
+  timeFormat: string;
+  dateTimeFormat: string;
+  hideSeconds: boolean;
+}
+
+// Opções para exibição de datas específicas em componentes
+export interface DateDisplayOptions {
+  hideYear: boolean;
+  hideTime: boolean;
+  hideDate: boolean;
+}
