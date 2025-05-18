@@ -56,7 +56,7 @@ const StatusBox: React.FC = () => {
             {session ? (
               <>
                 <p><strong>ID da Sessão:</strong> {session.access_token ? session.access_token.substring(0, 15) + '...' : "N/A"}</p>
-                <p><strong>Tipo de Provider:</strong> {session.provider}</p>
+                <p><strong>Tipo de Provider:</strong> {session.user?.app_metadata?.provider || "email"}</p>
                 <p><strong>Expira em:</strong> {session.expires_at ? new Date(session.expires_at * 1000).toLocaleString('pt-BR') : "N/A"}</p>
                 <p><strong>Token Refresh:</strong> {session.refresh_token ? "Disponível" : "Não disponível"}</p>
               </>
