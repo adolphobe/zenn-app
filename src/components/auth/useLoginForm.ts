@@ -43,6 +43,7 @@ export function useLoginForm(onSuccess?: () => void) {
       console.log("[LoginForm] Tentando login com:", values.email);
       console.log("[LoginForm] DETALHES EM PORTUGUÊS: Iniciando processo de autenticação para o usuário");
       
+      // Uso do método login com credenciais do formulário
       const { success, error } = await login(values.email, values.password);
       
       if (!success) {
@@ -63,10 +64,7 @@ export function useLoginForm(onSuccess?: () => void) {
         console.log("[LoginForm] Login bem-sucedido para:", values.email);
         console.log("[LoginForm] DETALHES EM PORTUGUÊS: Login realizado com sucesso, redirecionando automaticamente");
         
-        toast({
-          title: "Login realizado com sucesso",
-          description: "Você foi autenticado com sucesso",
-        });
+        // Não mostramos toast de sucesso aqui pois já temos no loginService.ts
         
         if (onSuccess) {
           console.log("[LoginForm] Executando callback de sucesso");
@@ -94,6 +92,9 @@ export function useLoginForm(onSuccess?: () => void) {
     isLoading,
     loginError,
     loginSuggestion,
-    onSubmit: form.handleSubmit(onSubmit)
+    onSubmit: form.handleSubmit((values) => {
+      // Essa wrapper function previne o comportamento padrão
+      onSubmit(values);
+    })
   };
 }

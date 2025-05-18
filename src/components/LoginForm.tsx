@@ -21,7 +21,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
 
   return (
     <Form {...form}>
-      <form onSubmit={onSubmit} className="space-y-6">
+      <form onSubmit={onSubmit} className="space-y-4">
         <LoginErrorDisplay error={loginError} suggestion={loginSuggestion} />
         
         <LoginFormFields form={form} />
