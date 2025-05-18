@@ -21,6 +21,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
   onForgotPassword 
 }) => {
   const [showPassword, setShowPassword] = useState(false);
+  
   const { 
     form, 
     isLoading, 
@@ -57,6 +58,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
                     <Input
                       placeholder="E-mail"
                       className="pl-10 h-12 bg-white border-blue-100 focus:border-blue-300 shadow-sm"
+                      autoComplete="email"
                       {...field}
                     />
                   </FormControl>
@@ -81,6 +83,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
                       type={showPassword ? "text" : "password"}
                       placeholder="Senha"
                       className="pl-10 pr-10 h-12 bg-white border-blue-100 focus:border-blue-300 shadow-sm"
+                      autoComplete="current-password"
                       {...field}
                     />
                   </FormControl>
@@ -88,6 +91,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
                     type="button"
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
                     onClick={togglePasswordVisibility}
+                    tabIndex={-1}
                   >
                     {showPassword ? (
                       <EyeOff size={18} />

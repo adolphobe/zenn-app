@@ -12,9 +12,34 @@ export const login = async (email: string, password: string) => {
     
     if (error) {
       console.error("[LoginService] Erro de login:", error.message);
+      
+      // Mapear erros específicos do Supabase para mensagens mais amigáveis
+      if (error.message.includes('Invalid login credentials')) {
+        return { 
+          success: false, 
+          error: "Usuário não encontrado ou senha incorreta. Por favor, verifique suas credenciais." 
+        };
+      }
+      
+      if (error.message.includes('Email not confirmed')) {
+        return {
+          success: false,
+          error: "Por favor, confirme seu e-mail antes de fazer login."
+        };
+      }
+      
+      // Erro genérico
       return { 
         success: false, 
-        error: "Usuário não encontrado ou senha incorreta. Por favor, verifique suas credenciais."
+        error: "Ocorreu um erro ao tentar fazer login. Por favor, tente novamente."
+      };
+    }
+    
+    if (!data.user || !data.session) {
+      console.error("[LoginService] Login falhou: Usuário ou sessão indefinidos");
+      return {
+        success: false,
+        error: "Falha na autenticação. Por favor, tente novamente."
       };
     }
     

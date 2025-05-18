@@ -6,6 +6,7 @@ import LoginForm from '../components/LoginForm';
 import SignupForm from '../components/SignupForm';
 import PasswordResetForm from '../components/PasswordResetForm';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/hooks/use-toast';
 
 const Login: React.FC = () => {
   const location = useLocation();
@@ -74,6 +75,11 @@ const Login: React.FC = () => {
     const actuallyAuthenticated = isAuthenticated || (localAuthCheck === true);
     
     if (actuallyAuthenticated && !isLoading && !isJustLoggedOut && localAuthCheck !== null) {
+      toast({
+        title: "Autenticado",
+        description: "Redirecionando para o dashboard...",
+      });
+      
       const redirectTimer = setTimeout(() => {
         navigate(from, { replace: true });
       }, 500);

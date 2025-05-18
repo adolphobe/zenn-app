@@ -34,9 +34,11 @@ export function useLoginForm(onSuccess?: () => void) {
     }
   }, [loginError]);
 
-  // Configurar limpeza de erros ao digitar
+  // Configurar limpeza de erros ao digitar em qualquer campo
   const setupErrorClearing = useCallback(() => {
-    const subscription = form.watch(() => clearErrors());
+    const subscription = form.watch(() => {
+      clearErrors();
+    });
     return () => subscription.unsubscribe();
   }, [form, clearErrors]);
 
@@ -52,7 +54,7 @@ export function useLoginForm(onSuccess?: () => void) {
       
       if (!result.success) {
         console.log("[LoginForm] Erro de login:", result.error);
-        setLoginError(result.error);
+        setLoginError(result.error || "Ocorreu um erro ao tentar fazer login. Por favor, tente novamente.");
       } else if (onSuccess) {
         onSuccess();
       }
@@ -64,17 +66,18 @@ export function useLoginForm(onSuccess?: () => void) {
     }
   };
   
-  // Manipulador de envio do formulário
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  // Manipulador de envio do formulário que evita o comportamento padrão
+  const onSubmit = useCallback((e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     form.handleSubmit(handleSubmit)(e);
-  };
+  }, [form, handleSubmit]);
 
   return {
     form,
     isLoading,
     loginError,
     onSubmit,
-    setupErrorClearing
+    setupErrorClearing,
+    clearErrors
   };
 }

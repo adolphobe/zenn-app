@@ -1,19 +1,21 @@
 
 import React from 'react';
 import { AlertCircle } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 interface LoginErrorDisplayProps {
   error: string | null;
 }
 
 const LoginErrorDisplay: React.FC<LoginErrorDisplayProps> = ({ error }) => {
-  if (!error) {
-    return <div className="min-h-[60px]" aria-hidden="true"></div>;
-  }
+  if (!error) return null;
 
   return (
-    <div 
-      className="flex items-center gap-3 bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded-md mb-5 animate-in fade-in duration-200"
+    <motion.div 
+      className="flex items-center gap-3 bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded-md mb-5"
+      initial={{ opacity: 0, y: -10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
       role="alert"
       aria-live="assertive"
     >
@@ -21,7 +23,7 @@ const LoginErrorDisplay: React.FC<LoginErrorDisplayProps> = ({ error }) => {
       <div>
         <p className="font-medium text-sm">{error}</p>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
