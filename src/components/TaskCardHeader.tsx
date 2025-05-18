@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { formatDate, isTaskOverdue } from '@/utils';
+import { formatDate, isTaskOverdue, safeParseDate } from '@/utils';
 import { DateDisplayOptions } from '@/types';
 import TaskCardTitle from './TaskCardTitle';
 import { Bell, Hash } from 'lucide-react';
@@ -11,7 +11,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 interface TaskCardHeaderProps {
   title: string;
   totalScore: number;
-  idealDate?: Date | null;
+  idealDate?: Date | string | null;
   isEditing: boolean;
   titleValue: string;
   dateDisplayOptions: DateDisplayOptions;
@@ -21,7 +21,6 @@ interface TaskCardHeaderProps {
   onTitleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onTitleBlur: () => void;
   onTitleKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void;
-  // Add these new props to access the individual pillar scores
   consequenceScore?: number;
   prideScore?: number;
   constructionScore?: number;
@@ -72,8 +71,11 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
     }
   };
   
-  // Check if task is overdue (before current date and time)
-  const taskIsOverdue = idealDate ? isTaskOverdue(idealDate) : false;
+  // Garantir que temos uma data válida - primeiro converte idealDate para Date usando safeParseDate
+  const parsedDate = safeParseDate(idealDate);
+  
+  // Check if task is overdue (before current date and time), usando apenas parsedDate que é Date | null
+  const taskIsOverdue = parsedDate ? isTaskOverdue(parsedDate) : false;
   
   // In chronological mode, always show dates regardless of showDates setting
   const shouldShowDate = viewMode === 'chronological' || showDates;
@@ -133,12 +135,12 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
         </div>
         
         <div className="flex items-center">
-          {idealDate && shouldShowDate && (
+          {parsedDate && shouldShowDate && (
             <div className="text-xs text-right ml-3 flex items-center">
               {taskIsOverdue && (
                 <Bell size={14} className="text-red-400 mr-1" />
               )}
-              {formatDate(idealDate, dateDisplayOptions)}
+              {formatDate(parsedDate, dateDisplayOptions)}
             </div>
           )}
           {shouldShowScore && (
