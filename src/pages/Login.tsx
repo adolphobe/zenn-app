@@ -218,7 +218,7 @@ const Login: React.FC = () => {
         </div>
 
         <div className="mt-12 text-center text-xs text-gray-400">
-          © {new Date().getFullYear()} Acto. Todos os direitos reservados.
+          © {new Date().getFullYear()} Zenn. Todos os direitos reservados.
         </div>
       </div>
 
