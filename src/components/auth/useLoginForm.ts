@@ -15,6 +15,7 @@ export function useLoginForm(onSuccess?: () => void) {
   const [isLoading, setIsLoading] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
   const [loginSuggestion, setLoginSuggestion] = useState<string | null>(null);
+  const [formSubmitting, setFormSubmitting] = useState(false);
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -34,7 +35,22 @@ export function useLoginForm(onSuccess?: () => void) {
     }
   }, [location.state]);
 
+  // Limpa os erros quando o usuário começa a digitar novamente
+  useEffect(() => {
+    const subscription = form.watch(() => {
+      if (loginError) {
+        setLoginError(null);
+        setLoginSuggestion(null);
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [form, loginError]);
+
   const onSubmit = async (values: LoginFormValues) => {
+    // Previne múltiplas submissões
+    if (formSubmitting) return;
+    
+    setFormSubmitting(true);
     setIsLoading(true);
     setLoginError(null);
     setLoginSuggestion(null);
@@ -80,6 +96,10 @@ export function useLoginForm(onSuccess?: () => void) {
       setLoginSuggestion(errorDetails.suggestion || null);
     } finally {
       setIsLoading(false);
+      // Permitir novas submissões após o término do processo
+      setTimeout(() => {
+        setFormSubmitting(false);
+      }, 500); // Pequeno atraso para evitar cliques duplos
     }
   };
 
@@ -87,14 +107,18 @@ export function useLoginForm(onSuccess?: () => void) {
   console.log("[LoginForm] Estado atual do erro:", loginError);
   console.log("[LoginForm] Estado atual da sugestão:", loginSuggestion);
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    form.handleSubmit((values) => {
+      onSubmit(values);
+    })(e);
+  };
+
   return {
     form,
     isLoading,
     loginError,
     loginSuggestion,
-    onSubmit: form.handleSubmit((values) => {
-      // Essa wrapper function previne o comportamento padrão
-      onSubmit(values);
-    })
+    onSubmit: handleSubmit
   };
 }
