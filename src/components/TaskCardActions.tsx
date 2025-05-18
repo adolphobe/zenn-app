@@ -45,10 +45,11 @@ const TaskCardActions: React.FC<TaskCardActionsProps> = ({
             size="sm"
             onClick={onToggleHidden}
             title={isHidden ? "Mostrar" : "Ocultar"}
-            className={buttonStyles}
+            className={`${buttonStyles} ${isHidden ? 'border-green-200 hover:border-green-300 hover:bg-green-50 dark:border-green-900 dark:hover:border-green-800' : ''}`}
             data-task-action="toggle-hidden"
+            data-hidden={isHidden ? "true" : "false"}
           >
-            {isHidden ? <Eye size={16} /> : <EyeOff size={16} />}
+            {isHidden ? <Eye size={16} className="text-green-600" /> : <EyeOff size={16} />}
             <span className="ml-1">{isHidden ? "Mostrar" : "Ocultar"}</span>
           </Button>
         )}

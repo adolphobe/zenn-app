@@ -84,7 +84,7 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
   return (
     <div className={`${isHidden && showHiddenTasks ? 'pt-[15px]' : ''} relative`}>
       {/* Hidden label with improved reactivity */}
-      <AnimatePresence>
+      <AnimatePresence mode="wait">
         {isHidden && showHiddenTasks && (
           <TooltipProvider>
             <Tooltip delayDuration={0}>
@@ -103,7 +103,7 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.8 }}
                   transition={{ duration: 0.2 }}
-                  layoutId={`hidden-badge`}
+                  layoutId={`hidden-badge-${title.substring(0, 10)}`}
                 >
                   OCULTO
                 </motion.div>

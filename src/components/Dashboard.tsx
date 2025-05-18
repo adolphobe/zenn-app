@@ -71,7 +71,7 @@ const Dashboard: React.FC = () => {
   // In chronological mode, always show hidden tasks
   const shouldShowHiddenTasks = viewMode === 'chronological' || showHiddenTasks;
   
-  // Filter tasks to only show non-completed and visible ones based on settings
+  // Filter tasks to only show non-completed and (if shouldShowHiddenTasks is false, only non-hidden tasks)
   const filteredTasks = tasks.filter(
     task => !task.completed && (shouldShowHiddenTasks || !task.hidden)
   );
@@ -158,7 +158,7 @@ const Dashboard: React.FC = () => {
     );
   }
   
-  // Animation variants for task cards with improved transitions
+  // Enhanced animation variants for task cards
   const taskVariants = {
     hidden: { 
       opacity: 0,
@@ -261,12 +261,13 @@ const Dashboard: React.FC = () => {
                       <AnimatePresence initial={false} mode="popLayout">
                         {sortedOverdueTasks.map(task => (
                           <motion.div
-                            key={task.id}
+                            key={`${task.id}-${task.hidden ? 1 : 0}`}
                             initial="hidden"
                             animate="visible"
                             exit="exit"
                             variants={taskVariants}
                             layout
+                            layoutId={`task-container-${task.id}`}
                           >
                             <TaskCard 
                               key={task.id} 
@@ -287,13 +288,13 @@ const Dashboard: React.FC = () => {
             <AnimatePresence initial={false} mode="popLayout">
               {sortedNonOverdueTasks.map(task => (
                 <motion.div
-                  key={task.id}
+                  key={`${task.id}-${task.hidden ? 1 : 0}-${task._optimisticUpdateTime || 0}`}
                   initial="hidden"
                   animate="visible"
                   exit="exit"
                   variants={taskVariants}
                   layout
-                  layoutId={`task-${task.id}`}
+                  layoutId={`task-container-${task.id}`}
                 >
                   <TaskCard 
                     task={task} 

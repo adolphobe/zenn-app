@@ -101,11 +101,13 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
     setFeedbackModalOpen(false);
   };
 
-  // Animation variants for expanded content
+  // Animation variants for expanded content - improved to prevent stretching
   const expandedContentVariants = {
     hidden: { 
       opacity: 0,
       height: 0,
+      scale: 0.98,
+      transformOrigin: "top",
       transition: { 
         duration: 0.2,
         ease: "easeInOut"
@@ -114,9 +116,20 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
     visible: { 
       opacity: 1,
       height: "auto",
+      scale: 1,
+      transformOrigin: "top",
       transition: {
-        duration: 0.2,
-        ease: "easeInOut"
+        height: {
+          duration: 0.25,
+          ease: "easeInOut"
+        },
+        opacity: {
+          duration: 0.15,
+          delay: 0.1
+        },
+        scale: {
+          duration: 0.2
+        }
       }
     }
   };
@@ -142,10 +155,16 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
 
   return (
     <>
-      <div
+      <motion.div
+        layout
+        layoutId={`task-card-${task.id}`}
         className={`task-card ${cardClass} ${task.completed ? 'opacity-50' : ''} relative cursor-pointer`}
         onClick={handleCardClick}
         data-task-id={task.id}
+        transition={{ 
+          layout: { duration: 0.3, ease: "easeInOut" },
+          opacity: { duration: 0.2 }
+        }}
       >
         <TaskCardHeader 
           title={task.title}
@@ -168,13 +187,12 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
         <AnimatePresence initial={false}>
           {isExpanded && (
             <motion.div 
-              className="mt-4"
+              className="mt-4 overflow-hidden"
               variants={expandedContentVariants}
               initial="hidden"
               animate="visible"
               exit="hidden"
               onClick={handleExpandedContentClick}
-              layout
             >
               <TaskPillarDetails task={task} />
               
@@ -196,7 +214,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
             </motion.div>
           )}
         </AnimatePresence>
-      </div>
+      </motion.div>
 
       <PostCompletionFeedback
         task={task}

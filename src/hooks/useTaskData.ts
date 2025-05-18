@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Task, TaskFormData } from '@/types';
@@ -171,13 +170,14 @@ export const useTaskData = (completed: boolean = false) => {
     }
   });
   
-  // Toggle hidden mutation - Improved optimistic updates
+  // Improved toggle hidden mutation with better optimistic updates
   const toggleHiddenMutation = useMutation({
     mutationFn: (id: string) => {
       // Validate task exists
       const task = tasks.find(t => t.id === id);
       if (!task) throw new Error(`Task with id ${id} not found`);
       
+      console.log(`[Mutation] Toggling task ${id} hidden status. Current: ${task.hidden}`);
       return toggleHiddenService(id);
     },
     onMutate: async (id) => {
@@ -187,12 +187,11 @@ export const useTaskData = (completed: boolean = false) => {
       // Cancel any outgoing refetches
       await queryClient.cancelQueries({ queryKey: ['tasks', currentUser?.id, completed] });
       
-      // Get current task
+      // Get snapshot of the current task
       const task = tasks.find(t => t.id === id);
       if (!task) return { previousTasks: tasks };
       
-      // Snapshot the previous value
-      const previousTasks = queryClient.getQueryData(['tasks', currentUser?.id, completed]);
+      const newHiddenState = !task.hidden;
       
       // Optimistically update to the new value
       queryClient.setQueryData(['tasks', currentUser?.id, completed], (old: Task[] | undefined) => {
@@ -200,45 +199,77 @@ export const useTaskData = (completed: boolean = false) => {
         
         return old.map(t => {
           if (t.id === id) {
-            // Log the visual update
-            console.log(`Atualizando visualmente tarefa ${id}. Visibilidade atual: ${t.hidden}, Nova: ${!t.hidden}`);
-            return { ...t, hidden: !t.hidden };
+            console.log(`[Optimistic Update] Changing task ${id} hidden from ${t.hidden} to ${newHiddenState}`);
+            return { 
+              ...t, 
+              hidden: newHiddenState,
+              // Add a timestamp to ensure the component detects the change
+              _optimisticUpdateTime: Date.now()
+            };
           }
           return t;
         });
       });
       
-      // Immediately show visual feedback
+      // Show immediate feedback based on the new state
       toast({
-        id: uuidv4(),
-        title: task.hidden ? "Tarefa visível" : "Tarefa oculta",
-        description: task.hidden ? "A tarefa agora está visível." : "A tarefa foi ocultada.",
+        id: `toggle-hidden-${id}-${Date.now()}`,
+        title: newHiddenState ? "Tarefa oculta" : "Tarefa visível",
+        description: newHiddenState 
+          ? "A tarefa foi ocultada e só será visível com o filtro ativado." 
+          : "A tarefa agora está visível.",
       });
       
-      // Return a context object with the snapshotted value
-      return { previousTasks };
+      // Return context with original tasks for potential rollback
+      return { 
+        previousTasks: tasks,
+        newHiddenState
+      };
     },
     onError: (error: any, id, context) => {
       console.error('Error toggling task hidden status:', error);
       
-      // Revert back to previous state if there's an error
       if (context?.previousTasks) {
+        // Revert to the previous state on error
         queryClient.setQueryData(['tasks', currentUser?.id, completed], context.previousTasks);
       }
       
       toast({
         id: uuidv4(),
-        title: "Erro ao atualizar tarefa",
+        title: "Erro ao atualizar visibilidade",
         description: "Não foi possível atualizar a visibilidade da tarefa. Tente novamente.",
         variant: "destructive",
       });
     },
-    onSettled: (_, __, id) => {
+    onSettled: (result, error, id, context) => {
       setTaskOperationLoading(id, 'toggle-hidden', false);
-      // Delay invalidation slightly to ensure UI has time to animate
-      setTimeout(() => {
-        queryClient.invalidateQueries({ queryKey: ['tasks', currentUser?.id, completed] });
-      }, 300);
+      
+      if (!error && result) {
+        // On successful completion, update the query data precisely to match the server
+        queryClient.setQueryData(['tasks', currentUser?.id, completed], (old: Task[] | undefined) => {
+          if (!old) return [];
+          
+          return old.map(t => {
+            if (t.id === id) {
+              console.log(`[Server Update] Setting task ${id} hidden to ${result.hidden}`);
+              return { 
+                ...t,
+                ...result,
+                // Keep the enhanced fields
+                operationLoading: t.operationLoading
+              };
+            }
+            return t;
+          });
+        });
+      }
+      
+      // Always invalidate to ensure consistency
+      queryClient.invalidateQueries({ 
+        queryKey: ['tasks', currentUser?.id, completed],
+        // Use refetchType: 'none' to prevent auto-refetching if our optimistic update is good
+        refetchType: error ? 'all' : 'none'
+      });
     }
   });
   
