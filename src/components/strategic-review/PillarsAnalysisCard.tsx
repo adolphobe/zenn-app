@@ -12,11 +12,34 @@ interface PillarsAnalysisCardProps {
 }
 
 const PillarsAnalysisCard: React.FC<PillarsAnalysisCardProps> = ({ tasks }) => {
-  // Use the insights analysis hook to get pillar data
-  const pillarData = useInsightsAnalysis(tasks);
+  // Use the insights analysis hook to get pillar data with proper fallbacks
+  const pillarData = useInsightsAnalysis(tasks || []);
   
-  // Use the pillar hover hook to handle dynamic insights
-  const { activeInsight, handlePillarHover } = usePillarHover(pillarData.insights, 'consequence');
+  // Use the pillar hover hook to handle dynamic insights with fallbacks
+  const { activeInsight, handlePillarHover } = usePillarHover(
+    pillarData?.insights || [], 
+    'consequence'
+  );
+  
+  // Safety check for missing data
+  if (!pillarData || !pillarData.averages) {
+    console.error("Missing pillar data in PillarsAnalysisCard");
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Foco das tarefas que você criou:</CardTitle>
+          <CardDescription>
+            Carregando dados de análise...
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="h-64 flex items-center justify-center">
+            <p className="text-muted-foreground">Aguarde enquanto processamos seus dados...</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
   
   return (
     <Card>
@@ -38,7 +61,7 @@ const PillarsAnalysisCard: React.FC<PillarsAnalysisCardProps> = ({ tasks }) => {
           />
         </div>
         
-        {/* Dynamic Insight Box */}
+        {/* Dynamic Insight Box - with safety check */}
         {activeInsight && (
           <div className="space-y-4 mt-6">
             <PillarInsight insight={activeInsight} />

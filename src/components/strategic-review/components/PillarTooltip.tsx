@@ -7,16 +7,22 @@ interface PillarTooltipProps {
 }
 
 const PillarTooltip: React.FC<PillarTooltipProps> = ({ active, payload }) => {
-  if (!active || !payload || !payload.length) {
+  if (!active || !payload || !payload.length || !payload[0]?.payload) {
     return null;
   }
   
   const data = payload[0].payload;
+  
+  // Check if the necessary data exists before accessing it
+  if (!data || !data.id || typeof data.value !== 'number') {
+    return null;
+  }
+  
   const { nivel, mensagem } = getPillarTooltip(data.id, data.value);
   
   return (
     <div className="bg-white p-2 border rounded-md shadow-md text-sm">
-      <p className="font-bold">{data.name}</p>
+      <p className="font-bold">{data.name || data.id}</p>
       <p className="font-semibold text-blue-600">{nivel}</p>
       <p className="text-gray-700">{mensagem}</p>
       <p className="font-mono mt-1">Nota: {data.value.toFixed(1)}</p>
@@ -56,6 +62,9 @@ const getPillarTooltip = (pilarId: string, score: number) => {
       else if (score >= 3.0) mensagem = "Você se manteve ativo, mas não saiu do lugar.";
       else mensagem = "Você se ocupou, mas não cresceu.";
       break;
+      
+    default:
+      mensagem = "Análise não disponível para este pilar.";
   }
 
   return { nivel, mensagem };

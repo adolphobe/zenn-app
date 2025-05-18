@@ -7,6 +7,11 @@ interface PillarInsightProps {
 }
 
 const PillarInsight: React.FC<PillarInsightProps> = ({ insight }) => {
+  // Safety check for invalid insight
+  if (!insight || !insight.id) {
+    return null;
+  }
+  
   // Function to determine background gradient based on insight id
   const getBackgroundGradient = (id: string) => {
     switch (id) {
@@ -31,7 +36,7 @@ const PillarInsight: React.FC<PillarInsightProps> = ({ insight }) => {
       }}
     >
       <h4 className="font-medium mb-3 text-base">
-        {insight.customTitle || insight.title}
+        {insight.customTitle || insight.title || 'Análise'}
       </h4>
       {insight.messages && insight.messages.map((message, msgIndex) => (
         <p key={msgIndex} className="text-sm text-muted-foreground">{message}</p>

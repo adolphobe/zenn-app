@@ -12,7 +12,7 @@ interface FeedbackAnalysisCardProps {
 
 // Custom tooltip component for the feedback chart
 const CustomTooltip = ({ active, payload }: any) => {
-  if (!active || !payload || !payload.length) return null;
+  if (!active || !payload || !payload.length || !payload[0]?.payload) return null;
   
   const data = payload[0].payload;
   const feedbackMessages: Record<string, string> = {
@@ -29,8 +29,8 @@ const CustomTooltip = ({ active, payload }: any) => {
   
   return (
     <div className="bg-background border rounded-md shadow-md p-3 text-sm">
-      <p className="font-medium">{titleMapping[data.id]}</p>
-      <p className="text-muted-foreground">{data.percent}% {feedbackMessages[data.id]}</p>
+      <p className="font-medium">{titleMapping[data.id] || data.id}</p>
+      <p className="text-muted-foreground">{data.percent}% {feedbackMessages[data.id] || ""}</p>
     </div>
   );
 };
@@ -63,7 +63,7 @@ const FeedbackAnalysisCard: React.FC<FeedbackAnalysisCardProps> = ({ tasks }) =>
       </CardHeader>
       <CardContent className="space-y-4 flex-grow flex flex-col">
         <div className="h-64">
-          {feedbackData && feedbackData.withFeedback ? (
+          {feedbackData && feedbackData.withFeedback && feedbackData.distribution && feedbackData.distribution.length > 0 ? (
             <ChartContainer 
               className="h-full w-full"
               config={{
@@ -74,7 +74,7 @@ const FeedbackAnalysisCard: React.FC<FeedbackAnalysisCardProps> = ({ tasks }) =>
             >
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart 
-                  data={feedbackData.distribution || []} 
+                  data={feedbackData.distribution} 
                   barGap={12} 
                   margin={{ top: 20, right: 10, left: 10, bottom: 10 }}
                 >
@@ -97,7 +97,7 @@ const FeedbackAnalysisCard: React.FC<FeedbackAnalysisCardProps> = ({ tasks }) =>
                       style={{ fontSize: '12px', fontWeight: 'bold' }}
                       offset={10}
                     />
-                    {feedbackData.distribution && feedbackData.distribution.map((entry, index) => (
+                    {feedbackData.distribution.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.color || '#ccc'} />
                     ))}
                   </Bar>
@@ -117,7 +117,9 @@ const FeedbackAnalysisCard: React.FC<FeedbackAnalysisCardProps> = ({ tasks }) =>
             <div 
               className="border rounded-lg p-4 animate-fade-in"
               style={{ 
-                background: GRADIENTS[feedbackData.topFeedback as keyof typeof GRADIENTS] || GRADIENTS.balanced,
+                background: feedbackData.topFeedback && 
+                  GRADIENTS[feedbackData.topFeedback as keyof typeof GRADIENTS] || 
+                  GRADIENTS.balanced,
                 animationDuration: '0.3s',
                 transition: 'background 0.3s ease'
               }}
