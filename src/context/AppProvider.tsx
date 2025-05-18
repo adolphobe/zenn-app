@@ -3,7 +3,6 @@ import { AppContext } from './AppContext';
 import { AppContextType, SortOptionsUpdate } from './types';
 import { appReducer } from './appReducer';
 import { initialState } from './initialState';
-import * as taskActions from './tasks/taskActions';
 import * as uiActions from './ui/uiActions';
 import { useAuth } from './auth';
 import { 
@@ -20,6 +19,19 @@ import {
 import { toast } from '@/hooks/use-toast';
 import { useTaskStore, useAuthStore } from '@/hooks/useTaskStore';
 import { v4 as uuidv4 } from 'uuid';
+import { 
+  addTask,
+  deleteTask,
+  toggleTaskCompleted,
+  toggleTaskHidden,
+  updateTask,
+  updateTaskTitle,
+  setTaskFeedback,
+  restoreTask,
+  addComment,
+  deleteComment,
+  syncTasksFromDatabase
+} from './tasks';
 
 // Provider component
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -49,27 +61,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       setIsSyncing(true);
       console.log("[AppProvider] Sincronizando tarefas do usuário:", currentUser.id);
       
-      // Fetch active (incomplete) tasks
-      const activeTasks = await fetchTasksFromDB(currentUser.id, false);
-      // Fetch completed tasks
-      const completedTasks = await fetchTasksFromDB(currentUser.id, true);
-      
-      // Combine all tasks
-      const allTasks = [...activeTasks, ...completedTasks];
-      
-      // Clear existing tasks and set the ones from the database
-      dispatch({ type: 'CLEAR_TASKS' });
-      
-      // Add each task to the state
-      allTasks.forEach(task => {
-        dispatch({ 
-          type: 'ADD_TASK', 
-          payload: task 
-        });
-      });
+      const allTasks = await syncTasksFromDatabase(dispatch, currentUser.id);
       
       setLastSyncTime(now);
-      console.log("[AppProvider] Tarefas sincronizadas:", allTasks.length);
+      console.log("[AppProvider] Tarefas sincronizadas:", allTasks?.length || 0);
       
       return allTasks;
     } catch (error) {
@@ -236,16 +231,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     state,
     dispatch,
     // Task actions
-    addTask: (task) => taskActions.addTask(dispatch, task),
-    deleteTask: (id) => taskActions.deleteTask(dispatch, id),
-    toggleTaskCompleted: (id) => taskActions.toggleTaskCompleted(dispatch, id),
-    toggleTaskHidden: (id) => taskActions.toggleTaskHidden(dispatch, id),
-    updateTask: (id, data) => taskActions.updateTask(dispatch, id, data),
-    updateTaskTitle: (id, title) => taskActions.updateTaskTitle(dispatch, id, title),
-    setTaskFeedback: (id, feedback) => taskActions.setTaskFeedback(dispatch, id, feedback),
-    restoreTask: (id) => taskActions.restoreTask(dispatch, id),
-    addComment: (taskId, text) => taskActions.addComment(dispatch, taskId, text),
-    deleteComment: (taskId, commentId) => taskActions.deleteComment(dispatch, taskId, commentId),
+    addTask: (task) => addTask(dispatch, task),
+    deleteTask: (id) => deleteTask(dispatch, id),
+    toggleTaskCompleted: (id) => toggleTaskCompleted(dispatch, id),
+    toggleTaskHidden: (id) => toggleTaskHidden(dispatch, id),
+    updateTask: (id, data) => updateTask(dispatch, id, data),
+    updateTaskTitle: (id, title) => updateTaskTitle(dispatch, id, title),
+    setTaskFeedback: (id, feedback) => setTaskFeedback(dispatch, id, feedback),
+    restoreTask: (id) => restoreTask(dispatch, id),
+    addComment: (taskId, text) => addComment(dispatch, taskId, text),
+    deleteComment: (taskId, commentId) => deleteComment(dispatch, taskId, commentId),
     syncTasksWithDatabase: (forceSync = true) => syncTasksWithDatabase(forceSync),
     
     // UI actions
