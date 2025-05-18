@@ -82,7 +82,8 @@ const HeroSection: React.FC<HeroSectionProps> = ({
                 </div>
                 <LoginForm 
                   onSuccess={() => navigate('/dashboard')} 
-                  onSwitchToSignup={() => navigate('/login')} 
+                  onSwitchToSignup={() => navigate('/login')}
+                  onForgotPassword={() => navigate('/reset-password')}
                 />
               </div>
             </div>
