@@ -2,7 +2,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Landing from './pages/Landing';
 import { ThemeProvider } from './components/ui/theme-provider';
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider } from './context/auth';
 import { UserProvider } from './context/UserContext';
 import ActoApp from './pages/ActoApp';
 import Login from './pages/Login';
