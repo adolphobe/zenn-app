@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { User, UserPreferences } from '@/types/user';
 import { AppState } from '@/context/types';
 import { debounce } from 'lodash';
+import { Json } from '@/integrations/supabase/types';
 
 // Function to extract preferences from app state
 export const extractPreferencesFromState = (state: AppState): UserPreferences => {
@@ -50,6 +51,23 @@ export const applyPreferencesToState = (preferences: UserPreferences, state: App
   };
 };
 
+// Function to validate if the JSON data has the expected UserPreferences structure
+const isValidUserPreferences = (data: Json | null): data is UserPreferences => {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) {
+    return false;
+  }
+  
+  const preferences = data as Record<string, any>;
+  
+  return (
+    typeof preferences.darkMode === 'boolean' &&
+    typeof preferences.activeViewMode === 'string' &&
+    typeof preferences.sidebarOpen === 'boolean' &&
+    preferences.viewModeSettings &&
+    preferences.dateDisplayOptions
+  );
+};
+
 // Function to get user preferences from Supabase
 export const fetchUserPreferences = async (userId: string): Promise<UserPreferences | null> => {
   try {
@@ -67,7 +85,12 @@ export const fetchUserPreferences = async (userId: string): Promise<UserPreferen
       return null;
     }
     
-    return data?.preferences as UserPreferences || null;
+    // Check if preferences exist and validate their structure
+    if (data?.preferences && isValidUserPreferences(data.preferences)) {
+      return data.preferences as UserPreferences;
+    }
+    
+    return null;
   } catch (error) {
     console.error("[PreferencesService] Erro inesperado ao buscar preferências:", error);
     console.error("[PreferencesService] DETALHES EM PORTUGUÊS: Ocorreu um erro ao carregar as preferências");
@@ -95,7 +118,12 @@ export const updateUserPreferences = debounce(async (
       return null;
     }
     
-    return data as UserPreferences || null;
+    // Check if returned data is valid
+    if (data && isValidUserPreferences(data as Json)) {
+      return data as UserPreferences;
+    }
+    
+    return null;
   } catch (error) {
     console.error("[PreferencesService] Erro inesperado ao atualizar preferências:", error);
     console.error("[PreferencesService] DETALHES EM PORTUGUÊS: Ocorreu um erro ao salvar as preferências");
@@ -116,7 +144,16 @@ export const savePreferencesToLocalStorage = (preferences: UserPreferences): voi
 export const loadPreferencesFromLocalStorage = (): UserPreferences | null => {
   try {
     const preferencesStr = localStorage.getItem('app_preferences');
-    return preferencesStr ? JSON.parse(preferencesStr) as UserPreferences : null;
+    if (!preferencesStr) return null;
+    
+    const parsedPreferences = JSON.parse(preferencesStr);
+    
+    // Validate the structure
+    if (isValidUserPreferences(parsedPreferences)) {
+      return parsedPreferences as UserPreferences;
+    }
+    
+    return null;
   } catch (error) {
     console.error("[PreferencesService] Erro ao carregar preferências do localStorage:", error);
     return null;
