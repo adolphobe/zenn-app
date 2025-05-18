@@ -1,10 +1,9 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { toast } from '@/hooks/use-toast';
-import { v4 as uuidv4 } from 'uuid';
 import { Task } from '@/types';
 import { toggleTaskHidden as toggleHiddenService } from '@/services/taskService';
 import { useAuth } from '@/context/auth';
+import { useTaskToasts } from '@/components/task/utils/taskToasts';
 
 export const useTaskVisibilityToggle = (
   tasks: Task[],
@@ -13,6 +12,7 @@ export const useTaskVisibilityToggle = (
 ) => {
   const { currentUser } = useAuth();
   const queryClient = useQueryClient();
+  const { showToggleHiddenToast } = useTaskToasts();
   
   // Toggle hidden mutation with improved animation
   const toggleHiddenMutation = useMutation({
@@ -68,8 +68,13 @@ export const useTaskVisibilityToggle = (
     onSuccess: (result, id) => {
       // Get current task state before update
       const task = tasks.find(t => t.id === id);
+      if (!task) return;
+      
       const wasHidden = task?.hidden;
       const isNowHidden = result.hidden;
+      
+      // Show toast notification
+      showToggleHiddenToast({...task, hidden: isNowHidden});
       
       // If the task was hidden, apply animation logic
       if (!wasHidden && isNowHidden) {
@@ -125,15 +130,6 @@ export const useTaskVisibilityToggle = (
           exact: false 
         });
       }
-      
-      // Add immediate visual feedback
-      toast({
-        id: `toggle-hidden-${id}-${Date.now()}`,
-        title: isNowHidden ? "Tarefa oculta" : "Tarefa visível",
-        description: isNowHidden 
-          ? "A tarefa foi ocultada e só será visível com o filtro ativado." 
-          : "A tarefa agora está visível.",
-      });
     },
     onError: (error: any, id, context) => {
       console.error('Error toggling task hidden status:', error);
@@ -142,13 +138,6 @@ export const useTaskVisibilityToggle = (
         // Revert to the previous state on error
         queryClient.setQueryData(['tasks', currentUser?.id, completed], context.previousTasks);
       }
-      
-      toast({
-        id: uuidv4(),
-        title: "Erro ao atualizar visibilidade",
-        description: "Não foi possível atualizar a visibilidade da tarefa. Tente novamente.",
-        variant: "destructive",
-      });
     },
     onSettled: (_, error, id) => {
       setTaskOperationLoading(id, 'toggle-hidden', false);
