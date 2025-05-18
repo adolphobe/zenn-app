@@ -6,3 +6,4 @@ export { usePillarHover } from './usePillarHover';
 export { useExpandedTask } from './useExpandedTask';
 export { useSidebar } from './useSidebar';
 export { useTabNavigation } from './useTabNavigation';
+export { useDateConfig } from './useDateConfig';

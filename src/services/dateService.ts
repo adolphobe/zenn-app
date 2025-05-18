@@ -1,11 +1,12 @@
+
 import {
   parse,
   format,
   isValid,
   parseISO,
   formatISO,
-  isAfter,
-  isBefore,
+  isAfter as dateIsAfter,
+  isBefore as dateIsBefore,
   startOfDay,
   endOfDay,
   addDays,
@@ -326,8 +327,8 @@ export const dateService = {
       }
       
       const isEqual = isSameDay(parsed1, parsed2);
-      const isBefore = isBefore(parsed1, parsed2);
-      const isAfter = isAfter(parsed1, parsed2);
+      const isBeforeResult = dateIsBefore(parsed1, parsed2);
+      const isAfterResult = dateIsAfter(parsed1, parsed2);
       
       const diffInMillis = Math.abs(parsed2.getTime() - parsed1.getTime());
       const diffInSeconds = Math.floor(diffInMillis / 1000);
@@ -341,8 +342,8 @@ export const dateService = {
       
       return {
         isEqual,
-        isBefore,
-        isAfter,
+        isBefore: isBeforeResult,
+        isAfter: isAfterResult,
         diffInDays,
         diffInHours,
         diffInMinutes,
@@ -459,7 +460,7 @@ export const dateService = {
         return false;
       }
       
-      return isBefore(dateToCompare, new Date());
+      return dateIsBefore(dateToCompare, new Date());
     } catch (error) {
       console.error('Erro ao verificar se tarefa está vencida:', error);
       return false;
