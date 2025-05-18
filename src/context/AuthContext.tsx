@@ -32,6 +32,18 @@ export const useAuth = () => {
   if (!context) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
+  
+  // Additional logging for each consumer of the auth context
+  const callerComponent = new Error().stack?.split('\n')[2]?.trim() || 'Unknown Component';
+  console.log(`[useAuth] Contexto de autenticação acessado por: ${callerComponent}`);
+  console.log(`[useAuth] Estado atual:`, { 
+    isAuthenticated: context.isAuthenticated, 
+    isLoading: context.isLoading,
+    hasUser: !!context.currentUser, 
+    hasSession: !!context.session,
+    userId: context.currentUser?.id || 'nenhum'
+  });
+  
   return context;
 };
 
@@ -85,81 +97,73 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [authState, setAuthState] = useState<string>("INITIALIZING");
 
   // Set up auth state listener and check for existing session
   useEffect(() => {
-    console.log("[AuthProvider] Inicializando estado de autenticação");
-    console.log("[AuthProvider] DETALHES EM PORTUGUÊS: Verificando se existe uma sessão ativa");
+    console.log("[AuthProvider] INICIANDO PROVIDER DE AUTENTICAÇÃO");
+    console.log("[AuthProvider] SEQUÊNCIA DE OPERAÇÕES: Inicializando estado -> Verificando sessão inicial -> Configurando listener de mudanças");
+    setAuthState("INITIALIZING");
     
-    // First check for existing session to set initial state
-    const checkInitialSession = async () => {
-      try {
-        const { data } = await supabase.auth.getSession();
-        console.log("[AuthProvider] Verificação inicial da sessão:", data.session ? "Sessão encontrada" : "Nenhuma sessão");
-        console.log("[AuthProvider] DETALHES EM PORTUGUÊS:", data.session ? "Encontramos uma sessão ativa" : "Nenhuma sessão ativa encontrada");
-        
-        if (data.session) {
-          setSession(data.session);
-          // Fetch user profile data
-          fetchUserProfile(data.session.user);
-        } else {
-          // No session found, mark as not loading
-          setIsLoading(false);
-        }
-      } catch (error) {
-        console.error("[AuthProvider] Erro ao verificar sessão:", error);
-        console.error("[AuthProvider] DETALHES EM PORTUGUÊS: Ocorreu um erro ao verificar se existe uma sessão ativa");
-        setIsLoading(false);
-      }
-    };
+    let unmounted = false;
     
     // Helper function to fetch user profile
     const fetchUserProfile = async (user: any) => {
+      if (unmounted) return;
+      
       try {
+        console.log("[AuthProvider] Buscando perfil do usuário:", user.email);
         const { data: profileData } = await supabase
           .from('profiles')
           .select('*')
           .eq('id', user.id)
           .maybeSingle();
           
+        if (unmounted) return;
+        
         const mappedUser = mapSupabaseUser(user, profileData);
-        console.log("[AuthProvider] Perfil do usuário carregado:", mappedUser.email);
-        console.log("[AuthProvider] DETALHES EM PORTUGUÊS: Perfil do usuário carregado com sucesso");
+        console.log("[AuthProvider] Perfil do usuário carregado com sucesso:", mappedUser.email);
         setCurrentUser(mappedUser);
       } catch (error) {
         console.error("[AuthProvider] Erro ao buscar perfil do usuário:", error);
-        console.error("[AuthProvider] DETALHES EM PORTUGUÊS: Ocorreu um erro ao carregar os dados do perfil do usuário");
+        if (unmounted) return;
+        
         const mappedUser = mapSupabaseUser(user);
         setCurrentUser(mappedUser);
       } finally {
-        setIsLoading(false);
+        if (!unmounted) {
+          setIsLoading(false);
+          setAuthState("COMPLETED_PROFILE_FETCH");
+        }
       }
     };
     
-    // Check initial session
-    checkInitialSession();
-    
-    // Set up auth state change listener
+    // First set up auth state change listener
+    console.log("[AuthProvider] Configurando listener de mudanças de autenticação");
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, newSession) => {
-        console.log("[AuthProvider] Estado de autenticação alterado:", event);
-        console.log("[AuthProvider] DETALHES EM PORTUGUÊS: Evento de autenticação detectado:", 
-          event === 'SIGNED_IN' ? 'Usuário entrou' : 
-          event === 'SIGNED_OUT' ? 'Usuário saiu' : 
-          'Outro evento de autenticação');
+        if (unmounted) return;
+        
+        const prevAuthState = authState;
+        setAuthState(`AUTH_STATE_CHANGE: ${event}`);
+        
+        console.log(`[AuthProvider] Evento de autenticação: ${event}`, {
+          prevState: prevAuthState,
+          hasSession: !!newSession,
+          timestamp: new Date().toISOString()
+        });
         
         if (event === 'SIGNED_OUT') {
-          console.log("[AuthProvider] Usuário deslogado");
-          console.log("[AuthProvider] DETALHES EM PORTUGUÊS: Usuário encerrou a sessão");
+          console.log("[AuthProvider] Evento de logout detectado - limpando estados");
           setSession(null);
           setCurrentUser(null);
           setIsLoading(false);
+          setAuthState("SIGNED_OUT");
           return;
         }
         
         if (newSession?.user) {
-          console.log("[AuthProvider] Nova sessão detectada");
-          console.log("[AuthProvider] DETALHES EM PORTUGUÊS: Iniciando nova sessão para o usuário");
+          console.log(`[AuthProvider] Nova sessão detectada para: ${newSession.user.email}`);
           setSession(newSession);
           // Fetch user profile using the helper
           fetchUserProfile(newSession.user);
@@ -167,13 +171,61 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
     );
     
+    // Then check for existing session to set initial state
+    const checkInitialSession = async () => {
+      try {
+        console.log("[AuthProvider] Verificando sessão inicial");
+        setAuthState("CHECKING_INITIAL_SESSION");
+        
+        const { data } = await supabase.auth.getSession();
+        
+        if (unmounted) return;
+        
+        console.log("[AuthProvider] Sessão inicial verificada:", data.session ? "ENCONTRADA" : "NÃO ENCONTRADA");
+        
+        if (data.session) {
+          setSession(data.session);
+          setAuthState("FOUND_INITIAL_SESSION");
+          
+          // Log detailed session info
+          console.log("[AuthProvider] DETALHES DA SESSÃO:", {
+            userId: data.session.user.id,
+            email: data.session.user.email,
+            expiresAt: data.session.expires_at ? new Date(data.session.expires_at * 1000).toISOString() : 'N/A',
+            provider: data.session.user.app_metadata?.provider || 'unknown',
+          });
+          
+          // Fetch user profile data
+          fetchUserProfile(data.session.user);
+        } else {
+          // No session found, mark as not loading
+          setAuthState("NO_INITIAL_SESSION");
+          setIsLoading(false);
+          // Double check localStorage for tokens to detect any inconsistencies
+          const hasToken = !!localStorage.getItem('sb-wbvxnapruffchikhrqrs-auth-token');
+          if (hasToken) {
+            console.warn("[AuthProvider] ALERTA DE INCONSISTÊNCIA: Token encontrado no localStorage, mas nenhuma sessão foi recuperada!");
+          }
+        }
+      } catch (error) {
+        console.error("[AuthProvider] Erro ao verificar sessão inicial:", error);
+        if (!unmounted) {
+          setAuthState("ERROR_CHECKING_SESSION");
+          setIsLoading(false);
+        }
+      }
+    };
+    
+    // Check initial session
+    checkInitialSession();
+    
     // Clean up subscription on unmount
     return () => {
-      console.log("[AuthProvider] Limpando - cancelando inscrição em eventos de autenticação");
-      console.log("[AuthProvider] DETALHES EM PORTUGUÊS: Desativando monitoramento de eventos de autenticação");
+      unmounted = true;
+      console.log("[AuthProvider] Limpando componente AuthProvider - cancelando inscrição em eventos");
       subscription.unsubscribe();
     };
-  }, []);
+  }, [authState]); // Add authState to dependencies to avoid stale state in logs
 
   // Login function
   const login = async (email: string, password: string): Promise<boolean> => {
@@ -367,6 +419,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setIsLoading(false);
     }
   };
+  
+  // Log any changes to key state variables
+  useEffect(() => {
+    console.log("[AuthProvider] Estado de autenticação alterado:", { 
+      isAuthenticated: !!session?.user,
+      hasUser: !!currentUser,
+      isLoading,
+      authStateLabel: authState,
+      timestamp: new Date().toISOString()
+    });
+  }, [session, currentUser, isLoading, authState]);
   
   // Context value
   const value = {

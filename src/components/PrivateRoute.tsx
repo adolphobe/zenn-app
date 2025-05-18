@@ -8,13 +8,16 @@ import { cn } from '@/lib/utils';
 
 /**
  * PrivateRoute - Protects routes that require authentication
- * Now enhanced to properly check authentication status but doesn't redirect
+ * Enhanced with detailed logging
  */
 export const PrivateRoute = () => {
   const { isAuthenticated, isLoading, currentUser, session } = useAuth();
   const location = useLocation();
   const { isOpen: sidebarOpen, open: openSidebar, isMobile } = useSidebar();
 
+  // Component mount tracking for debugging authentication flow
+  console.log(`[PrivateRoute] PrivateRoute MONTADO/RE-RENDERIZADO em ${location.pathname} - ${new Date().toISOString()}`);
+  
   // Log detailed authentication information for debugging
   console.log(`[PrivateRoute] Verificando autenticação em ${location.pathname}, isAuthenticated: ${isAuthenticated}, isLoading: ${isLoading}`);
   console.log(`[PrivateRoute] DETALHES EM PORTUGUÊS: Verificando se o usuário está autenticado para acessar a rota ${location.pathname}`);

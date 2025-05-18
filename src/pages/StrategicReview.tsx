@@ -16,8 +16,14 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { CalendarIcon, CalendarRange } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-// Main Strategic Review Page Component
+/**
+ * Strategic Review Page Component
+ * Enhanced with detailed authentication logging
+ */
 const StrategicReview: React.FC = () => {
+  // Authentication state tracking
+  console.log("[StrategicReview] COMPONENTE INICIALIZADO - Nova renderização");
+  
   const { state } = useAppContext();
   const { isAuthenticated, isLoading, currentUser, session } = useAuth();
   const [period, setPeriod] = useState<PeriodType>('week');
@@ -25,9 +31,10 @@ const StrategicReview: React.FC = () => {
   const [customEndDate, setCustomEndDate] = useState<Date | undefined>(undefined);
   const [showCustomDatePicker, setShowCustomDatePicker] = useState(false);
   
-  // Verificação detalhada de autenticação
+  // Verificação detalhada de autenticação com timestamp
   useEffect(() => {
-    console.log("[StrategicReview] Inicializando componente de revisão estratégica");
+    const timestamp = new Date().toISOString();
+    console.log(`[StrategicReview] Verificação de autenticação em: ${timestamp}`);
     console.log("[StrategicReview] Estado de autenticação =>", isAuthenticated ? "Autenticado" : "Não autenticado");
     console.log("[StrategicReview] Estado de carregamento =>", isLoading ? "Carregando" : "Carregamento concluído");
     console.log("[StrategicReview] Usuário atual =>", currentUser?.email || "Nenhum usuário");
@@ -44,7 +51,8 @@ const StrategicReview: React.FC = () => {
       isAuthenticated, 
       hasUser: !!currentUser,
       hasSession: !!session,
-      isLoading 
+      isLoading,
+      timestamp
     });
     
     // Verificar tokens no localStorage (apenas para debugging)
@@ -61,6 +69,9 @@ const StrategicReview: React.FC = () => {
   const { assignMissingPillars } = useTaskPillars();
   
   useEffect(() => {
+    // Log that we're initializing tasks
+    console.log("[StrategicReview] Inicializando tarefas do componente");
+    
     // Ensure all tasks have pillars assigned - explicitly call this
     assignMissingPillars();
     
@@ -69,7 +80,14 @@ const StrategicReview: React.FC = () => {
       title: "Revisão Estratégica",
       description: "Mostrando análise das tarefas concluídas."
     });
-  }, [assignMissingPillars]);
+    
+    // Log tasks data
+    console.log(`[StrategicReview] Total de tarefas disponíveis: ${state.tasks.length}`);
+    
+    return () => {
+      console.log("[StrategicReview] Componente será desmontado");
+    };
+  }, [assignMissingPillars, state.tasks.length]);
   
   // Reset custom dates when changing to a non-custom period
   useEffect(() => {
@@ -131,12 +149,23 @@ const StrategicReview: React.FC = () => {
     console.log("[StrategicReview] Ainda verificando autenticação...");
     return <div className="flex items-center justify-center min-h-screen">
       <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      <p className="ml-3">Verificando autenticação...</p>
     </div>;
   }
   
+  // Extra logging before showing error
   if (!isAuthenticated) {
     console.error("[StrategicReview] ERRO: Tentativa de acessar página protegida sem autenticação");
     console.error("[StrategicReview] DETALHES EM PORTUGUÊS: Você precisa estar logado para acessar esta página");
+    console.error("[StrategicReview] CONTEXTO COMPLETO:", { 
+      url: window.location.href,
+      isAuthenticated, 
+      isLoading,
+      hasUser: !!currentUser,
+      userEmail: currentUser?.email || "nenhum",
+      hasSession: !!session,
+      hasLocalToken: !!localStorage.getItem('sb-wbvxnapruffchikhrqrs-auth-token')
+    });
     
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-red-50">
@@ -158,10 +187,21 @@ const StrategicReview: React.FC = () => {
               Ir para Login manualmente
             </a>
           </div>
+          
+          <div className="mt-4 p-3 bg-gray-100 rounded text-xs">
+            <p className="font-semibold">Informações técnicas:</p>
+            <p>Estado de autenticação: {isAuthenticated ? "Autenticado" : "Não autenticado"}</p>
+            <p>Estado de carregamento: {isLoading ? "Carregando" : "Concluído"}</p>
+            <p>Usuário: {currentUser?.email || "Nenhum"}</p>
+            <p>Token no localStorage: {!!localStorage.getItem('sb-wbvxnapruffchikhrqrs-auth-token') ? "Presente" : "Ausente"}</p>
+          </div>
         </div>
       </div>
     );
   }
+  
+  // Final verification before rendering main content
+  console.log("[StrategicReview] RENDERIZANDO CONTEÚDO PRINCIPAL - Autenticação validada");
   
   return (
     <div className="w-full">
@@ -284,12 +324,10 @@ const StrategicReview: React.FC = () => {
           {/* Only show analysis cards if there are tasks */}
           {hasCompletedTasks && (
             <div className="grid gap-6 md:grid-cols-2">
-              {/* Making each card have the same height with matching flex */}
               <div className="flex">
                 <FeedbackAnalysisCard tasks={filteredTasks} />
               </div>
               
-              {/* Right column */}
               <div className="flex">
                 <PillarsAnalysisCard tasks={filteredTasks} />
               </div>

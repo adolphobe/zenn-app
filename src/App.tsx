@@ -15,6 +15,9 @@ import Login from "./pages/Login";
 import { PrivateRoute } from "./components/PrivateRoute";
 import { AuthProvider } from "./context/AuthContext";
 
+// Logging app initialization
+console.log("[App] Inicializando o componente App");
+
 // Create Query Client with better error handling
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -26,34 +29,40 @@ const queryClient = new QueryClient({
   },
 });
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <AuthProvider>
-        <AppProvider>
-          <ToastProvider>
-            <Toaster />
-            <Sonner />
-            <Routes>
-              {/* Public routes */}
-              <Route path="/" element={<Landing />} />
-              <Route path="/login" element={<Login />} />
-              
-              {/* Protected routes */}
-              <Route element={<PrivateRoute />}>
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/strategic-review" element={<StrategicReview />} />
-                <Route path="/history" element={<TaskHistory />} />
-              </Route>
-              
-              {/* Fallback route */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </ToastProvider>
-        </AppProvider>
-      </AuthProvider>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+const App = () => {
+  console.log("[App] Renderizando App");
+  
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <AuthProvider>
+          <AppProvider>
+            <ToastProvider>
+              <Toaster />
+              <Sonner />
+              <Routes>
+                {/* Public routes */}
+                <Route path="/" element={<Landing />} />
+                <Route path="/login" element={<Login />} />
+                
+                {/* Protected routes */}
+                <Route element={<PrivateRoute />}>
+                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/strategic-review" element={<StrategicReview />} />
+                  <Route path="/history" element={<TaskHistory />} />
+                </Route>
+                
+                {/* Fallback route */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </ToastProvider>
+          </AppProvider>
+        </AuthProvider>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+};
+
+console.log("[App] Componente App exportado");
 
 export default App;
