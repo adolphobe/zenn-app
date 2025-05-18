@@ -98,14 +98,16 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({ isOpen, onClose
 
         <DialogFooter className="sm:justify-between">
           <Button
-            variant="outline"
+            variant="destructive"
             onClick={handleCancel}
+            className="hover:bg-red-600"
           >
             Cancelar
           </Button>
           <Button
             onClick={handleNext}
-            className={step === 1 ? "bg-red-600 hover:bg-red-700" : ""}
+            variant="outline"
+            className="border-gray-200 hover:bg-transparent"
           >
             {step === 1 ? "Avançar" : "Confirmar exclusão"}
           </Button>
