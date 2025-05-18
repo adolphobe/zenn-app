@@ -13,7 +13,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 221 83% 53%;
+    --primary: 222.2 47.4% 11.2%;
     --primary-foreground: 210 40% 98%;
 
     --secondary: 210 40% 96.1%;
@@ -22,26 +22,17 @@
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
 
-    --accent: 199 89% 48%;
-    --accent-foreground: 0 0% 98%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 221 83% 53%;
+    --ring: 222.2 84% 4.9%;
 
-    --radius: 1rem;
-
-    --sidebar-background: 221 83% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 221 83% 53%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --radius: 0.5rem;
   }
 
   .dark {
@@ -54,7 +45,7 @@
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 217.2 91.2% 59.8%;
+    --primary: 210 40% 98%;
     --primary-foreground: 222.2 47.4% 11.2%;
 
     --secondary: 217.2 32.6% 17.5%;
@@ -63,7 +54,7 @@
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
 
-    --accent: 199 89% 60%;
+    --accent: 217.2 32.6% 17.5%;
     --accent-foreground: 210 40% 98%;
 
     --destructive: 0 62.8% 30.6%;
@@ -72,15 +63,6 @@
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
-    
-    --sidebar-background: 222.2 47.4% 11.2%;
-    --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 217.2 91.2% 59.8%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 217.2 32.6% 17.5%;
-    --sidebar-accent-foreground: 210 40% 98%;
-    --sidebar-border: 217.2 32.6% 17.5%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
   }
 }
 
@@ -88,165 +70,49 @@
   * {
     @apply border-border;
   }
-
   body {
-    @apply bg-background text-foreground antialiased;
-  }
-  
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-medium tracking-tight;
-  }
-  
-  input, select, textarea {
-    @apply bg-background;
+    @apply bg-background text-foreground;
   }
 }
 
-@layer components {
-  .task-card {
-    @apply relative p-6 rounded-xl shadow-sm transition-all duration-200 border hover:shadow-md;
+/* Animation keyframes for task transitions */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
   }
-
-  /* Updated task priority classes with matching border colors */
-  .task-critical {
-    @apply bg-[#FFEEEE] text-[#B84040] border-[#f9d1d1];
-  }
-
-  .task-important {
-    @apply bg-[#FFFAEA] text-[#A07225] border-[#ffdfbf];
-  }
-
-  .task-moderate {
-    @apply bg-[#F0F7FF] text-[#4A7EB5] border-[#d2e7ff];
-  }
-
-  .task-light {
-    @apply bg-acto-light text-acto-light-text border-border;
-  }
-
-  /* Filter styling for sidebar */
-  .filter-item {
-    @apply transition-colors duration-200;
-  }
-  
-  .filter-item-active {
-    @apply bg-[#f5f5f5] dark:bg-gray-700 text-gray-800 dark:text-gray-200;
-  }
-  
-  .filter-item-inactive {
-    @apply hover:bg-gray-100 dark:hover:bg-gray-800;
-  }
-
-  /* Rest of the CSS remains the same */
-  .sidebar-item {
-    @apply flex items-center gap-2 px-3 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors;
-  }
-
-  .sidebar-item.active {
-    @apply bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400;
-  }
-
-  /* Update the justify-content and text-align properties for the sidebar items */
-  .sidebar-item span {
-    @apply text-left;
-  }
-
-  .card-shadow {
-    @apply shadow-[0_2px_8px_rgba(0,0,0,0.05)];
-  }
-  
-  .btn-primary {
-    @apply bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors shadow-sm;
-  }
-  
-  .btn-secondary {
-    @apply bg-white border border-gray-200 hover:bg-gray-50 px-4 py-2 rounded-lg transition-colors shadow-sm;
-  }
-  
-  .input-field {
-    @apply px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all;
-  }
-
-  /* Updated button hover colors */
-  .blue-hover {
-    @apply hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-900/20 dark:hover:text-blue-400;
-  }
-
-  /* Task Score Container Styling */
-  .task-score-container {
-    @apply flex flex-col gap-1;
-  }
-  
-  .task-score-header {
-    @apply flex justify-between items-center;
-  }
-  
-  .task-score-title {
-    @apply font-medium;
-  }
-  
-  .task-score-value {
-    @apply font-semibold transition-all duration-300;
-  }
-  
-  .task-score-label {
-    @apply text-xs text-gray-500 mt-1;
-  }
-  
-  /* Score value styling based on score */
-  .task-score-critical {
-    @apply text-red-600;
-  }
-  
-  .task-score-important {
-    @apply text-orange-500;
-  }
-  
-  /* Updated color for moderate tasks */
-  .task-score-moderate {
-    @apply text-[#5083c1];
-  }
-  
-  .task-score-light {
-    @apply text-gray-400;
-  }
-  
-  /* Animations for the score */
-  .task-score-animate {
-    animation: pulse 1s ease-in-out;
-  }
-  
-  @keyframes pulse {
-    0%, 100% {
-      transform: scale(1);
-      opacity: 1;
-    }
-    50% {
-      transform: scale(1.1);
-      opacity: 0.8;
-      text-shadow: 0 0 15px currentColor;
-    }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }
 
-@layer utilities {
-  .animate-fade-in {
-    animation: fadeIn 0.3s ease-out forwards;
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
-  
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+  to {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.98);
   }
-  
-  /* Mobile-specific utilities */
-  .sidebar-overlay {
-    @apply fixed inset-0 bg-black bg-opacity-50 z-20;
-  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-in-out forwards;
+}
+
+.animate-fade-out {
+  animation: fadeOut 0.4s ease-in-out forwards;
+}
+
+/* Task card styling */
+.task-card {
+  @apply relative border rounded-lg p-4 shadow-sm transition-all duration-300;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+}
+
+.task-card:hover {
+  @apply shadow-md transform;
 }

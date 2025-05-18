@@ -30,23 +30,23 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
   const { showToggleHiddenToast } = useTaskToasts();
   const { animationClass, isPendingVisibilityUpdate, animationState } = useTaskAnimations(task);
   
-  // Atualizar titleValue quando a tarefa muda
+  // Update titleValue when task changes
   useEffect(() => {
     setTitleValue(task.title);
   }, [task.title]);
   
-  // Aplicar classe de prioridade apenas no modo potência
+  // Apply priority class only in power mode
   const cardClass = viewMode === 'chronological' 
     ? 'bg-white text-gray-800 border-gray-200' 
     : getTaskPriorityClass(task.totalScore);
   
-  // Manipulador para expansão do card
+  // Card expansion handler
   const handleCardClick = (e: React.MouseEvent) => {
     if (isEditingTitle) return;
     onToggleExpand(task.id);
   };
 
-  // Título relacionado
+  // Title related handlers
   const handleTitleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     setIsEditingTitle(true);
@@ -58,7 +58,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
 
   const handleTitleBlur = () => {
     if (titleValue.trim() !== task.title) {
-      // Usar updateTask em vez de updateTaskTitle
+      // Use updateTask instead of updateTaskTitle
       updateTask(task.id, { title: titleValue.trim() });
     }
     setIsEditingTitle(false);
@@ -67,7 +67,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
   const handleTitleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       if (titleValue.trim() !== task.title) {
-        // Usar updateTask em vez de updateTaskTitle
+        // Use updateTask instead of updateTaskTitle
         updateTask(task.id, { title: titleValue.trim() });
       }
       setIsEditingTitle(false);
@@ -77,7 +77,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
     }
   };
 
-  // Funções relacionadas a ações
+  // Action-related functions
   const handleCollapseTask = () => {
     onToggleExpand(task.id);
   };

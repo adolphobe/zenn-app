@@ -14,7 +14,7 @@ export const useTaskVisibilityToggle = (
   const { currentUser } = useAuth();
   const queryClient = useQueryClient();
   
-  // Toggle hidden mutation com animação melhorada
+  // Toggle hidden mutation with improved animation
   const toggleHiddenMutation = useMutation({
     mutationFn: (id: string) => {
       // Validate task exists
@@ -37,7 +37,7 @@ export const useTaskVisibilityToggle = (
       const task = tasks.find(t => t.id === id);
       if (!task) return { previousTasks };
       
-      // Determinar o novo estado
+      // Determine the new state
       const newHiddenState = !task.hidden;
       
       // Optimistically update to the new value with animation marker
@@ -71,12 +71,12 @@ export const useTaskVisibilityToggle = (
       const wasHidden = task?.hidden;
       const isNowHidden = result.hidden;
       
-      // Se a tarefa foi ocultada, aplicamos a lógica de animação
+      // If the task was hidden, apply animation logic
       if (!wasHidden && isNowHidden) {
-        // Para tarefas sendo ocultadas, adicionamos um pequeno delay para permitir 
-        // a animação de saída antes de remover da lista
+        // For tasks being hidden, add a small delay to allow 
+        // the exit animation before removing from the list
         setTimeout(() => {
-          // Atualizar a cache depois da animação de saída
+          // Update the cache after the exit animation
           queryClient.setQueryData(['tasks', currentUser?.id, completed], (old: Task[] | undefined) => {
             if (!old) return [];
             
@@ -94,14 +94,14 @@ export const useTaskVisibilityToggle = (
             });
           });
           
-          // Invalidar queries para atualizar os filtros
+          // Invalidate queries to update the filters
           queryClient.invalidateQueries({ 
             queryKey: ['tasks', currentUser?.id, completed],
             exact: false
           });
-        }, 400); // Tempo para animação de saída
+        }, 400); // Time for exit animation
       } else {
-        // Para mostrar uma tarefa oculta, atualizamos imediatamente
+        // For showing a hidden task, update immediately
         queryClient.setQueryData(['tasks', currentUser?.id, completed], (old: Task[] | undefined) => {
           if (!old) return [];
           
@@ -119,14 +119,14 @@ export const useTaskVisibilityToggle = (
           });
         });
         
-        // Invalidar a query para atualizar os filtros e mostrar a tarefa
+        // Invalidate the query to update the filters and show the task
         queryClient.invalidateQueries({ 
           queryKey: ['tasks'],
           exact: false 
         });
       }
       
-      // Adicionar feedback visual imediato
+      // Add immediate visual feedback
       toast({
         id: `toggle-hidden-${id}-${Date.now()}`,
         title: isNowHidden ? "Tarefa oculta" : "Tarefa visível",

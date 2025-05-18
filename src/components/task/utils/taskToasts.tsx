@@ -1,61 +1,46 @@
 
-import React, { createContext, useContext } from 'react';
-import { Task } from '@/types';
+import { useState } from 'react';
 import { toast } from '@/hooks/use-toast';
+import { v4 as uuidv4 } from 'uuid';
+import { Task } from '@/types';
+import { Eye, EyeOff, Check } from 'lucide-react';
 
-// Context for task toasts
-interface TaskToastContextType {
-  showToggleHiddenToast: (task: Task) => void;
-  showCompleteTaskToast: (task: Task) => void;
-  showDeleteTaskToast: (task: Task) => void;
-}
-
-const TaskToastContext = createContext<TaskToastContextType | undefined>(undefined);
-
-// Provider component
-export const TaskToastProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const useTaskToasts = () => {
+  // Toast for toggling task visibility
   const showToggleHiddenToast = (task: Task) => {
     toast({
+      id: `toggle-visibility-${task.id}-${Date.now()}`,
       title: task.hidden ? "Tarefa ocultada" : "Tarefa visível",
       description: task.hidden 
-        ? "A tarefa foi ocultada e só será visível com o filtro ativado."
+        ? "A tarefa foi ocultada e só será visível com o filtro ativado." 
         : "A tarefa agora está visível.",
+      icon: task.hidden ? <EyeOff size={16} /> : <Eye size={16} />,
     });
   };
 
-  const showCompleteTaskToast = (task: Task) => {
+  // Toast for task completion
+  const showTaskCompletedToast = (task: Task) => {
     toast({
-      title: "Tarefa completa",
-      description: `A tarefa "${task.title}" foi marcada como concluída.`,
+      id: `task-completed-${task.id}-${Date.now()}`,
+      title: "Tarefa concluída",
+      description: `"${task.title}" foi marcada como concluída.`,
+      icon: <Check size={16} />,
+      variant: "success",
     });
   };
 
-  const showDeleteTaskToast = (task: Task) => {
+  // Toast for task restoration
+  const showTaskRestoredToast = (task: Task) => {
     toast({
-      title: "Tarefa excluída",
-      description: `A tarefa "${task.title}" foi excluída.`,
-      variant: "destructive",
+      id: `task-restored-${task.id}-${Date.now()}`,
+      title: "Tarefa restaurada",
+      description: `"${task.title}" foi restaurada para a lista de tarefas ativas.`,
     });
   };
 
-  const value = {
+  return {
     showToggleHiddenToast,
-    showCompleteTaskToast,
-    showDeleteTaskToast
+    showTaskCompletedToast,
+    showTaskRestoredToast
   };
-
-  return (
-    <TaskToastContext.Provider value={value}>
-      {children}
-    </TaskToastContext.Provider>
-  );
-};
-
-// Custom hook for using task toasts
-export const useTaskToasts = () => {
-  const context = useContext(TaskToastContext);
-  if (context === undefined) {
-    throw new Error("useTaskToasts must be used within a TaskToastProvider");
-  }
-  return context;
 };

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '@/context/AppContext';
 import { useTaskDataContext } from '@/context/TaskDataProvider'; 
@@ -68,25 +67,46 @@ const Dashboard: React.FC = () => {
     localStorage.setItem('showOverdueTasks', JSON.stringify(showOverdueTasks));
   }, [showOverdueTasks]);
   
-  // Em modo cronológico, sempre mostrar tarefas ocultas
-  // Em modo potência, depende da configuração showHiddenTasks
+  // Enhanced animation variants for task cards
+  const taskVariants = {
+    hidden: { 
+      opacity: 0,
+      y: 20,
+      scale: 0.95,
+      transition: { duration: 0.3, ease: "easeInOut" }
+    },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      scale: 1,
+      transition: { duration: 0.3, ease: "easeInOut" }
+    },
+    exit: { 
+      opacity: 0,
+      scale: 0.9,
+      y: -20,
+      transition: { duration: 0.3, ease: "easeInOut" }
+    }
+  };
+  
+  // Filtered logic with enhanced animation support
   const shouldShowHiddenTasks = viewMode === 'chronological' || showHiddenTasks;
   
-  // Filtrar as tarefas não-completadas e visíveis, de acordo com as configurações
+  // Filter non-completed and visible tasks according to settings
   const filteredTasks = tasks.filter(task => {
-    // Primeiro, verificar se é uma tarefa não-completada
+    // First check if it's not completed
     const isNotCompleted = !task.completed;
     
-    // Em seguida, verificar a visibilidade com base nas preferências
+    // Next check visibility based on preferences
     const isVisible = shouldShowHiddenTasks || !task.hidden;
     
-    // Filtrar também tarefas com atualização de visibilidade pendente
+    // Filter for tasks with pending visibility updates
     const isPendingVisibilityUpdate = task._pendingVisibilityUpdate === true;
     const animationState = task._animationState || '';
     
-    // Incluir tarefas que:
-    // 1. Não estão completadas E
-    // 2. (Estão visíveis de acordo com as configurações OU têm uma atualização pendente)
+    // Include tasks that:
+    // 1. Are not completed AND
+    // 2. (Are visible according to settings OR have a pending update)
     return isNotCompleted && (isVisible || isPendingVisibilityUpdate);
   });
   
@@ -171,28 +191,6 @@ const Dashboard: React.FC = () => {
       </div>
     );
   }
-  
-  // Enhanced animation variants for task cards
-  const taskVariants = {
-    hidden: { 
-      opacity: 0,
-      y: 20,
-      scale: 0.95,
-      transition: { duration: 0.3, ease: "easeInOut" }
-    },
-    visible: { 
-      opacity: 1, 
-      y: 0,
-      scale: 1,
-      transition: { duration: 0.3, ease: "easeInOut" }
-    },
-    exit: { 
-      opacity: 0,
-      scale: 0.9,
-      y: -20,
-      transition: { duration: 0.3, ease: "easeInOut" }
-    }
-  };
   
   return (
     <>
