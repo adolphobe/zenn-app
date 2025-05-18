@@ -2,12 +2,15 @@
 import React from 'react';
 import { ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
 
 interface CTASectionProps {
   handleGetStarted: () => void;
 }
 
 const CTASection: React.FC<CTASectionProps> = ({ handleGetStarted }) => {
+  const navigate = useNavigate();
+  
   return (
     <section className="py-32 relative z-10 overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-blue-500 dark:from-blue-800 dark:to-blue-700 z-0"></div>
@@ -24,7 +27,7 @@ const CTASection: React.FC<CTASectionProps> = ({ handleGetStarted }) => {
             <h2 className="text-4xl md:text-5xl lg:text-6xl font-semibold mb-6 text-white">Pronto para encontrar clareza?</h2>
             <p className="text-xl text-blue-100 dark:text-blue-200 mb-10 max-w-2xl mx-auto">Comece hoje a jornada para uma execução pessoal com propósito e direção.</p>
             <Button 
-              onClick={handleGetStarted} 
+              onClick={() => navigate('/login')} 
               className="bg-white text-blue-600 dark:text-blue-700 hover:text-blue-700 dark:hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-100 px-10 py-6 rounded-xl text-lg font-medium transition-all duration-300 hover:scale-105 flex items-center gap-3 mx-auto group"
             >
               Começar Agora <ArrowRight className="transition-transform duration-300 group-hover:translate-x-1" />

@@ -81,12 +81,7 @@ const Landing: React.FC = () => {
   }, [imagesLoaded]);
 
   const handleGetStarted = () => {
-    if (isAuthenticated) {
-      navigate('/dashboard');
-      return;
-    }
-    setShowLogin(true);
-    window.scrollTo({ top: 0, behavior: 'smooth' }); 
+    navigate('/login');
   };
 
   useEffect(() => {

@@ -61,7 +61,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
           </p>
           <div className={`opacity-0 ${loaded ? 'fade-up fade-up-delay-2' : ''} ${showLogin ? 'hidden lg:block' : 'block'}`}>
             <Button 
-              onClick={handleGetStarted}
+              onClick={() => navigate('/login')}
               className="group bg-blue-600 hover:bg-blue-700 text-white px-8 py-6 rounded-lg text-lg transition-all duration-300 hover:scale-[1.03] flex items-center gap-2"
             >
               Começar Agora
