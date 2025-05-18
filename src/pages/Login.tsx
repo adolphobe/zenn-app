@@ -15,36 +15,21 @@ const Login: React.FC = () => {
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [isJustLoggedOut, setIsJustLoggedOut] = useState(false);
-  const [redirectAttempts, setRedirectAttempts] = useState(0);
-  const [localAuthCheck, setLocalAuthCheck] = useState<boolean | null>(null);
   
   // Get redirect path from location state or default to dashboard
   const from = location.state?.from?.pathname || "/dashboard";
   
   // Check if user has just logged out
   useEffect(() => {
-    // If we detect a "loggedOut" parameter in the URL or location state, set the flag
     const params = new URLSearchParams(location.search);
     const loggedOutFromUrl = params.get('loggedOut') === 'true';
     const loggedOutFromState = location.state?.loggedOut === true;
-    const forceClear = location.state?.forceClear === true;
     
     if (loggedOutFromUrl || loggedOutFromState) {
-      console.log("[Login] Usuário acabou de deslogar conforme indicado por parâmetro");
-      console.log("[Login] DETALHES EM PORTUGUÊS: Detectado logout recente");
       setIsJustLoggedOut(true);
       
-      // Clear any lingering logout flags
       localStorage.removeItem('logout_in_progress');
       
-      // Force clear any remaining auth tokens if flagged
-      if (forceClear) {
-        console.log("[Login] Limpando tokens de autenticação que podem ter persistido");
-        localStorage.removeItem('sb-wbvxnapruffchikhrqrs-auth-token');
-        localStorage.removeItem('supabase.auth.token');
-      }
-      
-      // Reset the flag after a delay to allow re-login
       setTimeout(() => {
         setIsJustLoggedOut(false);
       }, 800);
@@ -52,23 +37,20 @@ const Login: React.FC = () => {
   }, [location]);
 
   // Additional check for authentication using localStorage directly
+  const [localAuthCheck, setLocalAuthCheck] = useState<boolean | null>(null);
+  
   useEffect(() => {
     const checkLocalAuth = async () => {
       try {
-        // First check if there's a token in localStorage
         const hasToken = !!localStorage.getItem('sb-wbvxnapruffchikhrqrs-auth-token');
         
-        // If no token in localStorage, we're definitely not authenticated
         if (!hasToken) {
           setLocalAuthCheck(false);
           return;
         }
         
-        // Double-check with Supabase API for an active session
         const { data } = await supabase.auth.getSession();
         setLocalAuthCheck(!!data.session);
-        
-        console.log("[Login] Verificação local de autenticação:", !!data.session);
       } catch (err) {
         console.error("[Login] Erro ao verificar token local:", err);
         setLocalAuthCheck(false);
@@ -89,27 +71,16 @@ const Login: React.FC = () => {
 
   // Redirect automatically if authenticated and not just logged out
   useEffect(() => {
-    // Use both authentication checks to determine if user is truly authenticated
     const actuallyAuthenticated = isAuthenticated || (localAuthCheck === true);
     
     if (actuallyAuthenticated && !isLoading && !isJustLoggedOut && localAuthCheck !== null) {
-      console.log("[Login] Usuário autenticado, redirecionando para:", from);
-      console.log("[Login] DETALHES EM PORTUGUÊS: Autenticação verificada. Redirecionando para " + from);
+      const redirectTimer = setTimeout(() => {
+        navigate(from, { replace: true });
+      }, 500);
       
-      // Prevent redirect loops by tracking redirect attempts
-      if (redirectAttempts < 3) {
-        // Add a small delay before redirect to prevent loops
-        const redirectTimer = setTimeout(() => {
-          navigate(from, { replace: true });
-          setRedirectAttempts(prev => prev + 1);
-        }, 500);
-        
-        return () => clearTimeout(redirectTimer);
-      } else {
-        console.error("[Login] Muitas tentativas de redirecionamento detectadas. Possível loop de redirecionamento.");
-      }
+      return () => clearTimeout(redirectTimer);
     }
-  }, [isAuthenticated, isLoading, from, navigate, isJustLoggedOut, redirectAttempts, localAuthCheck]);
+  }, [isAuthenticated, isLoading, from, navigate, isJustLoggedOut, localAuthCheck]);
 
   // Toggle between login and signup
   const toggleSignup = () => {
@@ -131,9 +102,11 @@ const Login: React.FC = () => {
 
   // Prevent rendering content during loading
   if (isLoading || localAuthCheck === null) {
-    return <div className="flex items-center justify-center min-h-screen">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-    </div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-blue-50 to-white">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
   }
 
   // Use both authentication checks to determine if user is truly authenticated
@@ -142,10 +115,10 @@ const Login: React.FC = () => {
   // If user is authenticated and not just logged out, show a temporary message
   if (actuallyAuthenticated && !isJustLoggedOut) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gray-50">
+      <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gradient-to-b from-blue-50 to-white">
         <div className="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 mb-4 max-w-lg">
           <p className="font-bold">Já Autenticado</p>
-          <p>Você já está logado. Redirecionando para {from.replace("/", "")}...</p>
+          <p>Você já está logado. Redirecionando...</p>
         </div>
         
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mt-4"></div>
@@ -153,82 +126,29 @@ const Login: React.FC = () => {
     );
   }
 
-  // Background animation elements
-  const floatingItems = Array(7).fill(null).map((_, i) => (
-    <div 
-      key={i}
-      className="absolute rounded-full animated-float"
-      style={{
-        backgroundColor: 'rgba(59, 130, 246, 0.2)',
-        width: `${Math.random() * 100 + 50}px`,
-        height: `${Math.random() * 100 + 50}px`,
-        left: `${Math.random() * 70}%`,
-        top: `${Math.random() * 100}%`,
-        animationDelay: `${Math.random() * 2}s`,
-        animationDuration: `${Math.random() * 6 + 6}s`,
-        opacity: Math.random() * 0.4 + 0.3,
-      }}
-    />
-  ));
-
   return (
-    <div className="flex min-h-screen bg-gradient-to-b from-white to-blue-50 dark:from-gray-950 dark:to-gray-900 overflow-hidden relative">
-      {/* Animated floating background elements */}
-      <style>
-        {`
-        @keyframes float-animate {
-          0% {
-            transform: translate(0, 0) scale(1);
-            opacity: 0.3;
-          }
-          25% {
-            transform: translate(20px, -20px) scale(1.05);
-            opacity: 0.5;
-          }
-          50% {
-            transform: translate(40px, 10px) scale(1);
-            opacity: 0.7;
-          }
-          75% {
-            transform: translate(20px, 30px) scale(0.95);
-            opacity: 0.5;
-          }
-          100% {
-            transform: translate(0, 0) scale(1);
-            opacity: 0.3;
-          }
-        }
-        
-        .animated-float {
-            animation: float-animate ease-in-out infinite alternate;
-        }
-      `}
-      </style>
-      
-      {/* Floating items for background */}
-      {floatingItems}
-      
+    <div className="flex min-h-screen bg-gradient-to-b from-white to-blue-50">
       {/* Left column: Login/Signup Form */}
-      <div className="w-full md:w-1/2 flex flex-col justify-center px-8 sm:px-16 md:px-24 lg:px-32 z-10">
+      <div className="w-full md:w-1/2 flex flex-col justify-center px-8 sm:px-16 md:px-24 lg:px-32">
         <div className={`space-y-6 w-full max-w-md mx-auto transition-all duration-1000 ease-in-out ${loaded ? 'opacity-100' : 'opacity-0 translate-y-4'}`}>
           {/* Logo */}
-          <div className="text-left mb-12">
+          <div className="text-left mb-8">
             <img 
               src="https://cdn.shopify.com/s/files/1/0629/1993/4061/files/Sem_Titulo-8.jpg?v=1747284016" 
               alt="Acto Logo" 
-              className="w-[120px] mb-4"
+              className="w-[120px]"
             />
           </div>
 
           <div className="space-y-2 text-left">
-            <h1 className="text-3xl font-bold tracking-tight text-gray-800 dark:text-gray-100">
+            <h1 className="text-3xl font-bold tracking-tight text-gray-800">
               {isSignup 
                 ? "Crie sua conta" 
                 : isForgotPassword 
                   ? "Recupere sua senha" 
                   : "Bem vindo de volta!"}
             </h1>
-            <p className="text-muted-foreground">
+            <p className="text-gray-500">
               {isSignup 
                 ? "Cadastre-se para começar sua jornada conosco." 
                 : isForgotPassword
@@ -243,7 +163,6 @@ const Login: React.FC = () => {
             <PasswordResetForm 
               onCancel={showLogin} 
               onResetSent={(email) => {
-                // Show success message and maybe switch back to login after a delay
                 setTimeout(showLogin, 3000);
               }}
             />
@@ -252,29 +171,30 @@ const Login: React.FC = () => {
               onSwitchToSignup={toggleSignup} 
               onForgotPassword={showForgotPassword}
               onSuccess={() => {
-                console.log("[Login] Login bem-sucedido, redirecionando para: ", from);
-                console.log("[Login] DETALHES EM PORTUGUÊS: Login realizado com sucesso, redirecionando automaticamente");
                 navigate(from, { replace: true });
               }} 
             />
           )}
         </div>
 
-        <div className="mt-12 text-center text-xs text-muted-foreground opacity-70">
+        <div className="mt-12 text-center text-xs text-gray-400">
           © {new Date().getFullYear()} Acto. Todos os direitos reservados.
         </div>
       </div>
 
       {/* Right column: Image */}
-      <div className="hidden md:block md:w-1/2 relative">
+      <div className="hidden md:block md:w-1/2 relative bg-gradient-to-r from-blue-100 to-blue-200">
         <div className="absolute inset-0 overflow-hidden">
-          <img
-            src="https://images.unsplash.com/photo-1595131264264-377ba3b61f46?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-            alt="Fundo de login"
-            className="object-cover w-full h-full object-center"
-            style={{ minWidth: '100%', minHeight: '100%' }}
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-500/30 to-blue-600/20 mix-blend-multiply" />
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-400/20 to-blue-600/30 mix-blend-multiply" />
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-3/4">
+            <div className="p-8 bg-white/80 backdrop-blur-sm rounded-xl shadow-lg text-center">
+              <h2 className="text-2xl font-bold text-blue-800 mb-3">Acto</h2>
+              <p className="text-blue-600">A plataforma que simplifica sua jornada profissional.</p>
+            </div>
+          </div>
+          <div className="absolute top-[20%] left-[20%] w-32 h-32 rounded-full bg-blue-200/60"></div>
+          <div className="absolute bottom-[20%] right-[20%] w-40 h-40 rounded-full bg-blue-300/60"></div>
+          <div className="absolute top-[60%] right-[30%] w-24 h-24 rounded-full bg-blue-100/60"></div>
         </div>
       </div>
     </div>

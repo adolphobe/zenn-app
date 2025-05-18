@@ -1,11 +1,9 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import { Session } from '@supabase/supabase-js';
 
-// Login function
-export const login = async (email: string, password: string): Promise<{ success: boolean, error?: any, user?: any, session?: Session | null }> => {
+export const login = async (email: string, password: string) => {
   try {
-    console.log("[AuthService] Tentando login com email:", email);
+    console.log("[LoginService] Tentando login com:", email);
     
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
@@ -13,16 +11,20 @@ export const login = async (email: string, password: string): Promise<{ success:
     });
     
     if (error) {
-      console.error("[AuthService] Erro de login:", error.message);
-      return { success: false, error };
+      console.error("[LoginService] Erro de login:", error.message);
+      return { 
+        success: false, 
+        error: "Usuário não encontrado ou senha incorreta. Por favor, verifique suas credenciais."
+      };
     }
     
-    console.log("[AuthService] Login bem-sucedido:", data.user?.email);
-    
+    console.log("[LoginService] Login bem-sucedido para:", data.user?.email);
     return { success: true, user: data.user, session: data.session };
   } catch (error: any) {
-    console.error("[AuthService] Erro de login inesperado:", error);
-    
-    return { success: false, error };
+    console.error("[LoginService] Erro inesperado:", error);
+    return { 
+      success: false, 
+      error: "Ocorreu um erro ao tentar fazer login. Por favor, tente novamente."
+    };
   }
 };

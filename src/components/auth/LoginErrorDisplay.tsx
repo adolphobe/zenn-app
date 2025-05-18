@@ -1,27 +1,26 @@
 
 import React from 'react';
+import { AlertCircle } from 'lucide-react';
 
 interface LoginErrorDisplayProps {
   error: string | null;
-  suggestion: string | null;
 }
 
-const LoginErrorDisplay: React.FC<LoginErrorDisplayProps> = ({ error, suggestion }) => {
-  // Se não há erro, não renderizamos nada
+const LoginErrorDisplay: React.FC<LoginErrorDisplayProps> = ({ error }) => {
   if (!error) {
     return <div className="min-h-[60px]" aria-hidden="true"></div>;
   }
 
   return (
     <div 
-      className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-md shadow-md mb-6 animate-in fade-in duration-300"
+      className="flex items-center gap-3 bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded-md mb-5 animate-in fade-in duration-200"
       role="alert"
       aria-live="assertive"
     >
-      <p className="font-medium">{error}</p>
-      {suggestion && (
-        <p className="text-xs mt-1 text-red-600">{suggestion}</p>
-      )}
+      <AlertCircle className="text-red-500 h-5 w-5 flex-shrink-0" />
+      <div>
+        <p className="font-medium text-sm">{error}</p>
+      </div>
     </div>
   );
 };
