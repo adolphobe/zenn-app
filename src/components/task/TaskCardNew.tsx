@@ -1,7 +1,8 @@
+
 import React, { useState, useEffect } from 'react';
 import { Task } from '@/types';
 import { useAppContext } from '@/context/AppContext';
-import { getTaskPriorityClass } from '@/utils';
+import { getTaskPriorityClass, isTaskOverdue, safeParseDate } from '@/utils';
 import TaskCardHeader from '../TaskCardHeader';
 import { motion, AnimatePresence } from 'framer-motion';
 import TaskCardExpanded from './TaskCardExpanded';

@@ -11,7 +11,7 @@ interface TaskCardTitleProps {
   onTitleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onTitleBlur: () => void;
   onTitleKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void;
-  idealDate?: Date | null;
+  idealDate?: Date | string | null;
   viewMode?: ViewMode;
 }
 

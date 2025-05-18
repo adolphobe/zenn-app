@@ -1,11 +1,14 @@
 
 import { Task, DateDisplayOptions, ViewMode, SortOption } from './types';
 
-export const formatDate = (date: Date | null, options?: DateDisplayOptions): string => {
+export const formatDate = (date: Date | string | null, options?: DateDisplayOptions): string => {
   if (!date) return '';
   
+  // Convert string to Date if needed
+  const dateObj = typeof date === 'string' ? new Date(date) : date;
+  
   // Ensure we have a valid Date object
-  if (!(date instanceof Date) || isNaN(date.getTime())) {
+  if (!(dateObj instanceof Date) || isNaN(dateObj.getTime())) {
     console.warn('Invalid date provided to formatDate:', date);
     return '';
   }
@@ -18,21 +21,21 @@ export const formatDate = (date: Date | null, options?: DateDisplayOptions): str
   let result = '';
   
   if (!hideDate) {
-    const day = date.getDate().toString().padStart(2, '0');
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = dateObj.getDate().toString().padStart(2, '0');
+    const month = (dateObj.getMonth() + 1).toString().padStart(2, '0');
     
     result = `${day}/${month}`;
     
     if (!hideYear) {
-      const year = date.getFullYear();
+      const year = dateObj.getFullYear();
       result += `/${year}`;
     }
   }
   
   // Adicionar horário sem vírgula (formato 24 horas)
   if (!hideTime) {
-    const hours = date.getHours().toString().padStart(2, '0');
-    const minutes = date.getMinutes().toString().padStart(2, '0');
+    const hours = dateObj.getHours().toString().padStart(2, '0');
+    const minutes = dateObj.getMinutes().toString().padStart(2, '0');
     
     if (result) {
       result += ' '; // Espaço em vez de vírgula
