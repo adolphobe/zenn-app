@@ -4,12 +4,14 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import LoginForm from '../components/LoginForm';
 import SignupForm from '../components/SignupForm';
+import PasswordResetForm from '../components/PasswordResetForm';
 
 const Login: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { isAuthenticated, isLoading } = useAuth();
   const [isSignup, setIsSignup] = useState(false);
+  const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [isJustLoggedOut, setIsJustLoggedOut] = useState(false);
   
@@ -73,6 +75,19 @@ const Login: React.FC = () => {
   // Toggle between login and signup
   const toggleSignup = () => {
     setIsSignup(!isSignup);
+    setIsForgotPassword(false);
+  };
+
+  // Toggle to forgot password view
+  const showForgotPassword = () => {
+    setIsForgotPassword(true);
+    setIsSignup(false);
+  };
+
+  // Return to login view
+  const showLogin = () => {
+    setIsForgotPassword(false);
+    setIsSignup(false);
   };
 
   // Prevent rendering content during loading
@@ -165,20 +180,35 @@ const Login: React.FC = () => {
 
           <div className="space-y-2 text-left">
             <h1 className="text-3xl font-bold tracking-tight text-gray-800 dark:text-gray-100">
-              {isSignup ? "Crie sua conta" : "Bem vindo de volta!"}
+              {isSignup 
+                ? "Crie sua conta" 
+                : isForgotPassword 
+                  ? "Recupere sua senha" 
+                  : "Bem vindo de volta!"}
             </h1>
             <p className="text-muted-foreground">
               {isSignup 
                 ? "Cadastre-se para começar sua jornada conosco." 
-                : "Um novo dia chegou. É hora de continuar sua jornada."}
+                : isForgotPassword
+                  ? "Enviaremos um link para você redefinir sua senha."
+                  : "Um novo dia chegou. É hora de continuar sua jornada."}
             </p>
           </div>
 
           {isSignup ? (
             <SignupForm onCancel={toggleSignup} />
+          ) : isForgotPassword ? (
+            <PasswordResetForm 
+              onCancel={showLogin} 
+              onResetSent={(email) => {
+                // Show success message and maybe switch back to login after a delay
+                setTimeout(showLogin, 3000);
+              }}
+            />
           ) : (
             <LoginForm 
               onSwitchToSignup={toggleSignup} 
+              onForgotPassword={showForgotPassword}
               onSuccess={() => {
                 console.log("[Login] Login bem-sucedido, redirecionando para: ", from);
                 console.log("[Login] DETALHES EM PORTUGUÊS: Login realizado com sucesso, redirecionando automaticamente");

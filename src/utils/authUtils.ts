@@ -2,6 +2,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { NavigateFunction } from 'react-router-dom';
+import { processAuthError } from './authErrorUtils';
 
 /**
  * Performs a complete logout, clearing all session data and redirecting to login
@@ -19,7 +20,19 @@ export const performLogout = async (navigate: NavigateFunction): Promise<void> =
     localStorage.removeItem('supabase.auth.token');
     
     // Call Supabase signOut with global scope to ensure complete logout across all devices
-    await supabase.auth.signOut({ scope: 'global' });
+    const { error } = await supabase.auth.signOut({ scope: 'global' });
+    
+    if (error) {
+      const errorDetails = processAuthError(error);
+      console.error("[AuthUtils] Erro durante logout:", errorDetails);
+      console.error("[AuthUtils] DETALHES EM PORTUGUÊS:", errorDetails.message);
+      
+      toast({
+        title: "Alerta no logout",
+        description: "Ocorreu um problema, mas o logout local foi concluído.",
+        variant: "destructive",
+      });
+    }
     
     // Wait a moment to ensure complete session termination
     // This helps prevent issues with rapid navigation
@@ -52,13 +65,41 @@ export const performLogout = async (navigate: NavigateFunction): Promise<void> =
     // Clear logout flag even on error
     localStorage.removeItem('logout_in_progress');
     
+    const errorDetails = processAuthError(error);
+    
     toast({
       title: "Erro ao sair",
-      description: "Ocorreu um problema ao encerrar a sessão",
+      description: errorDetails.message,
       variant: "destructive",
     });
     
     // Force redirect to login anyway to break potential loops
     navigate('/login', { replace: true });
+  }
+};
+
+/**
+ * Checks if an active session exists and verifies with Supabase
+ * Useful for route guards and initial auth state checks
+ */
+export const checkAuthStatus = async () => {
+  try {
+    const { data, error } = await supabase.auth.getSession();
+    
+    if (error) {
+      console.error("[AuthUtils] Erro ao verificar status de autenticação:", error);
+      console.error("[AuthUtils] DETALHES EM PORTUGUÊS: Ocorreu um erro ao verificar se o usuário está autenticado");
+      return { isAuthenticated: false, error };
+    }
+    
+    return {
+      isAuthenticated: !!data.session,
+      session: data.session,
+      user: data.session?.user
+    };
+  } catch (error) {
+    console.error("[AuthUtils] Erro inesperado ao verificar autenticação:", error);
+    console.error("[AuthUtils] DETALHES EM PORTUGUÊS: Ocorreu um erro inesperado ao verificar o status de autenticação");
+    return { isAuthenticated: false, error };
   }
 };

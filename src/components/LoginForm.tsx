@@ -11,7 +11,8 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 import { toast } from '@/hooks/use-toast';
 import { useAuth } from '@/context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { processAuthError } from '@/utils/authErrorUtils';
 
 const loginSchema = z.object({
   email: z.string().email("Digite um e-mail válido"),
@@ -23,14 +24,17 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 interface LoginFormProps {
   onSuccess?: () => void;
   onSwitchToSignup: () => void;
+  onForgotPassword: () => void;
 }
 
-const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onSwitchToSignup }) => {
+const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onSwitchToSignup, onForgotPassword }) => {
   const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
+  const [loginSuggestion, setLoginSuggestion] = useState<string | null>(null);
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -40,20 +44,38 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onSwitchToSignup }) =>
     },
   });
 
+  // Check if user just reset their password
+  React.useEffect(() => {
+    if (location.state?.passwordReset) {
+      toast({
+        title: "Senha redefinida com sucesso",
+        description: "Você pode fazer login com sua nova senha agora.",
+      });
+    }
+  }, [location.state]);
+
   const onSubmit = async (values: LoginFormValues) => {
     setIsLoading(true);
     setLoginError(null);
+    setLoginSuggestion(null);
     
     try {
       console.log("[LoginForm] Tentando login com:", values.email);
       console.log("[LoginForm] DETALHES EM PORTUGUÊS: Iniciando processo de autenticação para o usuário");
       
-      const success = await login(values.email, values.password);
+      const { success, error } = await login(values.email, values.password);
       
       if (!success) {
         console.error("[LoginForm] Falha no login para:", values.email);
         console.error("[LoginForm] DETALHES EM PORTUGUÊS: O login falhou. Verifique se o email e senha estão corretos e se a conta existe.");
-        setLoginError("Usuário não encontrado ou senha incorreta. Por favor, verifique suas credenciais.");
+        
+        if (error) {
+          const errorDetails = processAuthError(error);
+          setLoginError(errorDetails.message);
+          setLoginSuggestion(errorDetails.suggestion || null);
+        } else {
+          setLoginError("Usuário não encontrado ou senha incorreta. Por favor, verifique suas credenciais.");
+        }
       } else {
         console.log("[LoginForm] Login bem-sucedido para:", values.email);
         console.log("[LoginForm] DETALHES EM PORTUGUÊS: Login realizado com sucesso, redirecionando automaticamente");
@@ -71,7 +93,10 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onSwitchToSignup }) =>
     } catch (error) {
       console.error("[LoginForm] Erro de login:", error);
       console.error("[LoginForm] DETALHES EM PORTUGUÊS: Ocorreu um erro técnico durante o processo de login. Verifique a conexão com o servidor.");
-      setLoginError("Ocorreu um erro ao processar sua solicitação. Por favor, tente novamente.");
+      
+      const errorDetails = processAuthError(error);
+      setLoginError(errorDetails.message);
+      setLoginSuggestion(errorDetails.suggestion || null);
     } finally {
       setIsLoading(false);
     }
@@ -88,11 +113,18 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onSwitchToSignup }) =>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         {loginError && (
           <Alert variant="destructive" className="py-2 animate-in fade-in slide-in-from-top-5 duration-300">
-            <div className="flex items-center gap-2">
-              <AlertCircle size={16} />
-              <AlertDescription className="text-sm font-medium">
-                {loginError}
-              </AlertDescription>
+            <div className="flex flex-col gap-1">
+              <div className="flex items-center gap-2">
+                <AlertCircle size={16} />
+                <AlertDescription className="text-sm font-medium">
+                  {loginError}
+                </AlertDescription>
+              </div>
+              {loginSuggestion && (
+                <AlertDescription className="text-xs ml-6">
+                  {loginSuggestion}
+                </AlertDescription>
+              )}
             </div>
           </Alert>
         )}
@@ -158,6 +190,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onSwitchToSignup }) =>
         <div className="flex justify-end">
           <button 
             type="button"
+            onClick={onForgotPassword}
             className="text-sm text-blue-600 hover:underline hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300 focus:outline-none transition-colors duration-300"
           >
             Esqueceu a senha?

@@ -1,18 +1,21 @@
+
 import { createContext, useState, useContext, useEffect, ReactNode } from 'react';
 import { User } from '../types/user';
 import { supabase } from '@/integrations/supabase/client';
 import { Session } from '@supabase/supabase-js';
 import { toast } from '@/hooks/use-toast';
+import { processAuthError } from '@/utils/authErrorUtils';
 
 // Type definitions for the auth context
 interface AuthContextType {
   currentUser: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<boolean>;
+  login: (email: string, password: string) => Promise<{ success: boolean, error?: any }>;
   signup: (email: string, password: string, name: string) => Promise<boolean>;
   logout: () => Promise<void>;
   session: Session | null;
+  sendPasswordResetEmail: (email: string) => Promise<{ success: boolean, error?: any }>;
 }
 
 // Create context with default values
@@ -20,10 +23,11 @@ export const AuthContext = createContext<AuthContextType>({
   currentUser: null,
   isAuthenticated: false,
   isLoading: true,
-  login: async () => false,
+  login: async () => ({ success: false }),
   signup: async () => false,
   logout: async () => {},
   session: null,
+  sendPasswordResetEmail: async () => ({ success: false }),
 });
 
 // Hook to use the auth context
@@ -189,7 +193,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   // Login function
-  const login = async (email: string, password: string): Promise<boolean> => {
+  const login = async (email: string, password: string): Promise<{ success: boolean, error?: any }> => {
     setIsLoading(true);
     
     try {
@@ -206,20 +210,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         console.error("[AuthProvider] Erro de login:", error.message);
         console.error("[AuthProvider] DETALHES EM PORTUGUÊS: Falha ao fazer login. Erro:", error.message);
         
-        // Show more user-friendly error messages
-        let errorMessage = "Falha no login. Verifique suas credenciais.";
-        if (error.message.includes("Invalid login credentials")) {
-          errorMessage = "Usuário não encontrado ou senha incorreta. Por favor, tente novamente.";
-        }
+        const errorDetails = processAuthError(error);
         
         toast({
           title: "Falha no login",
-          description: errorMessage,
+          description: errorDetails.message,
           variant: "destructive"
         });
         
         setIsLoading(false);
-        return false;
+        return { success: false, error };
       }
       
       console.log("[AuthProvider] Login bem-sucedido:", data.user?.email);
@@ -230,19 +230,71 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         description: "Bem-vindo de volta!",
       });
       
-      return true;
+      return { success: true };
     } catch (error: any) {
       console.error("[AuthProvider] Erro de login:", error);
       console.error("[AuthProvider] DETALHES EM PORTUGUÊS: Ocorreu um erro inesperado durante o processo de login");
       
+      const errorDetails = processAuthError(error);
+      
       toast({
         title: "Erro no login",
-        description: "Ocorreu um erro inesperado. Por favor, tente novamente.",
+        description: errorDetails.message,
         variant: "destructive"
       });
       
       setIsLoading(false);
-      return false;
+      return { success: false, error };
+    }
+  };
+
+  // Send password reset email
+  const sendPasswordResetEmail = async (email: string): Promise<{ success: boolean, error?: any }> => {
+    try {
+      console.log("[AuthProvider] Solicitando redefinição de senha para:", email);
+      console.log("[AuthProvider] DETALHES EM PORTUGUÊS: Enviando email de recuperação de senha");
+      
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: window.location.origin + '/reset-password',
+      });
+      
+      if (error) {
+        console.error("[AuthProvider] Erro ao enviar email de recuperação:", error);
+        console.error("[AuthProvider] DETALHES EM PORTUGUÊS: Não foi possível enviar o email de recuperação de senha");
+        
+        const errorDetails = processAuthError(error);
+        
+        toast({
+          title: "Erro na recuperação de senha",
+          description: errorDetails.message,
+          variant: "destructive"
+        });
+        
+        return { success: false, error };
+      }
+      
+      console.log("[AuthProvider] Email de recuperação enviado para:", email);
+      console.log("[AuthProvider] DETALHES EM PORTUGUÊS: Email de recuperação de senha enviado com sucesso");
+      
+      toast({
+        title: "Email enviado",
+        description: `Verifique sua caixa de entrada em ${email}`,
+      });
+      
+      return { success: true };
+    } catch (error) {
+      console.error("[AuthProvider] Erro ao enviar email de recuperação:", error);
+      console.error("[AuthProvider] DETALHES EM PORTUGUÊS: Ocorreu um erro inesperado ao tentar enviar o email");
+      
+      const errorDetails = processAuthError(error);
+      
+      toast({
+        title: "Erro na recuperação de senha",
+        description: errorDetails.message,
+        variant: "destructive"
+      });
+      
+      return { success: false, error };
     }
   };
 
@@ -268,9 +320,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         console.error("[AuthProvider] Erro no cadastro:", error.message);
         console.error("[AuthProvider] DETALHES EM PORTUGUÊS: Falha ao criar nova conta. Erro:", error.message);
         
+        const errorDetails = processAuthError(error);
+        
         toast({
           title: "Falha na criação da conta",
-          description: error.message,
+          description: errorDetails.message,
           variant: "destructive"
         });
         
@@ -323,9 +377,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       console.error("[AuthProvider] Erro no cadastro:", error);
       console.error("[AuthProvider] DETALHES EM PORTUGUÊS: Ocorreu um erro inesperado durante a criação da conta");
       
+      const errorDetails = processAuthError(error);
+      
       toast({
         title: "Falha na criação da conta",
-        description: error.message || "Ocorreu um erro inesperado ao criar sua conta",
+        description: errorDetails.message,
         variant: "destructive"
       });
       
@@ -359,9 +415,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         console.error("[AuthProvider] Erro no logout:", error.message);
         console.error("[AuthProvider] DETALHES EM PORTUGUÊS: Erro ao tentar encerrar a sessão:", error.message);
         
+        const errorDetails = processAuthError(error);
+        
         toast({
           title: "Falha no logout",
-          description: error.message,
+          description: errorDetails.message,
           variant: "destructive"
         });
       } else {
@@ -376,6 +434,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     } catch (error) {
       console.error("[AuthProvider] Erro durante logout:", error);
       console.error("[AuthProvider] DETALHES EM PORTUGUÊS: Ocorreu um erro inesperado ao tentar encerrar a sessão");
+      
+      const errorDetails = processAuthError(error);
     } finally {
       // Always clear user states and session when logging out
       setCurrentUser(null);
@@ -392,7 +452,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     login,
     signup,
     logout,
-    session
+    session,
+    sendPasswordResetEmail
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
