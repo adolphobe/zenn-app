@@ -132,7 +132,7 @@ export const sendPasswordResetEmail = async (email: string): Promise<{ success: 
 };
 
 // Signup function
-export const signup = async (email: string, password: string, name: string): Promise<{ success: boolean, error?: any, user?: User | null, session?: Session | null }> => {
+export const signup = async (email: string, password: string, name: string): Promise<{ success: boolean, error?: any, user?: any, session?: Session | null }> => {
   try {
     console.log("[AuthService] Tentando criar conta com email:", email);
     console.log("[AuthService] DETALHES EM PORTUGUÊS: Iniciando processo de criação de conta");
