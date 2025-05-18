@@ -1,12 +1,14 @@
-import React, { useReducer, useEffect, useCallback } from 'react';
+import React, { useReducer, useEffect, useCallback, useState } from 'react';
 import { AppContext } from './AppContext';
 import { AppContextType } from './types';
 import { appReducer } from './appReducer';
 import { initialState } from './initialState';
-import { initializeDemoTasks } from './demo/demoTasksInit';
 import * as taskActions from './tasks/taskActions';
 import * as uiActions from './ui/uiActions';
 import { useAuth } from './auth';
+import { 
+  fetchTasks as fetchTasksFromDB,
+} from '@/services/taskService';
 import { 
   fetchUserPreferences, 
   updateUserPreferences, 
@@ -16,17 +18,65 @@ import {
   applyPreferencesToState
 } from '@/services/preferencesService';
 import { toast } from '@/hooks/use-toast';
+import { useTaskStore, useAuthStore } from '@/hooks/useTaskStore';
 
 // Provider component
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [state, dispatch] = useReducer(appReducer, initialState);
   const { currentUser, isAuthenticated, isLoading } = useAuth();
+  const [isSyncing, setIsSyncing] = useState<boolean>(false);
   
-  // Initialize with sample tasks
+  // Store tasks in DOM for access by non-React components
+  useTaskStore(state.tasks);
+  
+  // Store user in DOM for access by non-React components
+  useAuthStore(currentUser);
+  
+  // Load tasks from Supabase when authenticated
   useEffect(() => {
-    initializeDemoTasks(dispatch, state.tasks.length);
-  }, []);
-
+    const loadUserTasks = async () => {
+      if (currentUser?.id && isAuthenticated && !isSyncing) {
+        try {
+          setIsSyncing(true);
+          console.log("[AppProvider] Carregando tarefas do usuário:", currentUser.id);
+          
+          // Fetch active (incomplete) tasks
+          const activeTasks = await fetchTasksFromDB(currentUser.id, false);
+          // Fetch completed tasks
+          const completedTasks = await fetchTasksFromDB(currentUser.id, true);
+          
+          // Combine all tasks
+          const allTasks = [...activeTasks, ...completedTasks];
+          
+          // Clear existing tasks and set the ones from the database
+          dispatch({ type: 'CLEAR_TASKS' });
+          
+          // Add each task to the state
+          allTasks.forEach(task => {
+            dispatch({ 
+              type: 'ADD_TASK', 
+              payload: task 
+            });
+          });
+          
+          console.log("[AppProvider] Tarefas carregadas:", allTasks.length);
+        } catch (error) {
+          console.error("[AppProvider] Erro ao carregar tarefas:", error);
+          
+          toast({
+            title: "Erro ao carregar tarefas",
+            description: "Não foi possível carregar suas tarefas. Tente novamente mais tarde.",
+            variant: "destructive",
+          });
+        } finally {
+          setIsSyncing(false);
+        }
+      }
+    };
+    
+    loadUserTasks();
+  }, [currentUser?.id, isAuthenticated]);
+  
   // Handle dark mode
   useEffect(() => {
     if (state.darkMode) {

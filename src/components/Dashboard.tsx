@@ -2,23 +2,24 @@
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '@/context/AppContext';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useAuth } from '@/context/auth';
 import TaskForm from './TaskForm';
 import TaskCard from './TaskCard';
 import SortDropdown from './SortDropdown';
-import { useLocation, useNavigate } from 'react-router-dom';
 import { sortTasks, isTaskOverdue } from '@/utils';
-import { Plus, Bell, ChevronDown, ChevronUp } from 'lucide-react';
+import { Plus, Bell, ChevronDown, ChevronUp, Loader2 } from 'lucide-react';
 import { useExpandedTask } from '@/context/hooks';
 import { Badge } from './ui/badge';
+import { Alert, AlertTitle, AlertDescription } from './ui/alert';
 
 const Dashboard: React.FC = () => {
   const { state } = useAppContext();
   const { tasks, viewMode, showHiddenTasks, sortOptions } = state;
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
   const isMobile = useIsMobile();
-  const location = useLocation();
-  const navigate = useNavigate();
   const [isTaskFormOpen, setIsTaskFormOpen] = useState(false);
   const { isTaskExpanded, toggleTaskExpanded } = useExpandedTask();
+  const [isLoading, setIsLoading] = useState(true);
   
   // State for showing/hiding overdue tasks, initialized from localStorage
   const [showOverdueTasks, setShowOverdueTasks] = useState(() => {
@@ -28,6 +29,21 @@ const Dashboard: React.FC = () => {
 
   // Force re-render every minute to update overdue status in real-time
   const [, setTime] = useState(new Date());
+  
+  // Set loading state based on tasks and auth loading
+  useEffect(() => {
+    // Set initial loading state
+    if (authLoading) {
+      setIsLoading(true);
+    } else {
+      // Small delay to avoid flicker for quick loads
+      const timer = setTimeout(() => {
+        setIsLoading(false);
+      }, 500);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [authLoading, tasks]);
   
   useEffect(() => {
     // Update current time every minute to check for newly overdue tasks
@@ -42,8 +58,6 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     localStorage.setItem('showOverdueTasks', JSON.stringify(showOverdueTasks));
   }, [showOverdueTasks]);
-  
-  // No more checks for strategic review route since it's handled by routing
   
   // In chronological mode, always show hidden tasks
   const shouldShowHiddenTasks = viewMode === 'chronological' || showHiddenTasks;
@@ -90,6 +104,30 @@ const Dashboard: React.FC = () => {
   const toggleOverdueTasks = () => {
     setShowOverdueTasks(prev => !prev);
   };
+  
+  if (isLoading || authLoading) {
+    return (
+      <div className="container p-4 mx-auto flex justify-center items-center h-[60vh]">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-primary" />
+          <p className="text-muted-foreground">Carregando suas tarefas...</p>
+        </div>
+      </div>
+    );
+  }
+  
+  if (!isAuthenticated) {
+    return (
+      <div className="container p-4 mx-auto">
+        <Alert>
+          <AlertTitle>Você não está autenticado</AlertTitle>
+          <AlertDescription>
+            Faça login para ver e gerenciar suas tarefas.
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
   
   return (
     <>

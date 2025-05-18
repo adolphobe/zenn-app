@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+
+import React, { useState } from 'react';
 import { useAppContext } from '@/context/AppContext';
 import { useAuth } from '@/context/auth';
 
@@ -15,14 +16,16 @@ import { TaskGroupGrid } from '@/components/task-history/task-cards';
 import { TasksTable } from '@/components/task-history/TaskTable';
 import { NoTasksMessage } from '@/components/task-history/NoTasksMessage';
 import { TaskPagination } from '@/components/task-history/TaskPagination';
+import { Loader2 } from 'lucide-react';
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 
 const TaskHistory = () => {
   const { state } = useAppContext();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('grid');
   
   // Use our custom hooks to manage the task data, filtering and pagination
-  const { completedTasks } = useCompletedTasks(state.tasks);
+  const { completedTasks, isLoading, error } = useCompletedTasks(state.tasks);
   
   const { 
     searchQuery, setSearchQuery,
@@ -47,6 +50,41 @@ const TaskHistory = () => {
     handlePageChange,
     getPageNumbers
   } = useTaskPagination(sortedTasks, periodFilter);
+
+  if (isLoading || authLoading) {
+    return (
+      <div className="container p-4 mx-auto flex justify-center items-center h-[60vh]">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-primary" />
+          <p className="text-muted-foreground">Carregando histórico de tarefas...</p>
+        </div>
+      </div>
+    );
+  }
+  
+  if (error) {
+    return (
+      <div className="container p-4 mx-auto">
+        <Alert variant="destructive">
+          <AlertTitle>Erro ao carregar tarefas</AlertTitle>
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
+  
+  if (!isAuthenticated) {
+    return (
+      <div className="container p-4 mx-auto">
+        <Alert>
+          <AlertTitle>Você não está autenticado</AlertTitle>
+          <AlertDescription>
+            Faça login para ver o histórico de tarefas.
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
 
   return (
     <div className="container p-4 mx-auto">
