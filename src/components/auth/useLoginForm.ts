@@ -15,7 +15,6 @@ export function useLoginForm(onSuccess?: () => void) {
   const [isLoading, setIsLoading] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
   const [loginSuggestion, setLoginSuggestion] = useState<string | null>(null);
-  const [formSubmitting, setFormSubmitting] = useState(false);
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -35,7 +34,7 @@ export function useLoginForm(onSuccess?: () => void) {
     }
   }, [location.state]);
 
-  // Limpa os erros quando o usuário começa a digitar novamente
+  // Clear errors when user starts typing again
   useEffect(() => {
     const subscription = form.watch(() => {
       if (loginError) {
@@ -46,79 +45,69 @@ export function useLoginForm(onSuccess?: () => void) {
     return () => subscription.unsubscribe();
   }, [form, loginError]);
 
-  const onSubmit = async (values: LoginFormValues) => {
-    // Previne múltiplas submissões
-    if (formSubmitting) return;
+  // Main login function - completely synchronous with manual form handling
+  const handleLogin = async (values: LoginFormValues) => {
+    // Prevent login while already loading
+    if (isLoading) return;
     
-    setFormSubmitting(true);
     setIsLoading(true);
     setLoginError(null);
     setLoginSuggestion(null);
     
     try {
       console.log("[LoginForm] Tentando login com:", values.email);
-      console.log("[LoginForm] DETALHES EM PORTUGUÊS: Iniciando processo de autenticação para o usuário");
-      
-      // Uso do método login com credenciais do formulário
       const { success, error } = await login(values.email, values.password);
       
       if (!success) {
         console.error("[LoginForm] Falha no login para:", values.email);
-        console.error("[LoginForm] DETALHES EM PORTUGUÊS: O login falhou. Verifique se o email e senha estão corretos e se a conta existe.");
         
         if (error) {
           const errorDetails = processAuthError(error);
           setLoginError(errorDetails.message);
           setLoginSuggestion(errorDetails.suggestion || null);
-          
-          console.log("[LoginForm] Erro definido:", errorDetails.message);
-          console.log("[LoginForm] Sugestão:", errorDetails.suggestion);
         } else {
           setLoginError("Usuário não encontrado ou senha incorreta. Por favor, verifique suas credenciais.");
         }
       } else {
         console.log("[LoginForm] Login bem-sucedido para:", values.email);
-        console.log("[LoginForm] DETALHES EM PORTUGUÊS: Login realizado com sucesso, redirecionando automaticamente");
-        
-        // Não mostramos toast de sucesso aqui pois já temos no loginService.ts
         
         if (onSuccess) {
-          console.log("[LoginForm] Executando callback de sucesso");
           onSuccess();
         }
       }
     } catch (error) {
       console.error("[LoginForm] Erro de login:", error);
-      console.error("[LoginForm] DETALHES EM PORTUGUÊS: Ocorreu um erro técnico durante o processo de login. Verifique a conexão com o servidor.");
       
       const errorDetails = processAuthError(error);
       setLoginError(errorDetails.message);
       setLoginSuggestion(errorDetails.suggestion || null);
     } finally {
       setIsLoading(false);
-      // Permitir novas submissões após o término do processo
-      setTimeout(() => {
-        setFormSubmitting(false);
-      }, 500); // Pequeno atraso para evitar cliques duplos
     }
   };
+  
+  // Manual form submission handler to ensure synchronous processing
+  const onSubmit = (e: React.FormEvent) => {
+    e.preventDefault(); // Critical: prevent form from refreshing page
+    
+    const isValid = form.trigger();
+    isValid.then(valid => {
+      if (valid) {
+        const values = form.getValues();
+        handleLogin(values);
+      }
+    });
+  };
 
-  // Debug the error state to see if it's being set correctly
+  // Debug logs
   console.log("[LoginForm] Estado atual do erro:", loginError);
   console.log("[LoginForm] Estado atual da sugestão:", loginSuggestion);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    form.handleSubmit((values) => {
-      onSubmit(values);
-    })(e);
-  };
 
   return {
     form,
     isLoading,
     loginError,
     loginSuggestion,
-    onSubmit: handleSubmit
+    onSubmit
   };
 }
