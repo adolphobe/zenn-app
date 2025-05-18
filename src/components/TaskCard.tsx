@@ -65,10 +65,17 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
     setFeedbackModalOpen(true);
   };
 
-  // Handle toggle hidden
+  // Handle toggle hidden with improved debugging
   const handleToggleHidden = (e: React.MouseEvent) => {
     e.stopPropagation();
     console.log('Ocultar/Mostrar tarefa clicado:', task.id, 'Status atual:', task.hidden);
+    console.log('Detalhes da tarefa:', {
+      id: task.id,
+      título: task.title,
+      oculto: task.hidden,
+      completada: task.completed
+    });
+    
     toggleTaskHidden(task.id);
   };
 
@@ -122,6 +129,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
       <div
         className={`task-card ${cardClass} ${task.completed ? 'opacity-50' : ''} relative cursor-pointer`}
         onClick={handleCardClick}
+        data-task-id={task.id}
       >
         <TaskCardHeader 
           title={task.title}

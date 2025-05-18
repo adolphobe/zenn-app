@@ -1,4 +1,3 @@
-
 import { Task, DateDisplayOptions, ViewMode, SortOption } from '../types';
 import { Dispatch } from 'react';
 
@@ -68,23 +67,42 @@ export type AppDispatch = Dispatch<Action>;
 export interface AppContextType {
   state: AppState;
   dispatch: AppDispatch;
-  addTask: (task: any) => void;
+  
+  // Task actions
+  addTask: (task: TaskFormData) => void;
   deleteTask: (id: string) => void;
   toggleTaskCompleted: (id: string) => void;
   toggleTaskHidden: (id: string) => void;
-  updateTask: (id: string, data: Partial<any>) => void;
+  updateTask: (id: string, data: Partial<TaskFormData>) => void;
   updateTaskTitle: (id: string, title: string) => void;
   setTaskFeedback: (id: string, feedback: 'transformed' | 'relief' | 'obligation') => void;
   restoreTask: (id: string) => void;
   addComment: (taskId: string, text: string) => void;
   deleteComment: (taskId: string, commentId: string) => void;
+  syncTasksWithDatabase: (forceSync?: boolean) => Promise<Task[] | null>;
+  
+  // UI actions
   setViewMode: (mode: ViewMode) => void;
   toggleShowHiddenTasks: () => void;
   toggleDarkMode: () => void;
   toggleSidebar: () => void;
-  updateDateDisplayOptions: (options: Partial<DateDisplayOptions>) => void;
-  setSortOptions: (options: { sortDirection: 'asc' | 'desc'; noDateAtEnd?: boolean }) => void;
   toggleShowPillars: () => void;
   toggleShowDates: () => void;
   toggleShowScores: () => void;
+  updateDateDisplayOptions: (options: Partial<DateDisplayOptions>) => void;
+  setSortOptions: (options: SortOptionsUpdate) => void;
 }
+
+export type TaskFormData = {
+  title: string;
+  description: string;
+  completedAt?: string;
+  feedback?: 'transformed' | 'relief' | 'obligation';
+  pillar?: string;
+  date?: string;
+};
+
+export type SortOptionsUpdate = {
+  power: SortOption;
+  chronological: SortOption;
+};

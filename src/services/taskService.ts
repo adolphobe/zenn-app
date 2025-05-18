@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { Task, TaskFormData } from '@/types';
 
@@ -172,9 +173,29 @@ export const toggleTaskCompletion = async (id: string, currentStatus: boolean): 
 export const toggleTaskHidden = async (id: string, currentStatus: boolean): Promise<Task> => {
   console.log(`Tentando atualizar tarefa com ID ${id}, status atual hidden: ${currentStatus}`);
   
+  // Validate that the task exists before attempting to update
+  const { data: existingTask, error: checkError } = await supabase
+    .from('tasks')
+    .select('id, hidden')
+    .eq('id', id)
+    .single();
+  
+  if (checkError) {
+    console.error(`Erro ao verificar existência da tarefa ${id}:`, checkError);
+    throw new Error(`Tarefa com ID ${id} não foi encontrada: ${checkError.message}`);
+  }
+  
+  if (!existingTask) {
+    console.error(`Tarefa com ID ${id} não existe no banco de dados`);
+    throw new Error(`Tarefa com ID ${id} não existe no banco de dados`);
+  }
+  
+  console.log(`Tarefa encontrada: ${existingTask.id}, estado atual hidden: ${existingTask.hidden}`);
+  
+  // Use the status from the database instead of the provided one to ensure accuracy
   const { data, error } = await supabase
     .from('tasks')
-    .update({ hidden: !currentStatus })
+    .update({ hidden: !existingTask.hidden })
     .eq('id', id)
     .select(`
       *,

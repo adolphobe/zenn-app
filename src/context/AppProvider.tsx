@@ -1,3 +1,4 @@
+
 import React, { useReducer, useEffect, useCallback, useState } from 'react';
 import { AppContext } from './AppContext';
 import { AppContextType } from './types';
@@ -19,12 +20,14 @@ import {
 } from '@/services/preferencesService';
 import { toast } from '@/hooks/use-toast';
 import { useTaskStore, useAuthStore } from '@/hooks/useTaskStore';
+import { v4 as uuidv4 } from 'uuid';
 
 // Provider component
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [state, dispatch] = useReducer(appReducer, initialState);
   const { currentUser, isAuthenticated, isLoading } = useAuth();
   const [isSyncing, setIsSyncing] = useState<boolean>(false);
+  const [lastSyncTime, setLastSyncTime] = useState<number>(0);
   
   // Store tasks in DOM for access by non-React components
   useTaskStore(state.tasks);
@@ -32,50 +35,65 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // Store user in DOM for access by non-React components
   useAuthStore(currentUser);
   
+  // Function to reload tasks from the database
+  const syncTasksWithDatabase = useCallback(async (forceSync: boolean = false) => {
+    if (!currentUser?.id || !isAuthenticated || (isSyncing && !forceSync)) return;
+    
+    const now = Date.now();
+    // Only sync if it's been at least 5 seconds since last sync or force sync is true
+    if (!forceSync && now - lastSyncTime < 5000) {
+      console.log("Skipping sync, last sync was less than 5 seconds ago");
+      return;
+    }
+    
+    try {
+      setIsSyncing(true);
+      console.log("[AppProvider] Sincronizando tarefas do usuário:", currentUser.id);
+      
+      // Fetch active (incomplete) tasks
+      const activeTasks = await fetchTasksFromDB(currentUser.id, false);
+      // Fetch completed tasks
+      const completedTasks = await fetchTasksFromDB(currentUser.id, true);
+      
+      // Combine all tasks
+      const allTasks = [...activeTasks, ...completedTasks];
+      
+      // Clear existing tasks and set the ones from the database
+      dispatch({ type: 'CLEAR_TASKS' });
+      
+      // Add each task to the state
+      allTasks.forEach(task => {
+        dispatch({ 
+          type: 'ADD_TASK', 
+          payload: task 
+        });
+      });
+      
+      setLastSyncTime(now);
+      console.log("[AppProvider] Tarefas sincronizadas:", allTasks.length);
+      
+      return allTasks;
+    } catch (error) {
+      console.error("[AppProvider] Erro ao sincronizar tarefas:", error);
+      
+      toast({
+        id: uuidv4(),
+        title: "Erro ao sincronizar tarefas",
+        description: "Não foi possível carregar suas tarefas. Tente novamente mais tarde.",
+        variant: "destructive",
+      });
+      return null;
+    } finally {
+      setIsSyncing(false);
+    }
+  }, [currentUser?.id, isAuthenticated, isSyncing, lastSyncTime]);
+  
   // Load tasks from Supabase when authenticated
   useEffect(() => {
-    const loadUserTasks = async () => {
-      if (currentUser?.id && isAuthenticated && !isSyncing) {
-        try {
-          setIsSyncing(true);
-          console.log("[AppProvider] Carregando tarefas do usuário:", currentUser.id);
-          
-          // Fetch active (incomplete) tasks
-          const activeTasks = await fetchTasksFromDB(currentUser.id, false);
-          // Fetch completed tasks
-          const completedTasks = await fetchTasksFromDB(currentUser.id, true);
-          
-          // Combine all tasks
-          const allTasks = [...activeTasks, ...completedTasks];
-          
-          // Clear existing tasks and set the ones from the database
-          dispatch({ type: 'CLEAR_TASKS' });
-          
-          // Add each task to the state
-          allTasks.forEach(task => {
-            dispatch({ 
-              type: 'ADD_TASK', 
-              payload: task 
-            });
-          });
-          
-          console.log("[AppProvider] Tarefas carregadas:", allTasks.length);
-        } catch (error) {
-          console.error("[AppProvider] Erro ao carregar tarefas:", error);
-          
-          toast({
-            title: "Erro ao carregar tarefas",
-            description: "Não foi possível carregar suas tarefas. Tente novamente mais tarde.",
-            variant: "destructive",
-          });
-        } finally {
-          setIsSyncing(false);
-        }
-      }
-    };
-    
-    loadUserTasks();
-  }, [currentUser?.id, isAuthenticated]);
+    if (currentUser?.id && isAuthenticated && !isSyncing) {
+      syncTasksWithDatabase();
+    }
+  }, [currentUser?.id, isAuthenticated, syncTasksWithDatabase]);
   
   // Handle dark mode
   useEffect(() => {
@@ -229,6 +247,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     restoreTask: (id) => taskActions.restoreTask(dispatch, id),
     addComment: (taskId, text) => taskActions.addComment(dispatch, taskId, text),
     deleteComment: (taskId, commentId) => taskActions.deleteComment(dispatch, taskId, commentId),
+    syncTasksWithDatabase: (forceSync = true) => syncTasksWithDatabase(forceSync),
     
     // UI actions
     setViewMode: (mode) => uiActions.setViewMode(dispatch, mode),

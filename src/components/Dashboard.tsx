@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '@/context/AppContext';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -7,19 +6,21 @@ import TaskForm from './TaskForm';
 import TaskCard from './TaskCard';
 import SortDropdown from './SortDropdown';
 import { sortTasks, isTaskOverdue } from '@/utils';
-import { Plus, Bell, ChevronDown, ChevronUp, Loader2 } from 'lucide-react';
+import { Plus, Bell, ChevronDown, ChevronUp, Loader2, RefreshCw } from 'lucide-react';
 import { useExpandedTask } from '@/context/hooks';
 import { Badge } from './ui/badge';
 import { Alert, AlertTitle, AlertDescription } from './ui/alert';
+import { Button } from './ui/button';
 
 const Dashboard: React.FC = () => {
-  const { state } = useAppContext();
+  const { state, syncTasksWithDatabase } = useAppContext();
   const { tasks, viewMode, showHiddenTasks, sortOptions } = state;
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const isMobile = useIsMobile();
   const [isTaskFormOpen, setIsTaskFormOpen] = useState(false);
   const { isTaskExpanded, toggleTaskExpanded } = useExpandedTask();
   const [isLoading, setIsLoading] = useState(true);
+  const [isSyncing, setIsSyncing] = useState(false);
   
   // State for showing/hiding overdue tasks, initialized from localStorage
   const [showOverdueTasks, setShowOverdueTasks] = useState(() => {
@@ -105,6 +106,20 @@ const Dashboard: React.FC = () => {
     setShowOverdueTasks(prev => !prev);
   };
   
+  const handleSyncTasks = async () => {
+    if (isSyncing) return;
+    
+    setIsSyncing(true);
+    await syncTasksWithDatabase(true);
+    setIsSyncing(false);
+    
+    // Show success toast
+    toast({
+      title: "Tarefas sincronizadas",
+      description: "Suas tarefas foram atualizadas com sucesso.",
+    });
+  };
+  
   if (isLoading || authLoading) {
     return (
       <div className="container p-4 mx-auto flex justify-center items-center h-[60vh]">
@@ -139,6 +154,21 @@ const Dashboard: React.FC = () => {
                 {viewMode === 'power' ? 'Modo Potência' : 'Modo Cronológico'}
               </h1>
               <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleSyncTasks}
+                  disabled={isSyncing}
+                  className="flex items-center gap-1"
+                >
+                  {isSyncing ? (
+                    <Loader2 size={16} className="animate-spin" />
+                  ) : (
+                    <RefreshCw size={16} />
+                  )}
+                  <span className="ml-1">Sincronizar</span>
+                </Button>
+                
                 <SortDropdown />
 
                 {isTaskFormOpen ? (
