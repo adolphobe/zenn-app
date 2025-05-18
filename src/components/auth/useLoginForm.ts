@@ -23,6 +23,7 @@ export function useLoginForm(onSuccess?: () => void) {
       email: "",
       password: "",
     },
+    mode: "onChange", // Valida ao digitar para feedback imediato
   });
 
   // Check if user just reset their password
@@ -48,6 +49,13 @@ export function useLoginForm(onSuccess?: () => void) {
     });
     return () => subscription.unsubscribe();
   }, [form, loginError, formSubmissionAttempted]);
+
+  // Debug logs para monitorar o estado do erro
+  useEffect(() => {
+    console.log("[LoginForm] Estado atual do erro:", loginError);
+    console.log("[LoginForm] Estado atual da sugestão:", loginSuggestion);
+    console.log("[LoginForm] Estado atual de carregamento:", isLoading);
+  }, [loginError, loginSuggestion, isLoading]);
 
   // Memoized login function to prevent unnecessary re-renders
   const handleLogin = useCallback(async (values: LoginFormValues) => {
@@ -104,7 +112,7 @@ export function useLoginForm(onSuccess?: () => void) {
   }, [isLoading, login, onSuccess]);
   
   // Submission handler that properly prevents default form behavior
-  const onSubmit = useCallback((e: React.FormEvent) => {
+  const onSubmit = useCallback((e: React.FormEvent<HTMLFormElement>) => {
     // Critical: prevent form from refreshing page
     e.preventDefault();
     console.log("[LoginForm] Formulário submetido, prevenindo comportamento padrão");
@@ -113,8 +121,7 @@ export function useLoginForm(onSuccess?: () => void) {
     setFormSubmissionAttempted(true);
     
     // Validate form and handle submission
-    const isValid = form.trigger();
-    isValid.then(valid => {
+    form.trigger().then(valid => {
       console.log("[LoginForm] Validação do formulário:", valid ? "válido" : "inválido");
       
       if (valid) {
@@ -125,13 +132,6 @@ export function useLoginForm(onSuccess?: () => void) {
       }
     });
   }, [form, handleLogin]);
-
-  // Debug logs for monitoring state
-  useEffect(() => {
-    console.log("[LoginForm] Estado atual do erro:", loginError);
-    console.log("[LoginForm] Estado atual da sugestão:", loginSuggestion);
-    console.log("[LoginForm] Estado atual de carregamento:", isLoading);
-  }, [loginError, loginSuggestion, isLoading]);
 
   return {
     form,
