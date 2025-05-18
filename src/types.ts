@@ -1,4 +1,3 @@
-
 import { ISODateString } from './types/dates';
 
 export interface Task {
@@ -9,17 +8,20 @@ export interface Task {
   constructionScore: number;
   totalScore: number;
   idealDate: Date | null;
+  hidden: boolean;
   completed: boolean;
   completedAt: Date | null;
-  hidden: boolean;
-  feedback?: 'transformed' | 'relief' | 'obligation';
-  comments: Comment[];
   createdAt: Date;
-  pillar?: string | null;
-  isDeleted?: boolean;
-  operationLoading?: Record<string, boolean>;
+  updatedAt: Date;
+  userId: string;
+  feedback: 'transformed' | 'relief' | 'obligation' | null;
+  comments?: Comment[];
+  pillar?: string;
+  operationLoading: Record<string, boolean>;
+  // Animation properties for task visibility transitions
+  _pendingVisibilityUpdate?: boolean;
+  _animationState?: 'hiding' | 'showing' | 'hidden' | 'visible';
   _optimisticUpdateTime?: number;
-  _pendingHiddenUpdate?: boolean;
 }
 
 export interface Comment {

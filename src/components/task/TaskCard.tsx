@@ -25,7 +25,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
   
   const { state } = useAppContext();
   const { showHiddenTasks, viewMode, dateDisplayOptions } = state;
-  const { toggleTaskHidden } = useTaskDataContext();
+  const { toggleTaskHidden, updateTaskTitle } = useTaskDataContext();
   const { showToggleHiddenToast } = useTaskToasts();
   
   // Atualizar titleValue quando a tarefa muda

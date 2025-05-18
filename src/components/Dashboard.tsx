@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '@/context/AppContext';
 import { useTaskDataContext } from '@/context/TaskDataProvider'; 
@@ -80,7 +81,7 @@ const Dashboard: React.FC = () => {
     const isVisible = shouldShowHiddenTasks || !task.hidden;
     
     // Filtrar também tarefas com atualização de visibilidade pendente
-    const isPendingVisibilityUpdate = task._pendingVisibilityUpdate || false;
+    const isPendingVisibilityUpdate = task._pendingVisibilityUpdate === true;
     const animationState = task._animationState || '';
     
     // Incluir tarefas que:

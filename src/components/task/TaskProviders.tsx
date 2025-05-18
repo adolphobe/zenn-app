@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { AnimatePresence } from 'framer-motion';
 import { TaskToastProvider } from './utils/taskToasts';
 
 interface TaskProvidersProps {
@@ -9,7 +10,9 @@ interface TaskProvidersProps {
 const TaskProviders: React.FC<TaskProvidersProps> = ({ children }) => {
   return (
     <TaskToastProvider>
-      {children}
+      <AnimatePresence mode="wait">
+        {children}
+      </AnimatePresence>
     </TaskToastProvider>
   );
 };

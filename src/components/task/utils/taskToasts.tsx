@@ -1,48 +1,61 @@
 
-import React, { createContext, useContext, useCallback } from 'react';
+import React, { createContext, useContext } from 'react';
 import { Task } from '@/types';
 import { toast } from '@/hooks/use-toast';
-import { useTaskDataContext } from '@/context/TaskDataProvider';
 
-// Contexto para os toasts
-const TaskToastContext = createContext<{
+// Context for task toasts
+interface TaskToastContextType {
   showToggleHiddenToast: (task: Task) => void;
-} | null>(null);
+  showCompleteTaskToast: (task: Task) => void;
+  showDeleteTaskToast: (task: Task) => void;
+}
 
+const TaskToastContext = createContext<TaskToastContextType | undefined>(undefined);
+
+// Provider component
 export const TaskToastProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { toggleTaskHidden } = useTaskDataContext();
-  
-  const showToggleHiddenToast = useCallback((task: Task) => {
-    // Se estamos prestes a ocultar uma tarefa (atualmente visível)
-    if (!task.hidden) {
-      // Notificar o usuário que a tarefa irá desaparecer
-      toast({
-        title: "A tarefa será ocultada",
-        description: "Esta tarefa desaparecerá da lista. Para vê-la novamente, ative a opção 'Mostrar tarefas ocultas' no menu lateral.",
-      });
-      
-      // Aplicar uma pequena pausa para permitir que o usuário veja o toast antes da animação
-      setTimeout(() => {
-        toggleTaskHidden(task.id);
-      }, 300);
-      return;
-    }
-    
-    // Em todos os outros casos, alternar imediatamente
-    toggleTaskHidden(task.id);
-  }, [toggleTaskHidden]);
+  const showToggleHiddenToast = (task: Task) => {
+    toast({
+      title: task.hidden ? "Tarefa ocultada" : "Tarefa visível",
+      description: task.hidden 
+        ? "A tarefa foi ocultada e só será visível com o filtro ativado."
+        : "A tarefa agora está visível.",
+    });
+  };
+
+  const showCompleteTaskToast = (task: Task) => {
+    toast({
+      title: "Tarefa completa",
+      description: `A tarefa "${task.title}" foi marcada como concluída.`,
+    });
+  };
+
+  const showDeleteTaskToast = (task: Task) => {
+    toast({
+      title: "Tarefa excluída",
+      description: `A tarefa "${task.title}" foi excluída.`,
+      variant: "destructive",
+    });
+  };
+
+  const value = {
+    showToggleHiddenToast,
+    showCompleteTaskToast,
+    showDeleteTaskToast
+  };
 
   return (
-    <TaskToastContext.Provider value={{ showToggleHiddenToast }}>
+    <TaskToastContext.Provider value={value}>
       {children}
     </TaskToastContext.Provider>
   );
 };
 
+// Custom hook for using task toasts
 export const useTaskToasts = () => {
   const context = useContext(TaskToastContext);
-  if (!context) {
-    throw new Error('useTaskToasts must be used within a TaskToastProvider');
+  if (context === undefined) {
+    throw new Error("useTaskToasts must be used within a TaskToastProvider");
   }
   return context;
 };
