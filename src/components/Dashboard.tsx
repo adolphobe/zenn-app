@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '@/context/AppContext';
-import { useTaskDataContext } from '@/context/TaskDataProvider';
+import { useTaskDataContext } from '@/context/TaskDataProvider'; // Use the new context
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useAuth } from '@/context/auth';
 import TaskForm from './TaskForm';
@@ -19,14 +19,12 @@ import { AnimatePresence, motion } from 'framer-motion';
 const Dashboard: React.FC = () => {
   const { state } = useAppContext();
   const { viewMode, showHiddenTasks, sortOptions, syncStatus } = state;
-  
   const { 
     tasks, 
     isLoading: tasksLoading, 
     forceSynchronize,
     operationsLoading
-  } = useTaskDataContext();
-  
+  } = useTaskDataContext(); // Use our new hook
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const isMobile = useIsMobile();
   const [isTaskFormOpen, setIsTaskFormOpen] = useState(false);
@@ -80,11 +78,11 @@ const Dashboard: React.FC = () => {
   
   // First separate overdue tasks from non-overdue tasks
   const overdueTasksChronological = viewMode === 'chronological'
-    ? filteredTasks.filter(task => task.idealDate && isTaskOverdue(task.idealDate ? safeParseDate(task.idealDate) : null))
+    ? filteredTasks.filter(task => task.idealDate && isTaskOverdue(task.idealDate))
     : [];
     
   const nonOverdueTasksChronological = viewMode === 'chronological'
-    ? filteredTasks.filter(task => !task.idealDate || !isTaskOverdue(task.idealDate ? safeParseDate(task.idealDate) : null))
+    ? filteredTasks.filter(task => !task.idealDate || !isTaskOverdue(task.idealDate))
     : filteredTasks;
     
   // Apply sorting to each group separately

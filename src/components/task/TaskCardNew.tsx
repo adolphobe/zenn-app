@@ -1,52 +1,41 @@
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Task } from '@/types';
-import { isTaskOverdue, safeParseDate } from '@/utils';
 import { useAppContext } from '@/context/AppContext';
+import { getTaskPriorityClass } from '@/utils';
 import TaskCardHeader from '../TaskCardHeader';
-import TaskCardExpanded from '../TaskCardExpanded';
-import { useTaskDataContext } from '@/context/TaskDataProvider';
 import { motion, AnimatePresence } from 'framer-motion';
+import TaskCardExpanded from './TaskCardExpanded';
+import PostCompletionFeedback from '../PostCompletionFeedback';
+import TaskForm from '../TaskForm';
+import DeleteTaskConfirmation from '../DeleteTaskConfirmation';
+import { useTaskDataContext } from '@/context/TaskDataProvider';
 
 interface TaskCardProps {
   task: Task;
   isExpanded: boolean;
-  onToggleExpand: (id: string) => void;
+  onToggleExpand: (taskId: string) => void;
 }
 
-const TaskCardNew: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand }) => {
-  const { 
-    deleteTask, 
-    updateTaskTitle, 
-    toggleTaskCompleted, 
-    toggleTaskHidden 
-  } = useTaskDataContext();
-  const { state: { viewMode, dateDisplayOptions, showHiddenTasks } } = useAppContext();
-  
-  const [isEditing, setIsEditing] = useState(false);
+const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand }) => {
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [titleValue, setTitleValue] = useState(task.title);
+  const [feedbackModalOpen, setFeedbackModalOpen] = useState(false);
+  const [editTaskModalOpen, setEditTaskModalOpen] = useState(false);
+  const [deleteConfirmModalOpen, setDeleteConfirmModalOpen] = useState(false);
+  const { state, updateTaskTitle } = useAppContext();
+  const { toggleTaskHidden, toggleTaskCompleted, setTaskFeedback } = useTaskDataContext();
+  const { dateDisplayOptions, showHiddenTasks, viewMode } = state;
   
-  // Reset title value when task changes
-  useEffect(() => {
-    setTitleValue(task.title);
-  }, [task.title]);
-
-  // Toggle card expansion
-  const handleCardClick = () => {
-    if (!isEditing) {
-      onToggleExpand(task.id);
-    }
-  };
-
-  // Prevent expanded content click from triggering card collapse
-  const handleExpandedContentClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-  };
-
-  // Title editing handlers
+  // Aplicar classe de prioridade apenas no modo potência
+  // No modo cronológico, usar um estilo neutro claro
+  const cardClass = viewMode === 'chronological' 
+    ? 'bg-white text-gray-800 border-gray-200' 
+    : getTaskPriorityClass(task.totalScore);
+  
   const handleTitleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setIsEditing(true);
+    setIsEditingTitle(true);
   };
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -54,121 +43,156 @@ const TaskCardNew: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand
   };
 
   const handleTitleBlur = () => {
-    if (titleValue.trim() !== '' && titleValue !== task.title) {
-      updateTaskTitle(task.id, titleValue);
-    } else {
-      setTitleValue(task.title); // Reset to original if empty or unchanged
+    if (titleValue.trim() !== task.title) {
+      updateTaskTitle(task.id, titleValue.trim());
     }
-    setIsEditing(false);
+    setIsEditingTitle(false);
   };
 
   const handleTitleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
-      if (titleValue.trim() !== '' && titleValue !== task.title) {
-        updateTaskTitle(task.id, titleValue);
-      } else {
-        setTitleValue(task.title);
+      if (titleValue.trim() !== task.title) {
+        updateTaskTitle(task.id, titleValue.trim());
       }
-      setIsEditing(false);
+      setIsEditingTitle(false);
     } else if (e.key === 'Escape') {
       setTitleValue(task.title);
-      setIsEditing(false);
+      setIsEditingTitle(false);
     }
   };
 
-  // Task action handlers
+  const handleCompleteTask = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setFeedbackModalOpen(true);
+  };
+
   const handleToggleHidden = (e: React.MouseEvent) => {
     e.stopPropagation();
+    console.log('Ocultar/Mostrar tarefa clicado:', task.id, 'Status atual:', task.hidden);
     toggleTaskHidden(task.id);
   };
 
   const handleEditTask = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setIsEditing(true);
-    handleTitleClick(e);
+    setEditTaskModalOpen(true);
   };
-
-  const handleCompleteTask = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    toggleTaskCompleted(task.id);
-  };
-
+  
   const handleDeleteTask = (e: React.MouseEvent) => {
     e.stopPropagation();
-    deleteTask(task.id);
+    setDeleteConfirmModalOpen(true);
   };
 
-  // Determine if task is overdue
-  const parsedDate = task.idealDate ? safeParseDate(task.idealDate) : null;
-  const isOverdue = parsedDate ? isTaskOverdue(parsedDate) : false;
-  
-  // Dynamic border and background styles
-  const getBorderStyle = () => {
-    if (task.hidden && showHiddenTasks) {
-      return 'border-gray-300/30 dark:border-gray-700/30';
+  const handleFeedbackConfirm = (feedbackType: 'transformed' | 'relief' | 'obligation') => {
+    // Primeiro marcamos a tarefa como completa
+    toggleTaskCompleted(task.id);
+    
+    // Depois salvamos o feedback
+    if (setTaskFeedback) {
+      setTaskFeedback(task.id, feedbackType);
     }
     
-    if (viewMode === 'chronological' && isOverdue) {
-      return 'border-red-200/50 dark:border-red-900/30';
-    }
-    
-    return 'border-gray-200/50 dark:border-gray-800/50';
+    setFeedbackModalOpen(false);
   };
-  
-  const getBackgroundStyle = () => {
-    if (task.hidden && showHiddenTasks) {
-      return 'bg-gray-50/80 dark:bg-gray-900/30';
-    }
-    
-    if (viewMode === 'chronological' && isOverdue) {
-      return 'bg-red-50/30 dark:bg-red-950/10';
-    }
-    
-    return 'bg-white/40 dark:bg-gray-950/40 backdrop-blur-[2px]';
+
+  const handleFeedbackCancel = () => {
+    setFeedbackModalOpen(false);
   };
+
+  // Manipulador para expansão do card
+  const handleCardClick = (e: React.MouseEvent) => {
+    // Se estivermos editando o título, não faremos nada
+    if (isEditingTitle) return;
+    
+    // Chamar a função de toggle
+    onToggleExpand(task.id);
+  };
+
+  // Manipulador para cliques em áreas expandidas
+  const handleExpandedContentClick = (e: React.MouseEvent) => {
+    // Impedir a propagação para o card
+    e.stopPropagation();
+  };
+
+  useEffect(() => {
+    setTitleValue(task.title);
+  }, [task.title]);
 
   return (
-    <motion.div 
-      className={`rounded-[10px] border ${getBorderStyle()} ${getBackgroundStyle()} 
-                shadow-sm hover:shadow-md transition-shadow duration-200 cursor-pointer p-4`}
-      whileHover={{ scale: 1.005 }}
-      whileTap={{ scale: 0.995 }}
-      onClick={handleCardClick}
-      layoutId={`task-card-${task.id}`}
-    >
-      <TaskCardHeader 
-        title={task.title}
-        totalScore={task.totalScore}
-        idealDate={task.idealDate}
-        isEditing={isEditing}
-        titleValue={titleValue}
-        dateDisplayOptions={dateDisplayOptions}
-        isHidden={task.hidden}
-        showHiddenTasks={showHiddenTasks}
-        onTitleClick={handleTitleClick}
-        onTitleChange={handleTitleChange}
-        onTitleBlur={handleTitleBlur}
-        onTitleKeyDown={handleTitleKeyDown}
-        consequenceScore={task.consequenceScore}
-        prideScore={task.prideScore}
-        constructionScore={task.constructionScore}
+    <>
+      <motion.div
+        layout
+        layoutId={`task-card-${task.id}`}
+        className={`task-card ${cardClass} ${task.completed ? 'opacity-50' : ''} relative cursor-pointer`}
+        onClick={handleCardClick}
+        data-task-id={task.id}
+        transition={{ 
+          layout: { duration: 0.3, ease: "easeInOut" },
+          opacity: { duration: 0.2 }
+        }}
+      >
+        <TaskCardHeader 
+          title={task.title}
+          totalScore={task.totalScore}
+          idealDate={task.idealDate}
+          isEditing={isEditingTitle}
+          titleValue={titleValue}
+          dateDisplayOptions={dateDisplayOptions}
+          isHidden={task.hidden}
+          showHiddenTasks={showHiddenTasks}
+          onTitleClick={handleTitleClick}
+          onTitleChange={handleTitleChange}
+          onTitleBlur={handleTitleBlur}
+          onTitleKeyDown={handleTitleKeyDown}
+          consequenceScore={task.consequenceScore}
+          prideScore={task.prideScore}
+          constructionScore={task.constructionScore}
+        />
+
+        <AnimatePresence initial={false}>
+          {isExpanded && (
+            <TaskCardExpanded 
+              task={task}
+              onToggleHidden={handleToggleHidden}
+              onEditTask={handleEditTask}
+              onCompleteTask={handleCompleteTask}
+              onDeleteTask={handleDeleteTask}
+              handleExpandedContentClick={handleExpandedContentClick}
+              viewMode={viewMode}
+            />
+          )}
+        </AnimatePresence>
+      </motion.div>
+
+      <PostCompletionFeedback
+        task={task}
+        isOpen={feedbackModalOpen}
+        onClose={handleFeedbackCancel}
+        onConfirm={handleFeedbackConfirm}
       />
       
-      <AnimatePresence>
-        {isExpanded && (
-          <TaskCardExpanded 
-            task={task}
-            onToggleHidden={handleToggleHidden}
-            onEditTask={handleEditTask}
-            onCompleteTask={handleCompleteTask}
-            onDeleteTask={handleDeleteTask}
-            handleExpandedContentClick={handleExpandedContentClick}
-            viewMode={viewMode}
-          />
-        )}
-      </AnimatePresence>
-    </motion.div>
+      {editTaskModalOpen && (
+        <TaskForm
+          onClose={() => setEditTaskModalOpen(false)}
+          initialData={{
+            title: task.title,
+            consequenceScore: task.consequenceScore,
+            prideScore: task.prideScore,
+            constructionScore: task.constructionScore,
+            idealDate: task.idealDate
+          }}
+          taskId={task.id}
+          task={task}
+          isEditing={true}
+        />
+      )}
+      
+      <DeleteTaskConfirmation
+        task={task}
+        isOpen={deleteConfirmModalOpen}
+        onClose={() => setDeleteConfirmModalOpen(false)}
+      />
+    </>
   );
 };
 
-export default TaskCardNew;
+export default TaskCard;

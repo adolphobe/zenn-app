@@ -1,4 +1,3 @@
-
 export interface Task {
   id: string;
   title: string;
@@ -15,7 +14,6 @@ export interface Task {
   comments: Comment[];
   operationLoading?: Record<string, boolean>;
   _optimisticUpdateTime?: number; // Add this property for animation tracking
-  pillar?: string; // Adicionando a propriedade pillar que estava faltando
 }
 
 export interface Comment {
