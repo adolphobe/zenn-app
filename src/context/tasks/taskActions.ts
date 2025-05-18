@@ -7,6 +7,11 @@ import { AppDispatch } from '../types';
 // Task-related actions
 export const addTask = (dispatch: AppDispatch, task: TaskFormData) => {
   dispatch({ type: 'ADD_TASK', payload: task });
+  toast({
+    id: uuidv4(),
+    title: "Tarefa adicionada",
+    description: `"${task.title}" foi adicionada com sucesso.`
+  });
 };
 
 export const deleteTask = (dispatch: AppDispatch, id: string) => {

@@ -5,7 +5,6 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import TaskForm from './TaskForm';
 import TaskCard from './TaskCard';
 import SortDropdown from './SortDropdown';
-import StatusBox from './StatusBox';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { sortTasks, isTaskOverdue } from '@/utils';
 import { Plus, Bell, ChevronDown, ChevronUp } from 'lucide-react';
@@ -43,6 +42,8 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     localStorage.setItem('showOverdueTasks', JSON.stringify(showOverdueTasks));
   }, [showOverdueTasks]);
+  
+  // No more checks for strategic review route since it's handled by routing
   
   // In chronological mode, always show hidden tasks
   const shouldShowHiddenTasks = viewMode === 'chronological' || showHiddenTasks;
@@ -94,9 +95,6 @@ const Dashboard: React.FC = () => {
     <>
       <div className="container p-4 mx-auto max-w-5xl">
         <div className="flex flex-col space-y-4">
-          {/* Status Box - New component added at the top */}
-          <StatusBox />
-          
           <div className="mb-6">
             <div className="flex justify-between items-center">
               <h1 className="text-2xl font-bold tracking-tight">

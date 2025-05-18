@@ -2,7 +2,6 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
-import StatusBox from '../components/StatusBox';
 import { useSidebar } from '@/context/hooks';
 import { Menu } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -34,11 +33,8 @@ const ActoApp: React.FC = () => {
           "flex justify-center"
         )}
       >
-        <div className="w-full max-w-6xl">
-          <StatusBox />
-          <div className="mt-4">
-            <Outlet />
-          </div>
+        <div className="w-full max-w-6xl"> 
+          <Outlet />
         </div>
       </main>
     </div>
