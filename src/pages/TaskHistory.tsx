@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '@/context/AppContext';
 import { useAuth } from '@/context/AuthContext';
+import StatusBox from '@/components/StatusBox';
 
 // Import refactored hooks
 import { useCompletedTasks } from '@/components/task-history/hooks/useCompletedTasks';
@@ -52,6 +53,9 @@ const TaskHistory = () => {
   return (
     <div className="container p-4 mx-auto">
       <div className="flex flex-col space-y-4">
+        {/* Add StatusBox at the top */}
+        <StatusBox />
+        
         {/* Pass filtered tasks to TaskHistoryStats instead of all completed tasks */}
         <TaskHistoryStats filteredTasks={sortedTasks} />
         
