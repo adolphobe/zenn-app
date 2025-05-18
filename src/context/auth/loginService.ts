@@ -20,7 +20,7 @@ export const login = async (email: string, password: string): Promise<{ success:
       console.error("[AuthService] Erro de login:", error.message);
       console.error("[AuthService] DETALHES EM PORTUGUÊS: Falha ao fazer login. Erro:", error.message);
       
-      // Não mostramos toast de erro aqui, deixamos para a camada de UI (useLoginForm)
+      // Removido toast de erro aqui para evitar duplicação com o componente de erro do formulário
       
       return { success: false, error };
     }
@@ -35,10 +35,10 @@ export const login = async (email: string, password: string): Promise<{ success:
     
     return { success: true, user: data.user, session: data.session };
   } catch (error: any) {
-    console.error("[AuthService] Erro de login:", error);
+    console.error("[AuthService] Erro de login inesperado:", error);
     console.error("[AuthService] DETALHES EM PORTUGUÊS: Ocorreu um erro inesperado durante o processo de login");
     
-    // Não mostramos toast de erro aqui, deixamos para a camada de UI (useLoginForm)
+    // Removido toast de erro aqui para evitar duplicação com o componente de erro do formulário
     
     return { success: false, error };
   }

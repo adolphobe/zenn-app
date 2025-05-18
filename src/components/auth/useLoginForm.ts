@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAuth } from '@/context/auth';
@@ -15,6 +15,7 @@ export function useLoginForm(onSuccess?: () => void) {
   const [isLoading, setIsLoading] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
   const [loginSuggestion, setLoginSuggestion] = useState<string | null>(null);
+  const [formSubmissionAttempted, setFormSubmissionAttempted] = useState(false);
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -34,22 +35,29 @@ export function useLoginForm(onSuccess?: () => void) {
     }
   }, [location.state]);
 
-  // Clear errors when user starts typing again
+  // Clear errors when user starts typing again, but only after first submission attempt
   useEffect(() => {
+    if (!formSubmissionAttempted) return;
+    
     const subscription = form.watch(() => {
       if (loginError) {
+        console.log("[LoginForm] Usuário está digitando, limpando erros anteriores");
         setLoginError(null);
         setLoginSuggestion(null);
       }
     });
     return () => subscription.unsubscribe();
-  }, [form, loginError]);
+  }, [form, loginError, formSubmissionAttempted]);
 
-  // Main login function - completely synchronous with manual form handling
-  const handleLogin = async (values: LoginFormValues) => {
+  // Memoized login function to prevent unnecessary re-renders
+  const handleLogin = useCallback(async (values: LoginFormValues) => {
     // Prevent login while already loading
-    if (isLoading) return;
+    if (isLoading) {
+      console.log("[LoginForm] Já existe um login em andamento, ignorando tentativa");
+      return;
+    }
     
+    console.log("[LoginForm] Iniciando processo de login");
     setIsLoading(true);
     setLoginError(null);
     setLoginSuggestion(null);
@@ -60,13 +68,19 @@ export function useLoginForm(onSuccess?: () => void) {
       
       if (!success) {
         console.error("[LoginForm] Falha no login para:", values.email);
+        console.error("[LoginForm] Erro detectado:", error);
         
         if (error) {
           const errorDetails = processAuthError(error);
+          console.log("[LoginForm] Erro processado:", errorDetails.message);
           setLoginError(errorDetails.message);
           setLoginSuggestion(errorDetails.suggestion || null);
+          
+          // Log para confirmar que o estado foi atualizado
+          console.log("[LoginForm] Estado de erro atualizado para:", errorDetails.message);
         } else {
           setLoginError("Usuário não encontrado ou senha incorreta. Por favor, verifique suas credenciais.");
+          console.log("[LoginForm] Estado de erro definido para mensagem padrão (credenciais inválidas)");
         }
       } else {
         console.log("[LoginForm] Login bem-sucedido para:", values.email);
@@ -76,32 +90,48 @@ export function useLoginForm(onSuccess?: () => void) {
         }
       }
     } catch (error) {
-      console.error("[LoginForm] Erro de login:", error);
+      console.error("[LoginForm] Erro de login não tratado:", error);
       
       const errorDetails = processAuthError(error);
       setLoginError(errorDetails.message);
       setLoginSuggestion(errorDetails.suggestion || null);
+      
+      console.log("[LoginForm] Estado de erro atualizado após exceção:", errorDetails.message);
     } finally {
       setIsLoading(false);
+      console.log("[LoginForm] Processo de login finalizado, isLoading =", false);
     }
-  };
+  }, [isLoading, login, onSuccess]);
   
-  // Manual form submission handler to ensure synchronous processing
-  const onSubmit = (e: React.FormEvent) => {
-    e.preventDefault(); // Critical: prevent form from refreshing page
+  // Submission handler that properly prevents default form behavior
+  const onSubmit = useCallback((e: React.FormEvent) => {
+    // Critical: prevent form from refreshing page
+    e.preventDefault();
+    console.log("[LoginForm] Formulário submetido, prevenindo comportamento padrão");
     
+    // Mark that a submission was attempted
+    setFormSubmissionAttempted(true);
+    
+    // Validate form and handle submission
     const isValid = form.trigger();
     isValid.then(valid => {
+      console.log("[LoginForm] Validação do formulário:", valid ? "válido" : "inválido");
+      
       if (valid) {
         const values = form.getValues();
         handleLogin(values);
+      } else {
+        console.log("[LoginForm] Formulário inválido, não prosseguindo com login");
       }
     });
-  };
+  }, [form, handleLogin]);
 
-  // Debug logs
-  console.log("[LoginForm] Estado atual do erro:", loginError);
-  console.log("[LoginForm] Estado atual da sugestão:", loginSuggestion);
+  // Debug logs for monitoring state
+  useEffect(() => {
+    console.log("[LoginForm] Estado atual do erro:", loginError);
+    console.log("[LoginForm] Estado atual da sugestão:", loginSuggestion);
+    console.log("[LoginForm] Estado atual de carregamento:", isLoading);
+  }, [loginError, loginSuggestion, isLoading]);
 
   return {
     form,
