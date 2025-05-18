@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useAuth } from '@/context/auth';
 import { useImagePreloader } from '@/hooks/useImagePreloader';
@@ -83,7 +84,7 @@ const Settings = () => {
   }
 
   return (
-    <div className="container py-8 max-w-3xl mx-auto">
+    <div className="container py-8 max-w-3xl mx-auto pb-0">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Configurações</h1>
         <p className="text-muted-foreground">Gerencie suas preferências e informações de conta</p>
@@ -130,11 +131,11 @@ const Settings = () => {
         </Card>
         
         {/* Delete Account Section */}
-        <div className="flex justify-center pt-6 pb-12">
+        <div className="flex justify-start pt-0 pb-0">
           <Button 
             variant="outline" 
             size="sm" 
-            className="text-red-400 border-red-100 hover:bg-red-50 hover:text-red-500"
+            className="text-red-400 border-red-100 hover:bg-red-50 hover:text-red-500 font-extralight"
             onClick={() => setIsDeleteModalOpen(true)}
           >
             Apagar minha conta
