@@ -20,6 +20,7 @@ import Settings from './pages/Settings';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { TaskDataProvider } from './context/TaskDataProvider';
 import TaskProviders from './components/task/TaskProviders';
+import { TooltipProvider } from './components/ui/tooltip';
 
 // Create a client
 const queryClient = new QueryClient({
@@ -37,31 +38,35 @@ function App() {
     <div className="App">
       <QueryClientProvider client={queryClient}>
         <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
-          <Toaster />
-          <AuthProvider>
-            <AppProvider>
-              <TaskProviders>
-                <TaskDataProvider>
-                  <Router>
-                    <Routes>
-                      <Route path="/" element={<Landing />} />
-                      <Route path="/login" element={<Login />} />
-                      <Route path="/reset-password" element={<ResetPassword />} />
-                      <Route path="/app" element={<ActoApp />} />
-                      <Route element={<PrivateRoute />}>
-                        <Route path="/dashboard" element={<Dashboard />} />
-                        <Route path="/dashboard2" element={<Dashboard2 />} />
-                        <Route path="/task-history" element={<TaskHistory />} />
-                        <Route path="/strategic-review" element={<StrategicReview />} />
-                        <Route path="/settings" element={<Settings />} />
-                      </Route>
-                      <Route path="*" element={<NotFound />} />
-                    </Routes>
-                  </Router>
-                </TaskDataProvider>
-              </TaskProviders>
-            </AppProvider>
-          </AuthProvider>
+          <TooltipProvider>
+            <Toaster />
+            <AuthProvider>
+              <AppProvider>
+                <TaskProviders>
+                  <TaskDataProvider>
+                    <UserProvider>
+                      <Router>
+                        <Routes>
+                          <Route path="/" element={<Landing />} />
+                          <Route path="/login" element={<Login />} />
+                          <Route path="/reset-password" element={<ResetPassword />} />
+                          <Route path="/app" element={<ActoApp />} />
+                          <Route element={<PrivateRoute />}>
+                            <Route path="/dashboard" element={<Dashboard />} />
+                            <Route path="/dashboard2" element={<Dashboard2 />} />
+                            <Route path="/task-history" element={<TaskHistory />} />
+                            <Route path="/strategic-review" element={<StrategicReview />} />
+                            <Route path="/settings" element={<Settings />} />
+                          </Route>
+                          <Route path="*" element={<NotFound />} />
+                        </Routes>
+                      </Router>
+                    </UserProvider>
+                  </TaskDataProvider>
+                </TaskProviders>
+              </AppProvider>
+            </AuthProvider>
+          </TooltipProvider>
         </ThemeProvider>
       </QueryClientProvider>
     </div>

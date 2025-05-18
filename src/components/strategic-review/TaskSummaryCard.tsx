@@ -13,10 +13,10 @@ interface TaskSummaryCardProps {
 
 const TaskSummaryCard: React.FC<TaskSummaryCardProps> = ({ tasks }) => {
   // Use the custom hook for zone analysis
-  const { zoneData, taskStats, colors } = useZoneAnalysis(tasks);
+  const { zoneData, taskStats, colors } = useZoneAnalysis(tasks || []);
   
   // If no tasks, show alert message
-  if (tasks.length === 0) {
+  if (!tasks || tasks.length === 0) {
     return (
       <Alert 
         variant="destructive" 
@@ -44,33 +44,33 @@ const TaskSummaryCard: React.FC<TaskSummaryCardProps> = ({ tasks }) => {
             <div className="text-sm text-gray-600">Tarefas Concluídas</div>
           </div>
           <div className="rounded-lg bg-blue-50 py-[35px] px-2 text-center">
-            <div className="text-[38px] font-bold text-blue-500">{taskStats.avgTotal.toFixed(1)}</div>
+            <div className="text-[38px] font-bold text-blue-500">{taskStats?.avgTotal?.toFixed(1) || '0.0'}</div>
             <div className="text-sm text-gray-600">Média de Score</div>
           </div>
         </div>
         
         {/* Summary text with line breaks */}
-      <div className="border rounded-lg py-[20px] px-[22px] bg-gradient-to-r from-blue-50 to-blue-50/30">
+        <div className="border rounded-lg py-[20px] px-[22px] bg-gradient-to-r from-blue-50 to-blue-50/30">
           <h4 className="font-medium text-sm mb-1">📊 Detalhes</h4>
           <p className="text-sm text-muted-foreground">
-            Neste período, você completou {tasks.length} tarefas com uma média de score de {taskStats.avgTotal.toFixed(1)}
-            {taskStats.criticalCount > 0 && <><br />{taskStats.criticalCount} tarefas eram críticas.</>}
+            Neste período, você completou {tasks.length} tarefas com uma média de score de {taskStats?.avgTotal?.toFixed(1) || '0.0'}
+            {taskStats?.criticalCount > 0 && <><br />{taskStats.criticalCount} tarefas eram críticas.</>}
           </p>
         </div>
         
-        {/* Modified: Removed height class from chart container div */}
-        <div className="h-0">
+        {/* Chart container with fixed height */}
+        <div className="h-[160px]">
           <ChartContainer 
             config={{
-              critical: { color: colors.critical },
-              important: { color: colors.important },
-              moderate: { color: colors.moderate },
-              hidden: { color: colors.hidden }
+              critical: { color: colors?.critical || '#ffcdd2' },
+              important: { color: colors?.important || '#ffe0b2' },
+              moderate: { color: colors?.moderate || '#bbdefb' },
+              hidden: { color: colors?.hidden || '#e0e0e0' }
             }}
           >
-            <ResponsiveContainer width="100%" height={60}>
+            <ResponsiveContainer width="100%" height="100%">
               <Bar
-                data={zoneData}
+                data={zoneData || []}
                 dataKey="value"
                 layout="vertical"
                 barSize={18}
@@ -79,7 +79,7 @@ const TaskSummaryCard: React.FC<TaskSummaryCardProps> = ({ tasks }) => {
                 <XAxis type="number" />
                 <YAxis dataKey="name" type="category" width={140} />
                 <Tooltip content={<ChartTooltipContent />} />
-                {zoneData.map((entry, index) => (
+                {zoneData && zoneData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
               </Bar>

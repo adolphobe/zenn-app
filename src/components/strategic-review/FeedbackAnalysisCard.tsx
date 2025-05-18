@@ -36,8 +36,8 @@ const CustomTooltip = ({ active, payload }: any) => {
 };
 
 const FeedbackAnalysisCard: React.FC<FeedbackAnalysisCardProps> = ({ tasks }) => {
-  // Use the feedback analysis hook
-  const feedbackData = useFeedbackAnalysis(tasks);
+  // Use the feedback analysis hook, ensure tasks is always an array
+  const feedbackData = useFeedbackAnalysis(tasks || []);
   
   // Function to get feedback title based on id
   const getFeedbackTitle = (id: string) => {
@@ -63,7 +63,7 @@ const FeedbackAnalysisCard: React.FC<FeedbackAnalysisCardProps> = ({ tasks }) =>
       </CardHeader>
       <CardContent className="space-y-4 flex-grow flex flex-col">
         <div className="h-64">
-          {feedbackData.withFeedback ? (
+          {feedbackData && feedbackData.withFeedback ? (
             <ChartContainer 
               className="h-full w-full"
               config={{
@@ -74,7 +74,7 @@ const FeedbackAnalysisCard: React.FC<FeedbackAnalysisCardProps> = ({ tasks }) =>
             >
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart 
-                  data={feedbackData.distribution} 
+                  data={feedbackData.distribution || []} 
                   barGap={12} 
                   margin={{ top: 20, right: 10, left: 10, bottom: 10 }}
                 >
@@ -97,8 +97,8 @@ const FeedbackAnalysisCard: React.FC<FeedbackAnalysisCardProps> = ({ tasks }) =>
                       style={{ fontSize: '12px', fontWeight: 'bold' }}
                       offset={10}
                     />
-                    {feedbackData.distribution.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    {feedbackData.distribution && feedbackData.distribution.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color || '#ccc'} />
                     ))}
                   </Bar>
                 </BarChart>
@@ -112,12 +112,12 @@ const FeedbackAnalysisCard: React.FC<FeedbackAnalysisCardProps> = ({ tasks }) =>
         </div>
         
         {/* Dynamic Insight Box - moved directly below the chart without spacing */}
-        {feedbackData.withFeedback && feedbackData.topFeedback && (
+        {feedbackData && feedbackData.withFeedback && feedbackData.topFeedback && (
           <div>
             <div 
               className="border rounded-lg p-4 animate-fade-in"
               style={{ 
-                background: GRADIENTS[feedbackData.topFeedback as keyof typeof GRADIENTS],
+                background: GRADIENTS[feedbackData.topFeedback as keyof typeof GRADIENTS] || GRADIENTS.balanced,
                 animationDuration: '0.3s',
                 transition: 'background 0.3s ease'
               }}
@@ -126,7 +126,7 @@ const FeedbackAnalysisCard: React.FC<FeedbackAnalysisCardProps> = ({ tasks }) =>
                 A sensação predominante foi: {getFeedbackTitle(feedbackData.topFeedback)}
               </h4>
               <p className="text-sm text-muted-foreground whitespace-pre-line">
-                {feedbackData.insight}
+                {feedbackData.insight || 'Não foi possível gerar insights com os dados disponíveis.'}
               </p>
             </div>
           </div>
