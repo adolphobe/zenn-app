@@ -25,7 +25,7 @@ export function useLoginForm(onSuccess?: () => void) {
       email: "",
       password: "",
     },
-    mode: "onChange",
+    mode: "onTouched", // Changed from "onChange" to "onTouched" to validate on blur
   });
 
   // Mapeamento de erros para códigos de erro

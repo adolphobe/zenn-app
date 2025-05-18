@@ -42,8 +42,11 @@ const LoginFormFields: React.FC<LoginFormFieldsProps> = ({ form }) => {
               <FormControl>
                 <Input
                   placeholder="E-mail"
+                  type="email"
                   className="pl-10 h-12 bg-white/80 dark:bg-gray-700/80 backdrop-blur-sm border-gray-200 dark:border-gray-600 transition-all duration-300 w-full" 
                   {...field}
+                  // Only trigger validation on blur
+                  onBlur={field.onBlur}
                 />
               </FormControl>
             </div>
@@ -68,6 +71,8 @@ const LoginFormFields: React.FC<LoginFormFieldsProps> = ({ form }) => {
                   placeholder="Senha"
                   className="pl-10 pr-10 h-12 bg-white/80 dark:bg-gray-700/80 backdrop-blur-sm border-gray-200 dark:border-gray-600 transition-all duration-300 w-full"
                   {...field}
+                  // Only trigger validation on blur
+                  onBlur={field.onBlur}
                 />
               </FormControl>
               <button

@@ -7,7 +7,8 @@ import SignupForm from '../components/SignupForm';
 import PasswordResetForm from '../components/PasswordResetForm';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
+import LoginErrorToast from '@/components/auth/LoginErrorToast';
 
 // Map of error codes to messages
 const ERROR_MESSAGES = {
@@ -27,7 +28,6 @@ const Login: React.FC = () => {
   const [isJustLoggedOut, setIsJustLoggedOut] = useState(false);
   const [searchParams] = useSearchParams();
   const [loginError, setLoginError] = useState<string | null>(null);
-  const [errorFadeOut, setErrorFadeOut] = useState(false);
   
   // Get redirect path from location state or default to dashboard
   const from = location.state?.from?.pathname || "/dashboard";
@@ -39,23 +39,15 @@ const Login: React.FC = () => {
     if (errorCode && ERROR_MESSAGES[errorCode as keyof typeof ERROR_MESSAGES]) {
       setLoginError(ERROR_MESSAGES[errorCode as keyof typeof ERROR_MESSAGES]);
       
-      // Set a timer to fade out the error message after 5 seconds
-      const timer = setTimeout(() => {
-        setErrorFadeOut(true);
-        
-        // After animation completes, clear the error
-        setTimeout(() => {
-          setLoginError(null);
-          setErrorFadeOut(false);
-          
-          // Remove the error parameter from the URL without page refresh
-          navigate('/login', { replace: true });
-        }, 300); // Animation duration
-      }, 5000);
-      
-      return () => clearTimeout(timer);
+      // Remove the error parameter from the URL without page refresh
+      navigate('/login', { replace: true });
     }
   }, [searchParams, navigate]);
+  
+  // Clear login error
+  const clearLoginError = () => {
+    setLoginError(null);
+  };
   
   // Check if user has just logged out
   useEffect(() => {
@@ -171,6 +163,12 @@ const Login: React.FC = () => {
 
   return (
     <div className="flex min-h-screen bg-gradient-to-b from-white to-blue-50">
+      {/* Login error toast notification */}
+      <LoginErrorToast 
+        error={loginError} 
+        onClose={clearLoginError}
+      />
+      
       {/* Left column: Login/Signup Form */}
       <div className="w-full md:w-1/2 flex flex-col justify-center px-8 sm:px-16 md:px-24 lg:px-32">
         <div className={`space-y-6 w-full max-w-md mx-auto transition-all duration-1000 ease-in-out ${loaded ? 'opacity-100' : 'opacity-0 translate-y-4'}`}>
@@ -200,26 +198,6 @@ const Login: React.FC = () => {
             </p>
           </div>
 
-          {/* Error display */}
-          <AnimatePresence>
-            {loginError && (
-              <motion.div 
-                className="flex items-center gap-3 bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded-md"
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: errorFadeOut ? 0 : 1, y: errorFadeOut ? -10 : 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.3 }}
-                role="alert"
-                aria-live="assertive"
-              >
-                <div className="text-red-500 h-5 w-5 flex-shrink-0">⚠️</div>
-                <div>
-                  <p className="font-medium text-sm">{loginError}</p>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
           {isSignup ? (
             <SignupForm onCancel={toggleSignup} />
           ) : isForgotPassword ? (
@@ -245,16 +223,10 @@ const Login: React.FC = () => {
         </div>
       </div>
 
-      {/* Right column: Image */}
+      {/* Right column: Plain gradient background (removing the promotional box) */}
       <div className="hidden md:block md:w-1/2 relative bg-gradient-to-r from-blue-100 to-blue-200">
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-blue-400/20 to-blue-600/30 mix-blend-multiply" />
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-3/4">
-            <div className="p-8 bg-white/80 backdrop-blur-sm rounded-xl shadow-lg text-center">
-              <h2 className="text-2xl font-bold text-blue-800 mb-3">Acto</h2>
-              <p className="text-blue-600">A plataforma que simplifica sua jornada profissional.</p>
-            </div>
-          </div>
           <div className="absolute top-[20%] left-[20%] w-32 h-32 rounded-full bg-blue-200/60"></div>
           <div className="absolute bottom-[20%] right-[20%] w-40 h-40 rounded-full bg-blue-300/60"></div>
           <div className="absolute top-[60%] right-[30%] w-24 h-24 rounded-full bg-blue-100/60"></div>
