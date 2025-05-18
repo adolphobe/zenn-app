@@ -1,5 +1,5 @@
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAuth } from '@/context/auth';
@@ -16,14 +16,12 @@ export function useLoginForm(onSuccess?: () => void) {
   const [loginError, setLoginError] = useState<string | null>(null);
   const [loginSuggestion, setLoginSuggestion] = useState<string | null>(null);
 
-  // Setup form with validation
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
       email: "",
       password: "",
     },
-    mode: "onChange" // Validate on change for better UX
   });
 
   // Check if user just reset their password
@@ -36,66 +34,66 @@ export function useLoginForm(onSuccess?: () => void) {
     }
   }, [location.state]);
 
-  // Handle form submission with background authentication
-  const handleSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
-    // Prevent the default form submission
-    e.preventDefault();
-    
-    // Validate the form
-    const isValid = await form.trigger();
-    if (!isValid) {
-      return; // Stop if form validation fails
-    }
-
-    // Clear previous errors
+  const onSubmit = async (values: LoginFormValues) => {
+    setIsLoading(true);
     setLoginError(null);
     setLoginSuggestion(null);
     
-    // Get the form values
-    const values = form.getValues();
-    
-    // Set loading state
-    setIsLoading(true);
-    
     try {
-      // Attempt login
+      console.log("[LoginForm] Tentando login com:", values.email);
+      console.log("[LoginForm] DETALHES EM PORTUGUÊS: Iniciando processo de autenticação para o usuário");
+      
       const { success, error } = await login(values.email, values.password);
       
       if (!success) {
-        // Handle login failure
+        console.error("[LoginForm] Falha no login para:", values.email);
+        console.error("[LoginForm] DETALHES EM PORTUGUÊS: O login falhou. Verifique se o email e senha estão corretos e se a conta existe.");
+        
         if (error) {
           const errorDetails = processAuthError(error);
           setLoginError(errorDetails.message);
           setLoginSuggestion(errorDetails.suggestion || null);
+          
+          console.log("[LoginForm] Erro definido:", errorDetails.message);
+          console.log("[LoginForm] Sugestão:", errorDetails.suggestion);
         } else {
           setLoginError("Usuário não encontrado ou senha incorreta. Por favor, verifique suas credenciais.");
         }
       } else {
-        // Handle login success
+        console.log("[LoginForm] Login bem-sucedido para:", values.email);
+        console.log("[LoginForm] DETALHES EM PORTUGUÊS: Login realizado com sucesso, redirecionando automaticamente");
+        
         toast({
           title: "Login realizado com sucesso",
           description: "Você foi autenticado com sucesso",
         });
         
         if (onSuccess) {
+          console.log("[LoginForm] Executando callback de sucesso");
           onSuccess();
         }
       }
     } catch (error) {
-      // Handle unexpected errors
+      console.error("[LoginForm] Erro de login:", error);
+      console.error("[LoginForm] DETALHES EM PORTUGUÊS: Ocorreu um erro técnico durante o processo de login. Verifique a conexão com o servidor.");
+      
       const errorDetails = processAuthError(error);
       setLoginError(errorDetails.message);
       setLoginSuggestion(errorDetails.suggestion || null);
     } finally {
       setIsLoading(false);
     }
-  }, [form, login, onSuccess]);
+  };
+
+  // Debug the error state to see if it's being set correctly
+  console.log("[LoginForm] Estado atual do erro:", loginError);
+  console.log("[LoginForm] Estado atual da sugestão:", loginSuggestion);
 
   return {
     form,
     isLoading,
     loginError,
     loginSuggestion,
-    handleSubmit
+    onSubmit: form.handleSubmit(onSubmit)
   };
 }

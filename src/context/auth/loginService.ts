@@ -8,6 +8,7 @@ import { Session } from '@supabase/supabase-js';
 export const login = async (email: string, password: string): Promise<{ success: boolean, error?: any, user?: any, session?: Session | null }> => {
   try {
     console.log("[AuthService] Tentando login com email:", email);
+    console.log("[AuthService] DETALHES EM PORTUGUÊS: Tentando fazer login com o email:", email);
     
     // Enhanced login with explicit storage options
     const { data, error } = await supabase.auth.signInWithPassword({
@@ -17,20 +18,40 @@ export const login = async (email: string, password: string): Promise<{ success:
     
     if (error) {
       console.error("[AuthService] Erro de login:", error.message);
+      console.error("[AuthService] DETALHES EM PORTUGUÊS: Falha ao fazer login. Erro:", error.message);
       
-      // Return the error explicitly without showing toast
-      // The error will be handled by the component
+      const errorDetails = processAuthError(error);
+      
+      toast({
+        title: "Falha no login",
+        description: errorDetails.message,
+        variant: "destructive"
+      });
+      
       return { success: false, error };
     }
     
     console.log("[AuthService] Login bem-sucedido:", data.user?.email);
+    console.log("[AuthService] DETALHES EM PORTUGUÊS: Login realizado com sucesso");
     
-    // Don't show success toast here, let the component handle it
+    toast({
+      title: "Login realizado com sucesso",
+      description: "Bem-vindo de volta!",
+    });
+    
     return { success: true, user: data.user, session: data.session };
   } catch (error: any) {
     console.error("[AuthService] Erro de login:", error);
+    console.error("[AuthService] DETALHES EM PORTUGUÊS: Ocorreu um erro inesperado durante o processo de login");
     
-    // Return the error without showing toast
+    const errorDetails = processAuthError(error);
+    
+    toast({
+      title: "Erro no login",
+      description: errorDetails.message,
+      variant: "destructive"
+    });
+    
     return { success: false, error };
   }
 };
