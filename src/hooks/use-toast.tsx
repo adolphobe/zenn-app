@@ -13,7 +13,7 @@ import {
   ToastViewport,
 } from "@/components/ui/toast"
 
-import { ExtendedToastProps, ToastActionElement } from "@/types/toast"
+import { ExtendedToastProps, ToastProps, ToastActionElement } from "@/types/toast"
 
 type ToasterToastProps = ExtendedToastProps & {
   id: string
@@ -115,13 +115,16 @@ export function useToast() {
 
 // Helper function for creating toasts
 export const toast = (props: ExtendedToastProps) => {
-  // We have to create a dummy implementation for the toast function
-  // that can be imported directly. In actual usage, components should
-  // use the useToast hook instead
-  console.log('Toast created via toast function:', props);
+  const { addToast } = useToast();
+  addToast({
+    ...props,
+    id: props.id || uuidv4()
+  });
 };
 
 export {
-  type ExtendedToastProps as ToastProps,
+  type ToastProps,
+  type ExtendedToastProps,
   type ToastActionElement,
+  ToastContext
 }

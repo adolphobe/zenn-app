@@ -4,7 +4,7 @@ import { toast } from '@/hooks/use-toast';
 import { v4 as uuidv4 } from 'uuid';
 import { Task } from '@/types';
 import { Eye, EyeOff, Check } from 'lucide-react';
-import { ToastProps } from '@/types/toast';
+import { ExtendedToastProps } from '@/types/toast';
 
 // Create context for the toast functions
 type TaskToastContextType = {

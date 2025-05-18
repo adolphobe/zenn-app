@@ -2,7 +2,7 @@
 import * as React from "react"
 import { ToastContext } from "@/hooks/use-toast-context"
 import { v4 as uuidv4 } from "uuid"
-import { ExtendedToastProps, ToastActionElement } from "@/types/toast"
+import { ExtendedToastProps, ToastProps, ToastActionElement } from "@/types/toast"
 
 function useToast() {
   const context = React.useContext(ToastContext);
@@ -44,7 +44,8 @@ function toast(props: ExtendedToastProps) {
 }
 
 export {
-  type ExtendedToastProps as ToastProps,
+  type ToastProps,
+  type ExtendedToastProps,
   type ToastActionElement,
   useToast,
   toast,

@@ -1,10 +1,10 @@
 
 import React from "react";
 import { v4 as uuidv4 } from "uuid";
-import { type ToastProps } from "@/components/ui/use-toast";
+import { ExtendedToastProps, ToastProps } from "@/types/toast";
 
 // Define toast with additional properties needed for the UI
-export type ToasterToast = ToastProps & {
+export type ToasterToast = ExtendedToastProps & {
   id: string;
   open: boolean;
   promise: boolean;
@@ -13,9 +13,9 @@ export type ToasterToast = ToastProps & {
 // Define the context type
 type ToastContextType = {
   toasts: ToasterToast[];
-  addToast: (toast: ToastProps) => void;
+  addToast: (toast: ExtendedToastProps) => void;
   removeToast: (id: string) => void;
-  updateToast: (id: string, toast: Partial<ToastProps>) => void;
+  updateToast: (id: string, toast: Partial<ExtendedToastProps>) => void;
 };
 
 // Create the context
@@ -27,7 +27,7 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [toasts, setToasts] = React.useState<ToasterToast[]>([]);
 
-  const addToast = React.useCallback((data: ToastProps) => {
+  const addToast = React.useCallback((data: ExtendedToastProps) => {
     const id = data.id || uuidv4();
     
     setToasts((prevToasts) => [
@@ -49,7 +49,7 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({
     );
   }, []);
 
-  const updateToast = React.useCallback((id: string, data: Partial<ToastProps>) => {
+  const updateToast = React.useCallback((id: string, data: Partial<ExtendedToastProps>) => {
     setToasts((prevToasts) => 
       prevToasts.map((toast) => 
         toast.id === id ? { ...toast, ...data } : toast
