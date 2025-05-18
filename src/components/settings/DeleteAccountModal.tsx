@@ -12,6 +12,8 @@ import {
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/hooks/use-toast';
+import { useAuth } from '@/context/auth';
+import { supabase } from '@/integrations/supabase/client';
 
 interface DeleteAccountModalProps {
   isOpen: boolean;
@@ -22,6 +24,8 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({ isOpen, onClose
   const [step, setStep] = useState<1 | 2>(1);
   const [confirmText, setConfirmText] = useState('');
   const [error, setError] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
+  const { signOut } = useAuth();
   
   const handleNext = () => {
     if (step === 1) {
@@ -34,11 +38,26 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({ isOpen, onClose
       }
       
       // If we get here, the text is correct
-      // In a real implementation, we would delete the account here
-      // For now, we'll just show a toast and close the modal
+      handleDeleteAccount();
+    }
+  };
+  
+  const handleDeleteAccount = async () => {
+    setIsDeleting(true);
+    try {
+      // Delete the user account using Supabase
+      const { error } = await supabase.auth.admin.deleteUser(
+        (await supabase.auth.getUser()).data.user?.id || ''
+      );
+      
+      if (error) throw error;
+      
+      // Log the user out
+      await signOut();
+      
       toast({
-        title: "Operação simulada",
-        description: "Em uma implementação real, sua conta seria excluída.",
+        title: "Conta apagada",
+        description: "Sua conta foi apagada com sucesso.",
       });
       
       // Reset the state and close the modal
@@ -46,6 +65,15 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({ isOpen, onClose
       setConfirmText('');
       setError('');
       onClose();
+    } catch (err) {
+      console.error('Error deleting account:', err);
+      toast({
+        title: "Erro ao apagar conta",
+        description: "Não foi possível apagar sua conta. Por favor, tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsDeleting(false);
     }
   };
   
@@ -107,9 +135,10 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({ isOpen, onClose
           <Button
             onClick={handleNext}
             variant="outline"
+            disabled={isDeleting}
             className="border-gray-200 hover:bg-transparent"
           >
-            {step === 1 ? "Avançar" : "Confirmar exclusão"}
+            {step === 1 ? "Avançar" : isDeleting ? "Excluindo..." : "Confirmar exclusão"}
           </Button>
         </DialogFooter>
       </DialogContent>

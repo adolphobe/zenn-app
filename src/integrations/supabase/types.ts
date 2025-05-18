@@ -39,6 +39,110 @@ export type Database = {
         }
         Relationships: []
       }
+      task_comments: {
+        Row: {
+          created_at: string
+          id: string
+          task_id: string
+          text: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          task_id: string
+          text: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          task_id?: string
+          text?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "task_comments_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "task_comments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tasks: {
+        Row: {
+          completed: boolean
+          completed_at: string | null
+          consequence_score: number
+          construction_score: number
+          created_at: string
+          feedback: Database["public"]["Enums"]["task_feedback_type"] | null
+          hidden: boolean
+          id: string
+          ideal_date: string | null
+          pillar: string | null
+          pride_score: number
+          title: string
+          total_score: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completed?: boolean
+          completed_at?: string | null
+          consequence_score?: number
+          construction_score?: number
+          created_at?: string
+          feedback?: Database["public"]["Enums"]["task_feedback_type"] | null
+          hidden?: boolean
+          id?: string
+          ideal_date?: string | null
+          pillar?: string | null
+          pride_score?: number
+          title: string
+          total_score: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          completed?: boolean
+          completed_at?: string | null
+          consequence_score?: number
+          construction_score?: number
+          created_at?: string
+          feedback?: Database["public"]["Enums"]["task_feedback_type"] | null
+          hidden?: boolean
+          id?: string
+          ideal_date?: string | null
+          pillar?: string | null
+          pride_score?: number
+          title?: string
+          total_score?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tasks_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -50,7 +154,7 @@ export type Database = {
       }
     }
     Enums: {
-      [_ in never]: never
+      task_feedback_type: "transformed" | "relief" | "obligation"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -165,6 +269,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      task_feedback_type: ["transformed", "relief", "obligation"],
+    },
   },
 } as const
