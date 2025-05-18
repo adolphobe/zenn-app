@@ -37,7 +37,10 @@ export const SAMPLE_TASKS: Array<Omit<import('./types').Task, 'id' | 'createdAt'
     completed: false,
     completedAt: null,
     feedback: null,
-    comments: []
+    comments: [],
+    updatedAt: new Date(),
+    userId: "",
+    operationLoading: {}
   },
   {
     title: "Preparar apresentação para o cliente XYZ",
@@ -50,7 +53,10 @@ export const SAMPLE_TASKS: Array<Omit<import('./types').Task, 'id' | 'createdAt'
     completed: false,
     completedAt: null,
     feedback: null,
-    comments: []
+    comments: [],
+    updatedAt: new Date(),
+    userId: "",
+    operationLoading: {}
   },
   {
     title: "Revisar e-mails pendentes",
@@ -63,7 +69,10 @@ export const SAMPLE_TASKS: Array<Omit<import('./types').Task, 'id' | 'createdAt'
     completed: false,
     completedAt: null,
     feedback: null,
-    comments: []
+    comments: [],
+    updatedAt: new Date(),
+    userId: "",
+    operationLoading: {}
   },
   {
     title: "Escrever artigo sobre sistemas de produtividade",
@@ -76,6 +85,9 @@ export const SAMPLE_TASKS: Array<Omit<import('./types').Task, 'id' | 'createdAt'
     completed: false,
     completedAt: null,
     feedback: null,
-    comments: []
+    comments: [],
+    updatedAt: new Date(),
+    userId: "",
+    operationLoading: {}
   }
 ];

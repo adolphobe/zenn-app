@@ -18,9 +18,12 @@ const mapToTask = (data: any): Task => ({
   completedAt: dateService.parseDate(data.completed_at),
   // Garantir que createdAt seja sempre uma data válida
   createdAt: dateService.parseDate(data.created_at) || new Date(),
+  updatedAt: dateService.parseDate(data.updated_at) || new Date(),
+  userId: data.user_id || '',
   feedback: data.feedback,
   pillar: data.pillar,
-  comments: data.comments || []
+  comments: data.comments || [],
+  operationLoading: {}
 });
 
 /**

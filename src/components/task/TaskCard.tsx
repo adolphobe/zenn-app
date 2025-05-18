@@ -9,6 +9,7 @@ import { getTaskPriorityClass } from '@/utils';
 import { useAppContext } from '@/context/AppContext';
 import { useTaskDataContext } from '@/context/TaskDataProvider';
 import { useTaskToasts } from './utils/taskToasts';
+import useTaskAnimations from '@/hooks/useTaskAnimations';
 
 interface TaskCardProps {
   task: Task;
@@ -25,8 +26,9 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
   
   const { state } = useAppContext();
   const { showHiddenTasks, viewMode, dateDisplayOptions } = state;
-  const { toggleTaskHidden, updateTaskTitle } = useTaskDataContext();
+  const { toggleTaskHidden, updateTask } = useTaskDataContext();
   const { showToggleHiddenToast } = useTaskToasts();
+  const { animationClass, isPendingVisibilityUpdate, animationState } = useTaskAnimations(task);
   
   // Atualizar titleValue quando a tarefa muda
   useEffect(() => {
@@ -56,7 +58,8 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
 
   const handleTitleBlur = () => {
     if (titleValue.trim() !== task.title) {
-      updateTaskTitle(task.id, titleValue.trim());
+      // Usar updateTask em vez de updateTaskTitle
+      updateTask(task.id, { title: titleValue.trim() });
     }
     setIsEditingTitle(false);
   };
@@ -64,7 +67,8 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
   const handleTitleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       if (titleValue.trim() !== task.title) {
-        updateTaskTitle(task.id, titleValue.trim());
+        // Usar updateTask em vez de updateTaskTitle
+        updateTask(task.id, { title: titleValue.trim() });
       }
       setIsEditingTitle(false);
     } else if (e.key === 'Escape') {
@@ -102,16 +106,6 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
     e.stopPropagation();
     setDeleteConfirmModalOpen(true);
   };
-
-  // Determine se a tarefa tem uma animação de visibilidade pendente
-  const isPendingVisibilityUpdate = task._pendingVisibilityUpdate || false;
-  const animationState = task._animationState || (task.hidden ? 'hidden' : 'visible');
-  
-  // Determine a classe de saída baseada no estado de animação
-  let animationClass = '';
-  if (isPendingVisibilityUpdate) {
-    animationClass = animationState === 'hiding' ? 'animate-fade-out' : 'animate-fade-in';
-  }
 
   return (
     <>

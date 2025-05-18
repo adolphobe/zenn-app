@@ -23,6 +23,8 @@ export const addTask = (state: AppState, action: Action): AppState => {
     completed: false,
     completedAt: null,
     createdAt: new Date(),
+    updatedAt: new Date(),
+    userId: action.payload.userId || '',
     feedback: null,
     comments: [],
     operationLoading: {}
