@@ -98,6 +98,11 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
     setFeedbackModalOpen(false);
   };
 
+  // Collapse function to pass to TaskCardExpanded
+  const handleCollapseTask = () => {
+    onToggleExpand(task.id);
+  };
+
   // Manipulador para expansão do card
   const handleCardClick = (e: React.MouseEvent) => {
     // Se estivermos editando o título, não faremos nada
@@ -158,6 +163,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
               onDeleteTask={handleDeleteTask}
               handleExpandedContentClick={handleExpandedContentClick}
               viewMode={viewMode}
+              onCollapseTask={handleCollapseTask}
             />
           )}
         </AnimatePresence>

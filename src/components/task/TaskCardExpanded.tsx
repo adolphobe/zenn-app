@@ -15,6 +15,7 @@ interface TaskCardExpandedProps {
   onDeleteTask: (e: React.MouseEvent) => void;
   handleExpandedContentClick: (e: React.MouseEvent) => void;
   viewMode: ViewMode;
+  onCollapseTask: () => void; // New prop to handle task collapsing
 }
 
 const expandedContentVariants = {
@@ -56,7 +57,8 @@ const TaskCardExpanded: React.FC<TaskCardExpandedProps> = ({
   onCompleteTask,
   onDeleteTask,
   handleExpandedContentClick,
-  viewMode
+  viewMode,
+  onCollapseTask
 }) => {
   return (
     <motion.div 
@@ -67,11 +69,11 @@ const TaskCardExpanded: React.FC<TaskCardExpandedProps> = ({
       exit="hidden"
       onClick={handleExpandedContentClick}
     >
-      <TaskPillarDetails task={task} />
+      <TaskPillarDetails task={task} onCollapseTask={onCollapseTask} />
       
       {/* Display comments if they exist - shown in both modes */}
       {task.comments && task.comments.length > 0 && (
-        <div className="mt-4">
+        <div className="mt-4 cursor-default">
           <TaskComments taskId={task.id} comments={task.comments} />
         </div>
       )}
