@@ -34,8 +34,8 @@ export const syncTasksFromDatabase = async (dispatch: AppDispatch, userId: strin
             ...task,
             // Convert dates back to Date objects
             idealDate: task.idealDate,
-            createdAt: task.createdAt,
-            completedAt: task.completedAt
+            completedAt: task.completedAt,
+            createdAt: task.createdAt
           }
         });
       });

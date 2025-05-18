@@ -1,3 +1,4 @@
+
 /**
  * Arquivo de simulação do banco de dados
  * Este arquivo contém dados fixos que simulam informações que viriam do banco de dados.
@@ -52,7 +53,11 @@ const createMockTask = (taskData: Partial<Task>): Task => {
   return {
     ...taskData,
     completedAt,
-    comments: taskData.comments || []
+    createdAt: taskData.createdAt || new Date(),
+    comments: taskData.comments || [],
+    hidden: taskData.hidden || false,
+    completed: taskData.completed || false,
+    operationLoading: {},
   } as Task;
 };
 

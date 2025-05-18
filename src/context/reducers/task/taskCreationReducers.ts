@@ -21,8 +21,8 @@ export const addTask = (state: AppState, action: Action): AppState => {
     idealDate: idealDate,
     hidden: (action.payload.consequenceScore + action.payload.prideScore + action.payload.constructionScore) < 8,
     completed: false,
-    createdAt: new Date(),
     completedAt: null,
+    createdAt: new Date(),
     feedback: null,
     comments: [],
     operationLoading: {}

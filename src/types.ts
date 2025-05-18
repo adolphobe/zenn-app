@@ -1,3 +1,4 @@
+
 import { ISODateString } from './types/dates';
 
 export interface Task {
@@ -13,6 +14,8 @@ export interface Task {
   hidden: boolean;
   feedback?: 'transformed' | 'relief' | 'obligation';
   comments: Comment[];
+  createdAt: Date;
+  pillar?: string | null;
   isDeleted?: boolean;
   operationLoading?: Record<string, boolean>;
   _optimisticUpdateTime?: number;
