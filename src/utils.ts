@@ -1,4 +1,3 @@
-
 import { Task, DateDisplayOptions, ViewMode, SortOption } from './types';
 
 export const formatDate = (date: Date | null, options?: DateDisplayOptions): string => {

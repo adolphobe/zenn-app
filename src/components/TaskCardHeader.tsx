@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { formatDate, isTaskOverdue } from '@/utils';
+import { formatDate, isTaskOverdue, safeParseDate } from '@/utils';
 import { DateDisplayOptions } from '@/types';
 import TaskCardTitle from './TaskCardTitle';
 import { Bell, Hash } from 'lucide-react';
@@ -72,8 +72,11 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
     }
   };
   
+  // Parse the date safely to handle both string and Date objects
+  const parsedDate = idealDate ? safeParseDate(idealDate) : null;
+  
   // Check if task is overdue (before current date and time)
-  const taskIsOverdue = idealDate ? isTaskOverdue(idealDate) : false;
+  const taskIsOverdue = parsedDate ? isTaskOverdue(parsedDate) : false;
   
   // In chronological mode, always show dates regardless of showDates setting
   const shouldShowDate = viewMode === 'chronological' || showDates;
@@ -138,7 +141,7 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
               {taskIsOverdue && (
                 <Bell size={14} className="text-red-400 mr-1" />
               )}
-              {formatDate(idealDate, dateDisplayOptions)}
+              {formatDate(parsedDate, dateDisplayOptions)}
             </div>
           )}
           {shouldShowScore && (
