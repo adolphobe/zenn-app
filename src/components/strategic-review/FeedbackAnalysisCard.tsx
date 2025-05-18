@@ -2,7 +2,7 @@
 import React from 'react';
 import { Task } from '@/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ChartContainer, ChartTooltipContent } from '@/components/ui/chart';
+import { ChartContainer } from '@/components/ui/chart';
 import { BarChart, Bar, Cell, ResponsiveContainer, XAxis, LabelList, Tooltip } from 'recharts';
 import { useFeedbackAnalysis, GRADIENTS } from './hooks/useFeedbackAnalysis';
 

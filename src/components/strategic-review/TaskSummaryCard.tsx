@@ -2,7 +2,7 @@
 import React from 'react';
 import { Task } from '@/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ChartContainer, ChartTooltipContent } from '@/components/ui/chart';
+import { ChartContainer } from '@/components/ui/chart';
 import { Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell, ResponsiveContainer } from 'recharts';
 import { useZoneAnalysis } from './hooks/useZoneAnalysis';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
@@ -10,6 +10,21 @@ import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
 interface TaskSummaryCardProps {
   tasks: Task[];
 }
+
+// Custom tooltip content for the chart
+const ChartTooltipContent = ({ active, payload }: any) => {
+  if (!active || !payload || !payload.length) {
+    return null;
+  }
+  
+  const item = payload[0];
+  return (
+    <div className="bg-background border rounded-md shadow-md p-3 text-sm">
+      <p className="font-medium">{item.payload.name}</p>
+      <p className="text-muted-foreground">Total: {item.value}</p>
+    </div>
+  );
+};
 
 const TaskSummaryCard: React.FC<TaskSummaryCardProps> = ({ tasks }) => {
   // Use the custom hook for zone analysis

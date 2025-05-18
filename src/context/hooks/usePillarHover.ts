@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { InsightMessage } from '@/components/strategic-review/types';
 
-export const usePillarHover = (insights: InsightMessage[], defaultPillarId: string = 'consequence') => {
+export const usePillarHover = (insights: InsightMessage[] = [], defaultPillarId: string = 'consequence') => {
   const [activeInsightId, setActiveInsightId] = useState<string>(defaultPillarId);
   
   // Reset to default when insights change or are empty

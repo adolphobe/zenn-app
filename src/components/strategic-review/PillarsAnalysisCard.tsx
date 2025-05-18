@@ -3,8 +3,8 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Task } from '@/types';
 import { useInsightsAnalysis } from './hooks/useInsightsAnalysis';
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
-import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, LabelList, Cell } from 'recharts';
+import { ChartContainer } from '@/components/ui/chart';
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, LabelList, Cell, Tooltip } from 'recharts';
 import { usePillarHover } from '@/context/hooks';
 
 interface PillarsAnalysisCardProps {
@@ -145,7 +145,7 @@ const PillarsAnalysisCard: React.FC<PillarsAnalysisCardProps> = ({ tasks }) => {
                     tickCount={6} 
                     hide={true} 
                   />
-                  <ChartTooltip 
+                  <Tooltip 
                     content={<CustomTooltipContent />}
                     cursor={{fill: 'rgba(0, 0, 0, 0.05)'}}
                   />
