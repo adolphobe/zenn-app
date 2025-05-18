@@ -1,3 +1,5 @@
+
+// Importações existentes permanecem as mesmas
 import { Locale } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { ISODateString, DateDisplayOptions, DateFormatConfig } from '@/types/dates';
@@ -35,7 +37,7 @@ import {
   isTaskOverdue as checkTaskOverdue
 } from './dateModules/dateOperations';
 
-// Configuração padrão para formatação de datas
+// Configuração padrão para formatação de datas - Brasileira
 const DEFAULT_CONFIG: DateFormatConfig = {
   locale: ptBR,
   dateFormat: 'dd/MM/yyyy',
@@ -44,6 +46,15 @@ const DEFAULT_CONFIG: DateFormatConfig = {
   hideSeconds: true,
   timeZone: 'America/Sao_Paulo' // Configuração padrão para Brasil
 };
+
+// Inicialização do sistema de datas com configuração brasileira
+setDefaultFormatLocale(ptBR);
+setGlobalTimeZone('America/Sao_Paulo');
+setDefaultFormats({
+  dateFormat: DEFAULT_CONFIG.dateFormat,
+  timeFormat: DEFAULT_CONFIG.timeFormat,
+  dateTimeFormat: DEFAULT_CONFIG.dateTimeFormat
+});
 
 /**
  * Serviço centralizado para manipulação de datas e conversões

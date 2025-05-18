@@ -81,3 +81,4 @@ export interface DateComparisonResult {
   diffInSeconds: number;
   humanReadableDiff: string; // Diferença em formato legível (ex: "3 dias atrás")
 }
+
