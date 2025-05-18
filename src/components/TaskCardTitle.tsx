@@ -28,8 +28,10 @@ const TaskCardTitle: React.FC<TaskCardTitleProps> = ({
 }) => {
   const titleInputRef = useRef<HTMLInputElement>(null);
   
-  // Determine if task is overdue and should have red text
-  const isOverdue = idealDate && dateService.isTaskOverdue(idealDate);
+  // Use o timezone configurado globalmente para determinar se a tarefa está vencida
+  const isOverdue = idealDate && dateService.isTaskOverdue(
+    dateService.toTimeZone(idealDate) || idealDate
+  );
   const showOverdueStyle = viewMode === 'chronological' && isOverdue;
 
   useEffect(() => {

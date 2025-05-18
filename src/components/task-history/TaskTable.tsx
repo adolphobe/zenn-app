@@ -56,7 +56,7 @@ export const CompletedTaskRow: React.FC<{ task: Task }> = ({ task }) => {
     if (!date) return '-';
     
     // Use o dateService para formatar a data consistentemente
-    return dateService.formatForDisplay(date, true);
+    return dateService.formatForDisplay(date, { hideYear: false, hideTime: false, hideDate: false });
   };
 
   const completedDateTime = formatCompletionDateTime(task.completedAt);

@@ -14,8 +14,8 @@ export const groupTasksByTimeline = (tasks: Task[], periodFilter: string = 'all'
     }];
   }
   
-  // Use the current date
-  const today = new Date();
+  // Use the current date with timezone support
+  const today = dateService.toTimeZone(new Date()) || new Date();
   today.setHours(0, 0, 0, 0);
   
   const thisWeekStart = startOfWeek(today, { locale: ptBR });
@@ -37,7 +37,8 @@ export const groupTasksByTimeline = (tasks: Task[], periodFilter: string = 'all'
     
     try {
       // Garantir que completedAt seja um objeto Date usando dateService
-      const completedDate = dateService.parseDate(task.completedAt);
+      // e converta para o timezone configurado
+      const completedDate = dateService.toTimeZone(task.completedAt);
       
       if (!completedDate) {
         groups.older.tasks.push(task);

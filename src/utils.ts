@@ -1,3 +1,4 @@
+
 import { Task, ViewMode, SortOption } from './types';
 import { DateDisplayOptions } from './types/dates';
 import { dateService } from './services/dateService';
@@ -43,8 +44,8 @@ export const sortTasks = (
       }
       
       // Ordenação secundária por data se pontuações forem iguais
-      const aDate = a.idealDate ? new Date(a.idealDate) : null;
-      const bDate = b.idealDate ? new Date(b.idealDate) : null;
+      const aDate = a.idealDate ? dateService.toTimeZone(a.idealDate) : null;
+      const bDate = b.idealDate ? dateService.toTimeZone(b.idealDate) : null;
       
       if (aDate && bDate) return (aDate.getTime() - bDate.getTime());
       if (aDate) return -1;
@@ -61,8 +62,9 @@ export const sortTasks = (
       
       // Ambas têm datas, ordenar por valor de data com base na direção
       if (a.idealDate && b.idealDate) {
-        const aDate = new Date(a.idealDate);
-        const bDate = new Date(b.idealDate);
+        // Use o timezone configurado para a comparação de datas
+        const aDate = dateService.toTimeZone(a.idealDate) || new Date(a.idealDate);
+        const bDate = dateService.toTimeZone(b.idealDate) || new Date(b.idealDate);
         const aTime = aDate.getTime();
         const bTime = bDate.getTime();
         

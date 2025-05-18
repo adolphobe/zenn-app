@@ -28,11 +28,21 @@ export interface DateFormatConfig {
   timeFormat: string;
   dateTimeFormat: string;
   hideSeconds: boolean;
+  timeZone: string; // Novo campo para timezone
 }
 
 // Opções para exibição de datas específicas em componentes
 export interface DateDisplayOptions {
-  hideYear: boolean;
-  hideTime: boolean;
-  hideDate: boolean;
+  hideYear?: boolean;
+  hideTime?: boolean;
+  hideDate?: boolean;
+  useTimeZone?: boolean; // Indica se deve usar timezone na formatação
+}
+
+// Interface para informações de timezone
+export interface TimeZoneInfo {
+  id: string;         // Identificador IANA (ex: 'America/Sao_Paulo')
+  name: string;       // Nome legível (ex: 'Horário de Brasília')
+  abbreviation: string; // Abreviação (ex: 'BRT')
+  offset: number;     // Deslocamento em minutos
 }

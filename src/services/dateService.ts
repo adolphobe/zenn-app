@@ -16,15 +16,22 @@ import {
   isYesterday
 } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { ISODateString, DateDisplayOptions } from '@/types/dates';
+import { 
+  formatInTimeZone, 
+  toZonedTime, 
+  fromZonedTime,
+  getTimezoneOffset
+} from 'date-fns-tz';
+import { ISODateString, DateDisplayOptions, DateFormatConfig } from '@/types/dates';
 
 // Configuração padrão para formatação de datas
-const DEFAULT_CONFIG = {
+const DEFAULT_CONFIG: DateFormatConfig = {
   locale: ptBR,
   dateFormat: 'dd/MM/yyyy',
   timeFormat: 'HH:mm',
   dateTimeFormat: 'dd/MM/yyyy HH:mm',
-  hideSeconds: true
+  hideSeconds: true,
+  timeZone: 'America/Sao_Paulo' // Configuração padrão para Brasil
 };
 
 /**
@@ -161,6 +168,90 @@ export const dateService = {
   },
   
   /**
+   * Formata uma data em um fuso horário específico para exibição
+   * @param date Data a ser formatada
+   * @param format Formato de saída (ex: 'dd/MM/yyyy HH:mm')
+   * @param timeZone Fuso horário (ex: 'America/Sao_Paulo')
+   */
+  formatInTimeZone(
+    date: Date | ISODateString | null | undefined,
+    format: string,
+    timeZone: string = this.config.timeZone
+  ): string {
+    if (!date) return '';
+    
+    try {
+      const parsedDate = this.parseDate(date);
+      if (!parsedDate || !isValid(parsedDate)) return '';
+      
+      return formatInTimeZone(parsedDate, timeZone, format, {
+        locale: this.config.locale
+      });
+    } catch (error) {
+      console.error('Erro formatando data no fuso horário:', error);
+      return '';
+    }
+  },
+  
+  /**
+   * Converte uma data para o fuso horário especificado
+   * @param date Data a ser convertida
+   * @param timeZone Fuso horário de destino (ex: 'America/Sao_Paulo')
+   */
+  toTimeZone(
+    date: Date | ISODateString | null | undefined, 
+    timeZone: string = this.config.timeZone
+  ): Date | null {
+    if (!date) return null;
+    
+    try {
+      const parsedDate = this.parseDate(date);
+      if (!parsedDate || !isValid(parsedDate)) return null;
+      
+      return toZonedTime(parsedDate, timeZone);
+    } catch (error) {
+      console.error('Erro convertendo data para fuso horário:', error);
+      return null;
+    }
+  },
+  
+  /**
+   * Converte uma data de um fuso horário específico para UTC
+   * @param date Data no fuso horário especificado
+   * @param timeZone Fuso horário de origem (ex: 'America/Sao_Paulo')
+   */
+  fromTimeZone(
+    date: Date | ISODateString | null | undefined,
+    timeZone: string = this.config.timeZone
+  ): Date | null {
+    if (!date) return null;
+    
+    try {
+      const parsedDate = this.parseDate(date);
+      if (!parsedDate || !isValid(parsedDate)) return null;
+      
+      return fromZonedTime(parsedDate, timeZone);
+    } catch (error) {
+      console.error('Erro convertendo data do fuso horário para UTC:', error);
+      return null;
+    }
+  },
+  
+  /**
+   * Retorna o deslocamento do fuso horário em minutos
+   * @param timeZone Fuso horário (ex: 'America/Sao_Paulo')
+   * @param date Data para calcular o deslocamento (relevante para DST)
+   */
+  getTimeZoneOffset(timeZone: string = this.config.timeZone, date: Date = new Date()): number {
+    try {
+      return getTimezoneOffset(timeZone, date);
+    } catch (error) {
+      console.error('Erro obtendo deslocamento do fuso horário:', error);
+      return 0;
+    }
+  },
+  
+  /**
    * Converte os campos de data de DTO para formato interno (Date)
    */
   fromDTO(dto: any): Partial<any> {
@@ -289,6 +380,14 @@ export const dateService = {
 /**
  * Exporta uma função helper para configurar o serviço de data
  */
-export const configureDateTime = (config: Partial<typeof DEFAULT_CONFIG>) => {
+export const configureDateTime = (config: Partial<DateFormatConfig>) => {
   dateService.config = { ...dateService.config, ...config };
+};
+
+/**
+ * Define o fuso horário padrão para toda a aplicação
+ * @param timeZone Fuso horário (ex: 'America/Sao_Paulo', 'Europe/London')
+ */
+export const setDefaultTimeZone = (timeZone: string) => {
+  dateService.config.timeZone = timeZone;
 };
