@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Form } from "@/components/ui/form";
 import LoginErrorDisplay from './auth/LoginErrorDisplay';
 import LoginFormFields from './auth/LoginFormFields';
@@ -18,6 +18,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
   onForgotPassword 
 }) => {
   const { form, isLoading, loginError, loginSuggestion, onSubmit } = useLoginForm(onSuccess);
+  const formRef = useRef<HTMLFormElement>(null);
 
   // Adicionar efeito para logs quando os erros mudarem
   useEffect(() => {
@@ -25,14 +26,22 @@ const LoginForm: React.FC<LoginFormProps> = ({
     console.log("[LoginForm Component] Recebendo sugestão:", loginSuggestion);
   }, [loginError, loginSuggestion]);
 
+  // Manipular o submit do formulário para prevenir o comportamento padrão
+  const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault(); // Impedir o refresh da página
+    onSubmit(e);
+  };
+
   return (
     <Form {...form}>
-      <form onSubmit={onSubmit} className="space-y-6">
-        {/* Certifique-se de que o componente de erro recebe as props corretamente */}
-        <LoginErrorDisplay 
-          error={loginError} 
-          suggestion={loginSuggestion} 
-        />
+      <form ref={formRef} onSubmit={handleFormSubmit} className="space-y-6">
+        {/* Garantir que a mensagem de erro seja exibida com alta prioridade */}
+        {loginError && (
+          <LoginErrorDisplay 
+            error={loginError} 
+            suggestion={loginSuggestion} 
+          />
+        )}
         
         <LoginFormFields form={form} />
 

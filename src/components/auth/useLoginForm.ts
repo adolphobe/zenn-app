@@ -15,6 +15,7 @@ export function useLoginForm(onSuccess?: () => void) {
   const [isLoading, setIsLoading] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
   const [loginSuggestion, setLoginSuggestion] = useState<string | null>(null);
+  const [formSubmitted, setFormSubmitted] = useState(false);
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -34,10 +35,39 @@ export function useLoginForm(onSuccess?: () => void) {
     }
   }, [location.state]);
 
-  const onSubmit = async (values: LoginFormValues) => {
-    // 1. Limpar erros anteriores
-    setLoginError(null);
-    setLoginSuggestion(null);
+  // Garantir que os erros permaneçam visíveis após o submit e não sejam limpos acidentalmente
+  useEffect(() => {
+    if (formSubmitted && loginError) {
+      console.log("[LoginForm] Mantendo erro visível após submit:", loginError);
+      
+      // Desativar flag de submit após processar
+      const timer = setTimeout(() => {
+        setFormSubmitted(false);
+      }, 100);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [formSubmitted, loginError]);
+
+  const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    // Prevenir o comportamento padrão de refresh da página
+    event.preventDefault();
+    
+    // Disparar a validação e obter valores do formulário
+    const result = await form.trigger();
+    if (!result) {
+      console.log("[LoginForm] Formulário inválido, parando submit");
+      return; // Não continuar se validação falhar
+    }
+
+    const values = form.getValues();
+    setFormSubmitted(true);
+    
+    // 1. Limpar erros anteriores somente se não estamos resubmetendo com erro existente
+    if (!loginError) {
+      setLoginError(null);
+      setLoginSuggestion(null);
+    }
     
     // 2. Definir loading
     setIsLoading(true);
@@ -95,12 +125,13 @@ export function useLoginForm(onSuccess?: () => void) {
   // Adicionar logs para verificar se os estados estão corretos
   console.log("[LoginForm] Estado atual do erro:", loginError);
   console.log("[LoginForm] Estado atual da sugestão:", loginSuggestion);
+  console.log("[LoginForm] Form foi submetido:", formSubmitted);
 
   return {
     form,
     isLoading,
     loginError,
     loginSuggestion,
-    onSubmit: form.handleSubmit(onSubmit)
+    onSubmit
   };
 }
