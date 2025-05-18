@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -13,6 +12,7 @@ import { toast } from '@/hooks/use-toast';
 import { useAuth } from '@/context/auth';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { processAuthError } from '@/utils/authErrorUtils';
+import { InvalidLoginMessage } from './InvalidLoginMessage';
 
 const loginSchema = z.object({
   email: z.string().email("Digite um e-mail válido"),
@@ -112,21 +112,10 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onSwitchToSignup, onFo
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         {loginError && (
-          <Alert variant="destructive" className="py-2 animate-in fade-in slide-in-from-top-5 duration-300">
-            <div className="flex flex-col gap-1">
-              <div className="flex items-center gap-2">
-                <AlertCircle size={16} />
-                <AlertDescription className="text-sm font-medium">
-                  {loginError}
-                </AlertDescription>
-              </div>
-              {loginSuggestion && (
-                <AlertDescription className="text-xs ml-6">
-                  {loginSuggestion}
-                </AlertDescription>
-              )}
-            </div>
-          </Alert>
+          <InvalidLoginMessage 
+            message={loginError} 
+            suggestion={loginSuggestion} 
+          />
         )}
       
         <FormField
