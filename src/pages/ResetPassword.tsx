@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { Lock, Eye, EyeOff } from 'lucide-react';
@@ -65,9 +64,10 @@ const ResetPassword: React.FC = () => {
           
           // If we have a code in query param format, we need to use the verifyOtp method
           if (codeFromQueryParam) {
-            console.log("[ResetPassword] Processando token do parâmetro 'code'");
+            console.log("[ResetPassword] Processando token do parâmetro 'code':", codeFromQueryParam);
+            // CORREÇÃO: Usar 'token' ao invés de 'token_hash'
             sessionResult = await supabase.auth.verifyOtp({
-              token_hash: codeFromQueryParam,
+              token: codeFromQueryParam,
               type: 'recovery'
             });
           } else {
@@ -88,6 +88,8 @@ const ResetPassword: React.FC = () => {
             setResetError("Link de redefinição inválido ou expirado. Solicite um novo link.");
           } else {
             // If we get here, we have a valid session
+            console.log("[ResetPassword] Sessão válida estabelecida com sucesso");
+            console.log("[ResetPassword] DETALHES EM PORTUGUÊS: Token de redefinição validado com sucesso");
             setHasToken(true);
           }
         } catch (error) {
@@ -304,4 +306,3 @@ const ResetPassword: React.FC = () => {
 };
 
 export default ResetPassword;
-
