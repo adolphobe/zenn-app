@@ -8,5 +8,5 @@ export { AuthProvider, useAuth } from './auth';
 export type { AppState, AppContextType, AppDispatch, Action } from './types';
 
 // Export actions
-export * as taskActions from './tasks/taskActions';
+export * as taskActions from './tasks';
 export * as uiActions from './ui/uiActions';
