@@ -177,7 +177,7 @@ const Login: React.FC = () => {
             <img 
               src="https://cdn.shopify.com/s/files/1/0629/1993/4061/files/loogzenn.png?v=1747447750" 
               alt="Zenn App" 
-              className="w-[120px]"
+              className="w-[100px]"
             />
           </div>
 
