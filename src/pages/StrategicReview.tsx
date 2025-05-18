@@ -1,6 +1,7 @@
+
 import React, { useState, useMemo, useEffect } from 'react';
 import { useAppContext } from '@/context/AppContext';
-import { useAuth } from '@/context/AuthContext'; // Direct import
+import { useAuth } from '@/context/AuthContext'; // Mantemos o import para fins de log
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Calendar } from '@/components/ui/calendar';
 import { format, isSameDay, startOfDay, endOfDay } from 'date-fns';
@@ -18,39 +19,31 @@ import { cn } from '@/lib/utils';
 
 /**
  * Strategic Review Page Component
- * Enhanced with detailed authentication logging and fixed authentication handling
+ * Simplified - removed authentication checks
  */
 const StrategicReview: React.FC = () => {
   // Create instance ID for better tracking
   const instanceId = Math.random().toString(36).substring(2, 7);
   const timestamp = new Date().toISOString();
   
-  // Authentication state tracking
+  // Log component initialization
   console.log(`[StrategicReview:${instanceId}] INICIALIZADO em ${timestamp}`);
   
   const { state } = useAppContext();
-  const { isAuthenticated, isLoading, currentUser, session } = useAuth();
+  const { currentUser } = useAuth(); // Mantemos para mostrar informações, mas não bloqueamos acesso
   const [period, setPeriod] = useState<PeriodType>('week');
   const [customStartDate, setCustomStartDate] = useState<Date | undefined>(undefined);
   const [customEndDate, setCustomEndDate] = useState<Date | undefined>(undefined);
   const [showCustomDatePicker, setShowCustomDatePicker] = useState(false);
   
-  // Verificação detalhada de autenticação com timestamp
+  // Registro simplificado de usuário atual (apenas para diagnóstico)
   useEffect(() => {
-    console.log(`[StrategicReview:${instanceId}] Efeito de verificação de auth executado em: ${new Date().toISOString()}`);
-    console.log(`[StrategicReview:${instanceId}] Estado de autenticação: ${isAuthenticated ? "Autenticado" : "Não autenticado"}`);
-    console.log(`[StrategicReview:${instanceId}] Estado de carregamento: ${isLoading ? "Carregando" : "Carregamento concluído"}`);
     console.log(`[StrategicReview:${instanceId}] Usuário atual: ${currentUser?.email || "Nenhum usuário"}`);
-    console.log(`[StrategicReview:${instanceId}] Tem sessão: ${!!session ? "Sim" : "Não"}`);
-    
-    // Verificação adicional para depuração
-    const hasTokenInStorage = !!localStorage.getItem('sb-wbvxnapruffchikhrqrs-auth-token');
-    console.log(`[StrategicReview:${instanceId}] Token no localStorage: ${hasTokenInStorage ? "Presente" : "Ausente"}`);
     
     return () => {
       console.log(`[StrategicReview:${instanceId}] Componente será desmontado em ${new Date().toISOString()}`);
     };
-  }, [isAuthenticated, isLoading, currentUser, session, instanceId]);
+  }, [currentUser, instanceId]);
   
   // Use the task pillars hook to ensure all tasks have pillars assigned
   const { assignMissingPillars } = useTaskPillars();
@@ -127,59 +120,9 @@ const StrategicReview: React.FC = () => {
 
   const hasCompletedTasks = filteredTasks.length > 0;
   
-  // Se estiver carregando ou não estiver autenticado, exibe mensagem apropriada
-  if (isLoading) {
-    console.log(`[StrategicReview:${instanceId}] Ainda verificando autenticação... ${new Date().toISOString()}`);
-    return <div className="flex items-center justify-center min-h-screen">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-      <div className="ml-4">Verificando autenticação... {new Date().toISOString()}</div>
-    </div>;
-  }
+  // Já não fazemos verificações de autenticação - essa é a principal alteração
+  console.log(`[StrategicReview:${instanceId}] RENDERIZANDO CONTEÚDO PRINCIPAL em ${new Date().toISOString()}`);
   
-  // Extra logging before showing error
-  if (!isAuthenticated) {
-    console.error(`[StrategicReview:${instanceId}] ERRO: Tentativa de acessar página protegida sem autenticação ${new Date().toISOString()}`);
-    console.error(`[StrategicReview:${instanceId}] DETALHES EM PORTUGUÊS: Você precisa estar logado para acessar esta página`);
-    
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-red-50">
-        <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full border-l-4 border-red-500">
-          <h1 className="text-2xl font-bold text-red-700 mb-4">Acesso Restrito</h1>
-          <p className="mb-4 text-gray-700">
-            Você não está autenticado e está tentando acessar a página de Revisão Estratégica.
-          </p>
-          <p className="mb-4 text-gray-700">
-            Em uma versão normal, você seria redirecionado para a página de login, 
-            mas o redirecionamento automático foi desativado.
-          </p>
-          
-          <div className="mt-6">
-            <a 
-              href="/login" 
-              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-            >
-              Ir para Login manualmente
-            </a>
-          </div>
-          
-          <div className="mt-4 p-3 bg-gray-100 rounded text-xs">
-            <p className="font-semibold">Informações técnicas:</p>
-            <p>Instance ID: {instanceId}</p>
-            <p>Timestamp: {timestamp}</p>
-            <p>Estado de autenticação: {isAuthenticated ? "Autenticado" : "Não autenticado"}</p>
-            <p>Estado de carregamento: {isLoading ? "Carregando" : "Concluído"}</p>
-            <p>Usuário: {currentUser?.email || "Nenhum"}</p>
-            <p>Token no localStorage: {!!localStorage.getItem('sb-wbvxnapruffchikhrqrs-auth-token') ? "Presente" : "Ausente"}</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-  
-  // Final verification before rendering main content
-  console.log(`[StrategicReview:${instanceId}] RENDERIZANDO CONTEÚDO PRINCIPAL - Autenticação validada ${new Date().toISOString()}`);
-  
-  // Rest of the component remains unchanged
   return (
     <div className="w-full">
       <div className="mb-6">
@@ -187,9 +130,11 @@ const StrategicReview: React.FC = () => {
         <p className="text-muted-foreground">Período: {dateRangeDisplay}</p>
       </div>
       
-      {/* Just to confirm authentication status */}
-      <div className="mb-4 px-4 py-2 bg-green-100 text-green-800 rounded-md">
-        <p>Usuário autenticado: {currentUser?.email || "Sem email"}</p>
+      {/* Painel de status de autenticação - somente para diagnóstico */}
+      <div className="mb-4 px-4 py-2 bg-blue-50 text-blue-800 rounded-md">
+        <p className="font-medium">Painel de diagnóstico:</p>
+        <p>Status: Este componente não verifica mais autenticação</p>
+        <p>Usuário atual: {currentUser?.email || "Nenhum"}</p>
         <p className="text-xs">ID da instância: {instanceId}</p>
         <p className="text-xs">Hora de renderização: {timestamp}</p>
       </div>
