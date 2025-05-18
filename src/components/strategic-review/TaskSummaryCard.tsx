@@ -58,8 +58,8 @@ const TaskSummaryCard: React.FC<TaskSummaryCardProps> = ({ tasks }) => {
           </p>
         </div>
         
-        {/* Chart container */}
-        <div className="h-[300px]">
+        {/* Modified: Removed height class from chart container div */}
+        <div className="h-0">
           <ChartContainer 
             config={{
               critical: { color: colors.critical },
@@ -68,7 +68,7 @@ const TaskSummaryCard: React.FC<TaskSummaryCardProps> = ({ tasks }) => {
               hidden: { color: colors.hidden }
             }}
           >
-            <ResponsiveContainer width="100%" height={250}>
+            <ResponsiveContainer width="100%" height={60}>
               <Bar
                 data={zoneData}
                 dataKey="value"

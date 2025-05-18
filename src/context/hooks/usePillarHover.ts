@@ -9,10 +9,7 @@ export const usePillarHover = (insights: InsightMessage[], defaultPillarId: stri
     setActiveInsightId(pillarId);
   };
   
-  // Safely find the active insight or return undefined
-  const activeInsight = insights && insights.length > 0 
-    ? insights.find(insight => insight.id === activeInsightId) || insights[0]
-    : undefined;
+  const activeInsight = insights.find(insight => insight.id === activeInsightId) || insights[0];
   
   return {
     activeInsightId,
