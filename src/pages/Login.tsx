@@ -175,8 +175,8 @@ const Login: React.FC = () => {
           {/* Logo */}
           <div className="text-left mb-8">
             <img 
-              src="https://cdn.shopify.com/s/files/1/0629/1993/4061/files/Sem_Titulo-8.jpg?v=1747284016" 
-              alt="Acto Logo" 
+              src="https://cdn.shopify.com/s/files/1/0629/1993/4061/files/loogzenn.png?v=1747447750" 
+              alt="Zenn App" 
               className="w-[120px]"
             />
           </div>
