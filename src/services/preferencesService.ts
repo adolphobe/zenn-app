@@ -52,7 +52,7 @@ export const applyPreferencesToState = (preferences: UserPreferences, state: App
 };
 
 // Function to validate if the JSON data has the expected UserPreferences structure
-const isValidUserPreferences = (data: Json | null): data is UserPreferences => {
+const isValidUserPreferences = (data: Json | null): boolean => {
   if (!data || typeof data !== 'object' || Array.isArray(data)) {
     return false;
   }
@@ -64,7 +64,9 @@ const isValidUserPreferences = (data: Json | null): data is UserPreferences => {
     typeof preferences.activeViewMode === 'string' &&
     typeof preferences.sidebarOpen === 'boolean' &&
     preferences.viewModeSettings &&
-    preferences.dateDisplayOptions
+    typeof preferences.viewModeSettings === 'object' &&
+    preferences.dateDisplayOptions &&
+    typeof preferences.dateDisplayOptions === 'object'
   );
 };
 
@@ -87,7 +89,8 @@ export const fetchUserPreferences = async (userId: string): Promise<UserPreferen
     
     // Check if preferences exist and validate their structure
     if (data?.preferences && isValidUserPreferences(data.preferences)) {
-      return data.preferences as UserPreferences;
+      // Use type assertion to convert to UserPreferences
+      return data.preferences as any as UserPreferences;
     }
     
     return null;
@@ -120,7 +123,7 @@ export const updateUserPreferences = debounce(async (
     
     // Check if returned data is valid
     if (data && isValidUserPreferences(data as Json)) {
-      return data as UserPreferences;
+      return data as any as UserPreferences;
     }
     
     return null;
@@ -150,7 +153,7 @@ export const loadPreferencesFromLocalStorage = (): UserPreferences | null => {
     
     // Validate the structure
     if (isValidUserPreferences(parsedPreferences)) {
-      return parsedPreferences as UserPreferences;
+      return parsedPreferences as any as UserPreferences;
     }
     
     return null;
