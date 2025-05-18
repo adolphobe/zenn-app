@@ -14,14 +14,15 @@ export const performLogout = async (navigate: NavigateFunction): Promise<void> =
     // Set logout in progress flag to prevent multiple logout attempts
     localStorage.setItem('logout_in_progress', 'true');
     
-    // Clear any supabase tokens manually first
+    // Clear any Supabase tokens manually first to ensure session is invalidated
     localStorage.removeItem('sb-wbvxnapruffchikhrqrs-auth-token');
     localStorage.removeItem('supabase.auth.token');
     
-    // Call Supabase signOut with global scope to ensure complete logout
+    // Call Supabase signOut with global scope to ensure complete logout across all devices
     await supabase.auth.signOut({ scope: 'global' });
     
     // Wait a moment to ensure complete session termination
+    // This helps prevent issues with rapid navigation
     await new Promise(resolve => setTimeout(resolve, 300));
     
     // Show success toast

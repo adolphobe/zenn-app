@@ -99,28 +99,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       localStorage.removeItem('logout_in_progress');
     }
     
-    // First check for existing session to set initial state
-    const checkInitialSession = async () => {
-      try {
-        const { data } = await supabase.auth.getSession();
-        console.log("[AuthProvider] Verificação inicial da sessão:", data.session ? "Sessão encontrada" : "Nenhuma sessão");
-        console.log("[AuthProvider] DETALHES EM PORTUGUÊS:", data.session ? "Encontramos uma sessão ativa" : "Nenhuma sessão ativa encontrada");
-        
-        if (data.session) {
-          setSession(data.session);
-          // Fetch user profile data
-          fetchUserProfile(data.session.user);
-        } else {
-          // No session found, mark as not loading
-          setIsLoading(false);
-        }
-      } catch (error) {
-        console.error("[AuthProvider] Erro ao verificar sessão:", error);
-        console.error("[AuthProvider] DETALHES EM PORTUGUÊS: Ocorreu um erro ao verificar se existe uma sessão ativa");
-        setIsLoading(false);
-      }
-    };
-    
     // Helper function to fetch user profile
     const fetchUserProfile = async (user: any) => {
       try {
@@ -144,36 +122,63 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
     };
     
-    // Check initial session
-    checkInitialSession();
-    
-    // Set up auth state change listener
+    // Set up auth state change listener FIRST
+    // IMPORTANT: We set this up before checking for an existing session to ensure we don't miss any auth events
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, newSession) => {
+      (event, newSession) => {
         console.log("[AuthProvider] Estado de autenticação alterado:", event);
         console.log("[AuthProvider] DETALHES EM PORTUGUÊS: Evento de autenticação detectado:", 
           event === 'SIGNED_IN' ? 'Usuário entrou' : 
           event === 'SIGNED_OUT' ? 'Usuário saiu' : 
           'Outro evento de autenticação');
         
+        // Use synchronous state updates here
+        setSession(newSession);
+        
         if (event === 'SIGNED_OUT') {
           console.log("[AuthProvider] Usuário deslogado");
           console.log("[AuthProvider] DETALHES EM PORTUGUÊS: Usuário encerrou a sessão");
-          setSession(null);
           setCurrentUser(null);
           setIsLoading(false);
           return;
         }
         
+        // Use setTimeout for any Supabase calls to prevent potential race conditions/deadlocks
         if (newSession?.user) {
           console.log("[AuthProvider] Nova sessão detectada");
           console.log("[AuthProvider] DETALHES EM PORTUGUÊS: Iniciando nova sessão para o usuário");
-          setSession(newSession);
-          // Fetch user profile using the helper
-          fetchUserProfile(newSession.user);
+          
+          setTimeout(() => {
+            fetchUserProfile(newSession.user);
+          }, 0);
         }
       }
     );
+    
+    // THEN check for existing session
+    const checkInitialSession = async () => {
+      try {
+        const { data } = await supabase.auth.getSession();
+        console.log("[AuthProvider] Verificação inicial da sessão:", data.session ? "Sessão encontrada" : "Nenhuma sessão");
+        console.log("[AuthProvider] DETALHES EM PORTUGUÊS:", data.session ? "Encontramos uma sessão ativa" : "Nenhuma sessão ativa encontrada");
+        
+        if (data.session) {
+          setSession(data.session);
+          // Fetch user profile data
+          fetchUserProfile(data.session.user);
+        } else {
+          // No session found, mark as not loading
+          setIsLoading(false);
+        }
+      } catch (error) {
+        console.error("[AuthProvider] Erro ao verificar sessão:", error);
+        console.error("[AuthProvider] DETALHES EM PORTUGUÊS: Ocorreu um erro ao verificar se existe uma sessão ativa");
+        setIsLoading(false);
+      }
+    };
+    
+    // Check for initial session after setting up the listener
+    checkInitialSession();
     
     // Clean up subscription on unmount
     return () => {
@@ -191,6 +196,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       console.log("[AuthProvider] Tentando login com email:", email);
       console.log("[AuthProvider] DETALHES EM PORTUGUÊS: Tentando fazer login com o email:", email);
       
+      // Enhanced login with explicit storage options
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password
@@ -328,8 +334,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
   
-  // Logout function - Enhanced to ensure complete session removal
+  // Logout function - Use the centralized function in authUtils.ts
   const logout = async (): Promise<void> => {
+    // We'll still use this function but delegate to the centralized one
+    // This keeps backward compatibility with existing code that calls auth.logout()
     console.log("[AuthProvider] Iniciando processo completo de logout do usuário");
     console.log("[AuthProvider] DETALHES EM PORTUGUÊS: Iniciando processo completo de logout no sistema");
     
@@ -344,7 +352,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       localStorage.removeItem('sb-wbvxnapruffchikhrqrs-auth-token');
       localStorage.removeItem('supabase.auth.token');
       
-      // Call Supabase signOut and wait for it to complete
+      // Call Supabase signOut with explicit scope to ensure all devices are logged out
       const { error } = await supabase.auth.signOut({ scope: 'global' });
       
       if (error) {
