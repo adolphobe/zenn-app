@@ -1,8 +1,8 @@
 
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
-import { Line, LineChart, ResponsiveContainer, XAxis, YAxis } from 'recharts';
+import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from '@/components/ui/chart';
+import { Line, LineChart, ResponsiveContainer, XAxis, YAxis, CartesianGrid } from 'recharts';
 import { format, subMonths } from 'date-fns';
 
 // Sample data - will be replaced with real data later
@@ -70,55 +70,80 @@ const UserStatsDisplay: React.FC = () => {
         </div>
         
         {/* Chart */}
-        <div className="h-[200px] mt-6">
+        <div className="h-[220px] mt-4 mb-2">
           <ChartContainer
             config={{
               created: {
                 label: 'Tarefas Cadastradas',
                 theme: { 
-                  light: '#9b87f5', // Primary Purple
-                  dark: '#9b87f5' 
+                  light: '#33C3F0', // Azul claro
+                  dark: '#33C3F0' 
                 },
               },
               completed: {
                 label: 'Tarefas Concluídas',
                 theme: { 
-                  light: '#33C3F0', // Sky Blue
-                  dark: '#1EAEDB' 
+                  light: '#7AE582', // Verde claro
+                  dark: '#7AE582' 
                 },
               },
             }}
           >
-            <LineChart data={chartData} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
-              <XAxis 
-                dataKey="name" 
-                axisLine={false} 
-                tickLine={false}
-                tick={{ fontSize: 12 }}
-                dy={10}
-              />
-              <YAxis 
-                hide={true} 
-              />
-              <ChartTooltip
-                content={<ChartTooltipContent />}
-              />
-              <Line
-                type="monotone"
-                dataKey="created"
-                strokeWidth={2}
-                activeDot={{ r: 6 }}
-                dot={{ r: 1 }}
-              />
-              <Line
-                type="monotone"
-                dataKey="completed"
-                strokeWidth={2}
-                activeDot={{ r: 6 }}
-                dot={{ r: 1 }}
-              />
-            </LineChart>
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart 
+                data={chartData} 
+                margin={{ top: 10, right: 20, left: 10, bottom: 25 }}
+              >
+                <CartesianGrid 
+                  vertical={true} 
+                  horizontal={false} 
+                  verticalPoints={chartData.map((_, index) => index)} 
+                  stroke="#EBEBEB" 
+                  strokeDasharray="3 3" 
+                />
+                <XAxis 
+                  dataKey="name" 
+                  axisLine={false} 
+                  tickLine={false}
+                  tick={{ fontSize: 12 }}
+                  dy={10}
+                />
+                <YAxis 
+                  hide={true} 
+                />
+                <ChartTooltip
+                  content={<ChartTooltipContent />}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="created"
+                  strokeWidth={2}
+                  activeDot={{ r: 6 }}
+                  dot={{ r: 2 }}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="completed"
+                  strokeWidth={2}
+                  activeDot={{ r: 6 }}
+                  dot={{ r: 2 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
           </ChartContainer>
+          
+          {/* Legend */}
+          <div className="flex justify-center mt-1">
+            <ChartLegend
+              payload={[
+                { value: 'created', color: '#33C3F0' },
+                { value: 'completed', color: '#7AE582' }
+              ]}
+              verticalAlign="bottom"
+            >
+              <ChartLegendContent />
+            </ChartLegend>
+          </div>
         </div>
       </CardContent>
     </Card>
