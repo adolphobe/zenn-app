@@ -67,7 +67,7 @@ export const fetchUserPreferences = async (userId: string): Promise<UserPreferen
       return null;
     }
     
-    return data?.preferences || null;
+    return data?.preferences as UserPreferences || null;
   } catch (error) {
     console.error("[PreferencesService] Erro inesperado ao buscar preferências:", error);
     console.error("[PreferencesService] DETALHES EM PORTUGUÊS: Ocorreu um erro ao carregar as preferências");
@@ -86,7 +86,7 @@ export const updateUserPreferences = debounce(async (
     const { data, error } = await supabase
       .rpc('update_user_preferences', {
         user_id: userId,
-        user_preferences: preferences
+        user_preferences: preferences as any
       });
     
     if (error) {
@@ -95,7 +95,7 @@ export const updateUserPreferences = debounce(async (
       return null;
     }
     
-    return data || null;
+    return data as UserPreferences || null;
   } catch (error) {
     console.error("[PreferencesService] Erro inesperado ao atualizar preferências:", error);
     console.error("[PreferencesService] DETALHES EM PORTUGUÊS: Ocorreu um erro ao salvar as preferências");
@@ -116,7 +116,7 @@ export const savePreferencesToLocalStorage = (preferences: UserPreferences): voi
 export const loadPreferencesFromLocalStorage = (): UserPreferences | null => {
   try {
     const preferencesStr = localStorage.getItem('app_preferences');
-    return preferencesStr ? JSON.parse(preferencesStr) : null;
+    return preferencesStr ? JSON.parse(preferencesStr) as UserPreferences : null;
   } catch (error) {
     console.error("[PreferencesService] Erro ao carregar preferências do localStorage:", error);
     return null;

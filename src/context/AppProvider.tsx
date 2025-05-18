@@ -1,4 +1,3 @@
-
 import React, { useReducer, useEffect, useCallback } from 'react';
 import { AppContext } from './AppContext';
 import { AppContextType } from './types';
@@ -107,7 +106,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             toast({
               title: "Preferências carregadas",
               description: "Suas preferências pessoais foram aplicadas",
-              duration: 3000,
             });
           }
         } catch (error) {
