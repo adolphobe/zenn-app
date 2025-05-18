@@ -1,7 +1,6 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '@/context/AppContext';
-import { useTaskDataContext } from '@/context/TaskDataProvider'; // Use the new context
+import { useTaskDataContext } from '@/context/TaskDataProvider'; 
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useAuth } from '@/context/auth';
 import TaskForm from './TaskForm';
@@ -24,7 +23,7 @@ const Dashboard: React.FC = () => {
     isLoading: tasksLoading, 
     forceSynchronize,
     operationsLoading
-  } = useTaskDataContext(); // Use our new hook
+  } = useTaskDataContext(); 
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const isMobile = useIsMobile();
   const [isTaskFormOpen, setIsTaskFormOpen] = useState(false);
@@ -81,12 +80,13 @@ const Dashboard: React.FC = () => {
     const isVisible = shouldShowHiddenTasks || !task.hidden;
     
     // Filtrar também tarefas com atualização de visibilidade pendente
-    const isPendingHiddenUpdate = task._pendingHiddenUpdate || false;
+    const isPendingVisibilityUpdate = task._pendingVisibilityUpdate || false;
+    const animationState = task._animationState || '';
     
-    // Mostrar tarefas que:
+    // Incluir tarefas que:
     // 1. Não estão completadas E
     // 2. (Estão visíveis de acordo com as configurações OU têm uma atualização pendente)
-    return isNotCompleted && (isVisible || isPendingHiddenUpdate);
+    return isNotCompleted && (isVisible || isPendingVisibilityUpdate);
   });
   
   // First separate overdue tasks from non-overdue tasks
@@ -171,25 +171,25 @@ const Dashboard: React.FC = () => {
     );
   }
   
-  // Enhanced animation variants for task cards with improved exit animation
+  // Enhanced animation variants for task cards
   const taskVariants = {
     hidden: { 
       opacity: 0,
       y: 20,
       scale: 0.95,
-      transition: { duration: 0.2, ease: "easeInOut" }
+      transition: { duration: 0.3, ease: "easeInOut" }
     },
     visible: { 
       opacity: 1, 
       y: 0,
       scale: 1,
-      transition: { duration: 0.2, ease: "easeInOut" }
+      transition: { duration: 0.3, ease: "easeInOut" }
     },
     exit: { 
       opacity: 0,
       scale: 0.9,
       y: -20,
-      transition: { duration: 0.2, ease: "easeInOut" }
+      transition: { duration: 0.3, ease: "easeInOut" }
     }
   };
   
@@ -249,9 +249,9 @@ const Dashboard: React.FC = () => {
             {/* Overdue tasks box - only show in chronological mode */}
             {viewMode === 'chronological' && sortedOverdueTasks.length > 0 && (
               <div className="border-2 border-[#ea384c]/30 rounded-lg p-4 relative mb-2 bg-[#ffafaf24] dark:bg-[#ff000024]">
-                <div className="absolute -top-3 left-4 bg-background bg-[transparent] dark:bg-[transparent] px-2">
+                <div className="absolute -top-3 left-4 bg-background px-2">
                   <Badge 
-                    className="bg-[#ffe7e7]/100 dark:bg-[#3e0515] text-[#ea384c] border-[#ea384c]/30 flex items-center gap-1 cursor-pointer hover:bg-[#ffd2d2] dark:hover:bg-[#59071e] transition-colors"
+                    className="bg-[#ffe7e7] dark:bg-[#3e0515] text-[#ea384c] border-[#ea384c]/30 flex items-center gap-1 cursor-pointer hover:bg-[#ffd2d2] dark:hover:bg-[#59071e] transition-colors"
                     onClick={toggleOverdueTasks}
                   >
                     <Bell size={14} />
@@ -274,7 +274,7 @@ const Dashboard: React.FC = () => {
                       <AnimatePresence initial={false} mode="popLayout">
                         {sortedOverdueTasks.map(task => (
                           <motion.div
-                            key={`${task.id}-${task.hidden ? 1 : 0}-${task._optimisticUpdateTime || 0}`}
+                            key={`overdue-task-${task.id}-${task.hidden ? 1 : 0}-${task._optimisticUpdateTime || 0}`}
                             initial="hidden"
                             animate="visible"
                             exit="exit"

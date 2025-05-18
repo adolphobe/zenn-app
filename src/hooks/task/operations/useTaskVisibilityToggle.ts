@@ -14,7 +14,7 @@ export const useTaskVisibilityToggle = (
   const { currentUser } = useAuth();
   const queryClient = useQueryClient();
   
-  // Toggle hidden mutation com animação de saída melhorada
+  // Toggle hidden mutation com animação melhorada
   const toggleHiddenMutation = useMutation({
     mutationFn: (id: string) => {
       // Validate task exists
@@ -37,9 +37,10 @@ export const useTaskVisibilityToggle = (
       const task = tasks.find(t => t.id === id);
       if (!task) return { previousTasks };
       
+      // Determinar o novo estado
       const newHiddenState = !task.hidden;
       
-      // Optimistically update to the new value
+      // Optimistically update to the new value with animation marker
       queryClient.setQueryData(['tasks', currentUser?.id, completed], (old: Task[] | undefined) => {
         if (!old) return [];
         
@@ -48,9 +49,10 @@ export const useTaskVisibilityToggle = (
             return { 
               ...t, 
               hidden: newHiddenState,
-              // Add a timestamp to ensure the animation detects the change
+              // Add animation markers
               _optimisticUpdateTime: Date.now(),
-              _pendingHiddenUpdate: true // Marcador para animação de saída
+              _animationState: newHiddenState ? 'hiding' : 'showing',
+              _pendingVisibilityUpdate: true
             };
           }
           return t;
@@ -64,42 +66,42 @@ export const useTaskVisibilityToggle = (
       };
     },
     onSuccess: (result, id) => {
+      // Get current task state before update
       const task = tasks.find(t => t.id === id);
       const wasHidden = task?.hidden;
       const isNowHidden = result.hidden;
       
-      // Se a tarefa vai ser ocultada, aplicamos um pequeno delay para permitir a animação de saída
+      // Se a tarefa foi ocultada, aplicamos a lógica de animação
       if (!wasHidden && isNowHidden) {
+        // Para tarefas sendo ocultadas, adicionamos um pequeno delay para permitir 
+        // a animação de saída antes de remover da lista
         setTimeout(() => {
-          // Depois que a animação de saída terminar, atualizamos o cache
+          // Atualizar a cache depois da animação de saída
           queryClient.setQueryData(['tasks', currentUser?.id, completed], (old: Task[] | undefined) => {
             if (!old) return [];
             
-            // A tarefa que acabou de ser ocultada não é mais filtrada aqui, pois queremos
-            // que ela seja removida da visualização ao ser ocultada, a menos que o filtro
-            // de tarefas ocultas esteja ativado
             return old.map(t => {
               if (t.id === id) {
                 return { 
                   ...t, 
                   ...result,
-                  // Manter a marca de timestamp para animação
                   _optimisticUpdateTime: t._optimisticUpdateTime || Date.now(),
-                  _pendingHiddenUpdate: false
+                  _animationState: 'hidden',
+                  _pendingVisibilityUpdate: false
                 };
               }
               return t;
             });
           });
           
-          // Invalidar a query para atualizar os filtros de visibilidade
+          // Invalidar queries para atualizar os filtros
           queryClient.invalidateQueries({ 
             queryKey: ['tasks', currentUser?.id, completed],
-            exact: true
+            exact: false
           });
-        }, 300); // Tempo para animação de saída
+        }, 400); // Tempo para animação de saída
       } else {
-        // Para mostrar uma tarefa, atualizamos imediatamente
+        // Para mostrar uma tarefa oculta, atualizamos imediatamente
         queryClient.setQueryData(['tasks', currentUser?.id, completed], (old: Task[] | undefined) => {
           if (!old) return [];
           
@@ -108,19 +110,19 @@ export const useTaskVisibilityToggle = (
               return { 
                 ...t, 
                 ...result,
-                // Manter a marca de timestamp para animação
                 _optimisticUpdateTime: t._optimisticUpdateTime || Date.now(),
-                _pendingHiddenUpdate: false
+                _animationState: 'visible',
+                _pendingVisibilityUpdate: false
               };
             }
             return t;
           });
         });
         
-        // Invalidar a query para atualizar os filtros de visibilidade
+        // Invalidar a query para atualizar os filtros e mostrar a tarefa
         queryClient.invalidateQueries({ 
-          queryKey: ['tasks', currentUser?.id, completed],
-          exact: true
+          queryKey: ['tasks'],
+          exact: false 
         });
       }
       

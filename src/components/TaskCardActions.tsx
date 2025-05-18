@@ -45,7 +45,7 @@ const TaskCardActions: React.FC<TaskCardActionsProps> = ({
             size="sm"
             onClick={onToggleHidden}
             title={isHidden ? "Mostrar" : "Ocultar"}
-            className={`${buttonStyles} ${isHidden ? 'border-green-200 hover:border-green-300 hover:bg-green-50 dark:border-green-900 dark:hover:border-green-800' : ''}`}
+            className={`${buttonStyles} ${isHidden ? 'border-green-200 hover:border-green-300 hover:bg-green-50 dark:border-green-900 dark:hover:border-green-800' : ''} transition-colors duration-200`}
             data-task-action="toggle-hidden"
             data-hidden={isHidden ? "true" : "false"}
           >

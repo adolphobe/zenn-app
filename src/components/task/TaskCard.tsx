@@ -23,7 +23,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
   const [feedbackModalOpen, setFeedbackModalOpen] = useState(false);
   const [deleteConfirmModalOpen, setDeleteConfirmModalOpen] = useState(false);
   
-  const { state, updateTaskTitle } = useAppContext();
+  const { state } = useAppContext();
   const { showHiddenTasks, viewMode, dateDisplayOptions } = state;
   const { toggleTaskHidden } = useTaskDataContext();
   const { showToggleHiddenToast } = useTaskToasts();
@@ -84,6 +84,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
   
   const handleToggleHidden = (e: React.MouseEvent) => {
     e.stopPropagation();
+    toggleTaskHidden(task.id);
     showToggleHiddenToast(task);
   };
 
@@ -102,27 +103,35 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
     setDeleteConfirmModalOpen(true);
   };
 
-  // Determine se a tarefa tem uma animação de saída pendente
-  const isPendingHiddenUpdate = task._pendingHiddenUpdate || false;
-  const exitClass = isPendingHiddenUpdate ? 'animate-fade-out' : '';
+  // Determine se a tarefa tem uma animação de visibilidade pendente
+  const isPendingVisibilityUpdate = task._pendingVisibilityUpdate || false;
+  const animationState = task._animationState || (task.hidden ? 'hidden' : 'visible');
+  
+  // Determine a classe de saída baseada no estado de animação
+  let animationClass = '';
+  if (isPendingVisibilityUpdate) {
+    animationClass = animationState === 'hiding' ? 'animate-fade-out' : 'animate-fade-in';
+  }
 
   return (
     <>
       <motion.div
         layout
         layoutId={`task-card-${task.id}`}
-        className={`task-card ${cardClass} ${task.completed ? 'opacity-50' : ''} ${exitClass} relative cursor-pointer`}
+        className={`task-card ${cardClass} ${task.completed ? 'opacity-50' : ''} ${animationClass} relative cursor-pointer`}
         onClick={handleCardClick}
         data-task-id={task.id}
+        data-animation-state={animationState}
+        data-pending-update={isPendingVisibilityUpdate}
         transition={{ 
           layout: { duration: 0.3, ease: "easeInOut" },
-          opacity: { duration: 0.2 }
+          opacity: { duration: 0.3 }
         }}
         exit={{ 
           opacity: 0, 
-          scale: 0.9, 
-          y: -20,
-          transition: { duration: 0.2, ease: "easeInOut" }
+          scale: 0.95, 
+          y: -10,
+          transition: { duration: 0.3, ease: "easeInOut" }
         }}
       >
         <TaskCardHeader 
