@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useAuth } from '@/context/auth';
 import { useImagePreloader } from '@/hooks/useImagePreloader';
@@ -10,6 +9,7 @@ import { updateUserProfile } from '@/utils/profileUtils';
 import AvatarSelector from '@/components/settings/AvatarSelector';
 import UserStatsDisplay from '@/components/settings/UserStatsDisplay';
 import AccountInfoSection from '@/components/settings/AccountInfoSection';
+import DeleteAccountModal from '@/components/settings/DeleteAccountModal';
 
 // Available avatars - easy to add more later
 const availableAvatars = [
@@ -17,7 +17,7 @@ const availableAvatars = [
   "https://img.freepik.com/free-psd/3d-rendering-hair-style-avatar-design_23-2151869153.jpg?ga=GA1.1.1745944876.1746044229&semt=ais_hybrid&w=740",
   "https://img.freepik.com/premium-photo/cartoon-character-with-blue-background-generated-by-ai_1029473-129016.jpg?ga=GA1.1.1745944876.1746044229&semt=ais_hybrid&w=740",
   "https://img.freepik.com/premium-photo/memoji-handsome-asian-guy-chinese-man-white-background-emoji-cartoon-character_826801-7436.jpg?ga=GA1.1.1745944876.1746044229&semt=ais_hybrid&w=740",
-  "https://img.freepik.com/free-psd/3d-rendering-hair-style-avatar-design_23-2151869159.jpg?ga=GA1.1.1745944876.1746044229&semt=ais_hybrid&w=740",
+  "https://img.freepik.com/premium-photo/3d-rendering-hair-style-avatar-design_23-2151869159.jpg?ga=GA1.1.1745944876.1746044229&semt=ais_hybrid&w=740",
   "https://img.freepik.com/premium-psd/3d-avatar-illustration-pro-gamer-isolated-transparent-background_846458-28.jpg?ga=GA1.1.1745944876.1746044229&semt=ais_hybrid&w=740",
   "https://img.freepik.com/free-psd/3d-illustration-human-avatar-profile_23-2150671122.jpg?ga=GA1.1.1745944876.1746044229&semt=ais_hybrid&w=740"
 ];
@@ -26,6 +26,7 @@ const Settings = () => {
   const { currentUser, isLoading } = useAuth();
   const [selectedAvatar, setSelectedAvatar] = useState<string | undefined>(currentUser?.profileImage);
   const [isSaving, setIsSaving] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   
   // Preload all avatar images
   const { imagesLoaded } = useImagePreloader({ imageUrls: availableAvatars });
@@ -127,7 +128,24 @@ const Settings = () => {
             </Button>
           </CardFooter>
         </Card>
+        
+        {/* Delete Account Section */}
+        <div className="flex justify-center pt-6 pb-12">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="text-red-400 border-red-100 hover:bg-red-50 hover:text-red-500"
+            onClick={() => setIsDeleteModalOpen(true)}
+          >
+            Apagar minha conta
+          </Button>
+        </div>
       </div>
+      
+      <DeleteAccountModal 
+        isOpen={isDeleteModalOpen} 
+        onClose={() => setIsDeleteModalOpen(false)} 
+      />
     </div>
   );
 };
