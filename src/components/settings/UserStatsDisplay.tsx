@@ -1,9 +1,9 @@
 
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from '@/components/ui/chart';
-import { Line, LineChart, ResponsiveContainer, XAxis, YAxis, CartesianGrid } from 'recharts';
+import { PieChart, Pie, ResponsiveContainer, Cell, Tooltip } from 'recharts';
 import { format, subMonths } from 'date-fns';
+import { Tooltip as UITooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 // Sample data - will be replaced with real data later
 const generateSampleData = () => {
@@ -34,6 +34,32 @@ const generateSampleData = () => {
 };
 
 const chartData = generateSampleData();
+
+// Calculate totals for pie chart
+const calculatePieData = (data) => {
+  const totalCreated = data.reduce((sum, item) => sum + item.created, 0);
+  const totalCompleted = data.reduce((sum, item) => sum + item.completed, 0);
+  const incomplete = totalCreated - totalCompleted;
+  
+  return [
+    { name: 'Concluídas', value: totalCompleted, color: '#92E3A9' }, // Soft green
+    { name: 'Não Concluídas', value: incomplete, color: '#B1C9FB' }  // Soft blue
+  ];
+};
+
+const pieData = calculatePieData(chartData);
+
+// Custom tooltip component for pie chart
+const CustomTooltip = ({ active, payload }) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-white p-2 shadow-md rounded-md border border-gray-100 text-xs">
+        <p className="font-medium">{payload[0].name}: {payload[0].value}</p>
+      </div>
+    );
+  }
+  return null;
+};
 
 const UserStatsDisplay: React.FC = () => {
   // Dados hipotéticos - serão substituídos mais tarde por dados reais
@@ -69,82 +95,62 @@ const UserStatsDisplay: React.FC = () => {
           </div>
         </div>
         
-        {/* Chart - Modern, clean style */}
-        <div className="h-[180px] mt-6 mb-4">
-          <ChartContainer
-            config={{
-              created: {
-                label: 'Tarefas Cadastradas',
-                theme: { 
-                  light: '#D3E4FD', // Soft blue for tasks created
-                  dark: '#D3E4FD' 
-                },
-              },
-              completed: {
-                label: 'Tarefas Concluídas',
-                theme: { 
-                  light: '#F2FCE2', // Soft green for tasks completed
-                  dark: '#F2FCE2' 
-                },
-              },
-            }}
-          >
+        {/* Chart and Details Section */}
+        <div className="flex flex-col md:flex-row items-center md:items-start justify-between gap-4 mt-2">
+          {/* Compact Pie Chart - 120x120px */}
+          <div className="relative w-[120px] h-[120px]">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart 
-                data={chartData}
-                margin={{ top: 5, right: 10, left: 10, bottom: 5 }}
-              >
-                <CartesianGrid 
-                  vertical={true}
-                  horizontal={false}
-                  verticalPoints={chartData.map((_, index) => index)}
-                  stroke="#EBEBEB"
-                  strokeDasharray="3 3"
-                  opacity={0.3}
-                />
-                <XAxis 
-                  dataKey="name"
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fontSize: 10, fill: '#8E9196' }}
-                  dy={5}
-                />
-                <YAxis 
-                  hide={true}
-                />
-                <ChartTooltip
-                  content={<ChartTooltipContent />}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="created"
-                  strokeWidth={2.5}
-                  activeDot={{ r: 4, strokeWidth: 0 }}
-                  dot={{ r: 0 }}
-                  style={{ strokeLinecap: "round" }}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="completed"
-                  strokeWidth={2.5}
-                  activeDot={{ r: 4, strokeWidth: 0 }}
-                  dot={{ r: 0 }}
-                  style={{ strokeLinecap: "round" }}
-                />
-              </LineChart>
+              <PieChart>
+                <Pie
+                  data={pieData}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={32}
+                  outerRadius={48}
+                  paddingAngle={2}
+                  dataKey="value"
+                >
+                  {pieData.map((entry, index) => (
+                    <Cell 
+                      key={`cell-${index}`} 
+                      fill={entry.color} 
+                      strokeWidth={0}
+                    />
+                  ))}
+                </Pie>
+                <Tooltip content={<CustomTooltip />} />
+              </PieChart>
             </ResponsiveContainer>
-          </ChartContainer>
-        </div>
-        
-        {/* Clear Legend with labels */}
-        <div className="flex justify-center gap-6 mt-2 mb-2">
-          <div className="flex items-center gap-2">
-            <div className="h-3 w-3 bg-[#D3E4FD] rounded"></div>
-            <span className="text-xs text-[#1A1F2C]">Tarefas Cadastradas</span>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="h-3 w-3 bg-[#F2FCE2] rounded"></div>
-            <span className="text-xs text-[#1A1F2C]">Tarefas Concluídas</span>
+          
+          {/* Chart Details */}
+          <div className="flex flex-col space-y-3 md:flex-1">
+            <h4 className="font-medium text-sm mb-1 text-center md:text-left">Distribuição de Tarefas</h4>
+            
+            <div className="flex flex-col space-y-2">
+              {pieData.map((entry, index) => (
+                <div key={`detail-${index}`} className="flex items-center space-x-2">
+                  <div className="h-3 w-3 rounded-sm" style={{ backgroundColor: entry.color }}></div>
+                  <div className="flex justify-between items-center w-full">
+                    <span className="text-xs text-gray-600">{entry.name}</span>
+                    <TooltipProvider>
+                      <UITooltip>
+                        <TooltipTrigger asChild>
+                          <span className="text-xs font-medium cursor-help">{entry.value}</span>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p className="text-xs">{Math.round((entry.value / stats.totalTasks) * 100)}% das tarefas</p>
+                        </TooltipContent>
+                      </UITooltip>
+                    </TooltipProvider>
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            <p className="text-xs text-muted-foreground mt-2 text-center md:text-left">
+              Passe o mouse sobre o gráfico para mais detalhes
+            </p>
           </div>
         </div>
       </CardContent>
