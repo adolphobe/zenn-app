@@ -69,22 +69,22 @@ const UserStatsDisplay: React.FC = () => {
           </div>
         </div>
         
-        {/* Chart */}
-        <div className="h-[220px] mt-4 mb-2">
+        {/* Chart - Redesenhado para ficar mais minimalista, como no exemplo */}
+        <div className="h-[200px] mt-4 mb-6">
           <ChartContainer
             config={{
               created: {
                 label: 'Tarefas Cadastradas',
                 theme: { 
-                  light: '#33C3F0', // Azul claro
-                  dark: '#33C3F0' 
+                  light: '#FF3366', // Rosa/vermelho para tarefas cadastradas (similar ao exemplo)
+                  dark: '#FF3366' 
                 },
               },
               completed: {
                 label: 'Tarefas Concluídas',
                 theme: { 
-                  light: '#7AE582', // Verde claro
-                  dark: '#7AE582' 
+                  light: '#3366FF', // Azul para tarefas concluídas
+                  dark: '#3366FF' 
                 },
               },
             }}
@@ -92,7 +92,7 @@ const UserStatsDisplay: React.FC = () => {
             <ResponsiveContainer width="100%" height="100%">
               <LineChart 
                 data={chartData} 
-                margin={{ top: 10, right: 20, left: 10, bottom: 25 }}
+                margin={{ top: 10, right: 15, left: 15, bottom: 20 }}
               >
                 <CartesianGrid 
                   vertical={true} 
@@ -100,12 +100,13 @@ const UserStatsDisplay: React.FC = () => {
                   verticalPoints={chartData.map((_, index) => index)} 
                   stroke="#EBEBEB" 
                   strokeDasharray="3 3" 
+                  opacity={0.5}
                 />
                 <XAxis 
                   dataKey="name" 
                   axisLine={false} 
                   tickLine={false}
-                  tick={{ fontSize: 12 }}
+                  tick={{ fontSize: 11 }}
                   dy={10}
                 />
                 <YAxis 
@@ -117,27 +118,29 @@ const UserStatsDisplay: React.FC = () => {
                 <Line
                   type="monotone"
                   dataKey="created"
-                  strokeWidth={2}
-                  activeDot={{ r: 6 }}
-                  dot={{ r: 2 }}
+                  strokeWidth={3}
+                  activeDot={{ r: 6, strokeWidth: 0 }}
+                  dot={{ r: 0 }}
+                  style={{ strokeLinecap: "round" }}
                 />
                 <Line
                   type="monotone"
                   dataKey="completed"
-                  strokeWidth={2}
-                  activeDot={{ r: 6 }}
-                  dot={{ r: 2 }}
+                  strokeWidth={3}
+                  activeDot={{ r: 6, strokeWidth: 0 }}
+                  dot={{ r: 0 }}
+                  style={{ strokeLinecap: "round" }}
                 />
               </LineChart>
             </ResponsiveContainer>
           </ChartContainer>
           
-          {/* Legend */}
+          {/* Legend - Redesenhada para combinar com o estilo minimalista */}
           <div className="flex justify-center mt-1">
             <ChartLegend
               payload={[
-                { value: 'created', color: '#33C3F0' },
-                { value: 'completed', color: '#7AE582' }
+                { value: 'created', color: '#FF3366' },
+                { value: 'completed', color: '#3366FF' }
               ]}
               verticalAlign="bottom"
             >
