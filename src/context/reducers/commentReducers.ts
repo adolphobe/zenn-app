@@ -13,7 +13,7 @@ export const addComment = (state: AppState, action: Action): AppState => {
         const newComment = {
           id: uuidv4(),
           text: action.payload.text,
-          createdAt: new Date().toISOString()
+          createdAt: new Date().toISOString() // Ensure we store as ISO string
         };
         const comments = task.comments ? [...task.comments, newComment] : [newComment];
         return { ...task, comments };

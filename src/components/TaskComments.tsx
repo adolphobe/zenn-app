@@ -5,6 +5,7 @@ import { Comment } from '@/types';
 import { useAppContext } from '@/context/AppContext';
 import { X } from 'lucide-react';
 import { cn } from "@/lib/utils";
+import { safeParseDate } from '@/utils';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -106,6 +107,26 @@ const TaskComments: React.FC<TaskCommentsProps> = ({ taskId, comments }) => {
     e.stopPropagation();
   };
   
+  // Função segura para formatar datas
+  const formatCommentDate = (dateString: string) => {
+    try {
+      // Converter a string para um objeto Date
+      const parsedDate = safeParseDate(dateString);
+      
+      // Se a data for inválida, retornar um texto de fallback
+      if (!parsedDate) {
+        console.warn('Invalid comment date encountered:', dateString);
+        return 'Data indisponível';
+      }
+      
+      // Formatar a data válida
+      return format(parsedDate, 'dd/MM/yyyy HH:mm');
+    } catch (error) {
+      console.error('Error formatting comment date:', error, dateString);
+      return 'Data indisponível';
+    }
+  };
+  
   return (
     <div className="mt-4" onClick={handleContainerClick}>
       <h4 className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">Comentários</h4>
@@ -126,7 +147,7 @@ const TaskComments: React.FC<TaskCommentsProps> = ({ taskId, comments }) => {
               <p className="text-sm text-gray-700 dark:text-gray-200">{comment.text}</p>
               <div className="flex justify-between items-center mt-2">
                 <p className="text-xs text-gray-400">
-                  {format(new Date(comment.createdAt), 'dd/MM/yyyy HH:mm')}
+                  {formatCommentDate(comment.createdAt)}
                 </p>
                 
                 <AlertDialog>

@@ -1,3 +1,4 @@
+
 export interface Task {
   id: string;
   title: string;
@@ -11,7 +12,7 @@ export interface Task {
   completedAt?: string | null;
   createdAt: Date;
   feedback: 'transformed' | 'relief' | 'obligation' | null;
-  comments: any[];
+  comments: Comment[];
   pillar?: string;
   operationLoading?: {
     [key: string]: boolean;
