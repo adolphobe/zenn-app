@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { Lock, Eye, EyeOff } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -27,6 +27,7 @@ type ResetPasswordFormValues = z.infer<typeof resetPasswordSchema>;
 const ResetPassword: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const [searchParams] = useSearchParams();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -42,23 +43,40 @@ const ResetPassword: React.FC = () => {
     },
   });
 
-  // Check for hash fragment containing access token on page load
+  // Check for hash fragment or query parameter containing access token on page load
   useEffect(() => {
     console.log("[ResetPassword] Verificando token de redefinição");
     console.log("[ResetPassword] DETALHES EM PORTUGUÊS: Verificando se o token de redefinição está presente na URL");
     
-    // When coming from an email link, Supabase will include the token in the URL hash
+    // Get the code from query params (Supabase may send it this way in some cases)
+    const codeFromQueryParam = searchParams.get('code');
+    
+    // When coming from an email link, Supabase will include the token in the URL hash or as a query param
     const hash = window.location.hash;
     
     async function handleToken() {
-      if (hash && hash.includes('access_token')) {
+      // Check if we have a token either in hash or query param
+      if ((hash && hash.includes('access_token')) || codeFromQueryParam) {
         console.log("[ResetPassword] Token de redefinição encontrado na URL");
         console.log("[ResetPassword] DETALHES EM PORTUGUÊS: Token de redefinição detectado, o usuário pode prosseguir");
-        setHasToken(true);
         
-        // Process the hash to recover the session - this will make updateUser work later
         try {
-          const { data, error } = await supabase.auth.getSession();
+          let sessionResult;
+          
+          // If we have a code in query param format, we need to use the verifyOtp method
+          if (codeFromQueryParam) {
+            console.log("[ResetPassword] Processando token do parâmetro 'code'");
+            sessionResult = await supabase.auth.verifyOtp({
+              token_hash: codeFromQueryParam,
+              type: 'recovery'
+            });
+          } else {
+            // Process the hash fragment (original implementation)
+            console.log("[ResetPassword] Processando token do hash da URL");
+            sessionResult = await supabase.auth.getSession();
+          }
+          
+          const { data, error } = sessionResult;
           
           if (error) {
             console.error("[ResetPassword] Erro ao processar sessão:", error);
@@ -68,9 +86,12 @@ const ResetPassword: React.FC = () => {
             console.error("[ResetPassword] Sessão não encontrada após processar token");
             console.error("[ResetPassword] DETALHES EM PORTUGUÊS: O token de redefinição não gerou uma sessão válida");
             setResetError("Link de redefinição inválido ou expirado. Solicite um novo link.");
+          } else {
+            // If we get here, we have a valid session
+            setHasToken(true);
           }
         } catch (error) {
-          console.error("[ResetPassword] Erro ao processar hash:", error);
+          console.error("[ResetPassword] Erro ao processar token:", error);
           console.error("[ResetPassword] DETALHES EM PORTUGUÊS: Ocorreu um erro ao tentar processar o link de redefinição");
           setResetError("Ocorreu um erro ao processar seu link de redefinição. Por favor, tente novamente.");
         }
@@ -82,7 +103,7 @@ const ResetPassword: React.FC = () => {
     }
     
     handleToken();
-  }, [location]);
+  }, [location, searchParams]);
 
   const onSubmit = async (values: ResetPasswordFormValues) => {
     if (!hasToken) {
@@ -283,3 +304,4 @@ const ResetPassword: React.FC = () => {
 };
 
 export default ResetPassword;
+
