@@ -37,7 +37,7 @@ const StatusBox: React.FC = () => {
           <h3 className="font-semibold">Informações de Autenticação:</h3>
           <div className="ml-2 mt-1">
             <p><strong>Status:</strong> {isLoading ? "Carregando..." : isAuthenticated ? "Usuário Autenticado" : "Usuário Não Autenticado"}</p>
-            {isAuthenticated ? (
+            {isAuthenticated && currentUser ? (
               <>
                 <p><strong>Usuário:</strong> {currentUser?.email}</p>
                 <p><strong>Nome:</strong> {currentUser?.name || "N/A"}</p>

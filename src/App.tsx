@@ -14,6 +14,7 @@ import Dashboard from "./components/Dashboard";
 import Login from "./pages/Login";
 import { PrivateRoute } from "./components/PrivateRoute";
 import { AuthProvider } from "./context/AuthContext";
+import ActoApp from "./pages/ActoApp";
 
 // Create Query Client with better error handling
 const queryClient = new QueryClient({

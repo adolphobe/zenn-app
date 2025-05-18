@@ -5,6 +5,7 @@ import Sidebar from './Sidebar';
 import { useSidebar } from '@/context/hooks';
 import { Menu } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import StatusBox from './StatusBox';
 
 /**
  * PrivateRoute - Protects routes that require authentication
@@ -43,6 +44,7 @@ export const PrivateRoute = () => {
           <p className="mt-2 text-sm">Não redirecionando para a página de login devido ao modo de depuração.</p>
           <p className="mt-2 text-sm">PORTUGUÊS: Você tentou acessar uma área protegida sem estar logado. Normalmente seria redirecionado para a tela de login.</p>
         </div>
+        <StatusBox />
       </div>
     );
   }
