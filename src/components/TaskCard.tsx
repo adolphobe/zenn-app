@@ -1,3 +1,4 @@
+
 //src/components/TaskCard.tsx
 import React, { useState, useEffect } from 'react';
 import { Task } from '@/types';
@@ -10,6 +11,7 @@ import PostCompletionFeedback from './PostCompletionFeedback';
 import TaskForm from './TaskForm';
 import TaskComments from './TaskComments';
 import DeleteTaskConfirmation from './DeleteTaskConfirmation';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface TaskCardProps {
   task: Task;
@@ -69,12 +71,6 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
   const handleToggleHidden = (e: React.MouseEvent) => {
     e.stopPropagation();
     console.log('Ocultar/Mostrar tarefa clicado:', task.id, 'Status atual:', task.hidden);
-    console.log('Detalhes da tarefa:', {
-      id: task.id,
-      título: task.title,
-      oculto: task.hidden,
-      completada: task.completed
-    });
     
     toggleTaskHidden(task.id);
   };
@@ -103,6 +99,26 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
 
   const handleFeedbackCancel = () => {
     setFeedbackModalOpen(false);
+  };
+
+  // Animation variants for expanded content
+  const expandedContentVariants = {
+    hidden: { 
+      opacity: 0,
+      height: 0,
+      transition: { 
+        duration: 0.2,
+        ease: "easeInOut"
+      }
+    },
+    visible: { 
+      opacity: 1,
+      height: "auto",
+      transition: {
+        duration: 0.2,
+        ease: "easeInOut"
+      }
+    }
   };
 
   // Manipulador para expansão do card que verifica se o clique veio de um elemento na área de conteúdo expandido
@@ -149,30 +165,37 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
           constructionScore={task.constructionScore}
         />
 
-        {isExpanded && (
-          <div 
-            className="mt-4 animate-fade-in" 
-            onClick={handleExpandedContentClick}
-          >
-            <TaskPillarDetails task={task} />
-            
-            {/* Display comments if they exist - shown in both modes */}
-            {task.comments && task.comments.length > 0 && (
-              <div className="mt-4">
-                <TaskComments taskId={task.id} comments={task.comments} />
-              </div>
-            )}
-            
-            <TaskCardActions 
-              isHidden={task.hidden}
-              onToggleHidden={handleToggleHidden}
-              onEditTask={handleEditTask}
-              onCompleteTask={handleCompleteTask}
-              onDeleteTask={handleDeleteTask}
-              viewMode={viewMode}
-            />
-          </div>
-        )}
+        <AnimatePresence initial={false}>
+          {isExpanded && (
+            <motion.div 
+              className="mt-4"
+              variants={expandedContentVariants}
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
+              onClick={handleExpandedContentClick}
+              layout
+            >
+              <TaskPillarDetails task={task} />
+              
+              {/* Display comments if they exist - shown in both modes */}
+              {task.comments && task.comments.length > 0 && (
+                <div className="mt-4">
+                  <TaskComments taskId={task.id} comments={task.comments} />
+                </div>
+              )}
+              
+              <TaskCardActions 
+                isHidden={task.hidden}
+                onToggleHidden={handleToggleHidden}
+                onEditTask={handleEditTask}
+                onCompleteTask={handleCompleteTask}
+                onDeleteTask={handleDeleteTask}
+                viewMode={viewMode}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       <PostCompletionFeedback

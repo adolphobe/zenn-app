@@ -81,16 +81,9 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
   // In chronological mode, only show score if showScores is true
   const shouldShowScore = viewMode !== 'chronological' || showScores;
   
-  // Animation variants for the hidden badge
-  const badgeVariants = {
-    initial: { opacity: 0, scale: 0.8 },
-    animate: { opacity: 1, scale: 1, transition: { duration: 0.3 } },
-    exit: { opacity: 0, scale: 0.8, transition: { duration: 0.2 } }
-  };
-  
   return (
-    <div className={`${isHidden && showHiddenTasks ? 'pt-[15px]' : ''}`}>
-      {/* Hidden label for hidden tasks that are only visible because of the filter - now with tooltip and animation */}
+    <div className={`${isHidden && showHiddenTasks ? 'pt-[15px]' : ''} relative`}>
+      {/* Hidden label with improved reactivity */}
       <AnimatePresence>
         {isHidden && showHiddenTasks && (
           <TooltipProvider>
@@ -106,17 +99,17 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
                     borderTopRightRadius: '0px',
                     borderBottomLeftRadius: '0px'
                   }}
-                  initial="initial"
-                  animate="animate"
-                  exit="exit"
-                  variants={badgeVariants}
-                  layout
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  transition={{ duration: 0.2 }}
+                  layoutId={`hidden-badge`}
                 >
                   OCULTO
                 </motion.div>
               </TooltipTrigger>
               <TooltipContent className="text-sm max-w-xs leading-relaxed border border-gray-200 bg-white/95 backdrop-blur-sm shadow-md"
-                           style={{ borderRadius: '6px' }}>
+                          style={{ borderRadius: '6px' }}>
                 {getTooltipMessage()}
               </TooltipContent>
             </Tooltip>

@@ -171,7 +171,7 @@ export const useTaskData = (completed: boolean = false) => {
     }
   });
   
-  // Toggle hidden mutation - Implementing optimistic updates
+  // Toggle hidden mutation - Improved optimistic updates
   const toggleHiddenMutation = useMutation({
     mutationFn: (id: string) => {
       // Validate task exists
@@ -187,29 +187,36 @@ export const useTaskData = (completed: boolean = false) => {
       // Cancel any outgoing refetches
       await queryClient.cancelQueries({ queryKey: ['tasks', currentUser?.id, completed] });
       
+      // Get current task
+      const task = tasks.find(t => t.id === id);
+      if (!task) return { previousTasks: tasks };
+      
       // Snapshot the previous value
       const previousTasks = queryClient.getQueryData(['tasks', currentUser?.id, completed]);
       
       // Optimistically update to the new value
       queryClient.setQueryData(['tasks', currentUser?.id, completed], (old: Task[] | undefined) => {
         if (!old) return [];
-        return old.map(task => {
-          if (task.id === id) {
-            return { ...task, hidden: !task.hidden };
+        
+        return old.map(t => {
+          if (t.id === id) {
+            // Log the visual update
+            console.log(`Atualizando visualmente tarefa ${id}. Visibilidade atual: ${t.hidden}, Nova: ${!t.hidden}`);
+            return { ...t, hidden: !t.hidden };
           }
-          return task;
+          return t;
         });
+      });
+      
+      // Immediately show visual feedback
+      toast({
+        id: uuidv4(),
+        title: task.hidden ? "Tarefa visível" : "Tarefa oculta",
+        description: task.hidden ? "A tarefa agora está visível." : "A tarefa foi ocultada.",
       });
       
       // Return a context object with the snapshotted value
       return { previousTasks };
-    },
-    onSuccess: (updatedTask) => {
-      toast({
-        id: uuidv4(),
-        title: updatedTask.hidden ? "Tarefa oculta" : "Tarefa visível",
-        description: updatedTask.hidden ? "A tarefa foi ocultada." : "A tarefa agora está visível.",
-      });
     },
     onError: (error: any, id, context) => {
       console.error('Error toggling task hidden status:', error);
@@ -228,8 +235,10 @@ export const useTaskData = (completed: boolean = false) => {
     },
     onSettled: (_, __, id) => {
       setTaskOperationLoading(id, 'toggle-hidden', false);
-      // Always invalidate to ensure consistency with server state
-      queryClient.invalidateQueries({ queryKey: ['tasks', currentUser?.id, completed] });
+      // Delay invalidation slightly to ensure UI has time to animate
+      setTimeout(() => {
+        queryClient.invalidateQueries({ queryKey: ['tasks', currentUser?.id, completed] });
+      }, 300);
     }
   });
   

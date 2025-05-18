@@ -158,24 +158,25 @@ const Dashboard: React.FC = () => {
     );
   }
   
-  // Animation variants for task cards
+  // Animation variants for task cards with improved transitions
   const taskVariants = {
     hidden: { 
       opacity: 0,
       y: 20,
       scale: 0.95,
-      transition: { duration: 0.3 }
+      transition: { duration: 0.2, ease: "easeInOut" }
     },
     visible: { 
       opacity: 1, 
       y: 0,
       scale: 1,
-      transition: { duration: 0.3 }
+      transition: { duration: 0.2, ease: "easeInOut" }
     },
     exit: { 
       opacity: 0,
       scale: 0.95,
-      transition: { duration: 0.2 }
+      y: -10,
+      transition: { duration: 0.15, ease: "easeInOut" }
     }
   };
   
@@ -248,36 +249,42 @@ const Dashboard: React.FC = () => {
                     }
                   </Badge>
                 </div>
-                <div 
-                  className={`grid grid-cols-1 gap-4 overflow-hidden transition-all duration-300 ease-in-out ${
-                    showOverdueTasks ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'
-                  }`}
-                >
-                  <AnimatePresence>
-                    {sortedOverdueTasks.map(task => (
-                      <motion.div
-                        key={task.id}
-                        initial="hidden"
-                        animate="visible"
-                        exit="exit"
-                        variants={taskVariants}
-                        layout
-                      >
-                        <TaskCard 
-                          key={task.id} 
-                          task={task} 
-                          isExpanded={isTaskExpanded(task.id)} 
-                          onToggleExpand={toggleTaskExpanded} 
-                        />
-                      </motion.div>
-                    ))}
-                  </AnimatePresence>
-                </div>
+                <AnimatePresence initial={false}>
+                  {showOverdueTasks && (
+                    <motion.div 
+                      className="grid grid-cols-1 gap-4"
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <AnimatePresence initial={false} mode="popLayout">
+                        {sortedOverdueTasks.map(task => (
+                          <motion.div
+                            key={task.id}
+                            initial="hidden"
+                            animate="visible"
+                            exit="exit"
+                            variants={taskVariants}
+                            layout
+                          >
+                            <TaskCard 
+                              key={task.id} 
+                              task={task} 
+                              isExpanded={isTaskExpanded(task.id)} 
+                              onToggleExpand={toggleTaskExpanded} 
+                            />
+                          </motion.div>
+                        ))}
+                      </AnimatePresence>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             )}
 
-            {/* Non-overdue tasks */}
-            <AnimatePresence>
+            {/* Non-overdue tasks with improved animations */}
+            <AnimatePresence initial={false} mode="popLayout">
               {sortedNonOverdueTasks.map(task => (
                 <motion.div
                   key={task.id}
@@ -286,6 +293,7 @@ const Dashboard: React.FC = () => {
                   exit="exit"
                   variants={taskVariants}
                   layout
+                  layoutId={`task-${task.id}`}
                 >
                   <TaskCard 
                     task={task} 

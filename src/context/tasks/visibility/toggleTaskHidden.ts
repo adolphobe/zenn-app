@@ -12,29 +12,28 @@ export const toggleTaskHidden = async (dispatch: AppDispatch, id: string) => {
     // Dispatch a loading state to give immediate feedback
     dispatch({ type: 'SET_TASK_OPERATION_LOADING', payload: { id, operation: 'toggle-hidden', loading: true } });
     
+    // Dispatch local state change immediately for UI responsiveness
+    // This gives instant visual feedback even before the API call completes
+    dispatch({ type: 'TOGGLE_TASK_HIDDEN', payload: id });
+    
     try {
-      // Call service directly without relying on local state
+      // Call service in background
       const updatedTask = await toggleTaskHiddenService(id);
       console.log('Tarefa atualizada com sucesso:', updatedTask);
-      
-      // Update local state IMMEDIATELY for instant UI feedback
-      dispatch({ type: 'TOGGLE_TASK_HIDDEN', payload: id });
       
       // Reset loading state
       dispatch({ type: 'SET_TASK_OPERATION_LOADING', payload: { id, operation: 'toggle-hidden', loading: false } });
       
-      toast({
-        id: uuidv4(),
-        title: updatedTask.hidden ? "Tarefa oculta" : "Tarefa visível",
-        description: updatedTask.hidden ? "A tarefa foi ocultada." : "A tarefa agora está visível.",
-      });
-      
+      // The toast is now handled by the React Query mutation in useTaskData.ts
       return updatedTask;
     } catch (error: any) {
       console.error('Error toggling task hidden status:', error);
       
       // Reset loading state
       dispatch({ type: 'SET_TASK_OPERATION_LOADING', payload: { id, operation: 'toggle-hidden', loading: false } });
+      
+      // Revert the optimistic update since the API call failed
+      dispatch({ type: 'TOGGLE_TASK_HIDDEN', payload: id });
       
       // Attempt data recovery - fetch from database regardless of specific error
       console.log('Tentando recarregar tarefas para sincronizar com o banco de dados...');
