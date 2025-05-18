@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAuth } from '@/context/auth';
 import { z } from "zod";
+import { useNavigate } from 'react-router-dom';
 
 // Define esquema para validação de formulário
 export const loginSchema = z.object({
@@ -16,7 +17,7 @@ export type LoginFormValues = z.infer<typeof loginSchema>;
 export function useLoginForm(onSuccess?: () => void) {
   const { login } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
-  const [loginError, setLoginError] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -27,40 +28,42 @@ export function useLoginForm(onSuccess?: () => void) {
     mode: "onChange",
   });
 
-  // Função para limpar erros
-  const clearErrors = useCallback(() => {
-    if (loginError) {
-      setLoginError(null);
+  // Mapeamento de erros para códigos de erro
+  const getErrorCode = (errorMessage: string): string => {
+    if (errorMessage.includes('não encontrado') || errorMessage.includes('senha incorreta')) {
+      return '1';
     }
-  }, [loginError]);
-
-  // Configurar limpeza de erros ao digitar em qualquer campo
-  const setupErrorClearing = useCallback(() => {
-    const subscription = form.watch(() => {
-      clearErrors();
-    });
-    return () => subscription.unsubscribe();
-  }, [form, clearErrors]);
+    if (errorMessage.includes('confirme seu e-mail')) {
+      return '2';
+    }
+    if (errorMessage.includes('Muitas tentativas') || errorMessage.includes('rate limit')) {
+      return '4';
+    }
+    return '3'; // Erro genérico
+  };
 
   // Função para lidar com o envio do formulário
   const handleSubmit = async (values: LoginFormValues) => {
     if (isLoading) return;
     
     setIsLoading(true);
-    setLoginError(null);
     
     try {
       const result = await login(values.email, values.password);
       
       if (!result.success) {
         console.log("[LoginForm] Erro de login:", result.error);
-        setLoginError(result.error || "Ocorreu um erro ao tentar fazer login. Por favor, tente novamente.");
+        
+        // Redirecionar para a página de login com o código de erro
+        const errorCode = result.error ? getErrorCode(result.error) : '3';
+        navigate(`/login?erro=${errorCode}`, { replace: true });
       } else if (onSuccess) {
         onSuccess();
       }
     } catch (error: any) {
       console.error("[LoginForm] Erro inesperado:", error);
-      setLoginError("Ocorreu um erro ao tentar fazer login. Por favor, tente novamente.");
+      // Redirecionar para a página de login com código de erro genérico
+      navigate('/login?erro=3', { replace: true });
     } finally {
       setIsLoading(false);
     }
@@ -75,9 +78,6 @@ export function useLoginForm(onSuccess?: () => void) {
   return {
     form,
     isLoading,
-    loginError,
-    onSubmit,
-    setupErrorClearing,
-    clearErrors
+    onSubmit
   };
 }

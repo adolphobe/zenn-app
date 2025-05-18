@@ -1,13 +1,11 @@
 
-import React, { useEffect } from 'react';
+import React, { useState } from 'react';
 import { Form } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import { FormField, FormControl, FormItem, FormMessage } from "@/components/ui/form";
-import LoginErrorDisplay from './auth/LoginErrorDisplay';
 import { useLoginForm } from './auth/useLoginForm';
-import { useState } from 'react';
 
 interface LoginFormProps {
   onSuccess?: () => void;
@@ -25,16 +23,8 @@ const LoginForm: React.FC<LoginFormProps> = ({
   const { 
     form, 
     isLoading, 
-    loginError, 
-    onSubmit,
-    setupErrorClearing 
+    onSubmit
   } = useLoginForm(onSuccess);
-
-  // Configurar limpeza de erros ao digitar
-  useEffect(() => {
-    const unsubscribe = setupErrorClearing();
-    return unsubscribe;
-  }, [setupErrorClearing]);
 
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
 
@@ -42,8 +32,6 @@ const LoginForm: React.FC<LoginFormProps> = ({
     <div className="w-full">
       <Form {...form}>
         <form onSubmit={onSubmit} className="space-y-4" noValidate>
-          <LoginErrorDisplay error={loginError} />
-          
           <FormField
             control={form.control}
             name="email"

@@ -28,6 +28,13 @@ export const login = async (email: string, password: string) => {
         };
       }
       
+      if (error.message.includes('rate limit') || error.message.includes('too many requests')) {
+        return {
+          success: false,
+          error: "Muitas tentativas de login. Aguarde um momento e tente novamente."
+        };
+      }
+      
       // Erro genérico
       return { 
         success: false, 

@@ -1,12 +1,21 @@
 
 import React, { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/auth';
 import LoginForm from '../components/LoginForm';
 import SignupForm from '../components/SignupForm';
 import PasswordResetForm from '../components/PasswordResetForm';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import { motion, AnimatePresence } from 'framer-motion';
+
+// Map of error codes to messages
+const ERROR_MESSAGES = {
+  '1': 'Usuário não encontrado ou senha incorreta. Por favor, verifique suas credenciais.',
+  '2': 'Por favor, confirme seu e-mail antes de fazer login.',
+  '3': 'Ocorreu um erro ao tentar fazer login. Por favor, tente novamente.',
+  '4': 'Muitas tentativas de login. Aguarde um momento e tente novamente.'
+};
 
 const Login: React.FC = () => {
   const location = useLocation();
@@ -16,9 +25,37 @@ const Login: React.FC = () => {
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [isJustLoggedOut, setIsJustLoggedOut] = useState(false);
+  const [searchParams] = useSearchParams();
+  const [loginError, setLoginError] = useState<string | null>(null);
+  const [errorFadeOut, setErrorFadeOut] = useState(false);
   
   // Get redirect path from location state or default to dashboard
   const from = location.state?.from?.pathname || "/dashboard";
+
+  // Check for error parameter in URL
+  useEffect(() => {
+    const errorCode = searchParams.get('erro');
+    
+    if (errorCode && ERROR_MESSAGES[errorCode as keyof typeof ERROR_MESSAGES]) {
+      setLoginError(ERROR_MESSAGES[errorCode as keyof typeof ERROR_MESSAGES]);
+      
+      // Set a timer to fade out the error message after 5 seconds
+      const timer = setTimeout(() => {
+        setErrorFadeOut(true);
+        
+        // After animation completes, clear the error
+        setTimeout(() => {
+          setLoginError(null);
+          setErrorFadeOut(false);
+          
+          // Remove the error parameter from the URL without page refresh
+          navigate('/login', { replace: true });
+        }, 300); // Animation duration
+      }, 5000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [searchParams, navigate]);
   
   // Check if user has just logged out
   useEffect(() => {
@@ -162,6 +199,26 @@ const Login: React.FC = () => {
                   : "Um novo dia chegou. É hora de continuar sua jornada."}
             </p>
           </div>
+
+          {/* Error display */}
+          <AnimatePresence>
+            {loginError && (
+              <motion.div 
+                className="flex items-center gap-3 bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded-md"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: errorFadeOut ? 0 : 1, y: errorFadeOut ? -10 : 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.3 }}
+                role="alert"
+                aria-live="assertive"
+              >
+                <div className="text-red-500 h-5 w-5 flex-shrink-0">⚠️</div>
+                <div>
+                  <p className="font-medium text-sm">{loginError}</p>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {isSignup ? (
             <SignupForm onCancel={toggleSignup} />
