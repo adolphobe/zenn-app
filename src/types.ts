@@ -30,7 +30,7 @@ export interface TaskFormData {
   consequenceScore: number;
   prideScore: number;
   constructionScore: number;
-  idealDate?: Date | null;
+  idealDate?: Date | string | null;  // Updated to match Task.idealDate
   completedAt?: string;
   feedback?: 'transformed' | 'relief' | 'obligation';
   pillar?: string;

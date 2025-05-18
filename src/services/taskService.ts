@@ -1,6 +1,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { Task, TaskFormData } from '@/types';
+import { safeParseDate } from '@/utils';
 
 // Helper function to map the response from Supabase to the Task type
 const mapToTask = (data: any): Task => ({
@@ -10,11 +11,13 @@ const mapToTask = (data: any): Task => ({
   prideScore: data.pride_score,
   constructionScore: data.construction_score,
   totalScore: data.total_score,
-  idealDate: data.ideal_date ? new Date(data.ideal_date) : null,
+  // Always try to parse dates to Date objects when mapping from the database
+  idealDate: data.ideal_date ? safeParseDate(data.ideal_date) : null,
   hidden: data.hidden,
   completed: data.completed,
   completedAt: data.completed_at,
-  createdAt: new Date(data.created_at),
+  // Ensure createdAt is parsed as a Date
+  createdAt: safeParseDate(data.created_at),
   feedback: data.feedback,
   pillar: data.pillar,
   comments: data.comments || []
@@ -62,6 +65,7 @@ export const fetchTasks = async (userId: string, completed: boolean = false): Pr
     throw error;
   }
 
+  // Process dates consistently when fetching data
   return (data || []).map(mapToTask);
 };
 

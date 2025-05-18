@@ -9,6 +9,7 @@ import {
   CONSTRUCTION_PHRASES 
 } from '../constants';
 import { useIsMobile } from '../hooks/use-mobile';
+import { safeParseDate } from '@/utils';
 
 interface TaskFormFieldsProps {
   formData: TaskFormData;
@@ -26,14 +27,17 @@ const TaskFormFields: React.FC<TaskFormFieldsProps> = ({
   const totalScore = formData.consequenceScore + formData.prideScore + formData.constructionScore;
   const isMobile = useIsMobile();
   
-  // Safe function to format date for datetime-local input
-  const formatDateForInput = (date: Date | null): string => {
-    if (!date) return '';
+  // Enhanced function to format date for input - handles both string and Date
+  const formatDateForInput = (dateValue: Date | string | null): string => {
+    if (!dateValue) return '';
     
     try {
+      // Convert string to Date if needed
+      const date = typeof dateValue === 'string' ? safeParseDate(dateValue) : dateValue;
+      
       // Check if the date is valid
-      if (isNaN(date.getTime())) {
-        console.warn('Invalid date for input:', date);
+      if (!date || isNaN(date.getTime())) {
+        console.warn('Invalid date for input:', dateValue);
         return '';
       }
       

@@ -1,4 +1,3 @@
-
 import { Task, DateDisplayOptions, ViewMode, SortOption } from './types';
 
 export const formatDate = (date: Date | string | null, options?: DateDisplayOptions): string => {
@@ -54,7 +53,7 @@ export const getTaskPriorityClass = (score: number): string => {
   return 'task-light';
 };
 
-// Helper function to safely create a Date object
+// Enhanced helper function to safely create a Date object
 export const safeParseDate = (dateInput: string | Date | null | undefined): Date | null => {
   if (!dateInput) return null;
   
@@ -66,9 +65,28 @@ export const safeParseDate = (dateInput: string | Date | null | undefined): Date
     
     // If it's a string, try to parse it
     if (typeof dateInput === 'string') {
+      // First, handle ISO strings directly
       const parsedDate = new Date(dateInput);
       if (!isNaN(parsedDate.getTime())) {
         return parsedDate;
+      }
+      
+      // If standard parsing fails, try other formats
+      // Handle common date formats (e.g., DD/MM/YYYY)
+      if (dateInput.includes('/')) {
+        const parts = dateInput.split(/[\/\-\s:]/);
+        // Assuming DD/MM/YYYY format
+        if (parts.length >= 3) {
+          // Note: month is 0-indexed in JS Date
+          const newDate = new Date(
+            parseInt(parts[2]), // Year
+            parseInt(parts[1]) - 1, // Month
+            parseInt(parts[0]) // Day
+          );
+          if (!isNaN(newDate.getTime())) {
+            return newDate;
+          }
+        }
       }
     }
     
