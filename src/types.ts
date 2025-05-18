@@ -1,3 +1,4 @@
+
 export interface Task {
   id: string;
   title: string;
@@ -12,6 +13,7 @@ export interface Task {
   createdAt: Date | string;
   feedback: 'transformed' | 'relief' | 'obligation' | null;
   comments: Comment[];
+  pillar?: string | null;
   operationLoading?: Record<string, boolean>;
   _optimisticUpdateTime?: number; // Add this property for animation tracking
 }

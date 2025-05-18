@@ -205,15 +205,17 @@ export const addDaysToDate = (date: Date, days: number): Date => {
 };
 
 // Verifica se uma tarefa está vencida (antes da data/hora atual)
-export const isTaskOverdue = (date: Date | null): boolean => {
+export const isTaskOverdue = (date: Date | string | null): boolean => {
   if (!date) return false;
   
+  // Convert string to Date if necessary
+  const dateObj = typeof date === 'string' ? new Date(date) : date;
+  
   // Ensure we have a valid Date object
-  if (!(date instanceof Date) || isNaN(date.getTime())) {
+  if (!(dateObj instanceof Date) || isNaN(dateObj.getTime())) {
     return false;
   }
   
   const now = new Date();
-  return date < now;
+  return dateObj < now;
 };
-

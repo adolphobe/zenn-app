@@ -15,7 +15,7 @@ interface TaskCardExpandedProps {
   onDeleteTask: (e: React.MouseEvent) => void;
   handleExpandedContentClick: (e: React.MouseEvent) => void;
   viewMode: ViewMode;
-  onCollapseTask: () => void; // New prop to handle task collapsing
+  onCollapseTask: () => void; // Prop to handle task collapsing
 }
 
 const expandedContentVariants = {
