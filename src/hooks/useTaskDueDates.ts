@@ -3,6 +3,7 @@ import { useCallback } from 'react';
 import { Task } from '@/types';
 import { dateService } from '@/services/dateService';
 import { useTimeZone } from './useTimeZone';
+import { isAfter, isBefore } from 'date-fns';
 
 /**
  * Hook especializado para manipulação de datas de vencimento de tarefas
@@ -88,5 +89,3 @@ export function useTaskDueDates() {
   };
 }
 
-// Importações necessárias para o hook que não são exportadas pelo dateService
-import { isAfter, isBefore } from 'date-fns';
