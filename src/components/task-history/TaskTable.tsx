@@ -83,7 +83,7 @@ export const CompletedTaskRow: React.FC<{ task: Task }> = ({ task }) => {
         </TableCell>
         <TableCell>{task.totalScore}/15</TableCell>
         <TableCell className="capitalize">{dominantPillar}</TableCell>
-        <TableCell>{task.feedback ? feedbackLabels[task.feedback] : '-'}</TableCell>
+        <TableCell>{task.feedback ? feedbackLabels[task.feedback as keyof typeof feedbackLabels] || '-' : '-'}</TableCell>
         <TableCell>
           <div className="flex gap-2">
             <Button 
@@ -133,26 +133,39 @@ export const CompletedTaskRow: React.FC<{ task: Task }> = ({ task }) => {
   );
 };
 
-export const TasksTable: React.FC<{ tasks: Task[] }> = ({ tasks }) => (
-  <Card>
-    <CardContent className="p-0">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Título</TableHead>
-            <TableHead>Concluído em</TableHead>
-            <TableHead>Pontuação</TableHead>
-            <TableHead>Pilar</TableHead>
-            <TableHead>Feedback</TableHead>
-            <TableHead>Ações</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {tasks.map(task => (
-            <CompletedTaskRow key={task.id} task={task} />
-          ))}
-        </TableBody>
-      </Table>
-    </CardContent>
-  </Card>
-);
+export const TasksTable: React.FC<{ tasks: Task[] }> = ({ tasks }) => {
+  // Verificar se temos tarefas válidas
+  if (!tasks || tasks.length === 0) {
+    return (
+      <Card>
+        <CardContent className="p-4">
+          <p className="text-center text-muted-foreground">Sem tarefas para exibir</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <Card>
+      <CardContent className="p-0">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Título</TableHead>
+              <TableHead>Concluído em</TableHead>
+              <TableHead>Pontuação</TableHead>
+              <TableHead>Pilar</TableHead>
+              <TableHead>Feedback</TableHead>
+              <TableHead>Ações</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {tasks.map(task => (
+              <CompletedTaskRow key={task.id} task={task} />
+            ))}
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
+  );
+};
