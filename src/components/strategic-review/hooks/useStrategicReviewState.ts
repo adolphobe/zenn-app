@@ -2,7 +2,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { PeriodType } from '../types';
 import { getDateRangeByPeriod, filterTasksByDateRange } from '../utils';
-import { format, isSameDay, startOfDay, endOfDay } from 'date-fns';
+import { format, isSameDay, startOfDay, endOfDay, subDays } from 'date-fns';
 import { Task } from '@/types';
 
 export const useStrategicReviewState = (tasks: Task[]) => {
@@ -18,6 +18,13 @@ export const useStrategicReviewState = (tasks: Task[]) => {
     // Log detalhado para verificar se as tarefas possuem dados de conclusão
     const completedWithDate = tasks?.filter(t => t.completed && t.completedAt)?.length || 0;
     console.log(`useStrategicReviewState: ${completedWithDate} tarefas concluídas com data de conclusão`);
+    
+    // Log das primeiras 3 tarefas para debugging
+    if (tasks?.length > 0) {
+      tasks.slice(0, 3).forEach((task, idx) => {
+        console.log(`Task #${idx+1} debug: id=${task.id}, title=${task.title}, completedAt=${task.completedAt}, completed=${task.completed}`);
+      });
+    }
     
     if (tasks?.length > 0 && completedWithDate === 0) {
       console.warn("useStrategicReviewState: ALERTA - Tarefas sem datas de conclusão podem não aparecer na análise");
@@ -46,7 +53,12 @@ export const useStrategicReviewState = (tasks: Task[]) => {
     if (period === 'custom-range' && customStartDate && customEndDate) {
       return [startOfDay(customStartDate), endOfDay(customEndDate)] as [Date, Date];
     }
-    return getDateRangeByPeriod(period);
+    
+    // Usar função auxiliar para calcular intervalo
+    const range = getDateRangeByPeriod(period);
+    console.log(`useStrategicReviewState: Calculado intervalo para ${period}:`, 
+      range[0].toISOString(), "até", range[1].toISOString());
+    return range;
   }, [period, customStartDate, customEndDate]);
   
   // Log do intervalo de datas calculado
@@ -56,18 +68,45 @@ export const useStrategicReviewState = (tasks: Task[]) => {
     }
   }, [dateRange]);
   
-  // Filter tasks based on date range
+  // Filter tasks based on date range with improved debugging
   const filteredTasks = useMemo(() => {
     const tasksSafe = Array.isArray(tasks) ? tasks : [];
-    const filtered = filterTasksByDateRange(tasksSafe, dateRange);
     
-    console.log(`useStrategicReviewState: Filtrado ${filtered.length} de ${tasksSafe.length} tarefas para análise`);
+    // Verificação adicional: converter para o formato esperado se necessário
+    const tasksWithDates = tasksSafe.map(task => {
+      // Certifique-se de que completedAt é um objeto Date válido quando a tarefa está concluída
+      if (task.completed && task.completedAt) {
+        // Se já for um Date, mantenha. Se for string, converta para Date
+        const completedAtDate = task.completedAt instanceof Date 
+          ? task.completedAt 
+          : new Date(task.completedAt);
+        
+        return { ...task, completedAt: completedAtDate };
+      }
+      return task;
+    });
+    
+    console.log(`useStrategicReviewState: Filtrando ${tasksWithDates.length} tarefas por data...`);
+    
+    // TEMPORÁRIO: Para debugging, considerar todas as tarefas concluídas se não houver nenhuma com data
+    const completedTasks = tasksWithDates.filter(t => t.completed);
+    const hasCompletedWithDates = completedTasks.some(t => t.completedAt);
+    
+    if (completedTasks.length > 0 && !hasCompletedWithDates) {
+      console.warn("useStrategicReviewState: TEMPORÁRIO - Mostrando todas as tarefas concluídas porque nenhuma tem data");
+      return completedTasks;
+    }
+    
+    // Usar a função normal de filtragem
+    const filtered = filterTasksByDateRange(tasksWithDates, dateRange);
+    
+    console.log(`useStrategicReviewState: Filtrado ${filtered.length} de ${tasksWithDates.length} tarefas para análise`);
     
     // Log detalhado sobre as tarefas filtradas
-    if (filtered.length === 0 && tasksSafe.length > 0) {
+    if (filtered.length === 0 && tasksWithDates.length > 0) {
       console.warn("useStrategicReviewState: ALERTA - Nenhuma tarefa filtrada apesar de existirem tarefas. Verificando datas:");
       
-      const completedTasks = tasksSafe.filter(t => t.completed);
+      const completedTasks = tasksWithDates.filter(t => t.completed);
       console.log(`useStrategicReviewState: Total de tarefas concluídas: ${completedTasks.length}`);
       
       completedTasks.forEach((task, idx) => {

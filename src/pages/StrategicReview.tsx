@@ -14,13 +14,24 @@ import { useToast } from '@/hooks/use-toast';
 const StrategicReview: React.FC = () => {
   const { state } = useAppContext();
   const { isAuthenticated } = useAuth();
-  const { toasts, addToast } = useToast(); // Corrigido para usar addToast, não toast diretamente
+  const { addToast } = useToast(); // Corrigido para usar addToast
   const isFirstRender = useRef(true);
   
-  // Verificação simples de autenticação
+  // Debug logs
   useEffect(() => {
     console.log("StrategicReview: Estado de autenticação =>", isAuthenticated ? "Autenticado" : "Não autenticado");
-  }, [isAuthenticated]);
+    console.log("StrategicReview: Total de tarefas no estado:", state.tasks.length);
+
+    const completedTasks = state.tasks.filter(t => t.completed);
+    console.log("StrategicReview: Tarefas concluídas:", completedTasks.length);
+    
+    // Log das primeiras tarefas para debug
+    if (completedTasks.length > 0) {
+      completedTasks.slice(0, 3).forEach((task, i) => {
+        console.log(`Tarefa concluída #${i+1}: "${task.title}", completedAt:`, task.completedAt);
+      });
+    }
+  }, [isAuthenticated, state.tasks]);
   
   // Use the task pillars hook to ensure all tasks have pillars assigned
   const { assignMissingPillars } = useTaskPillars();
@@ -53,7 +64,6 @@ const StrategicReview: React.FC = () => {
     
     // Show a toast to indicate the page is loaded - only on first render
     if (isFirstRender.current) {
-      // Use addToast from the hook context
       try {
         addToast({
           title: "Revisão Estratégica",
@@ -72,6 +82,13 @@ const StrategicReview: React.FC = () => {
       <div className="mb-6">
         <h1 className="text-3xl font-bold tracking-tight">Insights das suas tarefas</h1>
         <p className="text-muted-foreground">Período: {dateRangeDisplay || "Carregando..."}</p>
+        
+        {/* Debug info visible in development */}
+        {process.env.NODE_ENV !== 'production' && (
+          <div className="p-2 my-2 bg-yellow-50 border border-yellow-200 rounded text-xs">
+            <p>Debug: Encontradas {filteredTasks.length} tarefas de {state.tasks.length} totais.</p>
+          </div>
+        )}
       </div>
       
       <Tabs 

@@ -30,7 +30,7 @@ const TaskSummaryCard: React.FC<TaskSummaryCardProps> = ({ tasks }) => {
   // Use the custom hook for zone analysis
   const { zoneData, taskStats, colors } = useZoneAnalysis(tasks || []);
   
-  // If no tasks, show alert message
+  // If no tasks, show alert message with more details
   if (!tasks || tasks.length === 0) {
     return (
       <Alert 
@@ -40,6 +40,14 @@ const TaskSummaryCard: React.FC<TaskSummaryCardProps> = ({ tasks }) => {
         <AlertTitle className="text-lg font-medium">Nenhuma tarefa encontrada</AlertTitle>
         <AlertDescription>
           Não foram encontradas tarefas concluídas no período selecionado.
+          <div className="mt-2 text-sm">
+            <p>Possíveis soluções:</p>
+            <ul className="list-disc pl-5 mt-1 space-y-1">
+              <li>Tente selecionar um período maior (semana, mês, etc)</li>
+              <li>Verifique se você possui tarefas concluídas com datas de conclusão</li>
+              <li>Crie e complete tarefas para visualizar análises</li>
+            </ul>
+          </div>
         </AlertDescription>
       </Alert>
     );

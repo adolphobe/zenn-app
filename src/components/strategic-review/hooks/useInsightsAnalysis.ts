@@ -60,8 +60,11 @@ const PILLAR_MESSAGES = {
 
 export const useInsightsAnalysis = (tasks: Task[]): PillarDataType => {
   return useMemo(() => {
+    console.log("useInsightsAnalysis: Analisando", tasks?.length || 0, "tarefas");
+    
     // Return default empty values if no tasks
     if (!tasks || tasks.length === 0) {
+      console.log("useInsightsAnalysis: Sem tarefas, retornando valores padrão");
       return {
         averages: [
           { name: 'Era importante fazer', value: 0, color: COLORS.consequence, id: 'consequence' },
@@ -70,7 +73,29 @@ export const useInsightsAnalysis = (tasks: Task[]): PillarDataType => {
         ],
         highest: null,
         lowest: null,
-        insights: []
+        insights: [
+          {
+            id: 'consequence',
+            title: 'Risco',
+            classification: 'equilibrado',
+            messages: ['Sem dados suficientes para análise neste período.'],
+            customTitle: '⚖️ Dados insuficientes'
+          },
+          {
+            id: 'pride',
+            title: 'Orgulho',
+            classification: 'equilibrado',
+            messages: ['Sem dados suficientes para análise neste período.'],
+            customTitle: '⚖️ Dados insuficientes'
+          },
+          {
+            id: 'construction',
+            title: 'Crescimento pessoal',
+            classification: 'equilibrado',
+            messages: ['Sem dados suficientes para análise neste período.'],
+            customTitle: '⚖️ Dados insuficientes'
+          }
+        ]
       };
     }
     
@@ -78,6 +103,12 @@ export const useInsightsAnalysis = (tasks: Task[]): PillarDataType => {
     const avgConsequence = tasks.reduce((sum, task) => sum + task.consequenceScore, 0) / tasks.length;
     const avgPride = tasks.reduce((sum, task) => sum + task.prideScore, 0) / tasks.length;
     const avgConstruction = tasks.reduce((sum, task) => sum + task.constructionScore, 0) / tasks.length;
+    
+    console.log("useInsightsAnalysis: Médias calculadas:", {
+      consequence: avgConsequence,
+      pride: avgPride,
+      construction: avgConstruction
+    });
     
     const pillars = [
       { name: 'Era importante fazer', value: avgConsequence, color: COLORS.consequence, id: 'consequence' },

@@ -1,4 +1,3 @@
-
 import { PeriodType } from './types';
 import { subDays, startOfWeek, startOfMonth, endOfWeek, endOfMonth } from 'date-fns';
 import { Task } from '@/types';
@@ -27,26 +26,52 @@ export const getDateRangeByPeriod = (period: PeriodType): [Date, Date] => {
   }
 };
 
-// Helper to filter tasks by date range
+// Improved version of filterTasksByDateRange to handle potential date issues
 export const filterTasksByDateRange = (tasks: Task[], dateRange: [Date, Date]): Task[] => {
+  if (!tasks || !Array.isArray(tasks) || tasks.length === 0) {
+    console.log("filterTasksByDateRange: Nenhuma tarefa para filtrar");
+    return [];
+  }
+
+  if (!dateRange || dateRange.length !== 2) {
+    console.log("filterTasksByDateRange: Intervalo de datas inválido, retornando todas as tarefas concluídas");
+    return tasks.filter(task => task.completed);
+  }
+
   const [startDate, endDate] = dateRange;
   
-  // Start and end date with time set to beginning and end of day
-  const startDateTime = new Date(startDate);
-  startDateTime.setHours(0, 0, 0, 0);
+  console.log(`filterTasksByDateRange: Filtrando tarefas entre ${startDate.toISOString()} e ${endDate.toISOString()}`);
   
-  const endDateTime = new Date(endDate);
-  endDateTime.setHours(23, 59, 59, 999);
-  
-  // Filter completed tasks within the date range
-  return tasks.filter(task => {
-    // Only include completed tasks
-    if (!task.completed || !task.completedAt) return false;
+  // Filtrar somente tarefas concluídas e com data de conclusão
+  const result = tasks.filter(task => {
+    // Primeiro verificar se a tarefa está concluída
+    if (!task.completed) {
+      return false;
+    }
     
-    // Check if completion date is within the date range
-    const completionDate = new Date(task.completedAt);
-    return completionDate >= startDateTime && completionDate <= endDateTime;
+    // Verificar se tem data de conclusão
+    if (!task.completedAt) {
+      console.log(`filterTasksByDateRange: Tarefa concluída sem data (${task.title})`);
+      return false;
+    }
+    
+    // Garantir que completedAt é um Date
+    const completedAt = task.completedAt instanceof Date 
+      ? task.completedAt 
+      : new Date(task.completedAt);
+    
+    // Verificar se a data está dentro do intervalo
+    const isInRange = completedAt >= startDate && completedAt <= endDate;
+    
+    if (!isInRange && process.env.NODE_ENV !== 'production') {
+      console.log(`Tarefa "${task.title}" está fora do intervalo, data: ${completedAt.toISOString()}`);
+    }
+    
+    return isInRange;
   });
+  
+  console.log(`filterTasksByDateRange: Encontradas ${result.length} tarefas no intervalo`);
+  return result;
 };
 
 // Helper function to check if a date is within an interval
