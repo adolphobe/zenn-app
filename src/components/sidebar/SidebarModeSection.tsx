@@ -1,78 +1,65 @@
 
 import React from 'react';
-import { useAppContext } from '@/context/AppContext';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, CalendarClock, BarChart, History } from 'lucide-react';
-import SidebarNavItem from './SidebarNavItem';
-import SidebarSection from './SidebarSection';
+import { NavLink } from 'react-router-dom';
+import { Calendar, Clock, ListChecks, History } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { SidebarSection } from './SidebarSection';
 
-const SidebarModeSection: React.FC<{ sidebarOpen: boolean }> = ({ sidebarOpen }) => {
-  const { 
-    state: { viewMode }, 
-    setViewMode
-  } = useAppContext();
-  
-  const location = useLocation();
-  const navigate = useNavigate();
-  
-  // Check if user is on specific routes by checking if the path contains these segments
-  const isStrategicReview = location.pathname === '/strategic-review';
-  const isHistory = location.pathname === '/task-history';
-  const isSettings = location.pathname === '/settings';
-  
-  // Check if user is logged in
-  const isLoggedIn = localStorage.getItem('acto_is_logged_in') === 'true';
-  
-  // Determine the target path based on login status
-  const targetPath = isLoggedIn ? '/dashboard' : '/';
-  
-  // An item should only be active if we're on its page and not on a different special page
-  const isPowerModeActive = viewMode === 'power' && !isStrategicReview && !isHistory && !isSettings;
-  const isChronologicalModeActive = viewMode === 'chronological' && !isStrategicReview && !isHistory && !isSettings;
-  
-  // Navigate to main page with power view mode
-  const handlePowerModeClick = () => {
-    setViewMode('power');
-    navigate(targetPath);
-  };
+interface SidebarModeSectionProps {
+  sidebarOpen: boolean;
+}
 
-  // Navigate to main page with chronological view mode
-  const handleChronologicalModeClick = () => {
-    setViewMode('chronological');
-    navigate(targetPath);
-  };
-  
+const SidebarModeSection: React.FC<SidebarModeSectionProps> = ({ sidebarOpen }) => {
+  // Helper to get active class
+  const getNavClass = ({ isActive }: { isActive: boolean }) =>
+    cn(
+      "flex items-center p-2 rounded-md transition-colors",
+      "hover:bg-gray-100 dark:hover:bg-gray-800",
+      isActive ? "bg-gray-100 dark:bg-gray-800 text-primary" : "text-gray-700 dark:text-gray-300"
+    );
+
   return (
-    <SidebarSection title="Menu" sidebarOpen={sidebarOpen}>
-      <SidebarNavItem 
-        icon={LayoutDashboard} 
-        label="Modo Potência"
-        path={targetPath}
-        isActive={isPowerModeActive}
-        onClick={handlePowerModeClick}
-      />
-      
-      <SidebarNavItem 
-        icon={CalendarClock} 
-        label="Modo Cronológico"
-        path={targetPath}
-        isActive={isChronologicalModeActive}
-        onClick={handleChronologicalModeClick}
-      />
-      
-      <SidebarNavItem 
-        icon={BarChart} 
-        label="Insights"
-        path="/strategic-review"
-        isActive={isStrategicReview}
-      />
+    <SidebarSection 
+      title="Navegação"
+      showTitle={sidebarOpen}
+    >
+      <div className="space-y-1">
+        <NavLink 
+          to="/dashboard" 
+          className={getNavClass}
+          title="Dashboard"
+        >
+          <ListChecks className="w-5 h-5 mr-3" />
+          {sidebarOpen && <span>Dashboard</span>}
+        </NavLink>
+        
+        <NavLink 
+          to="/task-history" 
+          className={getNavClass}
+          title="Histórico"
+        >
+          <History className="w-5 h-5 mr-3" />
+          {sidebarOpen && <span>Histórico</span>}
+        </NavLink>
 
-      <SidebarNavItem 
-        icon={History}
-        label="Histórico"
-        path="/task-history"
-        isActive={isHistory}
-      />
+        <NavLink 
+          to="/task-history-new" 
+          className={getNavClass}
+          title="Novo Histórico"
+        >
+          <Clock className="w-5 h-5 mr-3" />
+          {sidebarOpen && <span>Novo Histórico</span>}
+        </NavLink>
+        
+        <NavLink 
+          to="/strategic-review" 
+          className={getNavClass}
+          title="Análise Estratégica"
+        >
+          <Calendar className="w-5 h-5 mr-3" />
+          {sidebarOpen && <span>Análise Estratégica</span>}
+        </NavLink>
+      </div>
     </SidebarSection>
   );
 };
