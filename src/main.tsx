@@ -17,6 +17,7 @@ const router = createHashRouter([
 ]);
 
 // Render the app
+// Note: React must be defined and imported here for hooks to work correctly
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <RouterProvider router={router} />

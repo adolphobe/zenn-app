@@ -33,16 +33,16 @@ const queryClient = new QueryClient({
   },
 });
 
-// Configuração padrão do fuso horário brasileiro
-React.useEffect(() => {
-  // Inicializar configurações de data na montagem do aplicativo
-  import('./utils/dateUtils').then(({ initializeDateTimeSettings }) => {
-    initializeDateTimeSettings();
-    console.log('Configurações de data e hora inicializadas');
-  });
-}, []);
-
 function App() {
+  // Moved useEffect inside the component where it belongs
+  React.useEffect(() => {
+    // Inicializar configurações de data na montagem do aplicativo
+    import('./utils/dateUtils').then(({ initializeDateTimeSettings }) => {
+      initializeDateTimeSettings();
+      console.log('Configurações de data e hora inicializadas');
+    });
+  }, []);
+
   return (
     <div className="App">
       <QueryClientProvider client={queryClient}>
