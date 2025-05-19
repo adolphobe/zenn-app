@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useAuth } from '../context/auth';
 import { Button } from './ui/button';
 import { AlertCircle } from 'lucide-react';
@@ -21,7 +21,7 @@ const CommentForm: React.FC<CommentFormProps> = ({ taskId, onCommentAdded }) => 
   console.log('[CommentForm] Props:', { taskId, onCommentAdded });
   console.log('[CommentForm] Auth state:', { isAuthenticated, currentUser });
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!text.trim() || !isAuthenticated) {
@@ -30,7 +30,7 @@ const CommentForm: React.FC<CommentFormProps> = ({ taskId, onCommentAdded }) => 
     }
     
     try {
-      console.log('[CommentForm] Submitting comment:', text);
+      console.log('[CommentForm] Submitting comment:', text, 'for taskId:', taskId);
       
       // Use the actual comment hook instead of the action
       await addComment(text.trim(), {
@@ -63,7 +63,7 @@ const CommentForm: React.FC<CommentFormProps> = ({ taskId, onCommentAdded }) => 
         variant: "destructive",
       });
     }
-  };
+  }, [text, isAuthenticated, taskId, addComment, onCommentAdded]);
 
   return (
     <form onSubmit={handleSubmit} className="mt-2">

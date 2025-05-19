@@ -11,11 +11,13 @@ import { dateService } from '@/services/dateService';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { useQueryClient } from '@tanstack/react-query';
 
 // Import our components
 import TaskFormFields from './TaskFormFields';
 import TaskComments from './TaskComments';
 import CommentForm from './CommentForm';
+import { useComments } from '@/hooks/useComments';
 
 interface TaskFormProps {
   onClose: () => void;
@@ -42,6 +44,16 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, initialData, taskId, task,
   const { activeTab, setActiveTab } = useTabNavigation('levels');
   const isMobile = useIsMobile();
   const commentsContainerRef = useRef<HTMLDivElement | null>(null);
+  const queryClient = useQueryClient();
+  
+  // Use our comments hook to fetch and manage comments
+  const { 
+    comments, 
+    isLoading: loadingComments, 
+    refreshComments,
+    isRefetching,
+    addComment: submitComment
+  } = useComments(taskId || '');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -83,7 +95,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, initialData, taskId, task,
   };
   
   // Function to scroll to the bottom of the comments list
-  const scrollToBottom = () => {
+  const scrollToBottom = useCallback(() => {
     if (commentsContainerRef.current) {
       const scrollElement = commentsContainerRef.current.querySelector('.native-scrollbar');
       if (scrollElement) {
@@ -95,22 +107,23 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, initialData, taskId, task,
     } else {
       console.log('[TaskForm] Comments container ref not found');
     }
-  };
+  }, []);
   
   // Effect to scroll to the bottom when the comments tab is selected or comments change
   useEffect(() => {
-    if (activeTab === 'comments' && task?.comments?.length) {
+    if (activeTab === 'comments' && comments?.length) {
       // Small delay to ensure the DOM has been updated
       setTimeout(scrollToBottom, 100);
     }
-  }, [activeTab, task?.comments?.length]);
+  }, [activeTab, comments?.length, scrollToBottom]);
   
   // Handler for when a comment is added
-  const handleCommentAdded = (): void => {
+  const handleCommentAdded = useCallback((): void => {
     console.log('[TaskForm] Comment added callback triggered');
+    refreshComments();
     // Try to scroll to bottom immediately and again after a delay
     setTimeout(scrollToBottom, 300);
-  };
+  }, [refreshComments, scrollToBottom]);
   
   // Simplified content when creating a new task
   if (!isEditing && !taskId) {
@@ -225,7 +238,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, initialData, taskId, task,
                       Níveis
                     </TabsTrigger>
                     <TabsTrigger value="comments" data-testid="comments-tab">
-                      Comentários {task?.comments && task.comments.length > 0 ? `(${task.comments.length})` : ''}
+                      Comentários {comments && comments.length > 0 ? `(${comments.length})` : ''}
                     </TabsTrigger>
                   </TabsList>
                   
@@ -243,14 +256,15 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, initialData, taskId, task,
                   <TabsContent value="comments">
                     {taskId ? (
                       <div ref={commentsContainerRef} className="space-y-4">
-                        {task?.comments && task.comments.length > 0 ? (
+                        {comments && comments.length > 0 ? (
                           <TaskComments 
                             taskId={taskId} 
-                            comments={task.comments}
+                            comments={comments}
+                            onCommentDeleted={() => refreshComments()}
                           />
                         ) : (
                           <div className="py-4 text-center text-gray-500 italic">
-                            Sem comentários para esta tarefa
+                            {loadingComments || isRefetching ? "Carregando comentários..." : "Sem comentários para esta tarefa"}
                           </div>
                         )}
                         

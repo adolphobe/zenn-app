@@ -24,7 +24,7 @@ export const useComments = (taskId: string) => {
   const queryClient = useQueryClient();
 
   // Add logging for debugging
-  console.log('[useComments] Init with taskId:', taskId, 'isAuthenticated:', isAuthenticated);
+  console.log('[useComments] Init with taskId:', taskId, 'isAuthenticated:', isAuthenticated, 'currentUser:', currentUser?.id);
 
   // Use React Query to fetch comments
   const { 
@@ -94,13 +94,24 @@ export const useComments = (taskId: string) => {
       return;
     }
 
-    console.log('[useComments] Adding comment, text:', text, 'taskId:', taskId);
+    if (!taskId) {
+      console.error('[useComments] Cannot add comment: No taskId provided');
+      if (callbacks?.onError) {
+        callbacks.onError(new Error('No taskId provided'));
+      }
+      return;
+    }
+
+    console.log('[useComments] Adding comment, text:', text, 'taskId:', taskId, 'userId:', currentUser.id);
     setIsSubmitting(true);
     
     try {
       // Add comment using the mutation
       const newComment = await addCommentMutation.mutateAsync({ text });
       console.log('[useComments] Comment added successfully:', newComment);
+      
+      // Force refresh of the comments
+      await queryClient.invalidateQueries({ queryKey: ['comments', taskId] });
       
       // Call success callback if provided
       if (callbacks?.onSuccess) {
