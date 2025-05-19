@@ -26,7 +26,7 @@ export const TaskTable: React.FC<TaskTableProps> = ({
   onSelectTask, 
   onRestoreTask 
 }) => {
-  // Helper for score color - UPDATED to match TaskScoreDisplay colors
+  // Helper for score color - UPDATED to match TaskScoreDisplay colors exactly
   const getScoreColor = (score: number) => {
     if (score >= 14) return 'text-red-600';
     if (score >= 11) return 'text-orange-500';
@@ -48,7 +48,7 @@ export const TaskTable: React.FC<TaskTableProps> = ({
     }
   };
 
-  // Helper for feedback label - UPDATED to use full messages
+  // Helper for feedback label - with full messages
   const getFeedbackLabel = (feedback: string | null) => {
     switch(feedback) {
       case 'transformed':

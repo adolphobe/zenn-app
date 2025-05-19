@@ -28,7 +28,6 @@ const TaskHistoryNewPage = () => {
   const { 
     tasks: completedTasks, 
     isLoading: completedTasksLoading,
-    stats,
     refetch
   } = useCompletedTasksData();
   
@@ -61,6 +60,43 @@ const TaskHistoryNewPage = () => {
   const [taskToRestore, setTaskToRestore] = useState<Task | null>(null);
   const [showAnalytics, setShowAnalytics] = useState<boolean>(false);
   
+  // Calculate stats based on filtered tasks
+  const calculateFilteredStats = () => {
+    // Count of filtered tasks
+    const count = filteredTasks.length;
+    
+    // High score tasks (score >= 12)
+    const highScoreCount = filteredTasks.filter(task => task.totalScore >= 12).length;
+    
+    // Average score calculation with null/undefined check
+    let averageScore = 0;
+    const validScoreTasks = filteredTasks.filter(task => typeof task.totalScore === 'number');
+    if (validScoreTasks.length > 0) {
+      const totalScore = validScoreTasks.reduce((sum, task) => sum + (task.totalScore || 0), 0);
+      averageScore = totalScore / validScoreTasks.length;
+    }
+    
+    return {
+      count,
+      highScoreCount,
+      averageScore
+    };
+  };
+  
+  // Get stats for current filtered tasks
+  const filteredStats = calculateFilteredStats();
+  
+  // Check if filters are being applied
+  const isFiltering = searchQuery.trim().length > 0 || 
+    periodFilter !== 'all' || 
+    scoreFilter !== 'all' || 
+    feedbackFilter !== 'all' || 
+    pillarFilter !== 'all';
+    
+  const resultsMessage = isFiltering 
+    ? `${filteredTasks.length} ${filteredTasks.length === 1 ? 'resultado' : 'resultados'} encontrados`
+    : '';
+    
   // Task selection handler
   const handleSelectTask = (taskId: string) => {
     const selectedTask = completedTasks.find(task => task.id === taskId);
@@ -113,17 +149,6 @@ const TaskHistoryNewPage = () => {
       </div>
     );
   }
-
-  // Show search results message when filtering
-  const isFiltering = searchQuery.trim().length > 0 || 
-    periodFilter !== 'all' || 
-    scoreFilter !== 'all' || 
-    feedbackFilter !== 'all' || 
-    pillarFilter !== 'all';
-    
-  const resultsMessage = isFiltering 
-    ? `${filteredTasks.length} ${filteredTasks.length === 1 ? 'resultado' : 'resultados'} encontrados`
-    : '';
 
   return (
     <motion.div 
@@ -199,11 +224,12 @@ const TaskHistoryNewPage = () => {
         <p className="text-sm text-muted-foreground mb-4">{resultsMessage}</p>
       )}
       
-      {/* Display task statistics */}
+      {/* Display dynamic task statistics based on filtered tasks */}
       <TaskStats 
-        count={stats.count}
-        highScoreCount={stats.highScoreCount}
-        averageScore={stats.averageScore}
+        count={filteredStats.count}
+        highScoreCount={filteredStats.highScoreCount}
+        averageScore={filteredStats.averageScore}
+        isFiltered={isFiltering}
       />
       
       {/* Display tasks */}

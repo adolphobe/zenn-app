@@ -32,12 +32,12 @@ export const TaskGrid: React.FC<TaskGridProps> = ({
     obligation: 'Terminei por obrigação'
   };
   
-  // Helper for score color - UPDATED to match TaskScoreDisplay colors
+  // Helper for score color - UPDATED to match TaskScoreDisplay colors exactly
   const getScoreColor = (score: number) => {
-    if (score >= 14) return 'bg-red-50 text-red-800 border-red-200';
-    if (score >= 11) return 'bg-orange-50 text-orange-800 border-orange-200';
-    if (score >= 8) return 'bg-blue-50 text-blue-800 border-blue-200';
-    return 'bg-gray-100 text-gray-800 border-gray-200';
+    if (score >= 14) return 'bg-red-50 text-red-600 border-red-200';
+    if (score >= 11) return 'bg-orange-50 text-orange-500 border-orange-200';
+    if (score >= 8) return 'bg-blue-50 text-blue-600 border-blue-200';
+    return 'bg-gray-100 text-slate-500 border-gray-200';
   };
 
   const containerVariants = {
@@ -79,7 +79,7 @@ export const TaskGrid: React.FC<TaskGridProps> = ({
         
         return (
           <motion.div key={task.id} variants={itemVariants}>
-            <Card className="mb-3 border-l-4 border-l-green-500 hover:bg-muted/10 transition-colors shadow-sm hover:shadow-md">
+            <Card className="mb-3 border-l-4 border-l-green-500 hover:bg-muted/10 transition-colors shadow-sm hover:shadow-md bg-white">
               <CardContent className="p-4">
                 <div 
                   className="cursor-pointer"
