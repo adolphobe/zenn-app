@@ -31,7 +31,7 @@ export const addComment = async (taskId: string, userId: string, text: string): 
 
     if (error) {
       console.error('[taskComments] Error adding comment:', error);
-      throw error;
+      throw new Error(`Failed to add comment: ${error.message}`);
     }
 
     console.log('[taskComments] Comment added successfully:', data);
@@ -58,7 +58,7 @@ export const deleteComment = async (commentId: string): Promise<void> => {
 
     if (error) {
       console.error('[taskComments] Error deleting comment:', error);
-      throw error;
+      throw new Error(`Failed to delete comment: ${error.message}`);
     }
 
     console.log('[taskComments] Comment deleted successfully');
@@ -85,7 +85,7 @@ export const getTaskComments = async (taskId: string): Promise<any[]> => {
 
     if (error) {
       console.error('[taskComments] Error fetching comments:', error);
-      throw error;
+      throw new Error(`Failed to fetch comments: ${error.message}`);
     }
 
     console.log(`[taskComments] Fetched ${data?.length || 0} comments for task ${taskId}`);

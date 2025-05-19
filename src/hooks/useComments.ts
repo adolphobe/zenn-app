@@ -37,7 +37,7 @@ export const useComments = (taskId: string) => {
     queryKey: ['comments', taskId],
     queryFn: () => getTaskComments(taskId),
     // Enable if we have taskId and are authenticated
-    enabled: !!taskId && isAuthenticated,
+    enabled: !!taskId,
     staleTime: 1000 * 60, // 1 minute
     select: (data) => {
       // Log the raw data from database for debugging
@@ -53,6 +53,10 @@ export const useComments = (taskId: string) => {
     mutationFn: async ({ text }: { text: string }) => {
       if (!isAuthenticated || !currentUser?.id) {
         throw new Error('User not authenticated');
+      }
+      
+      if (!taskId) {
+        throw new Error('Task ID is required');
       }
       
       console.log('[useComments] Adding comment to taskId:', taskId, 'userId:', currentUser.id, 'text:', text);
@@ -88,6 +92,12 @@ export const useComments = (taskId: string) => {
   const addComment = async (text: string, callbacks?: MutationCallbacks) => {
     if (!isAuthenticated || !currentUser?.id) {
       console.error('[useComments] Cannot add comment: User not authenticated');
+      toast({
+        id: uuidv4(),
+        title: "Erro ao adicionar comentário",
+        description: "Você precisa estar autenticado para comentar.",
+        variant: "destructive",
+      });
       if (callbacks?.onError) {
         callbacks.onError(new Error('User not authenticated'));
       }
@@ -96,6 +106,12 @@ export const useComments = (taskId: string) => {
 
     if (!taskId) {
       console.error('[useComments] Cannot add comment: No taskId provided');
+      toast({
+        id: uuidv4(),
+        title: "Erro ao adicionar comentário",
+        description: "ID da tarefa não encontrado.",
+        variant: "destructive",
+      });
       if (callbacks?.onError) {
         callbacks.onError(new Error('No taskId provided'));
       }
@@ -107,6 +123,12 @@ export const useComments = (taskId: string) => {
     
     if (trimmedText.length === 0) {
       console.error('[useComments] Cannot add comment: Empty text');
+      toast({
+        id: uuidv4(),
+        title: "Erro ao adicionar comentário",
+        description: "O comentário não pode estar vazio.",
+        variant: "destructive",
+      });
       if (callbacks?.onError) {
         callbacks.onError(new Error('Comment text cannot be empty'));
       }
@@ -130,14 +152,14 @@ export const useComments = (taskId: string) => {
         callbacks.onSuccess();
       }
       
+      setIsSubmitting(false);
       return newComment;
     } catch (error) {
       console.error('[useComments] Error adding comment:', error);
+      setIsSubmitting(false);
       if (callbacks?.onError) {
         callbacks.onError(error);
       }
-    } finally {
-      setIsSubmitting(false);
     }
   };
 

@@ -17,7 +17,7 @@ const CommentForm: React.FC<CommentFormProps> = ({ taskId, onCommentAdded }) => 
   const { isAuthenticated, currentUser } = useAuth();
   const { addComment, isSubmitting } = useComments(taskId);
 
-  // Logs detalhados para debugging
+  // Logs detalhados para debugging - MANTIDOS
   console.log('[CommentForm] Props:', { taskId, onCommentAdded });
   console.log('[CommentForm] Auth state:', { isAuthenticated, currentUser });
   console.log('[CommentForm] Texto do comentário:', text, 'Tipo:', typeof text);
@@ -37,6 +37,28 @@ const CommentForm: React.FC<CommentFormProps> = ({ taskId, onCommentAdded }) => 
     try {
       console.log('[CommentForm] Submitting comment:', trimmedText, 'for taskId:', taskId);
       console.log('[CommentForm] Current user:', currentUser);
+      
+      if (!taskId) {
+        console.error('[CommentForm] Cannot add comment: Task ID is missing');
+        toast({
+          id: uuidv4(),
+          title: "Erro ao adicionar comentário",
+          description: "ID da tarefa não encontrado.",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      if (!currentUser?.id) {
+        console.error('[CommentForm] Cannot add comment: User ID is missing');
+        toast({
+          id: uuidv4(),
+          title: "Erro ao adicionar comentário",
+          description: "Você precisa estar autenticado para comentar.",
+          variant: "destructive",
+        });
+        return;
+      }
       
       // Use the actual comment hook instead of the action
       await addComment(trimmedText, {
