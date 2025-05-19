@@ -79,21 +79,12 @@ const SidebarModeSection: React.FC<SidebarModeSectionProps> = ({ sidebarOpen }) 
         </div>
         
         <NavLink 
-          to="/task-history" 
+          to="/task-history-new" 
           className={getNavClass}
           title="Histórico"
         >
           <History className="w-5 h-5 mr-3" />
           {sidebarOpen && <span>Histórico</span>}
-        </NavLink>
-
-        <NavLink 
-          to="/task-history-new" 
-          className={getNavClass}
-          title="Novo Histórico"
-        >
-          <Clock className="w-5 h-5 mr-3" />
-          {sidebarOpen && <span>Novo Histórico</span>}
         </NavLink>
         
         <NavLink 

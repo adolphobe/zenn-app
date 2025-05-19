@@ -12,7 +12,6 @@ import { PrivateRoute } from './components/PrivateRoute';
 import { AppProvider } from './context/AppProvider';
 import { Toaster } from './components/ui/toaster';
 import Dashboard from './components/Dashboard';
-import TaskHistoryPage from './pages/task-history';
 import TaskHistoryNewPage from './pages/task-history-new';
 import StrategicReview from './pages/StrategicReview';
 import ResetPassword from './pages/ResetPassword';
@@ -60,7 +59,6 @@ function App() {
                         <Route path="/app" element={<ActoApp />} />
                         <Route element={<PrivateRoute />}>
                           <Route path="/dashboard" element={<Dashboard />} />
-                          <Route path="/task-history" element={<TaskHistoryPage />} />
                           <Route path="/task-history-new" element={<TaskHistoryNewPage />} />
                           <Route path="/strategic-review" element={<StrategicReview />} />
                           <Route path="/settings" element={<Settings />} />
