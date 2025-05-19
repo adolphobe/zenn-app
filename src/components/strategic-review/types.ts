@@ -1,5 +1,4 @@
-
-export type PeriodType = 'today' | 'yesterday' | 'week' | 'month' | 'custom' | 'custom-range';
+export type PeriodType = 'today' | 'yesterday' | 'week' | 'month' | 'custom' | 'custom-range' | 'all-time';
 
 export interface InsightMessage {
   id: string;

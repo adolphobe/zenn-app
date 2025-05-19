@@ -14,7 +14,7 @@ import { useToast } from '@/hooks/use-toast';
 const StrategicReview: React.FC = () => {
   const { state } = useAppContext();
   const { isAuthenticated } = useAuth();
-  const { addToast } = useToast(); // Corrigido para usar addToast
+  const { addToast } = useToast(); // Usando addToast do hook
   const isFirstRender = useRef(true);
   
   // Debug logs
@@ -24,12 +24,15 @@ const StrategicReview: React.FC = () => {
 
     const completedTasks = state.tasks.filter(t => t.completed);
     console.log("StrategicReview: Tarefas concluídas:", completedTasks.length);
+    console.log("StrategicReview: Estado tasks:", state.tasks);
     
     // Log das primeiras tarefas para debug
     if (completedTasks.length > 0) {
       completedTasks.slice(0, 3).forEach((task, i) => {
         console.log(`Tarefa concluída #${i+1}: "${task.title}", completedAt:`, task.completedAt);
       });
+    } else {
+      console.log("StrategicReview: Nenhuma tarefa concluída encontrada");
     }
   }, [isAuthenticated, state.tasks]);
   
@@ -87,6 +90,7 @@ const StrategicReview: React.FC = () => {
         {process.env.NODE_ENV !== 'production' && (
           <div className="p-2 my-2 bg-yellow-50 border border-yellow-200 rounded text-xs">
             <p>Debug: Encontradas {filteredTasks.length} tarefas de {state.tasks.length} totais.</p>
+            <p>Debug: Tarefas concluídas: {state.tasks.filter(t => t.completed).length}</p>
           </div>
         )}
       </div>

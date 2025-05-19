@@ -1,5 +1,6 @@
+
 import { PeriodType } from './types';
-import { subDays, startOfWeek, startOfMonth, endOfWeek, endOfMonth } from 'date-fns';
+import { subDays, startOfWeek, startOfMonth, endOfWeek, endOfMonth, subYears } from 'date-fns';
 import { Task } from '@/types';
 
 // Calculate start and end dates based on period
@@ -21,6 +22,9 @@ export const getDateRangeByPeriod = (period: PeriodType): [Date, Date] => {
     case 'custom-range':
       // This will be handled separately with explicit date parameters
       return [subDays(today, 30), today];
+    case 'all-time':
+      // Use a very large range for "all time" - 10 years back to today
+      return [subYears(today, 10), today];
     default:
       return [today, today];
   }
@@ -28,6 +32,8 @@ export const getDateRangeByPeriod = (period: PeriodType): [Date, Date] => {
 
 // Improved version of filterTasksByDateRange to handle potential date issues
 export const filterTasksByDateRange = (tasks: Task[], dateRange: [Date, Date]): Task[] => {
+  console.log("filterTasksByDateRange: Iniciando filtragem de tarefas");
+  
   if (!tasks || !Array.isArray(tasks) || tasks.length === 0) {
     console.log("filterTasksByDateRange: Nenhuma tarefa para filtrar");
     return [];
@@ -41,12 +47,31 @@ export const filterTasksByDateRange = (tasks: Task[], dateRange: [Date, Date]): 
   const [startDate, endDate] = dateRange;
   
   console.log(`filterTasksByDateRange: Filtrando tarefas entre ${startDate.toISOString()} e ${endDate.toISOString()}`);
+  console.log(`filterTasksByDateRange: Total de tarefas antes da filtragem: ${tasks.length}`);
+  
+  // Para debug, vamos verificar todas as tarefas que estão sendo filtradas
+  tasks.forEach((task, index) => {
+    if (task.completed && task.completedAt) {
+      const completedDate = task.completedAt instanceof Date ? 
+        task.completedAt : 
+        new Date(task.completedAt);
+        
+      console.log(`Tarefa #${index} - "${task.title}" - completedAt: ${completedDate.toISOString()}`);
+    } else if (task.completed) {
+      console.log(`Tarefa #${index} - "${task.title}" - concluída mas sem data de conclusão`);
+    }
+  });
   
   // Filtrar somente tarefas concluídas e com data de conclusão
   const result = tasks.filter(task => {
     // Primeiro verificar se a tarefa está concluída
     if (!task.completed) {
       return false;
+    }
+    
+    // Se estamos no modo "all-time", retorne todas as tarefas concluídas
+    if (startDate.getFullYear() <= 2015) {
+      return true;
     }
     
     // Verificar se tem data de conclusão
@@ -63,7 +88,7 @@ export const filterTasksByDateRange = (tasks: Task[], dateRange: [Date, Date]): 
     // Verificar se a data está dentro do intervalo
     const isInRange = completedAt >= startDate && completedAt <= endDate;
     
-    if (!isInRange && process.env.NODE_ENV !== 'production') {
+    if (!isInRange) {
       console.log(`Tarefa "${task.title}" está fora do intervalo, data: ${completedAt.toISOString()}`);
     }
     

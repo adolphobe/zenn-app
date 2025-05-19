@@ -1,56 +1,124 @@
+
 import { useMemo } from 'react';
 import { Task } from '@/types';
 
-// Colors for the charts
-const COLORS = {
-  zone: {
-    critical: '#ffcdd2',
-    important: '#ffe0b2',
-    moderate: '#bbdefb', // Keeping this as is since it's for charts, not text
-    hidden: '#e0e0e0'
-  }
-};
+// Define types for the return value
+interface ZoneData {
+  name: string;
+  value: number;
+  color: string;
+}
 
-export const useZoneAnalysis = (tasks: Task[]) => {
-  // Calculate zone distributions
-  const zoneData = useMemo(() => {
-    const zones = {
-      critical: 0,
-      important: 0,
-      moderate: 0,
-      hidden: 0
-    };
-    
-    tasks.forEach(task => {
-      if (task.totalScore >= 14) zones.critical++;
-      else if (task.totalScore >= 11) zones.important++;
-      else if (task.totalScore >= 8) zones.moderate++;
-      else zones.hidden++;
-    });
-    
-    return [
-      { name: 'Zona de Ação Imediata', value: zones.critical, color: COLORS.zone.critical },
-      { name: 'Zona de Mobilização', value: zones.important, color: COLORS.zone.important },
-      { name: 'Zona Moderada', value: zones.moderate, color: COLORS.zone.moderate },
-      { name: 'Zona Oculta', value: zones.hidden, color: COLORS.zone.hidden }
-    ];
-  }, [tasks]);
+interface TaskStats {
+  avgTotal: number;
+  criticalCount: number;
+  criticalPct: number;
+}
 
-  // Calculate task statistics
-  const taskStats = useMemo(() => {
-    if (tasks.length === 0) return { avgTotal: 0, highConsequence: 0, highPride: 0, criticalCount: 0 };
-    
-    const avgTotal = tasks.reduce((sum, task) => sum + task.totalScore, 0) / tasks.length;
-    const highConsequence = tasks.filter(task => task.consequenceScore >= 4).length;
-    const highPride = tasks.filter(task => task.prideScore === 5).length;
-    const criticalCount = tasks.filter(task => task.totalScore >= 14).length;
-    
-    return { avgTotal, highConsequence, highPride, criticalCount };
-  }, [tasks]);
-
-  return {
-    zoneData,
-    taskStats,
-    colors: COLORS.zone
+interface ZoneAnalysisResult {
+  zoneData: ZoneData[];
+  taskStats: TaskStats | null;
+  colors: {
+    critical: string;
+    important: string;
+    moderate: string;
+    hidden: string;
   };
+}
+
+export const useZoneAnalysis = (tasks: Task[]): ZoneAnalysisResult => {
+  const colors = {
+    critical: '#ef5350',    // Vermelho - tarefas de alto score
+    important: '#ffb74d',   // Laranja - tarefas de médio-alto score
+    moderate: '#64b5f6',    // Azul - tarefas de médio score
+    hidden: '#bdbdbd'       // Cinza - tarefas escondidas
+  };
+  
+  return useMemo(() => {
+    // Validação básica
+    if (!tasks || !Array.isArray(tasks) || tasks.length === 0) {
+      console.log("useZoneAnalysis: Nenhuma tarefa para análise");
+      return { 
+        zoneData: [], 
+        taskStats: null,
+        colors
+      };
+    }
+
+    // Log de debug
+    console.log(`useZoneAnalysis: Analisando ${tasks.length} tarefas concluídas`);
+
+    // Contagem inicial para verificar se há dados válidos
+    let validScoreTasks = 0;
+    tasks.forEach(task => {
+      if (typeof task.totalScore === 'number' || 
+          (typeof task.consequenceScore === 'number' && 
+           typeof task.prideScore === 'number' && 
+           typeof task.constructionScore === 'number')) {
+        validScoreTasks++;
+      }
+    });
+
+    console.log(`useZoneAnalysis: ${validScoreTasks} tarefas com scores válidos`);
+    
+    // Classificar tarefas por zonas baseadas no score total
+    const criticalZone = tasks.filter(task => task.totalScore >= 12);
+    const importantZone = tasks.filter(task => task.totalScore >= 8 && task.totalScore < 12);
+    const moderateZone = tasks.filter(task => task.totalScore < 8);
+    const hiddenTasks = tasks.filter(task => task.hidden);
+    
+    // Calcular estatísticas
+    const totalScore = tasks.reduce((sum, task) => {
+      return sum + (task.totalScore || 0);
+    }, 0);
+
+    const avgTotal = tasks.length > 0 ? totalScore / tasks.length : 0;
+    const criticalCount = criticalZone.length;
+    const criticalPct = tasks.length > 0 ? (criticalCount / tasks.length) * 100 : 0;
+    
+    console.log(`useZoneAnalysis: Pontuação média: ${avgTotal.toFixed(1)}`);
+    console.log(`useZoneAnalysis: Tarefas críticas: ${criticalCount} (${criticalPct.toFixed(1)}%)`);
+
+    // Criar dados para o gráfico de barras
+    const zoneData: ZoneData[] = [
+      {
+        name: "Zona Crítica",
+        value: criticalZone.length,
+        color: colors.critical
+      },
+      {
+        name: "Zona Importante",
+        value: importantZone.length,
+        color: colors.important
+      },
+      {
+        name: "Zona Moderada",
+        value: moderateZone.length,
+        color: colors.moderate
+      }
+    ];
+
+    // Adicionar tarefas escondidas se houver
+    if (hiddenTasks.length > 0) {
+      zoneData.push({
+        name: "Tarefas Ocultas",
+        value: hiddenTasks.length,
+        color: colors.hidden
+      });
+    }
+    
+    // Filtrar zonas vazias para o gráfico
+    const filteredZoneData = zoneData.filter(zone => zone.value > 0);
+    console.log("useZoneAnalysis: Dados do gráfico gerados:", filteredZoneData);
+
+    return {
+      zoneData: filteredZoneData,
+      taskStats: {
+        avgTotal,
+        criticalCount,
+        criticalPct
+      },
+      colors
+    };
+  }, [tasks, colors]);
 };

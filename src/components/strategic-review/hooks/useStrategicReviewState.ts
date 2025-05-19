@@ -17,16 +17,19 @@ export const useStrategicReviewState = (tasks: Task[]) => {
     
     // Log detalhado para verificar se as tarefas possuem dados de conclusão
     const completedWithDate = tasks?.filter(t => t.completed && t.completedAt)?.length || 0;
+    const completedTotal = tasks?.filter(t => t.completed)?.length || 0;
+    
+    console.log(`useStrategicReviewState: ${completedTotal} tarefas concluídas no total`);
     console.log(`useStrategicReviewState: ${completedWithDate} tarefas concluídas com data de conclusão`);
     
     // Log das primeiras 3 tarefas para debugging
     if (tasks?.length > 0) {
       tasks.slice(0, 3).forEach((task, idx) => {
-        console.log(`Task #${idx+1} debug: id=${task.id}, title=${task.title}, completedAt=${task.completedAt}, completed=${task.completed}`);
+        console.log(`Task #${idx+1} debug: id=${task.id}, title=${task.title}, completedAt=${task.completedAt ? (task.completedAt instanceof Date ? task.completedAt.toISOString() : task.completedAt) : 'null'}, completed=${task.completed}`);
       });
     }
     
-    if (tasks?.length > 0 && completedWithDate === 0) {
+    if (completedTotal > 0 && completedWithDate === 0) {
       console.warn("useStrategicReviewState: ALERTA - Tarefas sem datas de conclusão podem não aparecer na análise");
     }
   }, [tasks]);
@@ -72,6 +75,14 @@ export const useStrategicReviewState = (tasks: Task[]) => {
   const filteredTasks = useMemo(() => {
     const tasksSafe = Array.isArray(tasks) ? tasks : [];
     
+    if (tasksSafe.length === 0) {
+      console.log("useStrategicReviewState: Nenhuma tarefa disponível para filtragem");
+      return [];
+    }
+    
+    console.log(`useStrategicReviewState: Filtrando ${tasksSafe.length} tarefas por data...`);
+    console.log(`useStrategicReviewState: Total de tarefas concluídas: ${tasksSafe.filter(t => t.completed).length}`);
+    
     // Verificação adicional: converter para o formato esperado se necessário
     const tasksWithDates = tasksSafe.map(task => {
       // Certifique-se de que completedAt é um objeto Date válido quando a tarefa está concluída
@@ -86,38 +97,54 @@ export const useStrategicReviewState = (tasks: Task[]) => {
       return task;
     });
     
-    console.log(`useStrategicReviewState: Filtrando ${tasksWithDates.length} tarefas por data...`);
-    
-    // TEMPORÁRIO: Para debugging, considerar todas as tarefas concluídas se não houver nenhuma com data
+    // DIAGNÓSTICO: Verificar se existem tarefas concluídas e se suas datas são válidas
     const completedTasks = tasksWithDates.filter(t => t.completed);
-    const hasCompletedWithDates = completedTasks.some(t => t.completedAt);
+    console.log(`useStrategicReviewState: Total de tarefas concluídas (após map): ${completedTasks.length}`);
     
-    if (completedTasks.length > 0 && !hasCompletedWithDates) {
-      console.warn("useStrategicReviewState: TEMPORÁRIO - Mostrando todas as tarefas concluídas porque nenhuma tem data");
-      return completedTasks;
+    if (completedTasks.length > 0) {
+      completedTasks.slice(0, 3).forEach((task, idx) => {
+        const dateVal = task.completedAt ? 
+          (task.completedAt instanceof Date ? task.completedAt.toISOString() : task.completedAt) : 
+          'undefined';
+        console.log(`Tarefa concluída #${idx+1}: "${task.title}", completedAt: ${dateVal}, válida: ${!!task.completedAt}`);
+      });
     }
     
-    // Usar a função normal de filtragem
+    // Para o período "all-time", incluir todas as tarefas concluídas, ignorando datas
+    if (period === 'all-time') {
+      const allCompletedTasks = tasksWithDates.filter(t => t.completed);
+      console.log(`useStrategicReviewState: Modo 'Todo o Tempo' - Retornando ${allCompletedTasks.length} tarefas concluídas`);
+      return allCompletedTasks;
+    }
+    
+    // Usar a função normal de filtragem para outros períodos
     const filtered = filterTasksByDateRange(tasksWithDates, dateRange);
     
     console.log(`useStrategicReviewState: Filtrado ${filtered.length} de ${tasksWithDates.length} tarefas para análise`);
     
     // Log detalhado sobre as tarefas filtradas
-    if (filtered.length === 0 && tasksWithDates.length > 0) {
-      console.warn("useStrategicReviewState: ALERTA - Nenhuma tarefa filtrada apesar de existirem tarefas. Verificando datas:");
-      
-      const completedTasks = tasksWithDates.filter(t => t.completed);
-      console.log(`useStrategicReviewState: Total de tarefas concluídas: ${completedTasks.length}`);
+    if (filtered.length === 0 && completedTasks.length > 0) {
+      console.warn("useStrategicReviewState: ALERTA - Nenhuma tarefa filtrada apesar de existirem tarefas concluídas.");
+      console.log("useStrategicReviewState: Verificando se as tarefas concluídas têm datas válidas.");
       
       completedTasks.forEach((task, idx) => {
         if (idx < 5) { // Limita o log às primeiras 5 tarefas
-          console.log(`Tarefa #${idx + 1}: "${task.title}" - Concluída: ${task.completed}, Data: ${task.completedAt}`);
+          const completedDate = task.completedAt ? 
+            (task.completedAt instanceof Date ? task.completedAt : new Date(task.completedAt)) : 
+            null;
+            
+          console.log(`Tarefa #${idx + 1}: "${task.title}" - Concluída: ${task.completed}, Data: ${completedDate ? completedDate.toISOString() : 'null'}`);
+          
+          if (completedDate) {
+            const isInRange = completedDate >= dateRange[0] && completedDate <= dateRange[1];
+            console.log(`  - Está no intervalo? ${isInRange}, Intervalo: ${dateRange[0].toISOString()} até ${dateRange[1].toISOString()}`);
+          }
         }
       });
     }
     
     return filtered;
-  }, [tasks, dateRange]);
+  }, [tasks, dateRange, period]);
   
   // Format date range for display
   const dateRangeDisplay = useMemo(() => {
@@ -133,6 +160,10 @@ export const useStrategicReviewState = (tasks: Task[]) => {
     
     if (period === 'custom-range' && customStartDate && customEndDate) {
       return `${format(customStartDate, 'dd/MM/yyyy')} - ${format(customEndDate, 'dd/MM/yyyy')}`;
+    }
+    
+    if (period === 'all-time') {
+      return 'Todo o Tempo';
     }
     
     if (isSameDay(start, end)) {

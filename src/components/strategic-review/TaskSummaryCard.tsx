@@ -30,6 +30,40 @@ const TaskSummaryCard: React.FC<TaskSummaryCardProps> = ({ tasks }) => {
   // Use the custom hook for zone analysis
   const { zoneData, taskStats, colors } = useZoneAnalysis(tasks || []);
   
+  // DEBUG: Log data for analysis
+  React.useEffect(() => {
+    console.log("TaskSummaryCard: Recebeu tasks:", tasks?.length || 0);
+    console.log("TaskSummaryCard: ZoneData:", zoneData);
+    console.log("TaskSummaryCard: TaskStats:", taskStats);
+    
+    if (tasks && tasks.length > 0) {
+      // Check if tasks have valid data for analysis
+      const hasValidScores = tasks.every(task => 
+        typeof task.consequenceScore === 'number' && 
+        typeof task.prideScore === 'number' && 
+        typeof task.constructionScore === 'number'
+      );
+      
+      console.log("TaskSummaryCard: Tasks têm scores válidos:", hasValidScores);
+      
+      // Log some sample tasks
+      tasks.slice(0, 2).forEach((task, i) => {
+        console.log(`TaskSummaryCard: Amostra #${i+1}:`, {
+          id: task.id,
+          title: task.title,
+          completed: task.completed,
+          completedAt: task.completedAt,
+          scores: {
+            consequenceScore: task.consequenceScore,
+            prideScore: task.prideScore,
+            constructionScore: task.constructionScore,
+            totalScore: task.totalScore
+          }
+        });
+      });
+    }
+  }, [tasks]);
+  
   // If no tasks, show alert message with more details
   if (!tasks || tasks.length === 0) {
     return (
@@ -43,13 +77,41 @@ const TaskSummaryCard: React.FC<TaskSummaryCardProps> = ({ tasks }) => {
           <div className="mt-2 text-sm">
             <p>Possíveis soluções:</p>
             <ul className="list-disc pl-5 mt-1 space-y-1">
-              <li>Tente selecionar um período maior (semana, mês, etc)</li>
+              <li>Tente selecionar um período maior (semana, mês, ou "Todo o Tempo")</li>
               <li>Verifique se você possui tarefas concluídas com datas de conclusão</li>
               <li>Crie e complete tarefas para visualizar análises</li>
             </ul>
           </div>
         </AlertDescription>
       </Alert>
+    );
+  }
+  
+  // If no zone data or task stats despite having tasks, show a different message
+  if ((!zoneData || zoneData.length === 0 || !taskStats) && tasks.length > 0) {
+    return (
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle>Resumo de Tarefas</CardTitle>
+          <CardDescription>Visão geral das tarefas concluídas no período.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Alert className="bg-yellow-50 border-yellow-100">
+            <AlertTitle>Dados incompletos</AlertTitle>
+            <AlertDescription>
+              Algumas tarefas foram encontradas, mas não possuem dados completos para análise.
+              Verifique se as tarefas possuem pontuações atribuídas.
+            </AlertDescription>
+          </Alert>
+          
+          <div className="mt-4">
+            <div className="rounded-lg bg-blue-50 py-[35px] px-2 text-center">
+              <div className="text-[38px] font-bold text-blue-500">{tasks.length}</div>
+              <div className="text-sm text-gray-600">Tarefas Encontradas</div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     );
   }
   
@@ -82,33 +144,35 @@ const TaskSummaryCard: React.FC<TaskSummaryCardProps> = ({ tasks }) => {
         </div>
         
         {/* Chart container with fixed height */}
-        <div className="h-[160px]">
-          <ChartContainer 
-            config={{
-              critical: { color: colors?.critical || '#ffcdd2' },
-              important: { color: colors?.important || '#ffe0b2' },
-              moderate: { color: colors?.moderate || '#bbdefb' },
-              hidden: { color: colors?.hidden || '#e0e0e0' }
-            }}
-          >
-            <ResponsiveContainer width="100%" height="100%">
-              <Bar
-                data={zoneData || []}
-                dataKey="value"
-                layout="vertical"
-                barSize={18}
-              >
-                <CartesianGrid strokeDasharray="3 3" horizontal={false} />
-                <XAxis type="number" />
-                <YAxis dataKey="name" type="category" width={140} />
-                <Tooltip content={<ChartTooltipContent />} />
-                {zoneData && zoneData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
-                ))}
-              </Bar>
-            </ResponsiveContainer>
-          </ChartContainer>
-        </div>
+        {zoneData && zoneData.length > 0 && (
+          <div className="h-[160px]">
+            <ChartContainer 
+              config={{
+                critical: { color: colors?.critical || '#ffcdd2' },
+                important: { color: colors?.important || '#ffe0b2' },
+                moderate: { color: colors?.moderate || '#bbdefb' },
+                hidden: { color: colors?.hidden || '#e0e0e0' }
+              }}
+            >
+              <ResponsiveContainer width="100%" height="100%">
+                <Bar
+                  data={zoneData || []}
+                  dataKey="value"
+                  layout="vertical"
+                  barSize={18}
+                >
+                  <CartesianGrid strokeDasharray="3 3" horizontal={false} />
+                  <XAxis type="number" />
+                  <YAxis dataKey="name" type="category" width={140} />
+                  <Tooltip content={<ChartTooltipContent />} />
+                  {zoneData && zoneData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Bar>
+              </ResponsiveContainer>
+            </ChartContainer>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
