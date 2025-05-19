@@ -1,12 +1,19 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Task } from '@/types';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { RefreshCw } from 'lucide-react';
+import { AlwaysVisibleScrollArea } from '@/components/ui/always-visible-scroll-area';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { useTabNavigation } from '@/context/hooks/useTabNavigation';
+import RatingSliderReadOnly from '@/components/task-history/completed-task-modal/RatingSliderReadOnly';
+import { CONSEQUENCE_PHRASES, PRIDE_PHRASES, CONSTRUCTION_PHRASES } from '@/constants';
+import TaskComments from '@/components/TaskComments';
+import CommentForm from '@/components/CommentForm';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { RefreshCw } from 'lucide-react';
 
 interface TaskViewModalProps {
   task: Task | null;
@@ -21,115 +28,198 @@ const TaskViewModal: React.FC<TaskViewModalProps> = ({
   onClose,
   onRestore
 }) => {
+  const { activeTab, setActiveTab } = useTabNavigation('levels');
+  const isMobile = useIsMobile();
+  const commentsContainerRef = React.useRef<HTMLDivElement | null>(null);
+
   if (!task) return null;
   
-  // Format date helper
-  const formatDate = (date: Date | string | null) => {
-    if (!date) return 'Data não disponível';
-    return format(new Date(date), 'dd/MM/yyyy HH:mm', { locale: ptBR });
-  };
-  
-  // Helper to determine dominant pillar
-  const getDominantPillar = () => {
-    const scores = [
-      { name: 'risco', value: task.consequenceScore },
-      { name: 'orgulho', value: task.prideScore },
-      { name: 'crescimento', value: task.constructionScore },
-    ];
-    return scores.reduce((prev, current) => 
-      (prev.value > current.value) ? prev : current
-    ).name;
-  };
-
   const handleRestore = () => {
     onRestore(task.id);
     onClose();
   };
+  
+  // Helper for scrolling to bottom of comments
+  const scrollToBottom = () => {
+    if (commentsContainerRef.current) {
+      const scrollElement = commentsContainerRef.current.querySelector('.native-scrollbar');
+      if (scrollElement) {
+        scrollElement.scrollTop = scrollElement.scrollHeight;
+      }
+    }
+  };
+
+  // Helper to format dates
+  const formatDate = (date: Date | string | null) => {
+    if (!date) return 'Data não disponível';
+    return format(new Date(date), 'dd/MM/yyyy HH:mm', { locale: ptBR });
+  };
+
+  // Scroll to bottom when tab changes to comments
+  React.useEffect(() => {
+    if (activeTab === 'comments' && task?.comments?.length) {
+      // Small delay to ensure DOM has updated
+      setTimeout(scrollToBottom, 100);
+    }
+  }, [activeTab, task?.comments?.length]);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className={`bg-white dark:bg-gray-800 rounded-xl ${isMobile ? 'w-full max-w-lg' : 'w-full max-w-3xl'}`}>
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold">Detalhes da Tarefa</DialogTitle>
         </DialogHeader>
         
-        <div className="py-4 space-y-6">
-          {/* Title */}
-          <div>
-            <h2 className="text-lg font-medium">{task.title}</h2>
-            <p className="text-sm text-muted-foreground">
-              Concluída em {formatDate(task.completedAt)}
-            </p>
-          </div>
-          
-          {/* Scores */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
-              <h3 className="text-sm font-medium mb-2">Risco</h3>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Pontuação</span>
-                <Badge variant="outline">{task.consequenceScore}/5</Badge>
+        <div className="flex-grow overflow-hidden" style={{ maxHeight: isMobile ? '60vh' : '70vh' }}>
+          <AlwaysVisibleScrollArea className="h-full">
+            <div className="p-5 space-y-6">
+              {/* Task Title */}
+              <div>
+                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+                  Título da Tarefa
+                </label>
+                <div className="w-full p-3 border rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
+                  {task.title}
+                </div>
               </div>
-            </div>
-            
-            <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
-              <h3 className="text-sm font-medium mb-2">Orgulho</h3>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Pontuação</span>
-                <Badge variant="outline">{task.prideScore}/5</Badge>
-              </div>
-            </div>
-            
-            <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
-              <h3 className="text-sm font-medium mb-2">Crescimento</h3>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Pontuação</span>
-                <Badge variant="outline">{task.constructionScore}/5</Badge>
-              </div>
-            </div>
-          </div>
-          
-          {/* Total score and pillar */}
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
-            <div>
-              <h3 className="text-sm font-medium mb-1">Pilar dominante</h3>
-              <Badge>{getDominantPillar()}</Badge>
-            </div>
-            
-            <div className="mt-4 md:mt-0">
-              <h3 className="text-sm font-medium mb-1">Pontuação total</h3>
-              <span className="text-2xl font-bold">{task.totalScore}/15</span>
-            </div>
-          </div>
-          
-          {/* Feedback section */}
-          {task.feedback && (
-            <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
-              <h3 className="text-sm font-medium mb-2">Feedback</h3>
-              <p>
-                {task.feedback === 'transformed' && 'Foi transformador terminar'}
-                {task.feedback === 'relief' && 'Tive alívio ao finalizar'}
-                {task.feedback === 'obligation' && 'Terminei por obrigação'}
-              </p>
-            </div>
-          )}
-          
-          {/* Comments section - simplified */}
-          {task.comments && task.comments.length > 0 && (
-            <div className="border rounded-lg p-4">
-              <h3 className="text-sm font-medium mb-3">Comentários</h3>
-              <div className="space-y-3 max-h-40 overflow-y-auto">
-                {task.comments.map((comment, index) => (
-                  <div key={index} className="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg">
-                    <p className="text-sm">{comment.text}</p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {format(new Date(comment.createdAt), 'dd/MM/yyyy HH:mm', { locale: ptBR })}
-                    </p>
+              
+              {/* Task Dates & Feedback */}
+              <div className="flex flex-col space-y-2 mt-4">
+                <div className="flex flex-col sm:flex-row sm:justify-between">
+                  <div className="mb-2">
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Concluída em:</span>
+                    <span className="ml-2 text-sm text-gray-600 dark:text-gray-400">
+                      {formatDate(task.completedAt)}
+                    </span>
                   </div>
-                ))}
+                  {task.idealDate && (
+                    <div className="mb-2">
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Data da tarefa:</span>
+                      <span className="ml-2 text-sm text-gray-600 dark:text-gray-400">
+                        {formatDate(task.idealDate)}
+                      </span>
+                    </div>
+                  )}
+                </div>
+                
+                {/* Feedback Section - Dedicated space as requested */}
+                {task.feedback && (
+                  <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg mt-4">
+                    <h3 className="font-medium mb-2 text-gray-700 dark:text-gray-300">Feedback</h3>
+                    <div className="text-gray-600 dark:text-gray-300 px-2 py-1">
+                      {task.feedback === 'transformed' && (
+                        <span className="text-green-600 dark:text-green-400 font-medium">Foi transformador terminar</span>
+                      )}
+                      {task.feedback === 'relief' && (
+                        <span className="text-blue-600 dark:text-blue-400 font-medium">Tive alívio ao finalizar</span>
+                      )}
+                      {task.feedback === 'obligation' && (
+                        <span className="text-amber-600 dark:text-amber-400 font-medium">Terminei por obrigação</span>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
+              
+              {/* Tabs for levels and comments */}
+              <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                <TabsList className="grid w-full grid-cols-2 mb-4">
+                  <TabsTrigger value="levels">
+                    Níveis
+                  </TabsTrigger>
+                  <TabsTrigger value="comments">
+                    Comentários
+                  </TabsTrigger>
+                </TabsList>
+                
+                {/* Levels Tab Content */}
+                <TabsContent value="levels" className="space-y-6">
+                  {isMobile ? (
+                    <div className="space-y-6">
+                      <RatingSliderReadOnly
+                        value={task.consequenceScore}
+                        color="blue"
+                        label="Risco"
+                        description={CONSEQUENCE_PHRASES}
+                      />
+                      
+                      <RatingSliderReadOnly
+                        value={task.prideScore}
+                        color="orange"
+                        label="Orgulho"
+                        description={PRIDE_PHRASES}
+                      />
+                      
+                      <RatingSliderReadOnly
+                        value={task.constructionScore}
+                        color="green"
+                        label="Crescimento pessoal"
+                        description={CONSTRUCTION_PHRASES}
+                      />
+                      
+                      <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg shadow-sm mt-6">
+                        <div className="text-center">
+                          <span className="text-3xl font-bold">{task.totalScore}/15</span>
+                          <p className="text-sm text-gray-500 mt-1">Pontuação total</p>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-2 gap-6">
+                      <div className="space-y-6">
+                        <RatingSliderReadOnly
+                          value={task.consequenceScore}
+                          color="blue"
+                          label="Risco"
+                          description={CONSEQUENCE_PHRASES}
+                        />
+                        
+                        <RatingSliderReadOnly
+                          value={task.prideScore}
+                          color="orange"
+                          label="Orgulho"
+                          description={PRIDE_PHRASES}
+                        />
+                        
+                        <RatingSliderReadOnly
+                          value={task.constructionScore}
+                          color="green"
+                          label="Crescimento pessoal"
+                          description={CONSTRUCTION_PHRASES}
+                        />
+                      </div>
+                      
+                      <div className="space-y-6">
+                        <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg shadow-sm mt-[33px]">
+                          <div className="text-center">
+                            <span className="text-3xl font-bold">{task.totalScore}/15</span>
+                            <p className="text-sm text-gray-500 mt-1">Pontuação total</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </TabsContent>
+                
+                {/* Comments Tab Content */}
+                <TabsContent value="comments">
+                  <div ref={commentsContainerRef}>
+                    {task.comments && task.comments.length > 0 ? (
+                      <div className="space-y-4">
+                        <TaskComments taskId={task.id} comments={task.comments} />
+                        <CommentForm taskId={task.id} onCommentAdded={scrollToBottom} />
+                      </div>
+                    ) : (
+                      <div className="text-center p-6 text-gray-500">
+                        <p>Nenhum comentário para esta tarefa.</p>
+                        <CommentForm taskId={task.id} onCommentAdded={scrollToBottom} />
+                      </div>
+                    )}
+                  </div>
+                </TabsContent>
+              </Tabs>
             </div>
-          )}
+          </AlwaysVisibleScrollArea>
         </div>
         
         <DialogFooter className="flex justify-between">
