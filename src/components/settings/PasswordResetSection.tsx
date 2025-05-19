@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -26,6 +27,7 @@ const PasswordResetSection = () => {
   const [passwordLongEnough, setPasswordLongEnough] = useState(true);
   const [currentPasswordError, setCurrentPasswordError] = useState(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [samePasswordError, setSamePasswordError] = useState(false);
 
   const validateForm = () => {
     let valid = true;
@@ -34,6 +36,7 @@ const PasswordResetSection = () => {
     setPasswordsMatch(true);
     setPasswordLongEnough(true);
     setCurrentPasswordError(false);
+    setSamePasswordError(false);
     
     // Check if new passwords match
     if (newPassword !== confirmPassword) {
@@ -44,6 +47,12 @@ const PasswordResetSection = () => {
     // Check password length (minimum 6 characters for Supabase)
     if (newPassword.length < 6) {
       setPasswordLongEnough(false);
+      valid = false;
+    }
+
+    // Check if new password is the same as current password
+    if (newPassword === currentPassword && newPassword !== '') {
+      setSamePasswordError(true);
       valid = false;
     }
 
@@ -62,6 +71,7 @@ const PasswordResetSection = () => {
     setIsLoading(true);
     setCurrentPasswordError(false);
     setShowSuccessMessage(false);
+    setSamePasswordError(false);
     
     try {
       // First get the current session to retrieve the email
@@ -102,17 +112,42 @@ const PasswordResetSection = () => {
         return;
       }
 
+      // Check if new password is the same as current password
+      if (newPassword === currentPassword) {
+        setSamePasswordError(true);
+        
+        toast({
+          title: "Senha igual à atual",
+          description: "A nova senha não pode ser igual à senha atual.",
+          variant: "destructive"
+        });
+        
+        setIsDialogOpen(false);
+        setIsLoading(false);
+        return;
+      }
+
       // If current password is correct, update to the new password
       const { error: updateError } = await supabase.auth.updateUser({
         password: newPassword
       });
 
       if (updateError) {
-        toast({
-          title: "Erro ao atualizar senha",
-          description: updateError.message,
-          variant: "destructive"
-        });
+        // Handle specific error for same password (from Supabase)
+        if (updateError.message.includes('different from the old password')) {
+          setSamePasswordError(true);
+          toast({
+            title: "Senha igual à atual",
+            description: "A nova senha não pode ser igual à senha atual.",
+            variant: "destructive"
+          });
+        } else {
+          toast({
+            title: "Erro ao atualizar senha",
+            description: updateError.message,
+            variant: "destructive"
+          });
+        }
       } else {
         // Show success message with a more noticeable toast
         toast({
@@ -178,6 +213,7 @@ const PasswordResetSection = () => {
                 onChange={(e) => {
                   setCurrentPassword(e.target.value);
                   setCurrentPasswordError(false);
+                  setSamePasswordError(false);
                 }}
                 required
                 className={currentPasswordError ? "border-red-500" : ""}
@@ -197,14 +233,23 @@ const PasswordResetSection = () => {
                 type="password"
                 placeholder="Digite sua nova senha"
                 value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
+                onChange={(e) => {
+                  setNewPassword(e.target.value);
+                  setSamePasswordError(false);
+                }}
                 required
-                className={!passwordLongEnough ? "border-red-500" : ""}
+                className={!passwordLongEnough || samePasswordError ? "border-red-500" : ""}
               />
               {!passwordLongEnough && (
                 <p className="text-xs text-red-500 flex items-center mt-1">
                   <AlertCircle className="h-3 w-3 mr-1" />
                   A senha deve ter no mínimo 6 caracteres
+                </p>
+              )}
+              {samePasswordError && (
+                <p className="text-xs text-red-500 flex items-center mt-1">
+                  <AlertCircle className="h-3 w-3 mr-1" />
+                  A nova senha não pode ser igual à senha atual
                 </p>
               )}
             </div>
