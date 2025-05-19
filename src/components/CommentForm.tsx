@@ -62,7 +62,7 @@ const CommentForm: React.FC<CommentFormProps> = ({ taskId, onCommentAdded }) => 
           console.log('[CommentForm] Comment added successfully');
           setText(''); // Clear the input on success
           
-          // Force immediate refresh of ALL relevant queries without refetchType parameter
+          // Force immediate refresh of ALL relevant queries
           await Promise.all([
             queryClient.invalidateQueries({ 
               queryKey: ['comments', taskId]

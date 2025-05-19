@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Task, Comment } from '@/types';
 import TaskDetailsModal from '@/components/task/TaskDetailsModal';
 import { useQueryClient } from '@tanstack/react-query';
@@ -14,21 +14,16 @@ interface TaskModalProps {
 
 // Este componente agora simplificado, apenas utilizando o TaskDetailsModal padrão
 const TaskModal: React.FC<TaskModalProps> = ({ task, isOpen, onClose, onRestore }) => {
-  // Track local comments state to ensure UI updates
   const [localComments, setLocalComments] = useState<Comment[]>([]);
   const queryClient = useQueryClient();
   
-  // Use the comments hook directly to get real-time updates
+  // Use the comments hook only if we have a task
   const { 
     comments, 
-    refreshComments, 
-    isLoading, 
-    isRefetching 
+    refreshComments
   } = task?.id ? useComments(task.id) : { 
     comments: [], 
-    refreshComments: () => Promise.resolve(),
-    isLoading: false,
-    isRefetching: false 
+    refreshComments: () => Promise.resolve()
   };
   
   // Update local comments whenever the hook comments change
@@ -43,37 +38,28 @@ const TaskModal: React.FC<TaskModalProps> = ({ task, isOpen, onClose, onRestore 
   useEffect(() => {
     if (isOpen && task?.id) {
       console.log('[TaskModal] Modal opened, refreshing task data for task:', task.id);
-      
-      // Refresh all related data
       queryClient.invalidateQueries({ queryKey: ['comments', task.id] });
       queryClient.invalidateQueries({ queryKey: ['task', task.id] });
-      refreshComments();
     }
-  }, [isOpen, task?.id, queryClient, refreshComments]);
+  }, [isOpen, task?.id, queryClient]);
 
-  // Create a handler to keep task data fresh when comments are added
-  const handleCommentAdded = useCallback(async () => {
+  // Handler for when a comment is added
+  const handleCommentAdded = async () => {
     if (task?.id) {
-      console.log('[TaskModal] Comment added, forcing immediate refresh');
+      console.log('[TaskModal] Comment added, refreshing comments');
       
       try {
-        // Force immediate data refresh
+        // Invalidate the queries
         await queryClient.invalidateQueries({ queryKey: ['comments', task.id] });
         await queryClient.invalidateQueries({ queryKey: ['task', task.id] });
         
-        // Refresh comments without trying to use the return value directly
+        // Get fresh comments data
         await refreshComments();
-        
-        // Get the updated comments from the query cache directly
-        const updatedCommentsData = queryClient.getQueryData<Comment[]>(['comments', task.id]);
-        if (updatedCommentsData) {
-          setLocalComments(updatedCommentsData);
-        }
       } catch (error) {
         console.error('[TaskModal] Error refreshing comments:', error);
       }
     }
-  }, [task?.id, queryClient, refreshComments]);
+  };
 
   return (
     <TaskDetailsModal
