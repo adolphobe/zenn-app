@@ -1,3 +1,4 @@
+
 import React, { useRef, useEffect, useState } from 'react';
 import { Task, TaskFormData } from '../types';
 import TaskFormFields from './TaskFormFields';
@@ -82,6 +83,7 @@ const TaskFormTabs: React.FC<TaskFormTabsProps> = ({
     if (taskId) {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       queryClient.invalidateQueries({ queryKey: ['task', taskId] });
+      queryClient.invalidateQueries({ queryKey: ['comments', taskId] });
     }
   };
 
@@ -97,6 +99,7 @@ const TaskFormTabs: React.FC<TaskFormTabsProps> = ({
     if (taskId) {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       queryClient.invalidateQueries({ queryKey: ['task', taskId] });
+      queryClient.invalidateQueries({ queryKey: ['comments', taskId] });
     }
   };
   
@@ -114,7 +117,7 @@ const TaskFormTabs: React.FC<TaskFormTabsProps> = ({
     );
   }
   
-  // Log rendering info outside of JSX to avoid TypeScript error
+  // Log rendering info in useEffect to avoid TypeScript error
   useEffect(() => {
     if (taskId && task) {
       console.log('[TaskFormTabs] Rendering comments section', { 

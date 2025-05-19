@@ -83,8 +83,9 @@ export interface AppContextType {
   updateTaskTitle: (id: string, title: string) => void;
   setTaskFeedback: (id: string, feedback: 'transformed' | 'relief' | 'obligation') => void;
   restoreTask: (id: string) => void;
-  addComment: (taskId: string, text: string) => void;
-  deleteComment: (taskId: string, commentId: string) => void;
+  // Note: We're removing these from the context as they are now handled by the hook
+  // addComment: (taskId: string, text: string) => void;
+  // deleteComment: (taskId: string, commentId: string) => void;
   syncTasksWithDatabase: (forceSync?: boolean) => Promise<Task[] | null>;
   
   // UI actions

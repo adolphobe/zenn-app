@@ -1,9 +1,9 @@
 
 import React, { useState } from 'react';
-import { useAppContext } from '../context/AppContext';
 import { useAuth } from '../context/auth';
 import { Button } from './ui/button';
 import { toast } from '@/hooks/use-toast';
+import { useComments } from '@/hooks/useComments';
 
 interface CommentFormProps {
   taskId: string;
@@ -12,9 +12,8 @@ interface CommentFormProps {
 
 const CommentForm: React.FC<CommentFormProps> = ({ taskId, onCommentAdded }) => {
   const [text, setText] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const { addComment } = useAppContext();
-  const { currentUser, isAuthenticated } = useAuth();
+  const { isAuthenticated, currentUser } = useAuth();
+  const { addComment, isSubmitting } = useComments(taskId);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,24 +36,16 @@ const CommentForm: React.FC<CommentFormProps> = ({ taskId, onCommentAdded }) => 
       return;
     }
     
-    try {
-      setIsSubmitting(true);
-      
-      // Use the actual user ID from the authentication context
-      const success = await addComment(taskId, text.trim(), currentUser.id);
-      
-      if (success) {
+    // Call the addComment function from our hook
+    addComment(text, {
+      onSuccess: () => {
         setText(''); // Clear form on success
         
         if (onCommentAdded) {
           onCommentAdded();
         }
       }
-    } catch (error) {
-      console.error('[CommentForm] Error adding comment:', error);
-    } finally {
-      setIsSubmitting(false);
-    }
+    });
   };
 
   return (

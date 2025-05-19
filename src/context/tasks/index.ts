@@ -17,11 +17,5 @@ export {
 // Recovery actions
 export { restoreTask } from './recovery/restoreTask';
 
-// Comment actions
-export { 
-  addComment,
-  deleteComment
-} from './comments/commentActions';
-
 // Utility functions
 export { syncTasksFromDatabase } from './utils/syncTasks';

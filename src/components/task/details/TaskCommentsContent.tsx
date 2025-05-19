@@ -1,9 +1,10 @@
 
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Task } from '@/types';
 import TaskComments from '@/components/TaskComments';
 import CommentForm from '@/components/CommentForm';
 import { useQueryClient } from '@tanstack/react-query';
+import { useComments } from '@/hooks/useComments';
 
 interface TaskCommentsContentProps {
   task: Task;
@@ -13,18 +14,17 @@ interface TaskCommentsContentProps {
 const TaskCommentsContent: React.FC<TaskCommentsContentProps> = ({ task, onCommentAdded }) => {
   const commentsRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
-  const [localCommentsCount, setLocalCommentsCount] = useState<number>(task?.comments?.length || 0);
+  const { comments } = useComments(task?.id || '');
   
   // Log task data for debugging
   useEffect(() => {
-    console.log('[TaskCommentsContent] Task data:', {
-      id: task?.id,
-      hasComments: task?.comments && task.comments.length > 0,
-      commentsCount: task?.comments?.length
-    });
-    
-    // Update local count when task comments change
-    setLocalCommentsCount(task?.comments?.length || 0);
+    if (task?.id) {
+      console.log('[TaskCommentsContent] Task data:', {
+        id: task?.id,
+        hasComments: task?.comments && task.comments.length > 0,
+        commentsCount: task?.comments?.length
+      });
+    }
   }, [task]);
   
   // Verificar se a tarefa existe e tem um ID válido
@@ -36,18 +36,15 @@ const TaskCommentsContent: React.FC<TaskCommentsContentProps> = ({ task, onComme
     );
   }
 
-  const hasComments = task.comments && task.comments.length > 0;
+  const taskComments = task.comments || comments;
+  const hasComments = taskComments && taskComments.length > 0;
   
   // Handler para quando um comentário é adicionado
   const handleCommentAdded = (): void => {
-    console.log('[TaskCommentsContent] Comment added, calling parent callback');
-    
-    // Increment local counter to help UI update immediately
-    setLocalCommentsCount(prev => prev + 1);
-    
     // Invalidate queries to refresh task data
     queryClient.invalidateQueries({ queryKey: ['tasks'] });
     queryClient.invalidateQueries({ queryKey: ['task', task.id] });
+    queryClient.invalidateQueries({ queryKey: ['comments', task.id] });
     
     // Call parent callback if provided
     if (onCommentAdded) {
@@ -68,14 +65,10 @@ const TaskCommentsContent: React.FC<TaskCommentsContentProps> = ({ task, onComme
   
   // Handler para quando um comentário é removido
   const handleCommentDeleted = (): void => {
-    console.log('[TaskCommentsContent] Comment deleted, updating UI');
-    
-    // Decrement local counter to help UI update immediately
-    setLocalCommentsCount(prev => Math.max(0, prev - 1));
-    
     // Invalidate queries to refresh task data
     queryClient.invalidateQueries({ queryKey: ['tasks'] });
     queryClient.invalidateQueries({ queryKey: ['task', task.id] });
+    queryClient.invalidateQueries({ queryKey: ['comments', task.id] });
   };
 
   return (
@@ -84,7 +77,7 @@ const TaskCommentsContent: React.FC<TaskCommentsContentProps> = ({ task, onComme
         <div className="space-y-4">
           <TaskComments 
             taskId={task.id} 
-            comments={task.comments} 
+            comments={taskComments} 
             onCommentDeleted={handleCommentDeleted}
           />
           <CommentForm taskId={task.id} onCommentAdded={handleCommentAdded} />

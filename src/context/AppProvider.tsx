@@ -28,8 +28,6 @@ import {
   updateTaskTitle,
   setTaskFeedback,
   restoreTask,
-  addComment,
-  deleteComment,
   syncTasksFromDatabase
 } from './tasks';
 
@@ -226,7 +224,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     isAuthenticated
   ]);
 
-  // Create context value object with all actions
+  // Create context value object with all actions - removed addComment and deleteComment
   const contextValue: AppContextType = {
     state,
     dispatch,
@@ -239,8 +237,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     updateTaskTitle: (id, title) => updateTaskTitle(dispatch, id, title),
     setTaskFeedback: (id, feedback) => setTaskFeedback(dispatch, id, feedback),
     restoreTask: (id) => restoreTask(dispatch, id),
-    addComment: (taskId, text) => addComment(dispatch, taskId, text),
-    deleteComment: (taskId, commentId) => deleteComment(dispatch, taskId, commentId),
     syncTasksWithDatabase: (forceSync = true) => syncTasksWithDatabase(forceSync),
     
     // UI actions
@@ -253,7 +249,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     toggleShowScores: () => uiActions.toggleShowScores(dispatch),
     updateDateDisplayOptions: (options) => uiActions.updateDateDisplayOptions(dispatch, options),
     setSortOptions: (options) => uiActions.setSortOptions(dispatch, options),
-    toggleViewMode: () => dispatch({ type: 'TOGGLE_VIEW_MODE' }) // Add toggleViewMode function
+    toggleViewMode: () => dispatch({ type: 'TOGGLE_VIEW_MODE' })
   };
 
   return (

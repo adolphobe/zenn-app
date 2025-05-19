@@ -1,11 +1,10 @@
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { format } from 'date-fns';
 import { Comment } from '@/types';
-import { useAppContext } from '@/context/AppContext';
 import { X } from 'lucide-react';
-import { cn } from "@/lib/utils";
 import { safeParseDate } from '@/utils';
+import { useComments } from '@/hooks/useComments';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,29 +23,12 @@ interface TaskCommentsProps {
   onCommentDeleted?: () => void; 
 }
 
-const TaskComments: React.FC<TaskCommentsProps> = ({ taskId, comments, onCommentDeleted }) => {
-  const { deleteComment } = useAppContext();
-  const [commentToDelete, setCommentToDelete] = useState<string | null>(null);
+const TaskComments: React.FC<TaskCommentsProps> = ({ taskId, comments: initialComments, onCommentDeleted }) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const [localComments, setLocalComments] = useState<Comment[]>(comments);
+  const { comments: hookComments, deleteComment } = useComments(taskId);
   
-  // Update local comments when props change
-  useEffect(() => {
-    setLocalComments(comments);
-  }, [comments]);
-  
-  // Add more detailed logging for debugging
-  useEffect(() => {
-    console.log(`[TaskComments] Rendering ${localComments.length} comments for task ${taskId}`);
-    localComments.forEach((comment, index) => {
-      console.log(`[TaskComments] Comment ${index}:`, {
-        id: comment.id,
-        text: comment.text,
-        createdAt: comment.createdAt,
-        userId: comment.userId
-      });
-    });
-  }, [localComments, taskId]);
+  // Use either the props comments or the data from the hook, with props taking precedence
+  const displayComments = initialComments.length > 0 ? initialComments : hookComments;
   
   // Add global CSS for scrollbar
   useEffect(() => {
@@ -98,7 +80,6 @@ const TaskComments: React.FC<TaskCommentsProps> = ({ taskId, comments, onComment
       
       // Add to head
       document.head.appendChild(style);
-      console.log('[TaskComments] Added scrollbar styles');
     }
     
     // No need to clean up, we want the style to remain.
@@ -106,58 +87,30 @@ const TaskComments: React.FC<TaskCommentsProps> = ({ taskId, comments, onComment
   
   // Effect to scroll to bottom whenever comments change
   useEffect(() => {
-    if (scrollContainerRef.current && localComments.length > 0) {
+    if (scrollContainerRef.current && displayComments.length > 0) {
       // Scroll to bottom of comments div
       scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight;
-      console.log('[TaskComments] Scrolled to bottom of comments container');
     }
-  }, [localComments]); // Execute when comments change
+  }, [displayComments]); // Execute when comments change
   
-  if (!localComments || localComments.length === 0) {
-    console.log('[TaskComments] No comments to display');
+  if (!displayComments || displayComments.length === 0) {
     return null;
   }
   
   const handleDeleteComment = async (commentId: string) => {
-    if (!deleteComment) {
-      console.error('[TaskComments] deleteComment function is not available');
-      return;
-    }
-    
-    console.log(`[TaskComments] Deleting comment ${commentId} for task ${taskId}`);
-    
-    // Update local state immediately for instant UI feedback
-    setLocalComments(prev => prev.filter(comment => comment.id !== commentId));
-    
-    try {
-      // Delete from database and global state
-      await deleteComment(taskId, commentId);
-      
-      // Always call the callback since we're in the try block
-      // This fixes the TypeScript error by not testing void for truthiness
-      if (onCommentDeleted) {
-        console.log('[TaskComments] Calling onCommentDeleted callback');
-        onCommentDeleted();
+    // Use the deleteComment function from our hook
+    deleteComment(commentId, {
+      onSuccess: () => {
+        // Call the callback since we're in the success handler
+        if (onCommentDeleted) {
+          onCommentDeleted();
+        }
       }
-    } catch (error) {
-      console.error('[TaskComments] Error deleting comment:', error);
-      // Restore the comment in the UI since deletion failed
-      const deletedComment = comments.find(c => c.id === commentId);
-      if (deletedComment) {
-        setLocalComments(prev => [...prev, deletedComment]);
-      }
-    }
-    
-    setCommentToDelete(null);
+    });
   };
   
   // Prevent click event propagation
   const handleContainerClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-  };
-  
-  // Prevent mousedown in the comment form from bubbling up
-  const handleContainerMouseDown = (e: React.MouseEvent) => {
     e.stopPropagation();
   };
   
@@ -169,14 +122,12 @@ const TaskComments: React.FC<TaskCommentsProps> = ({ taskId, comments, onComment
       
       // If date is invalid, return fallback text
       if (!parsedDate) {
-        console.warn('[TaskComments] Invalid comment date encountered:', dateString);
         return 'Data indisponível';
       }
       
       // Format valid date
       return format(parsedDate, 'dd/MM/yyyy HH:mm');
     } catch (error) {
-      console.error('[TaskComments] Error formatting comment date:', error, dateString);
       return 'Data indisponível';
     }
   };
@@ -185,14 +136,14 @@ const TaskComments: React.FC<TaskCommentsProps> = ({ taskId, comments, onComment
     <div className="mt-4 cursor-default" onClick={handleContainerClick}>
       <h4 className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">Comentários</h4>
       
-      {/* Div with native scrollbar and styling, now with ref and onClick to avoid propagation */}
+      {/* Div with native scrollbar and styling */}
       <div 
         ref={scrollContainerRef}
         className="native-scrollbar h-60 overflow-auto rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 cursor-default"
         onClick={handleContainerClick}
       >
         <div className="space-y-3 p-4">
-          {localComments.map(comment => (
+          {displayComments.map(comment => (
             <div 
               key={comment.id} 
               className="bg-gray-50 dark:bg-gray-800 p-3 rounded-md relative"
