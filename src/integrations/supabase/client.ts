@@ -18,7 +18,7 @@ export const supabase = createClient<Database>(
       persistSession: true,
       autoRefreshToken: true,
       detectSessionInUrl: true, // Important for password reset and OAuth flows
-      debug: true, // Enable debug logs to help troubleshoot authentication issues
+      debug: false, // Turn off debug logs to reduce console noise
       flowType: 'pkce', // Use PKCE flow for better security
     },
   }
