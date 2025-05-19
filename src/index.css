@@ -115,7 +115,7 @@
 @layer components {
   /* Botão Verde */
   .btn-green {
-    background-color: #44a648 !important;
+    background-color: #3d9c40 !important;
     color: white !important;
     transition: all 0.2s ease-in-out;
   }
