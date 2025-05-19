@@ -21,11 +21,11 @@ export const useTaskStateOperations = (
     toggleCompleteLoading 
   } = useTaskCompletionToggle(tasks, completed, setTaskOperationLoading);
   
-  // Task visibility toggle mutation
+  // Task visibility toggle mutation - now passing all three required arguments
   const { 
     toggleTaskHidden, 
     toggleHiddenLoading 
-  } = useTaskVisibilityToggle(tasks, setTaskOperationLoading);
+  } = useTaskVisibilityToggle(tasks, completed, setTaskOperationLoading);
   
   // Task feedback mutation
   const { 
