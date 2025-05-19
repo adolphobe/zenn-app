@@ -24,24 +24,26 @@ const PasswordResetSection = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [passwordsMatch, setPasswordsMatch] = useState(true);
   const [passwordLongEnough, setPasswordLongEnough] = useState(true);
+  const [currentPasswordError, setCurrentPasswordError] = useState(false);
 
   const validateForm = () => {
     let valid = true;
+    
+    // Reset errors
+    setPasswordsMatch(true);
+    setPasswordLongEnough(true);
+    setCurrentPasswordError(false);
     
     // Check if new passwords match
     if (newPassword !== confirmPassword) {
       setPasswordsMatch(false);
       valid = false;
-    } else {
-      setPasswordsMatch(true);
     }
 
     // Check password length (minimum 6 characters for Supabase)
     if (newPassword.length < 6) {
       setPasswordLongEnough(false);
       valid = false;
-    } else {
-      setPasswordLongEnough(true);
     }
 
     return valid;
@@ -57,6 +59,7 @@ const PasswordResetSection = () => {
 
   const handlePasswordChange = async () => {
     setIsLoading(true);
+    setCurrentPasswordError(false);
     
     try {
       // First get the current session to retrieve the email
@@ -81,11 +84,17 @@ const PasswordResetSection = () => {
       });
 
       if (signInError) {
+        console.error("Erro na verificação de senha:", signInError.message);
+        
+        // Show error for current password
+        setCurrentPasswordError(true);
+        
         toast({
           title: "Senha atual incorreta",
           description: "Por favor, verifique sua senha atual e tente novamente.",
           variant: "destructive"
         });
+        
         setIsDialogOpen(false);
         setIsLoading(false);
         return;
@@ -105,7 +114,7 @@ const PasswordResetSection = () => {
       } else {
         toast({
           title: "Senha alterada com sucesso",
-          description: "Sua senha foi atualizada."
+          description: "Sua senha foi atualizada. Sua sessão continua ativa."
         });
 
         // Clear form inputs
@@ -145,9 +154,19 @@ const PasswordResetSection = () => {
                 type="password"
                 placeholder="Digite sua senha atual"
                 value={currentPassword}
-                onChange={(e) => setCurrentPassword(e.target.value)}
+                onChange={(e) => {
+                  setCurrentPassword(e.target.value);
+                  setCurrentPasswordError(false);
+                }}
                 required
+                className={currentPasswordError ? "border-red-500" : ""}
               />
+              {currentPasswordError && (
+                <p className="text-xs text-red-500 flex items-center mt-1">
+                  <AlertCircle className="h-3 w-3 mr-1" />
+                  Senha atual incorreta
+                </p>
+              )}
             </div>
             
             <div className="space-y-2">
