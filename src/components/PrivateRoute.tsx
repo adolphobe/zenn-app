@@ -10,12 +10,10 @@ import { logInfo } from '@/utils/logUtils';
 
 /**
  * PrivateRoute - Protects routes that require authentication
- * Fixed to handle navigation properly with hash router
  */
 export const PrivateRoute = () => {
   const { isAuthenticated, isLoading } = useAuth();
   const location = useLocation();
-  const navigate = useNavigate();
   const { isOpen: sidebarOpen, open: openSidebar, isMobile } = useSidebar();
   const [authChecked, setAuthChecked] = useState(false);
   
@@ -24,21 +22,6 @@ export const PrivateRoute = () => {
     localStorage.getItem('logout_in_progress') === 'true',
   []);
   
-  // Ensure current path is clean, without duplications
-  useEffect(() => {
-    const currentPath = location.pathname;
-    
-    // Log navigation without triggering extra renders
-    if (currentPath !== '/dashboard') {
-      logInfo('PrivateRoute', `Navegação detectada para: ${currentPath}`);
-    }
-    
-    // Private route paths should always start with /
-    if (currentPath && !currentPath.startsWith('/')) {
-      navigate(`/${currentPath}`, { replace: true });
-    }
-  }, [location.pathname, navigate]);
-
   // Use effect to ensure we've completed at least one auth check
   useEffect(() => {
     if (!isLoading) {
@@ -57,8 +40,6 @@ export const PrivateRoute = () => {
   const actuallyAuthenticated = isAuthenticated && !logoutInProgress;
   
   if (!actuallyAuthenticated) {
-    logInfo('PrivateRoute', `Usuário não autenticado, redirecionando de ${location.pathname}`);
-    
     // Return a redirect to login with current location stored for later redirect back
     return <Navigate to="/login" state={{ from: location }} replace />;
   }

@@ -4,7 +4,6 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSidebar } from '@/context/hooks/useSidebar';
-import { logInfo } from '@/utils/logUtils';
 
 interface SidebarNavItemProps {
   icon: LucideIcon;
@@ -29,7 +28,7 @@ const SidebarNavItem: React.FC<SidebarNavItemProps> = ({
   const navigate = useNavigate();
   const { isOpen } = useSidebar();
   
-  // Compare only the actual path part, ignoring hash parts
+  // Compare only the actual path part for HashRouter
   const currentPath = location.pathname;
   // Normalize path, ensuring it has a leading slash
   const normalizedPath = path.startsWith('/') ? path : `/${path}`;
@@ -49,10 +48,7 @@ const SidebarNavItem: React.FC<SidebarNavItemProps> = ({
       // Ensure path is properly formatted with leading slash if needed
       const formattedPath = path.startsWith('/') ? path : `/${path}`;
       
-      // Log action for debugging
-      logInfo('SidebarNavItem', `Navegação para: ${formattedPath}`, { from: currentPath });
-      
-      // Navigate to the path directly without hash manipulation
+      // Navigate to the path directly
       navigate(formattedPath);
     }
   };

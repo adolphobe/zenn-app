@@ -59,9 +59,7 @@ function App() {
                         <Route path="/app" element={<ActoApp />} />
                         <Route element={<PrivateRoute />}>
                           <Route path="/dashboard" element={<Dashboard />} />
-                          {/* Removed dashboard2 route */}
                           <Route path="/task-history" element={<TaskHistory />} />
-                          {/* No longer need duplicate task-history route without leading slash */}
                           <Route path="/strategic-review" element={<StrategicReview />} />
                           <Route path="/settings" element={<Settings />} />
                         </Route>

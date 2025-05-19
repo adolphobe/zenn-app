@@ -1,29 +1,19 @@
 
-import React, { useState, useEffect } from 'react';
-import { useAppContext } from '@/context/AppContext';
+import React from 'react';
 import { useAuth } from '@/context/auth';
 import { useTaskDataContext } from '@/context/TaskDataProvider';
-import { logInfo } from '@/utils/logUtils';
-import { TaskHistoryContent } from './TaskHistoryContent';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Loader2 } from 'lucide-react';
 
+/**
+ * Simplified TaskHistoryPage component that displays completed tasks
+ */
 const TaskHistoryPage = () => {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
-  const [error, setError] = useState<string | null>(null);
-  
-  // Use the TaskDataContext for completed tasks
   const { completedTasks, completedTasksLoading } = useTaskDataContext();
-  const isLoading = completedTasksLoading || authLoading;
   
-  // Log page load only once to reduce console noise
-  useEffect(() => {
-    logInfo('TaskHistory', 'Página de histórico de tarefas carregada', {
-      autenticado: isAuthenticated,
-      carregando: isLoading,
-      tarefas: completedTasks.length
-    });
-  }, []);
+  const isLoading = completedTasksLoading || authLoading;
 
   if (isLoading) {
     return (
@@ -32,17 +22,6 @@ const TaskHistoryPage = () => {
           <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-primary" />
           <p className="text-muted-foreground">Carregando histórico de tarefas...</p>
         </div>
-      </div>
-    );
-  }
-  
-  if (error) {
-    return (
-      <div className="container p-4 mx-auto">
-        <Alert variant="destructive">
-          <AlertTitle>Erro ao carregar tarefas</AlertTitle>
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
       </div>
     );
   }
@@ -60,7 +39,48 @@ const TaskHistoryPage = () => {
     );
   }
 
-  return <TaskHistoryContent setError={setError} />;
+  // Simplified content - just show a list of completed tasks
+  return (
+    <div className="container p-4 mx-auto">
+      <h1 className="text-2xl font-bold mb-4">Histórico de Tarefas</h1>
+      
+      <div className="text-muted-foreground mb-4">
+        {completedTasks.length > 0 ? 
+          `${completedTasks.length} ${completedTasks.length === 1 ? 'tarefa concluída' : 'tarefas concluídas'}` : 
+          'Nenhuma tarefa concluída para exibir'
+        }
+      </div>
+
+      {completedTasks.length === 0 ? (
+        <Alert>
+          <AlertTitle>Nenhuma tarefa concluída</AlertTitle>
+          <AlertDescription>
+            Quando você concluir tarefas, elas aparecerão aqui.
+          </AlertDescription>
+        </Alert>
+      ) : (
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {completedTasks.map((task) => (
+            <Card key={task.id}>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-md font-medium">
+                  {task.title}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground line-clamp-2 mb-2">
+                  {task.description || 'Sem descrição'}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Concluída em: {task.completedAt ? new Date(task.completedAt).toLocaleDateString('pt-BR') : 'Data desconhecida'}
+                </p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 };
 
 export default TaskHistoryPage;
