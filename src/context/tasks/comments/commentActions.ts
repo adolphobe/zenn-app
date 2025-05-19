@@ -8,6 +8,7 @@ import {
 } from '@/services/task';
 import { Comment } from '@/types';
 import { supabase } from '@/integrations/supabase/client';
+import { mapToComment } from '@/services/task/taskMapper';
 
 // Helper to get the current user through Supabase client directly
 const getCurrentUser = async () => {
@@ -54,13 +55,9 @@ export const addComment = async (dispatch: AppDispatch, taskId: string, text: st
       throw new Error('Failed to add comment');
     }
     
-    // Create complete comment object for Redux state
-    const newComment: Comment = {
-      id: commentData.id,
-      text: text,
-      createdAt: commentData.created_at || new Date().toISOString(),
-      userId: currentUser.id
-    };
+    // Create complete comment object using the mapper
+    const newComment = mapToComment(commentData);
+    console.log('[CommentActions] Mapped comment:', newComment);
     
     // Update local state with the complete comment
     dispatch({ 
@@ -76,6 +73,8 @@ export const addComment = async (dispatch: AppDispatch, taskId: string, text: st
       title: "Comentário adicionado",
       description: "Seu comentário foi adicionado com sucesso."
     });
+
+    return newComment;
   } catch (error) {
     console.error('[CommentActions] Error adding comment:', error);
     toast({
@@ -84,6 +83,7 @@ export const addComment = async (dispatch: AppDispatch, taskId: string, text: st
       description: "Não foi possível adicionar o comentário. Tente novamente.",
       variant: "destructive",
     });
+    return null;
   }
 };
 

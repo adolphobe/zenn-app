@@ -28,9 +28,17 @@ const TaskComments: React.FC<TaskCommentsProps> = ({ taskId, comments }) => {
   const [commentToDelete, setCommentToDelete] = useState<string | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   
-  // Log comments when they change
+  // Add more detailed logging for debugging
   useEffect(() => {
-    console.log(`[TaskComments] Rendering ${comments.length} comments for task ${taskId}`, comments);
+    console.log(`[TaskComments] Rendering ${comments.length} comments for task ${taskId}`);
+    comments.forEach((comment, index) => {
+      console.log(`[TaskComments] Comment ${index}:`, {
+        id: comment.id,
+        text: comment.text,
+        createdAt: comment.createdAt,
+        userId: comment.userId
+      });
+    });
   }, [comments, taskId]);
   
   // Add global CSS for scrollbar

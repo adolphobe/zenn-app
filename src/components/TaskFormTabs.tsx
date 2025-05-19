@@ -1,3 +1,4 @@
+
 import React, { useRef, useEffect, useState } from 'react';
 import { Task, TaskFormData } from '../types';
 import TaskFormFields from './TaskFormFields';
@@ -142,7 +143,7 @@ const TaskFormTabs: React.FC<TaskFormTabsProps> = ({
               </div>
             )}
             
-            {/* Fixed: Correctly render the CommentForm component */}
+            {/* Fixed: Correctly render the CommentForm component as JSX element */}
             <CommentForm 
               taskId={taskId}
               onCommentAdded={handleCommentAdded}

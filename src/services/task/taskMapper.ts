@@ -1,6 +1,16 @@
 
-import { Task } from '@/types';
+import { Task, Comment } from '@/types';
 import { dateService } from '../dateService';
+
+/**
+ * Maps Supabase response data for comments to the Comment type
+ */
+export const mapToComment = (data: any): Comment => ({
+  id: data.id,
+  text: data.text,
+  createdAt: data.created_at || new Date().toISOString(),
+  userId: data.user_id
+});
 
 /**
  * Maps Supabase response data to the Task type with consistent date handling
@@ -21,7 +31,10 @@ export const mapToTask = (data: any): Task => ({
   userId: data.user_id || '',
   feedback: data.feedback,
   pillar: data.pillar,
-  comments: data.comments || [],
+  // Map comments array properly using mapToComment function
+  comments: Array.isArray(data.comments) 
+    ? data.comments.map(mapToComment) 
+    : [],
   operationLoading: {}
 });
 
