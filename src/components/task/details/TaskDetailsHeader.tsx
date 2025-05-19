@@ -33,7 +33,7 @@ const TaskDetailsHeader: React.FC<TaskDetailsHeaderProps> = ({ task }) => {
     const feedbackStyles = {
       transformed: 'text-green-600 dark:text-green-400',
       relief: 'text-blue-600 dark:text-blue-400',
-      obligation: 'text-amber-600 dark:text-amber-400'
+      obligation: 'text-gray-600 dark:text-gray-400'
     };
     
     return (
