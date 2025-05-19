@@ -1,4 +1,3 @@
-
 import { Outlet, useLocation, Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/auth';
 import Sidebar from './Sidebar';
@@ -7,6 +6,7 @@ import { Menu } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useEffect, useState, useMemo } from 'react';
 import { logInfo } from '@/utils/logUtils';
+import { LoadingOverlay } from './ui/loading-overlay';
 
 /**
  * PrivateRoute - Protects routes that require authentication
@@ -29,11 +29,21 @@ export const PrivateRoute = () => {
     }
   }, [isLoading]);
 
-  // Show loading state while checking authentication
+  // Check if login is successful and we should show the loading overlay
+  const loginSuccess = localStorage.getItem('login_success') === 'true';
+
+  // Show loading overlay while checking authentication
   if (isLoading || !authChecked) {
-    return <div className="flex items-center justify-center min-h-screen">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-    </div>;
+    if (loginSuccess) {
+      // Show the consistent loading overlay instead of the simple spinner
+      return <LoadingOverlay show={true} />;
+    }
+    
+    // Don't show any loading UI during logout
+    if (logoutInProgress) return null;
+    
+    // Otherwise, hide any loading UI to avoid flashing
+    return null;
   }
 
   // Simplified authentication check
@@ -42,6 +52,11 @@ export const PrivateRoute = () => {
   if (!actuallyAuthenticated) {
     // Return a redirect to login with current location stored for later redirect back
     return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  // Clear the login_success flag once authenticated route is rendered
+  if (loginSuccess) {
+    localStorage.removeItem('login_success');
   }
 
   // User is authenticated, render the protected layout with sidebar

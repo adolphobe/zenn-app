@@ -1,4 +1,3 @@
-
 import React, { useReducer, useEffect, useCallback, useState } from 'react';
 import { AppContext } from './AppContext';
 import { AppContextType, SortOptionsUpdate } from './types';
@@ -282,6 +281,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   // Only show loading overlay when authenticated user is going to dashboard
+  // and we're loading preferences or still in auth loading state
   const showLoadingOverlay = isNavigatingToDashboard && (isLoadingPreferences || isLoading);
 
   return (

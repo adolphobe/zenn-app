@@ -24,6 +24,9 @@ export function LoadingOverlay({
   const isLandingPage = location.pathname === '/';
   const isLogoutInProgress = localStorage.getItem('logout_in_progress') === 'true';
   
+  // Check if login is successful to show loading overlay
+  const isLoginSuccess = localStorage.getItem('login_success') === 'true';
+  
   useEffect(() => {
     let fadeTimeout: NodeJS.Timeout;
     let hideTimeout: NodeJS.Timeout;
@@ -34,7 +37,11 @@ export function LoadingOverlay({
       return;
     }
 
-    if (show) {
+    // Force visible during successful login redirects
+    if (isLoginSuccess) {
+      setVisible(true);
+      setFading(false);
+    } else if (show) {
       setVisible(true);
       setFading(false);
     } else if (visible) {
@@ -49,7 +56,7 @@ export function LoadingOverlay({
     }
 
     // If we're showing and have a delay set, auto-hide after delay
-    if (show && delay) {
+    if ((show || isLoginSuccess) && delay) {
       fadeTimeout = setTimeout(() => {
         setFading(true);
         
@@ -64,7 +71,7 @@ export function LoadingOverlay({
       clearTimeout(fadeTimeout);
       clearTimeout(hideTimeout);
     };
-  }, [show, delay, visible, onComplete, isLandingPage, isLogoutInProgress]);
+  }, [show, delay, visible, onComplete, isLandingPage, isLogoutInProgress, isLoginSuccess]);
 
   // Don't render if not visible, on landing page, or during logout
   if (!visible || isLandingPage || isLogoutInProgress) return null;
