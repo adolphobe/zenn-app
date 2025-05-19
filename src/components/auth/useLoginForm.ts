@@ -57,8 +57,13 @@ export function useLoginForm(onSuccess?: () => void) {
         // Redirecionar para a página de login com o código de erro
         const errorCode = result.error ? getErrorCode(result.error) : '3';
         navigate(`/login?erro=${errorCode}`, { replace: true });
-      } else if (onSuccess) {
-        onSuccess();
+      } else {
+        // Set login_success flag to indicate that we should show the loading overlay
+        localStorage.setItem('login_success', 'true');
+        
+        if (onSuccess) {
+          onSuccess();
+        }
       }
     } catch (error: any) {
       console.error("[LoginForm] Erro inesperado:", error);

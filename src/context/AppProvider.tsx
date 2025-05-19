@@ -43,8 +43,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [isLoadingPreferences, setIsLoadingPreferences] = useState<boolean>(true);
   const location = useLocation();
   
-  // Verificar se estamos na página inicial
+  // Check if we're on the landing page
   const isLandingPage = location.pathname === '/';
+  
+  // Check if we're on the login page
+  const isLoginPage = location.pathname.includes('/login');
+  
+  // Only show loading overlay when authenticated user is going to dashboard
+  const isNavigatingToDashboard = isAuthenticated && !isLandingPage && !isLoginPage;
   
   // Store tasks in DOM for access by non-React components
   useTaskStore(state.tasks);
@@ -275,8 +281,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     toggleViewMode: () => dispatch({ type: 'TOGGLE_VIEW_MODE' })
   };
 
-  // Somente exiba o LoadingOverlay se não estiver na página inicial
-  const showLoadingOverlay = !isLandingPage && (isLoadingPreferences || isLoading);
+  // Only show loading overlay when authenticated user is going to dashboard
+  const showLoadingOverlay = isNavigatingToDashboard && (isLoadingPreferences || isLoading);
 
   return (
     <AppContext.Provider value={contextValue}>

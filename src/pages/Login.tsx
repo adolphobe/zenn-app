@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/auth';
@@ -135,6 +136,9 @@ const Login: React.FC = () => {
         title: "Autenticado",
         description: "Redirecionando para o dashboard...",
       });
+      
+      // Set login_success flag to indicate successful login and allow showing the loading overlay
+      localStorage.setItem('login_success', 'true');
       
       const redirectTimer = setTimeout(() => {
         navigate(from, { replace: true });
