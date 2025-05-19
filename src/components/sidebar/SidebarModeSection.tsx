@@ -3,7 +3,7 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { Calendar, Clock, ListChecks, History } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { SidebarSection } from './SidebarSection';
+import SidebarSection from './SidebarSection';
 
 interface SidebarModeSectionProps {
   sidebarOpen: boolean;
@@ -21,7 +21,7 @@ const SidebarModeSection: React.FC<SidebarModeSectionProps> = ({ sidebarOpen }) 
   return (
     <SidebarSection 
       title="Navegação"
-      showTitle={sidebarOpen}
+      sidebarOpen={sidebarOpen}
     >
       <div className="space-y-1">
         <NavLink 
