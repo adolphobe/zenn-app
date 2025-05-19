@@ -10,7 +10,7 @@ interface FeaturesSectionProps {
 
 const FeaturesSection: React.FC<FeaturesSectionProps> = ({ openExplanationModal }) => {
   return (
-    <section className="py-32 relative z-10 overflow-hidden bg-gradient-to-b from-white via-blue-100 to-white dark:from-gray-900 dark:via-gray-800 dark:to-gray-900" style={{backfaceVisibility: 'hidden', transform: 'translateZ(0)'}}>
+    <section className="py-16 pt-8 relative z-10 overflow-hidden bg-gradient-to-b from-white via-blue-100 to-white dark:from-gray-900 dark:via-gray-800 dark:to-gray-900" style={{backfaceVisibility: 'hidden', transform: 'translateZ(0)'}}>
       <div className="blob-animation w-64 h-64 top-20 left-10" style={{ animation: 'float-around 25s infinite ease-in-out' }}></div>
       <div className="blob-animation w-96 h-96 bottom-40 right-20" style={{ animation: 'float-around 30s infinite ease-in-out reverse' }}></div>
       <div className="container mx-auto px-8 relative">

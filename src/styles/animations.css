@@ -94,3 +94,28 @@
 .animate-floating-enhanced {
   animation: floating 6s ease-in-out infinite;
 }
+
+@keyframes float-around {
+  0% {
+    transform: translate(0, 0);
+  }
+  33% {
+    transform: translate(5%, -5%);
+  }
+  66% {
+    transform: translate(-5%, 5%);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+.blob-animation {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(50px);
+  background-color: rgba(191, 219, 254, 0.3);
+  z-index: 0;
+  pointer-events: none;
+}
+
