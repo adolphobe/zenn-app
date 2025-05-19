@@ -20,6 +20,9 @@ const RatingSliderReadOnly: React.FC<RatingSliderReadOnlyProps> = ({
   description,
   className
 }) => {
+  // Ensure value is within valid range
+  const safeValue = Math.max(1, Math.min(value || 1, maxValue));
+  
   // Define styling based on color theme
   const colorStyles = {
     blue: {
@@ -56,22 +59,24 @@ const RatingSliderReadOnly: React.FC<RatingSliderReadOnlyProps> = ({
 
   const styles = colorStyles[color];
   
-  // Custom slider display logic for read only view
-  const displayValue = value === 0 ? 1 : value;
+  // Get description text safely
+  const descriptionText = description && description.length > 0 
+    ? (description[safeValue - 1] || '') 
+    : '';
   
   return (
     <div className={cn("rounded-lg p-5 mb-6 transition-all", styles.bg, className)}>
       <div className="flex justify-between items-center mb-3">
         <h3 className={cn("font-medium text-sm", styles.text)}>{label}</h3>
         <span className={cn("font-semibold text-sm", styles.text)}>
-          {displayValue}/{maxValue}
+          {safeValue}/{maxValue}
         </span>
       </div>
       
       <div className="relative mb-4 px-3 py-1">
         {/* Read-only slider */}
         <Slider
-          value={[value]}
+          value={[safeValue]}
           min={1}
           max={maxValue}
           step={1}
@@ -81,7 +86,7 @@ const RatingSliderReadOnly: React.FC<RatingSliderReadOnlyProps> = ({
             range: cn(
               "bg-gradient-to-r", 
               styles.gradient,
-              value === 1 ? "opacity-0" : "opacity-100"
+              safeValue === 1 ? "opacity-0" : "opacity-100"
             ),
             thumb: cn(styles.fill, "cursor-default")
           }}
@@ -95,7 +100,7 @@ const RatingSliderReadOnly: React.FC<RatingSliderReadOnlyProps> = ({
               className={cn(
                 "w-6 h-6 rounded-full border-2 transition-all duration-200",
                 "transform translate-y-[-4px]", 
-                step <= value
+                step <= safeValue
                   ? cn("bg-white", styles.activeBorder)
                   : cn("bg-white", styles.border)
               )}
@@ -106,7 +111,7 @@ const RatingSliderReadOnly: React.FC<RatingSliderReadOnlyProps> = ({
       
       {/* Description text */}
       <p className={cn("text-sm mt-3 text-[14px]", styles.text)}>
-        {description[value - 1] || ''}
+        {descriptionText}
       </p>
     </div>
   );

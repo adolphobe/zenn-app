@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { Task } from '@/types';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -27,19 +27,35 @@ const TaskViewModal: React.FC<TaskViewModalProps> = ({
   onClose,
   onRestore
 }) => {
-  const [activeTab, setActiveTab] = React.useState('levels');
+  // Local state for tabs
+  const [activeTab, setActiveTab] = useState('levels');
   const isMobile = useIsMobile();
   const commentsContainerRef = React.useRef<HTMLDivElement | null>(null);
 
+  // Early return if no task
   if (!task) return null;
   
+  // Helper function to restore task
   const handleRestore = () => {
-    onRestore(task.id);
-    onClose();
+    if (task && task.id) {
+      onRestore(task.id);
+      onClose();
+    }
   };
   
+  // Helper for formatting dates
+  const formatDate = (date: Date | string | null) => {
+    if (!date) return 'Data não disponível';
+    try {
+      return format(new Date(date), 'dd/MM/yyyy HH:mm', { locale: ptBR });
+    } catch (e) {
+      console.error("Error formatting date:", e);
+      return 'Data inválida';
+    }
+  };
+
   // Helper for scrolling to bottom of comments
-  const scrollToBottom = React.useCallback(() => {
+  const scrollToBottom = useCallback(() => {
     if (commentsContainerRef.current) {
       const scrollElement = commentsContainerRef.current.querySelector('.native-scrollbar');
       if (scrollElement) {
@@ -47,21 +63,42 @@ const TaskViewModal: React.FC<TaskViewModalProps> = ({
       }
     }
   }, []);
-
-  // Helper to format dates
-  const formatDate = (date: Date | string | null) => {
-    if (!date) return 'Data não disponível';
-    return format(new Date(date), 'dd/MM/yyyy HH:mm', { locale: ptBR });
-  };
-
-  // Effect to scroll to bottom when tab changes to comments
-  React.useEffect(() => {
+  
+  // Effect to scroll to bottom when tab changes to comments or when comments are added
+  useEffect(() => {
     if (activeTab === 'comments' && task?.comments?.length) {
-      // Small delay to ensure DOM has updated
       const timer = setTimeout(scrollToBottom, 100);
       return () => clearTimeout(timer);
     }
-  }, [activeTab, task?.comments?.length, scrollToBottom]);
+  }, [activeTab, task.comments?.length, scrollToBottom]);
+
+  // Feedback display helper
+  const renderFeedback = () => {
+    if (!task.feedback) return null;
+    
+    const feedbackLabels = {
+      transformed: 'Foi transformador terminar',
+      relief: 'Tive alívio ao finalizar',
+      obligation: 'Terminei por obrigação'
+    };
+    
+    const feedbackStyles = {
+      transformed: 'text-green-600 dark:text-green-400',
+      relief: 'text-blue-600 dark:text-blue-400',
+      obligation: 'text-amber-600 dark:text-amber-400'
+    };
+    
+    return (
+      <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg mt-4">
+        <h3 className="font-medium mb-2 text-gray-700 dark:text-gray-300">Feedback</h3>
+        <div className="text-gray-600 dark:text-gray-300 px-2 py-1">
+          <span className={`font-medium ${feedbackStyles[task.feedback as keyof typeof feedbackStyles] || ''}`}>
+            {feedbackLabels[task.feedback as keyof typeof feedbackLabels] || 'Feedback não disponível'}
+          </span>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -83,7 +120,7 @@ const TaskViewModal: React.FC<TaskViewModalProps> = ({
                 </div>
               </div>
               
-              {/* Task Dates & Feedback */}
+              {/* Task Dates */}
               <div className="flex flex-col space-y-2 mt-4">
                 <div className="flex flex-col sm:flex-row sm:justify-between">
                   <div className="mb-2">
@@ -102,23 +139,8 @@ const TaskViewModal: React.FC<TaskViewModalProps> = ({
                   )}
                 </div>
                 
-                {/* Feedback Section - Dedicated space as requested */}
-                {task.feedback && (
-                  <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg mt-4">
-                    <h3 className="font-medium mb-2 text-gray-700 dark:text-gray-300">Feedback</h3>
-                    <div className="text-gray-600 dark:text-gray-300 px-2 py-1">
-                      {task.feedback === 'transformed' && (
-                        <span className="text-green-600 dark:text-green-400 font-medium">Foi transformador terminar</span>
-                      )}
-                      {task.feedback === 'relief' && (
-                        <span className="text-blue-600 dark:text-blue-400 font-medium">Tive alívio ao finalizar</span>
-                      )}
-                      {task.feedback === 'obligation' && (
-                        <span className="text-amber-600 dark:text-amber-400 font-medium">Terminei por obrigação</span>
-                      )}
-                    </div>
-                  </div>
-                )}
+                {/* Feedback Section */}
+                {renderFeedback()}
               </div>
               
               {/* Tabs for levels and comments */}
@@ -159,7 +181,7 @@ const TaskViewModal: React.FC<TaskViewModalProps> = ({
                       
                       <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg shadow-sm mt-6">
                         <div className="text-center">
-                          <span className="text-3xl font-bold">{task.totalScore}/15</span>
+                          <span className="text-3xl font-bold">{task.totalScore || 0}/15</span>
                           <p className="text-sm text-gray-500 mt-1">Pontuação total</p>
                         </div>
                       </div>
@@ -192,7 +214,7 @@ const TaskViewModal: React.FC<TaskViewModalProps> = ({
                       <div className="space-y-6">
                         <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg shadow-sm mt-[33px]">
                           <div className="text-center">
-                            <span className="text-3xl font-bold">{task.totalScore}/15</span>
+                            <span className="text-3xl font-bold">{task.totalScore || 0}/15</span>
                             <p className="text-sm text-gray-500 mt-1">Pontuação total</p>
                           </div>
                         </div>
