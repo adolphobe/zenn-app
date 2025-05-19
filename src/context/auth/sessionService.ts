@@ -33,7 +33,8 @@ export const checkAuthSession = async (): Promise<AuthSessionResult> => {
     const { data, error } = await supabase.auth.getSession();
     
     if (error) {
-      console.error("[AuthService] Erro ao verificar status de autenticação");
+      console.error("[AuthService] Erro ao verificar status de autenticação:", error);
+      console.error("[AuthService] DETALHES EM PORTUGUÊS: Ocorreu um erro ao verificar se o usuário está autenticado");
       return { isAuthenticated: false, session: null, user: null, error };
     }
     
@@ -51,7 +52,8 @@ export const checkAuthSession = async (): Promise<AuthSessionResult> => {
       user
     };
   } catch (error) {
-    console.error("[AuthService] Erro inesperado ao verificar autenticação");
+    console.error("[AuthService] Erro inesperado ao verificar autenticação:", error);
+    console.error("[AuthService] DETALHES EM PORTUGUÊS: Ocorreu um erro inesperado ao verificar o status de autenticação");
     return { isAuthenticated: false, session: null, user: null, error };
   }
 };

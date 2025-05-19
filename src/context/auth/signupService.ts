@@ -8,6 +8,7 @@ import { Session } from '@supabase/supabase-js';
 export const signup = async (email: string, password: string, name: string): Promise<{ success: boolean, error?: any, user?: any, session?: Session | null }> => {
   try {
     console.log("[AuthService] Tentando criar conta com email:", email);
+    console.log("[AuthService] DETALHES EM PORTUGUÊS: Iniciando processo de criação de conta");
     
     const { data, error } = await supabase.auth.signUp({
       email,
@@ -21,6 +22,7 @@ export const signup = async (email: string, password: string, name: string): Pro
     
     if (error) {
       console.error("[AuthService] Erro no cadastro:", error.message);
+      console.error("[AuthService] DETALHES EM PORTUGUÊS: Falha ao criar nova conta. Erro:", error.message);
       
       const errorDetails = processAuthError(error);
       
@@ -35,6 +37,7 @@ export const signup = async (email: string, password: string, name: string): Pro
     
     if (data?.user?.identities?.length === 0) {
       console.error("[AuthService] Usuário já existe");
+      console.error("[AuthService] DETALHES EM PORTUGUÊS: Este email já está registrado no sistema");
       
       toast({
         title: "Falha na criação da conta",
@@ -48,6 +51,7 @@ export const signup = async (email: string, password: string, name: string): Pro
     // Check if email confirmation is required
     if (data?.user && data.session) {
       console.log("[AuthService] Conta criada e autenticada automaticamente");
+      console.log("[AuthService] DETALHES EM PORTUGUÊS: Conta criada com sucesso e login efetuado automaticamente");
       
       toast({
         title: "Conta criada com sucesso",
@@ -57,6 +61,7 @@ export const signup = async (email: string, password: string, name: string): Pro
       return { success: true, user: data.user, session: data.session };
     } else if (data?.user) {
       console.log("[AuthService] Confirmação de email necessária");
+      console.log("[AuthService] DETALHES EM PORTUGUÊS: Conta criada. É necessário confirmar o email antes de fazer login");
       
       toast({
         title: "Conta criada com sucesso",
@@ -69,6 +74,7 @@ export const signup = async (email: string, password: string, name: string): Pro
     return { success: true };
   } catch (error: any) {
     console.error("[AuthService] Erro no cadastro:", error);
+    console.error("[AuthService] DETALHES EM PORTUGUÊS: Ocorreu um erro inesperado durante a criação da conta");
     
     const errorDetails = processAuthError(error);
     

@@ -14,6 +14,7 @@ export function useAuthState() {
   // Set up auth state listener and check for existing session
   useEffect(() => {
     console.log("[AuthProvider] Inicializando estado de autenticação");
+    console.log("[AuthProvider] DETALHES EM PORTUGUÊS: Verificando se existe uma sessão ativa");
     
     // Check for logout in progress flag and clear it if it exists on page load
     const logoutInProgress = localStorage.getItem('logout_in_progress');
@@ -32,12 +33,17 @@ export function useAuthState() {
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
           (event, newSession) => {
             console.log("[AuthProvider] Estado de autenticação alterado:", event);
+            console.log("[AuthProvider] DETALHES EM PORTUGUÊS: Evento de autenticação detectado:", 
+              event === 'SIGNED_IN' ? 'Usuário entrou' : 
+              event === 'SIGNED_OUT' ? 'Usuário saiu' : 
+              'Outro evento de autenticação');
             
             // Update session state
             setSession(newSession);
             
             if (event === 'SIGNED_OUT') {
               console.log("[AuthProvider] Usuário deslogado");
+              console.log("[AuthProvider] DETALHES EM PORTUGUÊS: Usuário encerrou a sessão");
               setCurrentUser(null);
               setIsLoading(false);
               return;
@@ -46,6 +52,7 @@ export function useAuthState() {
             // Use setTimeout to prevent potential race conditions
             if (newSession?.user) {
               console.log("[AuthProvider] Nova sessão detectada");
+              console.log("[AuthProvider] DETALHES EM PORTUGUÊS: Iniciando nova sessão para o usuário");
               
               // Use setTimeout to avoid race conditions
               setTimeout(() => {
@@ -72,7 +79,7 @@ export function useAuthState() {
     const listenerSetup = setupAuthListener();
     
     if (!listenerSetup) {
-      console.error("[AuthProvider] Falha ao configurar listener de autenticação");
+      console.error("[AuthProvider] Falha ao configurar listener de autenticação, tentando recuperar sessão existente");
       setIsLoading(false);
     }
     
@@ -90,6 +97,7 @@ export function useAuthState() {
         }
         
         console.log("[AuthProvider] Verificação inicial da sessão:", isAuthenticated ? "Sessão encontrada" : "Nenhuma sessão");
+        console.log("[AuthProvider] DETALHES EM PORTUGUÊS:", isAuthenticated ? "Encontramos uma sessão ativa" : "Nenhuma sessão ativa encontrada");
         
         if (isAuthenticated && session && user) {
           setSession(session);
@@ -100,7 +108,8 @@ export function useAuthState() {
         setIsLoading(false);
         setAuthInitialized(true);
       } catch (error) {
-        console.error("[AuthProvider] Erro ao verificar sessão");
+        console.error("[AuthProvider] Erro ao verificar sessão:", error);
+        console.error("[AuthProvider] DETALHES EM PORTUGUÊS: Ocorreu um erro ao verificar se existe uma sessão ativa");
         setIsLoading(false);
         setAuthInitialized(true);
       }

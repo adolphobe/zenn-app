@@ -1,3 +1,4 @@
+
 import React, { useCallback } from 'react';
 import { Task } from '@/types';
 import TaskPillarDetails from '../TaskPillarDetails';
@@ -88,7 +89,8 @@ const TaskCardExpanded: React.FC<TaskCardExpandedProps> = ({
         <div className="mt-4 cursor-default">
           <TaskComments 
             taskId={task.id} 
-            comments={task.comments || []} 
+            comments={task.comments} 
+            onCommentDeleted={handleCommentDeleted} 
           />
         </div>
       )}

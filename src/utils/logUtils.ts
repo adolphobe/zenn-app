@@ -17,7 +17,7 @@ export enum LogLevel {
 
 // Global configuration for logging
 const LOG_CONFIG = {
-  minLevel: process.env.NODE_ENV === 'production' ? LogLevel.WARN : LogLevel.INFO,
+  minLevel: process.env.NODE_ENV === 'production' ? LogLevel.WARN : LogLevel.DEBUG,
   enableThrottling: true,
   disabledCategories: [] as string[]
 };

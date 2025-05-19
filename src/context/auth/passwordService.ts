@@ -10,6 +10,7 @@ const RESET_PASSWORD_URL = "https://zenn-app.lovable.app/reset-password";
 export const sendPasswordResetEmail = async (email: string): Promise<{ success: boolean, error?: any }> => {
   try {
     console.log("[AuthService] Solicitando redefinição de senha para:", email);
+    console.log("[AuthService] DETALHES EM PORTUGUÊS: Enviando email de recuperação de senha");
     
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: RESET_PASSWORD_URL,
@@ -17,6 +18,7 @@ export const sendPasswordResetEmail = async (email: string): Promise<{ success: 
     
     if (error) {
       console.error("[AuthService] Erro ao enviar email de recuperação:", error);
+      console.error("[AuthService] DETALHES EM PORTUGUÊS: Não foi possível enviar o email de recuperação de senha");
       
       const errorDetails = processAuthError(error);
       
@@ -30,6 +32,7 @@ export const sendPasswordResetEmail = async (email: string): Promise<{ success: 
     }
     
     console.log("[AuthService] Email de recuperação enviado para:", email);
+    console.log("[AuthService] DETALHES EM PORTUGUÊS: Email de recuperação de senha enviado com sucesso");
     
     toast({
       title: "Email enviado",
@@ -39,6 +42,7 @@ export const sendPasswordResetEmail = async (email: string): Promise<{ success: 
     return { success: true };
   } catch (error) {
     console.error("[AuthService] Erro ao enviar email de recuperação:", error);
+    console.error("[AuthService] DETALHES EM PORTUGUÊS: Ocorreu um erro inesperado ao tentar enviar o email");
     
     const errorDetails = processAuthError(error);
     
