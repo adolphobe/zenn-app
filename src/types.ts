@@ -1,3 +1,4 @@
+
 import { ISODateString } from './types/dates';
 
 export interface Task {
@@ -17,6 +18,7 @@ export interface Task {
   feedback: 'transformed' | 'relief' | 'obligation' | null;
   comments?: Comment[];
   pillar?: string;
+  is_power_extra?: boolean; // Nova propriedade para o recurso Potência Extra
   operationLoading: Record<string, boolean>;
   // Animation properties for task visibility transitions
   _pendingVisibilityUpdate?: boolean;

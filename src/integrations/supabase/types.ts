@@ -92,6 +92,7 @@ export type Database = {
           hidden: boolean
           id: string
           ideal_date: string | null
+          is_power_extra: boolean | null
           pillar: string | null
           pride_score: number
           title: string
@@ -109,6 +110,7 @@ export type Database = {
           hidden?: boolean
           id?: string
           ideal_date?: string | null
+          is_power_extra?: boolean | null
           pillar?: string | null
           pride_score?: number
           title: string
@@ -126,6 +128,7 @@ export type Database = {
           hidden?: boolean
           id?: string
           ideal_date?: string | null
+          is_power_extra?: boolean | null
           pillar?: string | null
           pride_score?: number
           title?: string

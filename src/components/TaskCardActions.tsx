@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Eye, EyeOff, Edit2, CheckSquare, Trash2 } from 'lucide-react';
+import { Eye, EyeOff, Edit2, CheckSquare, Trash2, Zap } from 'lucide-react';
 import { Button } from './ui/button';
 import { ViewMode } from '@/types';
 
@@ -10,6 +10,9 @@ interface TaskCardActionsProps {
   onEditTask: (e: React.MouseEvent) => void;
   onCompleteTask: (e: React.MouseEvent) => void;
   onDeleteTask: (e: React.MouseEvent) => void;
+  onTogglePowerExtra?: (e: React.MouseEvent) => void;
+  isPowerExtra?: boolean;
+  showPowerExtraButton?: boolean;
   viewMode?: ViewMode;
 }
 
@@ -19,6 +22,9 @@ const TaskCardActions: React.FC<TaskCardActionsProps> = ({
   onEditTask,
   onCompleteTask,
   onDeleteTask,
+  onTogglePowerExtra,
+  isPowerExtra = false,
+  showPowerExtraButton = false,
   viewMode = 'power'
 }) => {
   // Estilo base para todos os botões de ação (excluindo o de completar)
@@ -66,6 +72,26 @@ const TaskCardActions: React.FC<TaskCardActionsProps> = ({
         >
           <Trash2 size={16} />
         </Button>
+
+        {/* Botão Potência Extra - apenas visível no modo potência e para tarefas com pontuação alta */}
+        {viewMode === 'power' && showPowerExtraButton && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onTogglePowerExtra}
+            title={isPowerExtra ? "Desativar Potência Extra" : "Ativar Potência Extra"}
+            className={`
+              ${buttonStyles} 
+              ${isPowerExtra ? 'bg-red-50 text-red-600 border-red-300 hover:bg-red-100' : ''}
+              transition-colors duration-200
+            `}
+            data-task-action="toggle-power-extra"
+            data-power-extra={isPowerExtra ? "true" : "false"}
+          >
+            <Zap size={16} className={isPowerExtra ? "text-red-600" : ""} />
+            <span className="ml-1">{isPowerExtra ? "Desativar" : "Potência Extra"}</span>
+          </Button>
+        )}
       </div>
       
       {/* Right side action: Complete */}

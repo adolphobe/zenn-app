@@ -15,6 +15,9 @@ interface TaskCardExpandedProps {
   onEditTask: (e: React.MouseEvent) => void;
   onCompleteTask: (e: React.MouseEvent) => void;
   onDeleteTask: (e: React.MouseEvent) => void;
+  onTogglePowerExtra?: (e: React.MouseEvent) => void;
+  isPowerExtra?: boolean;
+  showPowerExtraButton?: boolean;
   handleExpandedContentClick: (e: React.MouseEvent) => void;
   viewMode: ViewMode;
   onCollapseTask: () => void; // Prop to handle task collapsing
@@ -58,6 +61,9 @@ const TaskCardExpanded: React.FC<TaskCardExpandedProps> = ({
   onEditTask,
   onCompleteTask,
   onDeleteTask,
+  onTogglePowerExtra,
+  isPowerExtra,
+  showPowerExtraButton,
   handleExpandedContentClick,
   viewMode,
   onCollapseTask
@@ -104,6 +110,9 @@ const TaskCardExpanded: React.FC<TaskCardExpandedProps> = ({
         onEditTask={onEditTask}
         onCompleteTask={onCompleteTask}
         onDeleteTask={onDeleteTask}
+        onTogglePowerExtra={onTogglePowerExtra}
+        isPowerExtra={isPowerExtra}
+        showPowerExtraButton={showPowerExtraButton}
         viewMode={viewMode}
       />
     </motion.div>

@@ -23,6 +23,35 @@
   @apply bg-acto-light text-acto-light-text border-gray-300;
 }
 
+/* Estilo para o modo de Potência Extra */
+.task-power-extra {
+  @apply border-red-500 shadow-lg shadow-red-300;
+  background-image: linear-gradient(to right, #ffefef, #f0f7ff, #fff5eb);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* Indicador de ponto piscando para Potência Extra */
+.power-extra-indicator {
+  @apply w-2 h-2 rounded-full bg-red-500 mr-2 inline-block;
+  animation: blink 1.5s ease-in-out infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+@keyframes pulse {
+  0%, 100% { 
+    transform: scale(1);
+    box-shadow: 0 10px 15px -3px rgba(239, 68, 68, 0.2);
+  }
+  50% { 
+    transform: scale(1.01);
+    box-shadow: 0 10px 15px -3px rgba(239, 68, 68, 0.4);
+  }
+}
+
 /* Animações para mostrar/ocultar tarefas */
 .task-card[data-animation-state="hiding"] {
   animation: fadeOut 0.4s ease-in-out forwards;

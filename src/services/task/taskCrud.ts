@@ -62,6 +62,9 @@ export const createTask = async (taskData: TaskFormData, userId: string): Promis
   // Se taskData.hidden estiver definido, use-o, caso contrário, defina como true se totalScore < 8
   const isHidden = taskData.hidden !== undefined ? taskData.hidden : totalScore < 8;
 
+  // Determinar se deve ser "Potência Extra" - inicialmente falso para novas tarefas
+  const isPowerExtra = false;
+
   const { data, error } = await supabase
     .from('tasks')
     .insert({
@@ -74,6 +77,7 @@ export const createTask = async (taskData: TaskFormData, userId: string): Promis
       ideal_date: idealDateISO,
       pillar: dominantPillar,
       hidden: isHidden,
+      is_power_extra: isPowerExtra,
       completed: false
     })
     .select()
@@ -105,6 +109,8 @@ export const updateTask = async (id: string, taskData: Partial<TaskFormData>): P
     // Convert Date to ISO string for the database
     updateData.ideal_date = dateService.toISOString(taskData.idealDate);
   }
+  if (taskData.hidden !== undefined) updateData.hidden = taskData.hidden;
+  if (taskData.is_power_extra !== undefined) updateData.is_power_extra = taskData.is_power_extra;
   
   // Calculate total score if any score component is updated
   if (taskData.consequenceScore !== undefined || taskData.prideScore !== undefined || taskData.constructionScore !== undefined) {

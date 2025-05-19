@@ -36,10 +36,15 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
     setTitleValue(task.title);
   }, [task.title]);
   
-  // Apply priority class only in power mode
-  const cardClass = viewMode === 'chronological' 
+  // Determinar classes de estilo com base no modo e status da tarefa
+  let cardClass = viewMode === 'chronological' 
     ? 'bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 border-gray-200 dark:border-gray-700' 
     : getTaskPriorityClass(task.totalScore);
+  
+  // Aplicar estilo "Potência Extra" se estiver ativado e no modo potência
+  if (viewMode === 'power' && task.is_power_extra && task.totalScore >= 14) {
+    cardClass += ' task-power-extra';
+  }
   
   // Card expansion handler
   const handleCardClick = (e: React.MouseEvent) => {
@@ -105,6 +110,30 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
     e.stopPropagation();
     setDeleteConfirmModalOpen(true);
   };
+  
+  // Novo handler para alternar o estado de Potência Extra
+  const handleTogglePowerExtra = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    
+    // Atualizar a propriedade is_power_extra
+    updateTask(task.id, { is_power_extra: !task.is_power_extra });
+  };
+
+  // Verificar se deve mostrar o botão de Potência Extra (apenas para tarefas com pontuação >= 14)
+  const showPowerExtraButton = task.totalScore >= 14;
+
+  // Conteúdo de título com indicador de Potência Extra quando ativado
+  const renderTitleContent = () => {
+    if (viewMode === 'power' && task.is_power_extra && task.totalScore >= 14) {
+      return (
+        <>
+          <span className="power-extra-indicator" aria-hidden="true"></span>
+          {task.title}
+        </>
+      );
+    }
+    return task.title;
+  };
 
   return (
     <>
@@ -128,7 +157,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
         }}
       >
         <TaskCardHeader 
-          title={task.title}
+          title={renderTitleContent()}
           totalScore={task.totalScore}
           idealDate={task.idealDate}
           isEditing={isEditingTitle}
@@ -153,6 +182,9 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
               onEditTask={handleEditTask}
               onCompleteTask={handleCompleteTask}
               onDeleteTask={handleDeleteTask}
+              onTogglePowerExtra={handleTogglePowerExtra}
+              isPowerExtra={task.is_power_extra}
+              showPowerExtraButton={showPowerExtraButton}
               handleExpandedContentClick={handleExpandedContentClick}
               viewMode={viewMode}
               onCollapseTask={handleCollapseTask}

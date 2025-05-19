@@ -40,6 +40,7 @@ export const mapToTask = (data: any): Task => {
     userId: data.user_id || '',
     feedback: data.feedback,
     pillar: data.pillar,
+    is_power_extra: data.is_power_extra || false,
     comments: mappedComments,
     operationLoading: {}
   };
