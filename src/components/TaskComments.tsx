@@ -7,9 +7,10 @@ import { safeParseDate } from '@/utils';
 interface TaskCommentsProps {
   taskId: string;
   comments: Comment[];
+  onCommentDeleted?: () => void;  // Adicionado como opcional
 }
 
-const TaskComments: React.FC<TaskCommentsProps> = ({ taskId, comments: initialComments }) => {
+const TaskComments: React.FC<TaskCommentsProps> = ({ taskId, comments: initialComments, onCommentDeleted }) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   
   // Add global CSS for scrollbar
