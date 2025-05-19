@@ -21,10 +21,10 @@ export const useTaskStateOperations = (
     toggleCompleteLoading 
   } = useTaskCompletionToggle(tasks, completed, setTaskOperationLoading);
   
-  // Task visibility toggle mutation
+  // Task visibility toggle mutation - Fix: Use the correct property name "toggleHiddenLoading"
   const { 
     toggleTaskHidden, 
-    toggleVisibilityLoading 
+    toggleHiddenLoading 
   } = useTaskVisibilityToggle(tasks, setTaskOperationLoading);
   
   // Task feedback mutation
@@ -33,11 +33,11 @@ export const useTaskStateOperations = (
     setFeedbackLoading 
   } = useTaskFeedback(setTaskOperationLoading);
   
-  // Task restore mutation
+  // Task restore mutation - Fix: Pass only one argument as expected
   const { 
     restoreTask, 
     restoreLoading 
-  } = useTaskRestore(tasks, completed, setTaskOperationLoading);
+  } = useTaskRestore(setTaskOperationLoading);
   
   return {
     toggleTaskCompleted,
@@ -46,7 +46,7 @@ export const useTaskStateOperations = (
     restoreTask,
     stateOperationsLoading: {
       toggleComplete: toggleCompleteLoading,
-      toggleVisibility: toggleVisibilityLoading,
+      toggleVisibility: toggleHiddenLoading,
       setFeedback: setFeedbackLoading,
       restore: restoreLoading
     }

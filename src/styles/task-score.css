@@ -1,0 +1,55 @@
+
+/* Task Score Display Styles */
+.task-score-container {
+  @apply flex flex-col gap-1 items-start p-2 rounded-md;
+}
+
+.task-score-header {
+  @apply flex justify-between w-full items-center;
+}
+
+.task-score-title {
+  @apply font-medium;
+}
+
+.task-score-value {
+  @apply font-bold;
+}
+
+.task-score-label {
+  @apply text-sm text-muted-foreground mt-1;
+}
+
+/* Score color classes - based on score levels */
+.task-score-critical {
+  @apply text-red-600 font-semibold;
+}
+
+.task-score-important {
+  @apply text-orange-500 font-semibold;
+}
+
+.task-score-moderate {
+  @apply text-blue-600 font-semibold;
+}
+
+.task-score-light {
+  @apply text-slate-500 font-medium;
+}
+
+/* Animation for critical and important scores */
+@keyframes pulse-scale {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.task-score-animate {
+  animation: pulse-scale 1s ease-in-out infinite;
+}

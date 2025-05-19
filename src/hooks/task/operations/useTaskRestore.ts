@@ -1,46 +1,60 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { toast } from '@/hooks/use-toast';
-import { v4 as uuidv4 } from 'uuid';
+import { Task } from '@/types';
 import { restoreTask as restoreTaskService } from '@/services/taskService';
+import { useAuth } from '@/context/auth';
+import { logDiagnostics } from '@/utils/diagnosticLog';
 
 export const useTaskRestore = (
   setTaskOperationLoading: (taskId: string, operation: string, loading: boolean) => void
 ) => {
+  const { currentUser } = useAuth();
   const queryClient = useQueryClient();
   
   // Restore task mutation
-  const restoreTaskMutation = useMutation({
+  const restoreMutation = useMutation({
     mutationFn: (id: string) => {
+      logDiagnostics('RESTORE_TASK', `Restoring task ${id}`);
       return restoreTaskService(id);
     },
-    onMutate: (id) => {
+    onMutate: async (id) => {
+      // Set loading state
       setTaskOperationLoading(id, 'restore', true);
+      
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey: ['tasks'] });
+      
+      // Get snapshot of the previous tasks
+      const previousTasks = queryClient.getQueryData(['tasks', currentUser?.id, true]);
+      
+      // Return context for potential rollback
+      return { previousTasks };
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tasks'] });
-      toast({
-        id: uuidv4(),
-        title: "Tarefa restaurada",
-        description: "A tarefa foi restaurada com sucesso."
+    onSuccess: (_, id) => {
+      logDiagnostics('RESTORE_TASK', `Task ${id} successfully restored, invalidating queries`);
+      
+      // Invalidate all task queries to refresh data
+      queryClient.invalidateQueries({ 
+        queryKey: ['tasks'],
+        exact: false 
       });
     },
-    onError: (error: any) => {
+    onError: (error, id, context) => {
       console.error('Error restoring task:', error);
-      toast({
-        id: uuidv4(),
-        title: "Erro ao restaurar tarefa",
-        description: "Não foi possível restaurar a tarefa. Tente novamente.",
-        variant: "destructive",
-      });
+      
+      if (context?.previousTasks) {
+        // Revert to the previous state on error
+        queryClient.setQueryData(['tasks', currentUser?.id, true], context.previousTasks);
+      }
     },
-    onSettled: (_, __, id) => {
+    onSettled: (_, error, id) => {
+      // Always clear loading state
       setTaskOperationLoading(id, 'restore', false);
     }
   });
   
   return {
-    restoreTask: (id: string) => restoreTaskMutation.mutate(id),
-    restoreLoading: restoreTaskMutation.isPending
+    restoreTask: (id: string) => restoreMutation.mutate(id),
+    restoreLoading: restoreMutation.isPending
   };
 };

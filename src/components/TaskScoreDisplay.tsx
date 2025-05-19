@@ -1,6 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { cn } from "../lib/utils";
+import "../styles/task-score.css";
 
 interface TaskScoreDisplayProps {
   score: number;
@@ -26,7 +27,7 @@ const TaskScoreDisplay: React.FC<TaskScoreDisplayProps> = ({
     } else if (score >= 11) {
       return "task-score-important"; // Orange with animation
     } else if (score >= 8) {
-      return "task-score-moderate"; // Now uses #5083c1 without animation
+      return "task-score-moderate"; // Now uses blue without animation
     } else {
       return "task-score-light"; // Light gray without animation
     }

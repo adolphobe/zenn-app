@@ -1,10 +1,9 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { toast } from '@/hooks/use-toast';
-import { v4 as uuidv4 } from 'uuid';
 import { Task } from '@/types';
-import { toggleTaskCompletion as toggleCompletionService } from '@/services/taskService';
+import { toggleTaskCompletion } from '@/services/taskService';
 import { useAuth } from '@/context/auth';
+import { useTaskToasts } from '@/components/task/utils/taskToasts';
 import { logDiagnostics, logDateInfo } from '@/utils/diagnosticLog';
 
 export const useTaskCompletionToggle = (
@@ -14,84 +13,92 @@ export const useTaskCompletionToggle = (
 ) => {
   const { currentUser } = useAuth();
   const queryClient = useQueryClient();
+  const { showCompletionToast } = useTaskToasts();
   
+  // Toggle completion mutation
   const toggleCompletionMutation = useMutation({
     mutationFn: (id: string) => {
-      // Validate task exists
+      // Get current task status for logging
       const task = tasks.find(t => t.id === id);
       if (!task) throw new Error(`Task with id ${id} not found`);
       
-      logDiagnostics('TOGGLE_COMPLETION', `Toggling task completion for ${id}, current state: ${task.completed}`);
-      logDateInfo('TOGGLE_COMPLETION', 'Current completedAt', task.completedAt);
+      logDiagnostics('TOGGLE_COMPLETION', `Toggling task ${id} completion, current status: ${task.completed}`);
       
-      return toggleCompletionService(id, task.completed);
+      // If completing, log exact completion time we're using
+      if (!task.completed) {
+        const nowDate = new Date();
+        logDateInfo('TOGGLE_COMPLETION', `Setting completedAt for task ${id}`, nowDate);
+      }
+      
+      return toggleTaskCompletion(id, task.completed);
     },
-    onMutate: (id) => {
+    onMutate: async (id) => {
+      // Set loading state
       setTaskOperationLoading(id, 'toggle-complete', true);
       
-      // Optimistic update
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey: ['tasks', currentUser?.id, completed] });
+      
+      // Snapshot of the current data
+      const previousTasks = queryClient.getQueryData(['tasks', currentUser?.id, completed]);
+      
+      // Get task data for optimistic update
+      const task = tasks.find(t => t.id === id);
+      if (!task) return { previousTasks };
+      
+      // Optimistically update to the new value with exact timestamp
+      const newCompletedState = !task.completed;
+      const nowIso = new Date().toISOString();
+      
+      logDiagnostics('TOGGLE_COMPLETION', `Optimistic update for task ${id}`, {
+        newCompletedState,
+        completedAt: newCompletedState ? nowIso : null
+      });
+      
       queryClient.setQueryData(['tasks', currentUser?.id, completed], (old: Task[] | undefined) => {
         if (!old) return [];
         
         return old.map(t => {
           if (t.id === id) {
-            const newCompleted = !t.completed;
-            const newCompletedAt = newCompleted ? new Date() : null;
-            
-            logDateInfo('TOGGLE_COMPLETION', 'Setting optimistic completedAt', newCompletedAt);
-            
             return { 
               ...t, 
-              completed: newCompleted,
-              completedAt: newCompletedAt,
-              _optimisticUpdateTime: Date.now()
+              completed: newCompletedState,
+              completedAt: newCompletedState ? nowIso : null
             };
           }
           return t;
         });
       });
-    },
-    onSuccess: (updatedTask) => {
-      // Log success for diagnosis
-      logDiagnostics('TOGGLE_COMPLETION', 'Success, invalidating queries');
-      logDateInfo('TOGGLE_COMPLETION', 'Updated task completedAt from success', updatedTask.completedAt);
       
-      // Invalidate all task-related queries to ensure consistency
-      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      // Return context with original tasks for potential rollback
+      return { previousTasks };
     },
-    onError: (error: any, id) => {
+    onSuccess: (updatedTask, id) => {
+      const task = tasks.find(t => t.id === id);
+      
+      if (task) {
+        logDateInfo('TOGGLE_COMPLETION', `Success response for task ${id} completedAt`, updatedTask.completedAt);
+        
+        // Show toast notification
+        showCompletionToast(updatedTask);
+      }
+      
+      // Invalidate queries to refresh cache with server data
+      queryClient.invalidateQueries({ 
+        queryKey: ['tasks'],
+        exact: false 
+      });
+    },
+    onError: (error, id, context) => {
       console.error('Error toggling task completion:', error);
       
-      // Log error for diagnosis
-      logDiagnostics('TOGGLE_COMPLETION', `Error: ${error.message || 'Unknown error'}`);
-      
-      // Revert optimistic update
-      queryClient.setQueryData(['tasks', currentUser?.id, completed], (old: Task[] | undefined) => {
-        if (!old) return [];
-        
-        return old.map(t => {
-          if (t.id === id) {
-            const task = tasks.find(originalTask => originalTask.id === id);
-            
-            logDateInfo('TOGGLE_COMPLETION', 'Reverting to original completedAt', task?.completedAt);
-            
-            return { 
-              ...(task || t), 
-              _optimisticUpdateTime: Date.now()
-            };
-          }
-          return t;
-        });
-      });
-      
-      toast({
-        id: uuidv4(),
-        title: "Erro ao atualizar tarefa",
-        description: "Não foi possível atualizar o status da tarefa. Tente novamente.",
-        variant: "destructive",
-      });
+      if (context?.previousTasks) {
+        // Revert to the previous state on error
+        queryClient.setQueryData(['tasks', currentUser?.id, completed], context.previousTasks);
+      }
     },
-    onSettled: (_, __, id) => {
+    onSettled: (_, error, id) => {
+      // Always clear loading state
       setTaskOperationLoading(id, 'toggle-complete', false);
     }
   });

@@ -32,16 +32,30 @@ export const TaskDataProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         // Log the original completedAt for diagnosis
         logDateInfo('TaskDataProvider', `Task ${task.id} original completedAt`, task.completedAt);
         
-        // Ensure completedAt is always a valid Date
+        // IMPROVED: Enhanced completed date handling with fallback
         let completedAt: Date | null = null;
         
         if (task.completedAt) {
           if (task.completedAt instanceof Date) {
             completedAt = task.completedAt;
+            logDiagnostics('TaskDataProvider', `Task ${task.id}: completedAt is already a Date instance`);
           } else {
+            // Try harder to parse the date
             const parsedDate = safeParseDate(task.completedAt);
-            completedAt = parsedDate || new Date(); // Use current date as fallback
+            
+            if (parsedDate) {
+              completedAt = parsedDate;
+              logDiagnostics('TaskDataProvider', `Task ${task.id}: completedAt parsed successfully`);
+            } else {
+              // If we can't parse it, use current date as fallback
+              completedAt = new Date();
+              logDiagnostics('TaskDataProvider', `Task ${task.id}: FALLBACK to current date for invalid completedAt`);
+            }
           }
+        } else if (task.completed) {
+          // If task is completed but has no completedAt, provide a fallback
+          completedAt = new Date();
+          logDiagnostics('TaskDataProvider', `Task ${task.id}: FALLBACK to current date for missing completedAt`);
         }
         
         // Log the processed completedAt
@@ -61,7 +75,10 @@ export const TaskDataProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         };
       } catch (error) {
         console.error('Error processing task date:', error);
-        return task; // Return original task if processing fails
+        return {
+          ...task,
+          completedAt: task.completed ? new Date() : null
+        }; // Return task with fixed completedAt if processing fails
       }
     });
   }, [completedTasksData.tasks]);

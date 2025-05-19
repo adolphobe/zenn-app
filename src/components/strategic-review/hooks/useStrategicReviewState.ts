@@ -1,3 +1,4 @@
+
 import { useState, useMemo, useEffect } from 'react';
 import { PeriodType } from '../types';
 import { getDateRangeByPeriod } from '../utils';
@@ -89,7 +90,7 @@ export const useStrategicReviewState = (tasks: Task[]) => {
     }
   };
   
-  // Filter tasks based on date range with improved handling and diagnostic logs
+  // IMPROVED: Filter tasks based on date range with enhanced date comparison logic
   const filteredTasks = useMemo(() => {
     const tasksSafe = Array.isArray(tasks) ? tasks : [];
     
@@ -104,6 +105,12 @@ export const useStrategicReviewState = (tasks: Task[]) => {
       logDiagnostics('useStrategicReviewState', `All-time filter: Found ${allCompleted.length} completed tasks`);
       return allCompleted;
     }
+    
+    // Extract range dates for easier logging
+    const rangeStart = dateRange[0];
+    const rangeEnd = dateRange[1];
+    
+    logDiagnostics('useStrategicReviewState', `Filtering tasks with range: ${rangeStart.toISOString()} to ${rangeEnd.toISOString()}`);
     
     // Filter completed tasks with valid completedAt dates within the range
     const filtered = tasksSafe.filter(task => {
@@ -129,13 +136,22 @@ export const useStrategicReviewState = (tasks: Task[]) => {
           return false;
         }
         
-        // Check if within range
-        const inRange = completedDate >= dateRange[0] && completedDate <= dateRange[1];
+        // IMPROVED: For "today" period, use isSameDay for more accurate comparison
+        if (period === 'today') {
+          const isToday = isSameDay(completedDate, new Date());
+          logDiagnostics('FILTER_TASK', `Task ${task.id} completed on ${completedDate.toISOString()} isToday: ${isToday}`);
+          return isToday;
+        }
+        
+        // For other periods, check if date is within range
+        const startOfCompletedDate = startOfDay(completedDate); 
+        const inRange = startOfCompletedDate >= rangeStart && startOfCompletedDate <= rangeEnd;
         
         logDiagnostics('FILTER_TASK', `Task ${task.id} date ${completedDate.toISOString()} in range: ${inRange}`, {
           taskDate: completedDate,
-          rangeStart: dateRange[0],
-          rangeEnd: dateRange[1]
+          taskDateStart: startOfCompletedDate,
+          rangeStart: rangeStart,
+          rangeEnd: rangeEnd
         });
         
         return inRange;
