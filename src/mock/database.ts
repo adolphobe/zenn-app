@@ -1,4 +1,3 @@
-
 /**
  * Arquivo de simulação do banco de dados
  * Este arquivo contém dados fixos que simulam informações que viriam do banco de dados.
@@ -82,7 +81,8 @@ export const pendingTasksData: Task[] = [
       {
         id: "comm-001",
         text: "Preciso focar nas aulas de conversação",
-        createdAt: "2025-05-11T14:30:00.000Z"
+        createdAt: "2025-05-11T14:30:00.000Z",
+        userId: "demo-user-id"  // Added userId
       }
     ]
   }),
@@ -138,12 +138,14 @@ export const pendingTasksData: Task[] = [
       {
         id: "comm-002",
         text: "Solicitar dados atualizados do departamento financeiro",
-        createdAt: "2025-05-12T11:20:00.000Z"
+        createdAt: "2025-05-12T11:20:00.000Z",
+        userId: "demo-user-id"  // Added userId
       },
       {
         id: "comm-003",
         text: "Revisar gráficos da seção 3",
-        createdAt: "2025-05-14T16:45:00.000Z"
+        createdAt: "2025-05-14T16:45:00.000Z",
+        userId: "demo-user-id"  // Added userId
       }
     ]
   }),
@@ -386,7 +388,8 @@ export const completedTasksData: Task[] = [
       {
         id: "comm-comp-001",
         text: "Reunião com equipe financeira ajudou a esclarecer dúvidas",
-        createdAt: "2025-04-05T10:15:00.000Z"
+        createdAt: "2025-04-05T10:15:00.000Z",
+        userId: "demo-user-id"  // Added userId
       }
     ]
   }),
@@ -426,12 +429,14 @@ export const completedTasksData: Task[] = [
       {
         id: "comm-comp-002",
         text: "Cliente aceitou termos mais favoráveis que o esperado",
-        createdAt: "2025-04-15T14:30:00.000Z"
+        createdAt: "2025-04-15T14:30:00.000Z",
+        userId: "demo-user-id"  // Added userId
       },
       {
         id: "comm-comp-003",
         text: "Documentação final enviada para análise jurídica",
-        createdAt: "2025-04-18T11:45:00.000Z"
+        createdAt: "2025-04-18T11:45:00.000Z",
+        userId: "demo-user-id"  // Added userId
       }
     ]
   }),
