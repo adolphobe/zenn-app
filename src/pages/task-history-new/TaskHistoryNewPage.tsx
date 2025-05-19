@@ -4,12 +4,15 @@ import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Loader2 } from 'lucide-react';
 import { useCompletedTasksData } from './hooks/useCompletedTasksData';
 import { useTaskFilters } from './hooks/useTaskFilters';
+import { useTaskPagination } from './hooks/useTaskPagination';
 import { TaskStats } from './components/TaskStats';
 import { TaskTable } from './components/TaskTable';
 import { TaskGrid } from './components/TaskGrid';
+import { TaskGroupList } from './components/TaskGroupList';
 import { TaskSearch } from './components/TaskSearch';
 import { ViewToggle } from './components/ViewToggle';
 import { AdvancedFilters } from './components/AdvancedFilters';
+import { TaskPagination } from './components/TaskPagination';
 
 /**
  * New Task History Page component that will gradually incorporate features from the existing one
@@ -37,6 +40,15 @@ const TaskHistoryNewPage = () => {
     startDate, setStartDate,
     endDate, setEndDate
   } = useTaskFilters(completedTasks);
+  
+  // Use pagination with task grouping
+  const {
+    currentPage,
+    totalPages,
+    paginatedTasks,
+    groupedTasks,
+    handlePageChange
+  } = useTaskPagination(filteredTasks);
   
   // Loading state
   if (completedTasksLoading) {
@@ -133,18 +145,38 @@ const TaskHistoryNewPage = () => {
         averageScore={stats.averageScore}
       />
       
-      {/* Display tasks in appropriate view mode */}
-      {viewMode === 'list' ? (
-        <TaskTable 
-          tasks={filteredTasks} 
-          onSelectTask={handleSelectTask}
-        />
-      ) : (
-        <TaskGrid
-          tasks={filteredTasks}
-          onSelectTask={handleSelectTask}
-        />
-      )}
+      {/* Display tasks */}
+      <div className="mt-6">
+        {/* If grouping is enabled, show grouped tasks */}
+        {periodFilter !== 'all' || searchQuery ? (
+          viewMode === 'list' ? (
+            <TaskTable 
+              tasks={paginatedTasks} 
+              onSelectTask={handleSelectTask}
+            />
+          ) : (
+            <TaskGrid
+              tasks={paginatedTasks}
+              onSelectTask={handleSelectTask}
+            />
+          )
+        ) : (
+          <TaskGroupList
+            groups={groupedTasks}
+            viewMode={viewMode}
+            onSelectTask={handleSelectTask}
+          />
+        )}
+        
+        {/* Pagination controls */}
+        {totalPages > 1 && (
+          <TaskPagination 
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
+        )}
+      </div>
       
       {/* Add simple task info selection message */}
       {selectedTaskId && (
