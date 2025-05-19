@@ -6,6 +6,7 @@ import { AlertCircle } from 'lucide-react';
 import { useComments } from '@/hooks/useComments';
 import { toast } from '@/hooks/use-toast';
 import { v4 as uuidv4 } from 'uuid';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface CommentFormProps {
   taskId: string;
@@ -16,11 +17,11 @@ const CommentForm: React.FC<CommentFormProps> = ({ taskId, onCommentAdded }) => 
   const [text, setText] = useState('');
   const { isAuthenticated, currentUser } = useAuth();
   const { addComment, isSubmitting } = useComments(taskId);
+  const queryClient = useQueryClient();
 
-  // Logs detalhados para debugging - MANTIDOS
+  // Logs detalhados para debugging
   console.log('[CommentForm] Props:', { taskId, onCommentAdded });
   console.log('[CommentForm] Auth state:', { isAuthenticated, currentUser });
-  console.log('[CommentForm] Texto do comentário:', text, 'Tipo:', typeof text);
 
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,7 +37,6 @@ const CommentForm: React.FC<CommentFormProps> = ({ taskId, onCommentAdded }) => 
     
     try {
       console.log('[CommentForm] Submitting comment:', trimmedText, 'for taskId:', taskId);
-      console.log('[CommentForm] Current user:', currentUser);
       
       if (!taskId) {
         console.error('[CommentForm] Cannot add comment: Task ID is missing');
@@ -66,6 +66,12 @@ const CommentForm: React.FC<CommentFormProps> = ({ taskId, onCommentAdded }) => 
           console.log('[CommentForm] Comment added successfully');
           setText(''); // Clear the input on success
           
+          // Invalidate all relevant queries to update UI everywhere
+          queryClient.invalidateQueries({ queryKey: ['comments', taskId] });
+          queryClient.invalidateQueries({ queryKey: ['tasks'] });
+          queryClient.invalidateQueries({ queryKey: ['task', taskId] });
+          queryClient.invalidateQueries({ queryKey: ['completedTasks'] });
+          
           // Call the callback to refresh the comments list and scroll to bottom
           if (onCommentAdded) {
             console.log('[CommentForm] Calling onCommentAdded callback');
@@ -91,7 +97,7 @@ const CommentForm: React.FC<CommentFormProps> = ({ taskId, onCommentAdded }) => 
         variant: "destructive",
       });
     }
-  }, [text, isAuthenticated, taskId, addComment, onCommentAdded, currentUser]);
+  }, [text, isAuthenticated, taskId, addComment, onCommentAdded, currentUser, queryClient]);
 
   return (
     <form onSubmit={handleSubmit} className="mt-2">
@@ -105,11 +111,7 @@ const CommentForm: React.FC<CommentFormProps> = ({ taskId, onCommentAdded }) => 
       <div className="flex flex-col space-y-2">
         <textarea
           value={text}
-          onChange={(e) => {
-            const newValue = e.target.value;
-            console.log('[CommentForm] Input changed:', newValue, 'Type:', typeof newValue);
-            setText(newValue);
-          }}
+          onChange={(e) => setText(e.target.value)}
           placeholder={isAuthenticated ? "Adicionar comentário..." : "Faça login para comentar"}
           className="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200"
           rows={3}

@@ -38,7 +38,7 @@ export const useComments = (taskId: string) => {
     queryFn: () => getTaskComments(taskId),
     // Enable if we have taskId
     enabled: !!taskId,
-    staleTime: 1000 * 60, // 1 minute
+    staleTime: 1000 * 30, // 30 seconds
     select: (data) => {
       // Log the raw data from database for debugging
       console.log('[useComments] Raw comment data:', data);
@@ -65,10 +65,11 @@ export const useComments = (taskId: string) => {
     onSuccess: () => {
       console.log('[useComments] Comment added successfully, invalidating queries');
       
-      // Invalidate queries to refresh data
+      // Invalidate queries to refresh data across the app
       queryClient.invalidateQueries({ queryKey: ['comments', taskId] });
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       queryClient.invalidateQueries({ queryKey: ['task', taskId] });
+      queryClient.invalidateQueries({ queryKey: ['completedTasks'] });
       
       toast({
         id: uuidv4(),
@@ -145,6 +146,8 @@ export const useComments = (taskId: string) => {
       
       // Force refresh of the comments
       await queryClient.invalidateQueries({ queryKey: ['comments', taskId] });
+      await queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      await queryClient.invalidateQueries({ queryKey: ['task', taskId] });
       
       // Call success callback if provided
       if (callbacks?.onSuccess) {
@@ -176,6 +179,7 @@ export const useComments = (taskId: string) => {
       queryClient.invalidateQueries({ queryKey: ['comments', taskId] });
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       queryClient.invalidateQueries({ queryKey: ['task', taskId] });
+      queryClient.invalidateQueries({ queryKey: ['completedTasks'] });
       
       toast({
         id: uuidv4(),

@@ -7,6 +7,7 @@ import { RefreshCw } from 'lucide-react';
 import { AlwaysVisibleScrollArea } from '@/components/ui/always-visible-scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useQueryClient } from '@tanstack/react-query';
 
 // Importando componentes auxiliares
 import TaskDetailsHeader from './details/TaskDetailsHeader';
@@ -34,6 +35,7 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
   const [activeTab, setActiveTab] = useState('levels');
   const isMobile = useIsMobile();
   const commentsContainerRef = useRef<HTMLDivElement | null>(null);
+  const queryClient = useQueryClient();
   
   // Função para rolagem até o final dos comentários - definida fora de qualquer condicional
   const scrollToBottom = useCallback(() => {
@@ -54,6 +56,15 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
     }
   }, [activeTab, task?.comments?.length, scrollToBottom]);
 
+  // When the modal is opened, refresh the comments data
+  useEffect(() => {
+    if (isOpen && task?.id) {
+      // Invalidate queries to refresh data
+      queryClient.invalidateQueries({ queryKey: ['comments', task.id] });
+      queryClient.invalidateQueries({ queryKey: ['task', task.id] });
+    }
+  }, [isOpen, task?.id, queryClient]);
+
   // Handler para restaurar tarefa
   const handleRestore = () => {
     if (onRestore && task?.id) {
@@ -61,6 +72,19 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
       onClose();
     }
   };
+  
+  // Handler for when a comment is added
+  const handleCommentAdded = useCallback(() => {
+    // Force data refresh
+    if (task?.id) {
+      console.log('[TaskDetailsModal] Comment added, refreshing data');
+      queryClient.invalidateQueries({ queryKey: ['comments', task.id] });
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      
+      // Scroll to bottom after a small delay
+      setTimeout(scrollToBottom, 300);
+    }
+  }, [task?.id, queryClient, scrollToBottom]);
   
   // Se não tiver uma tarefa, renderiza um modal simplificado
   if (!task) {
@@ -104,7 +128,7 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
                     Níveis
                   </TabsTrigger>
                   <TabsTrigger value="comments">
-                    Comentários
+                    Comentários {task.comments && task.comments.length > 0 ? `(${task.comments.length})` : ''}
                   </TabsTrigger>
                 </TabsList>
                 
@@ -117,7 +141,7 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
                   <div ref={commentsContainerRef}>
                     <TaskCommentsContent 
                       task={task} 
-                      onCommentAdded={scrollToBottom} 
+                      onCommentAdded={handleCommentAdded} 
                     />
                   </div>
                 </TabsContent>
