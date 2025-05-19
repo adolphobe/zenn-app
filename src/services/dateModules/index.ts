@@ -31,6 +31,9 @@ import {
   isTaskOverdue
 } from './dateOperations';
 import { DateFormatConfig } from '@/types/dates';
+import { validateDate, DateValidationResult, DateValidationOptions } from './dateValidation';
+import { compareDates, DateComparisonResult } from './dateCompare';
+import { fromDTO, toDTO } from './dateDTOConverter';
 
 // Export all date modules
 export {
@@ -66,8 +69,23 @@ export {
   endOfDay,
   isDateBefore,
   isDateAfter,
-  isTaskOverdue
+  isTaskOverdue,
+  
+  // Validation
+  validateDate,
+  
+  // Comparison
+  compareDates,
+  
+  // DTO Conversion
+  fromDTO,
+  toDTO
 };
 
-// Configuration type
-export type { DateFormatConfig };
+// Configuration and result types
+export type { 
+  DateFormatConfig,
+  DateValidationResult,
+  DateValidationOptions,
+  DateComparisonResult
+};

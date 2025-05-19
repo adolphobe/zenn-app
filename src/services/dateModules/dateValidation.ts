@@ -1,7 +1,6 @@
 
 import { parseDate } from './dateParser';
 import { isDateBefore, isDateAfter } from './dateOperations';
-import { formatForDisplay } from './dateFormatter';
 
 /**
  * Interface para resultado da validação de datas
@@ -51,7 +50,7 @@ export function validateDate(
       const minDate = parseDate(options.minDate);
       if (minDate && isDateBefore(parsedDate, minDate)) {
         // Formatação simples para a mensagem
-        const formattedMinDate = formatForDisplay(minDate, {});
+        const formattedMinDate = formatSimple(minDate);
         return { 
           isValid: false, 
           message: `Data não pode ser anterior a ${formattedMinDate}`
@@ -64,7 +63,7 @@ export function validateDate(
       const maxDate = parseDate(options.maxDate);
       if (maxDate && isDateAfter(parsedDate, maxDate)) {
         // Formatação simples para a mensagem
-        const formattedMaxDate = formatForDisplay(maxDate, {});
+        const formattedMaxDate = formatSimple(maxDate);
         return { 
           isValid: false, 
           message: `Data não pode ser posterior a ${formattedMaxDate}`
@@ -86,7 +85,7 @@ export function validateDate(
  * Formata uma data para exibição em mensagens de validação
  * Versão simplificada para evitar dependências circulares
  */
-function formatForDisplay(date: Date, options: any): string {
+function formatSimple(date: Date): string {
   try {
     // Formato dd/MM/yyyy simples para mensagens de validação
     return date.toLocaleDateString('pt-BR');
