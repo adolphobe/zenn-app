@@ -10,7 +10,7 @@ import {
   TableCell 
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { Eye, RefreshCw } from 'lucide-react';
+import { Eye, RefreshCw, ArrowUp, ArrowDown } from 'lucide-react';
 import { Task } from '@/types';
 import { Badge } from '@/components/ui/badge';
 import { motion } from 'framer-motion';
@@ -19,12 +19,18 @@ interface TaskTableProps {
   tasks: Task[];
   onSelectTask: (taskId: string) => void;
   onRestoreTask?: (taskId: string) => void;
+  onSort?: (field: string, direction: 'asc' | 'desc') => void;
+  sortField?: string;
+  sortDirection?: 'asc' | 'desc';
 }
 
 export const TaskTable: React.FC<TaskTableProps> = ({ 
   tasks, 
   onSelectTask, 
-  onRestoreTask 
+  onRestoreTask,
+  onSort,
+  sortField,
+  sortDirection
 }) => {
   // Helper for score color - UPDATED to match TaskScoreDisplay colors exactly
   const getScoreColor = (score: number) => {
@@ -78,16 +84,52 @@ export const TaskTable: React.FC<TaskTableProps> = ({
 
   // Create motion variants for the TableRow
   const MotionTableRow = motion(TableRow);
+  
+  // Handle sort click
+  const handleSortClick = (field: string) => {
+    if (!onSort) return;
+    
+    // If already sorting by this field, toggle direction
+    const newDirection = (sortField === field && sortDirection === 'asc') ? 'desc' : 'asc';
+    onSort(field, newDirection);
+  };
+  
+  // Render sort indicator
+  const renderSortIndicator = (field: string) => {
+    if (sortField !== field) return null;
+    
+    return sortDirection === 'asc' 
+      ? <ArrowUp className="ml-1 h-4 w-4 inline" /> 
+      : <ArrowDown className="ml-1 h-4 w-4 inline" />;
+  };
+  
+  // Make table head sortable
+  const SortableTableHead = ({ field, children }: { field: string, children: React.ReactNode }) => {
+    // Only add sort functionality if onSort callback is provided
+    if (!onSort) return <TableHead>{children}</TableHead>;
+    
+    return (
+      <TableHead 
+        className="cursor-pointer hover:bg-gray-100 transition-colors"
+        onClick={() => handleSortClick(field)}
+      >
+        <div className="flex items-center">
+          {children}
+          {renderSortIndicator(field)}
+        </div>
+      </TableHead>
+    );
+  };
 
   return (
     <div className="border rounded-md overflow-hidden shadow-sm bg-white">
       <Table>
         <TableHeader className="bg-gray-50">
           <TableRow>
-            <TableHead>Tarefa</TableHead>
-            <TableHead>Pontuação</TableHead>
-            <TableHead>Feedback</TableHead>
-            <TableHead>Data de Conclusão</TableHead>
+            <SortableTableHead field="title">Tarefa</SortableTableHead>
+            <SortableTableHead field="totalScore">Pontuação</SortableTableHead>
+            <SortableTableHead field="feedback">Feedback</SortableTableHead>
+            <SortableTableHead field="completedAt">Data de Conclusão</SortableTableHead>
             <TableHead>Ações</TableHead>
           </TableRow>
         </TableHeader>

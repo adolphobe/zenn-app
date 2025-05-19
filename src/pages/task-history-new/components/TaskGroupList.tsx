@@ -16,13 +16,19 @@ interface TaskGroupListProps {
   viewMode: 'list' | 'grid';
   onSelectTask: (taskId: string) => void;
   onRestoreTask?: (taskId: string) => void;
+  onSort?: (field: string, direction: 'asc' | 'desc') => void;
+  sortField?: string;
+  sortDirection?: 'asc' | 'desc';
 }
 
 export const TaskGroupList: React.FC<TaskGroupListProps> = ({ 
   groups, 
   viewMode,
   onSelectTask,
-  onRestoreTask
+  onRestoreTask,
+  onSort,
+  sortField,
+  sortDirection
 }) => {
   if (!groups.length) {
     return (
@@ -45,13 +51,19 @@ export const TaskGroupList: React.FC<TaskGroupListProps> = ({
             <TaskTable 
               tasks={group.tasks} 
               onSelectTask={onSelectTask}
-              onRestoreTask={onRestoreTask} 
+              onRestoreTask={onRestoreTask}
+              onSort={onSort}
+              sortField={sortField}
+              sortDirection={sortDirection}
             />
           ) : (
             <TaskGrid 
               tasks={group.tasks} 
               onSelectTask={onSelectTask}
               onRestoreTask={onRestoreTask}
+              onSort={onSort}
+              sortField={sortField}
+              sortDirection={sortDirection}
             />
           )}
           

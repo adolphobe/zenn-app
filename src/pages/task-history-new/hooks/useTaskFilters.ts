@@ -12,6 +12,10 @@ export const useTaskFilters = (tasks: Task[]) => {
   const [sortBy, setSortBy] = useState('newest');
   const [showFilters, setShowFilters] = useState(false);
   
+  // Column sorting
+  const [sortField, setSortField] = useState<string>('completedAt');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
+  
   // Advanced filters
   const [periodFilter, setPeriodFilter] = useState('all');
   const [scoreFilter, setScoreFilter] = useState('all');
@@ -118,26 +122,53 @@ export const useTaskFilters = (tasks: Task[]) => {
     endDate
   ]);
   
+  // Function to handle column sorting
+  const handleColumnSort = (field: string, direction: 'asc' | 'desc') => {
+    setSortField(field);
+    setSortDirection(direction);
+    
+    // Map to predefined sort types for dropdown compatibility
+    if (field === 'completedAt') {
+      setSortBy(direction === 'desc' ? 'newest' : 'oldest');
+    } else if (field === 'totalScore') {
+      setSortBy(direction === 'desc' ? 'highScore' : 'lowScore');
+    } else if (field === 'title') {
+      setSortBy('alphabetical');
+    }
+  };
+  
   // Sort filtered tasks
   const sortedTasks = useMemo(() => {
     if (!filteredTasks.length) return [];
     
     return [...filteredTasks].sort((a, b) => {
-      switch (sortBy) {
-        case 'oldest':
-          return new Date(a.completedAt || 0).getTime() - new Date(b.completedAt || 0).getTime();
-        case 'highScore':
-          return (b.totalScore || 0) - (a.totalScore || 0);
-        case 'lowScore':
-          return (a.totalScore || 0) - (b.totalScore || 0);
-        case 'alphabetical':
-          return a.title.localeCompare(b.title);
-        case 'newest':
-        default:
-          return new Date(b.completedAt || 0).getTime() - new Date(a.completedAt || 0).getTime();
+      // Sort based on column sort
+      if (sortField === 'title') {
+        // String comparison for title
+        const comparison = a.title.localeCompare(b.title);
+        return sortDirection === 'asc' ? comparison : -comparison;
+      }
+      else if (sortField === 'totalScore') {
+        // Number comparison for score
+        const aScore = a.totalScore || 0;
+        const bScore = b.totalScore || 0;
+        return sortDirection === 'asc' ? aScore - bScore : bScore - aScore;
+      }
+      else if (sortField === 'feedback') {
+        // String comparison for feedback
+        const aFeedback = a.feedback || '';
+        const bFeedback = b.feedback || '';
+        const comparison = aFeedback.localeCompare(bFeedback);
+        return sortDirection === 'asc' ? comparison : -comparison;
+      }
+      else {
+        // Default to date sorting (completedAt)
+        const aTime = new Date(a.completedAt || 0).getTime();
+        const bTime = new Date(b.completedAt || 0).getTime();
+        return sortDirection === 'asc' ? aTime - bTime : bTime - aTime;
       }
     });
-  }, [filteredTasks, sortBy]);
+  }, [filteredTasks, sortField, sortDirection]);
   
   return {
     searchQuery,
@@ -149,6 +180,11 @@ export const useTaskFilters = (tasks: Task[]) => {
     filteredTasks: sortedTasks,
     showFilters,
     setShowFilters,
+    
+    // Column sorting
+    sortField,
+    sortDirection,
+    handleColumnSort,
     
     // Advanced filters
     periodFilter,

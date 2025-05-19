@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Task } from '@/types';
 import { format } from 'date-fns';
@@ -12,12 +11,18 @@ interface TaskGridProps {
   tasks: Task[];
   onSelectTask: (taskId: string) => void;
   onRestoreTask?: (taskId: string) => void;
+  sortField?: string;
+  sortDirection?: 'asc' | 'desc';
+  onSort?: (field: string, direction: 'asc' | 'desc') => void;
 }
 
 export const TaskGrid: React.FC<TaskGridProps> = ({ 
   tasks, 
   onSelectTask, 
-  onRestoreTask 
+  onRestoreTask,
+  sortField,
+  sortDirection,
+  onSort
 }) => {
   // Visual styles per feedback type
   const feedbackColors: Record<string, string> = {

@@ -43,7 +43,8 @@ const TaskHistoryNewPage = () => {
     feedbackFilter, setFeedbackFilter,
     pillarFilter, setPillarFilter,
     startDate, setStartDate,
-    endDate, setEndDate
+    endDate, setEndDate,
+    sortField, sortDirection, handleColumnSort
   } = useTaskFilters(completedTasks);
   
   // Use pagination with task grouping
@@ -246,12 +247,17 @@ const TaskHistoryNewPage = () => {
               tasks={paginatedTasks} 
               onSelectTask={handleSelectTask}
               onRestoreTask={handleRestoreClick}
+              onSort={handleColumnSort}
+              sortField={sortField}
+              sortDirection={sortDirection}
             />
           ) : (
             <TaskGrid
               tasks={paginatedTasks}
               onSelectTask={handleSelectTask}
               onRestoreTask={handleRestoreClick}
+              sortField={sortField}
+              sortDirection={sortDirection}
             />
           )
         ) : (
@@ -260,6 +266,9 @@ const TaskHistoryNewPage = () => {
             viewMode={viewMode}
             onSelectTask={handleSelectTask}
             onRestoreTask={handleRestoreClick}
+            onSort={handleColumnSort}
+            sortField={sortField}
+            sortDirection={sortDirection}
           />
         )}
         
