@@ -47,7 +47,7 @@ export const TaskGrid: React.FC<TaskGridProps> = ({ tasks, onSelectTask }) => {
             <div className="flex items-center justify-between">
               <div className="flex items-center">
                 <Badge variant="outline" className="mr-2">
-                  {task.score || 0} pontos
+                  {task.totalScore || 0} pontos
                 </Badge>
                 
                 {task.feedback && (
@@ -62,9 +62,9 @@ export const TaskGrid: React.FC<TaskGridProps> = ({ tasks, onSelectTask }) => {
           </CardContent>
           
           <CardFooter className="p-4 pt-0 text-xs text-muted-foreground">
-            {task.pillar?.consequence > 0 && <span className="mr-2">C:{task.pillar.consequence}</span>}
-            {task.pillar?.pride > 0 && <span className="mr-2">O:{task.pillar.pride}</span>}
-            {task.pillar?.construction > 0 && <span>Co:{task.pillar.construction}</span>}
+            {task.consequenceScore > 0 && <span className="mr-2">C:{task.consequenceScore}</span>}
+            {task.prideScore > 0 && <span className="mr-2">O:{task.prideScore}</span>}
+            {task.constructionScore > 0 && <span>Co:{task.constructionScore}</span>}
           </CardFooter>
         </Card>
       ))}

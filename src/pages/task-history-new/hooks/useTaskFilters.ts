@@ -63,7 +63,7 @@ export const useTaskFilters = (tasks: Task[]) => {
       if (!matchesPeriod) return false;
       
       // Score filter
-      const score = task.score || 0;
+      const score = task.totalScore || 0;
       let matchesScore = true;
       
       if (scoreFilter !== 'all') {
@@ -89,15 +89,18 @@ export const useTaskFilters = (tasks: Task[]) => {
       // Pillar filter
       let matchesPillar = true;
       
-      if (pillarFilter !== 'all' && task.pillar) {
-        const { consequence, pride, construction } = task.pillar;
-        const maxPillar = Math.max(consequence || 0, pride || 0, construction || 0);
+      if (pillarFilter !== 'all') {
+        const maxValue = Math.max(
+          task.consequenceScore || 0,
+          task.prideScore || 0,
+          task.constructionScore || 0
+        );
         
-        if (pillarFilter === 'consequence' && consequence !== maxPillar) {
+        if (pillarFilter === 'consequence' && task.consequenceScore !== maxValue) {
           matchesPillar = false;
-        } else if (pillarFilter === 'pride' && pride !== maxPillar) {
+        } else if (pillarFilter === 'pride' && task.prideScore !== maxValue) {
           matchesPillar = false;
-        } else if (pillarFilter === 'construction' && construction !== maxPillar) {
+        } else if (pillarFilter === 'construction' && task.constructionScore !== maxValue) {
           matchesPillar = false;
         }
       }
@@ -124,9 +127,9 @@ export const useTaskFilters = (tasks: Task[]) => {
         case 'oldest':
           return new Date(a.completedAt || 0).getTime() - new Date(b.completedAt || 0).getTime();
         case 'highScore':
-          return (b.score || 0) - (a.score || 0);
+          return (b.totalScore || 0) - (a.totalScore || 0);
         case 'lowScore':
-          return (a.score || 0) - (b.score || 0);
+          return (a.totalScore || 0) - (b.totalScore || 0);
         case 'alphabetical':
           return a.title.localeCompare(b.title);
         case 'newest':
