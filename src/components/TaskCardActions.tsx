@@ -59,7 +59,10 @@ const TaskCardActions: React.FC<TaskCardActionsProps> = ({
           size="sm"
           onClick={onDeleteTask}
           title="Excluir"
-          className={buttonStyles}
+          className={`
+            ${buttonStyles} 
+            btn-red-lixeira
+          `}
         >
           <Trash2 size={16} />
         </Button>
