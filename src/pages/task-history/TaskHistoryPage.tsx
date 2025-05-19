@@ -25,31 +25,7 @@ const TaskHistoryPage = () => {
       authLoading,
       tasksLoaded: completedTasks.length 
     });
-    
-    // Verificar se temos uma URL com duplicação do path
-    if (currentUrl.includes('/task-history#/task-history')) {
-      logError('TaskHistory', 'URL com duplicação detectada', currentUrl);
-    }
-    
-    // Validate any tasks with completedAt dates
-    if (completedTasks.length > 0) {
-      completedTasks.forEach(task => {
-        if (task.completedAt) {
-          const isValid = task.completedAt instanceof Date && 
-            !isNaN(task.completedAt.getTime());
-          
-          if (!isValid) {
-            logError('TaskHistory', `Task ${task.id} tem data de conclusão inválida`, task.completedAt);
-          }
-        }
-      });
-    }
-    
-    // Clean up function to help with debugging
-    return () => {
-      logInfo('TaskHistory', 'Componente desmontado');
-    };
-  }, [isAuthenticated, authLoading, completedTasks]);
+  }, [isAuthenticated, authLoading, completedTasks.length]);
 
   if (isLoading) {
     return (
