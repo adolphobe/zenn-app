@@ -5,6 +5,8 @@ import TaskSummaryCard from './TaskSummaryCard';
 import PillarsAnalysisCard from './PillarsAnalysisCard';
 import FeedbackAnalysisCard from './FeedbackAnalysisCard';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
+import { CalendarClock } from 'lucide-react';
 
 interface AnalysisContentProps {
   tasks: Task[];
@@ -55,12 +57,27 @@ const AnalysisContent: React.FC<AnalysisContentProps> = ({ tasks, isLoading = fa
     return (
       <Alert variant="destructive">
         <AlertTitle>Nenhuma tarefa concluída encontrada</AlertTitle>
-        <AlertDescription>
-          Não foram encontradas tarefas concluídas no período selecionado.
-          <br />
-          <br />
-          Tente selecionar "Todo o Tempo" para ver todas as suas tarefas concluídas, 
-          ou verifique se você já completou alguma tarefa.
+        <AlertDescription className="space-y-3">
+          <p>
+            Não foram encontradas tarefas concluídas no período selecionado.
+          </p>
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                // Find the "Todo o Tempo" tab and click it
+                const allTimeTab = document.querySelector('[value="all-time"]');
+                if (allTimeTab && allTimeTab instanceof HTMLElement) {
+                  allTimeTab.click();
+                }
+              }}
+              size="sm"
+              className="mt-2"
+            >
+              <CalendarClock className="mr-2 h-4 w-4" />
+              Ver todas as tarefas concluídas
+            </Button>
+          </div>
         </AlertDescription>
       </Alert>
     );

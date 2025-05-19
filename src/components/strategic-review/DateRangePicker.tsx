@@ -6,7 +6,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { CalendarIcon, CalendarRange } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
-import { toast } from '@/hooks/use-toast';
+import { useToast } from '@/hooks/use-toast';
 
 interface DateRangePickerProps {
   customStartDate: Date | undefined;
@@ -21,6 +21,8 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
   setCustomStartDate,
   setCustomEndDate
 }) => {
+  const { addToast } = useToast(); // Correct usage of useToast
+  
   return (
     <div className="flex flex-col sm:flex-row gap-4 mt-4">
       <div>
@@ -86,7 +88,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
           variant="secondary" 
           onClick={() => {
             if (!customStartDate || !customEndDate) {
-              toast({
+              addToast({
                 title: "Datas inválidas",
                 description: "Por favor, selecione ambas as datas.",
                 variant: "destructive"
@@ -95,7 +97,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
             }
             
             if (customEndDate < customStartDate) {
-              toast({
+              addToast({
                 title: "Intervalo inválido",
                 description: "A data final deve ser posterior à data inicial.",
                 variant: "destructive"
@@ -103,7 +105,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
               return;
             }
             
-            toast({
+            addToast({
               title: "Filtro aplicado",
               description: `Mostrando dados de ${format(customStartDate, 'dd/MM/yyyy')} a ${format(customEndDate, 'dd/MM/yyyy')}`
             });

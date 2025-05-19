@@ -6,9 +6,14 @@ import { PeriodType } from './types';
 interface PeriodTabsProps {
   period: PeriodType;
   onPeriodChange: (period: PeriodType) => void;
+  showAllTimeProminent?: boolean;
 }
 
-const PeriodTabs: React.FC<PeriodTabsProps> = ({ period, onPeriodChange }) => {
+const PeriodTabs: React.FC<PeriodTabsProps> = ({ 
+  period, 
+  onPeriodChange,
+  showAllTimeProminent = false 
+}) => {
   return (
     <Tabs value={period} onValueChange={(value) => onPeriodChange(value as PeriodType)}>
       <TabsList className="flex flex-wrap mb-2">
@@ -18,7 +23,12 @@ const PeriodTabs: React.FC<PeriodTabsProps> = ({ period, onPeriodChange }) => {
         <TabsTrigger value="month">Este Mês</TabsTrigger>
         <TabsTrigger value="custom">Últimos 30 dias</TabsTrigger>
         <TabsTrigger value="custom-range">Personalizado</TabsTrigger>
-        <TabsTrigger value="all-time">Todo o Tempo</TabsTrigger>
+        <TabsTrigger 
+          value="all-time" 
+          className={showAllTimeProminent ? "bg-primary-foreground border-primary" : ""}
+        >
+          Todo o Tempo
+        </TabsTrigger>
       </TabsList>
     </Tabs>
   );

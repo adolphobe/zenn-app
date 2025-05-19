@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect } from 'react';
+import React, { createContext, useContext, useEffect, useMemo } from 'react';
 import { useTaskData } from '@/hooks/useTaskData';
 import { Task, TaskFormData } from '@/types';
 import { safeParseDate } from '@/utils';
@@ -30,25 +30,32 @@ export const TaskDataProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         completedTasksData.tasks.slice(0, 2).map(t => ({
           id: t.id,
           title: t.title,
-          completedAt: t.completedAt
+          completedAt: t.completedAt,
+          completed: t.completed
         }))
       );
     }
   }, [activeTasksData.tasks, completedTasksData.tasks]);
   
-  // Create context value with both active and completed tasks
-  const contextValue: TaskDataContextType = {
-    ...activeTasksData,
-    completedTasks: completedTasksData.tasks.map(task => {
-      // We're not changing the task type structure here, just ensuring dates are valid
-      // This prevents "Invalid time value" errors when components try to format dates
+  // Process completed tasks to ensure dates are valid
+  const processedCompletedTasks = React.useMemo(() => {
+    return completedTasksData.tasks.map(task => {
       try {
+        // Ensure completedAt is always a valid Date
+        let completedAt: Date | null = null;
+        
+        if (task.completedAt) {
+          if (task.completedAt instanceof Date) {
+            completedAt = task.completedAt;
+          } else {
+            const parsedDate = safeParseDate(task.completedAt);
+            completedAt = parsedDate || new Date(); // Use current date as fallback
+          }
+        }
+        
         return {
           ...task,
-          // Keep completedAt as consistent type - prefer Date object
-          completedAt: task.completedAt instanceof Date ? 
-            task.completedAt : 
-            (task.completedAt ? safeParseDate(task.completedAt) : null),
+          completedAt,
           // Ensure idealDate is validated but keep original type structure
           idealDate: task.idealDate ? 
             (task.idealDate instanceof Date ? task.idealDate : safeParseDate(task.idealDate)) : 
@@ -62,7 +69,26 @@ export const TaskDataProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         console.error('Error processing task date:', error, task);
         return task; // Return original task if processing fails
       }
-    }),
+    });
+  }, [completedTasksData.tasks]);
+  
+  // Log when processed tasks change
+  useEffect(() => {
+    console.log(`TaskDataProvider: Processed ${processedCompletedTasks.length} completed tasks`);
+    
+    if (processedCompletedTasks.length > 0) {
+      const withValidDates = processedCompletedTasks.filter(t => 
+        t.completedAt instanceof Date && !isNaN(t.completedAt.getTime())
+      ).length;
+      
+      console.log(`TaskDataProvider: ${withValidDates} of ${processedCompletedTasks.length} have valid completedAt dates`);
+    }
+  }, [processedCompletedTasks]);
+
+  // Create context value with both active and completed tasks
+  const contextValue: TaskDataContextType = {
+    ...activeTasksData,
+    completedTasks: processedCompletedTasks,
     completedTasksLoading: completedTasksData.isLoading,
   };
 

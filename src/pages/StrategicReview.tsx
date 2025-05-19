@@ -14,7 +14,7 @@ import { useTaskDataContext } from '@/context/TaskDataProvider';
 const StrategicReview: React.FC = () => {
   const { isAuthenticated } = useAuth();
   const { completedTasks, completedTasksLoading } = useTaskDataContext();
-  const { toast } = useToast();
+  const { addToast } = useToast(); // Correct usage of useToast
   const isFirstRender = useRef(true);
   
   // Debug logs
@@ -50,7 +50,8 @@ const StrategicReview: React.FC = () => {
     filteredTasks,
     setCustomStartDate,
     setCustomEndDate,
-    handlePeriodChange
+    handlePeriodChange,
+    taskStats
   } = useStrategicReviewState(completedTasks || []);
 
   // Adicionar logs para diagnóstico
@@ -69,7 +70,7 @@ const StrategicReview: React.FC = () => {
     // Show a toast to indicate the page is loaded - only on first render
     if (isFirstRender.current) {
       try {
-        toast({
+        addToast({
           title: "Revisão Estratégica",
           description: completedTasksLoading 
             ? "Carregando suas tarefas concluídas..." 
@@ -83,7 +84,7 @@ const StrategicReview: React.FC = () => {
       }
       isFirstRender.current = false;
     }
-  }, [assignMissingPillars, toast, completedTasksLoading, completedTasks]);
+  }, [assignMissingPillars, addToast, completedTasksLoading, completedTasks]);
   
   return (
     <div className="w-full">
@@ -94,6 +95,15 @@ const StrategicReview: React.FC = () => {
             dateRangeDisplay || "Nenhum período selecionado"
           )}
         </p>
+        
+        {/* Task Statistics Summary */}
+        {taskStats && !completedTasksLoading && (
+          <div className="mt-2 text-sm text-muted-foreground">
+            <span className="font-medium">{taskStats.totalFilteredTasks}</span> tarefas concluídas 
+            {period !== 'all-time' ? ' no período selecionado' : ''} 
+            {' '}de um total de <span className="font-medium">{taskStats.totalCompletedTasks}</span>
+          </div>
+        )}
         
         {/* Debug info visible in development */}
         {process.env.NODE_ENV !== 'production' && (

@@ -2,9 +2,15 @@
 import { useState, useMemo, useEffect } from 'react';
 import { PeriodType } from '../types';
 import { getDateRangeByPeriod } from '../utils';
-import { format, isSameDay, startOfDay, endOfDay, subDays } from 'date-fns';
+import { format, isSameDay, startOfDay, endOfDay, subDays, isValid } from 'date-fns';
 import { Task } from '@/types';
 import { dateService } from '@/services/dateService';
+
+// Interface for task statistics
+interface TaskStats {
+  totalCompletedTasks: number;
+  totalFilteredTasks: number;
+}
 
 export const useStrategicReviewState = (tasks: Task[]) => {
   const [period, setPeriod] = useState<PeriodType>('week');
@@ -26,7 +32,16 @@ export const useStrategicReviewState = (tasks: Task[]) => {
     // Log das primeiras 3 tarefas para debugging
     if (tasks?.length > 0) {
       tasks.slice(0, 3).forEach((task, idx) => {
-        console.log(`Task #${idx+1} debug: id=${task.id}, title=${task.title}, completedAt=${task.completedAt ? (task.completedAt instanceof Date ? task.completedAt.toISOString() : task.completedAt) : 'null'}, completed=${task.completed}`);
+        console.log(`Task #${idx+1} debug:`, {
+          id: task.id,
+          title: task.title,
+          completedAt: task.completedAt ? 
+            (task.completedAt instanceof Date ? 
+              task.completedAt.toISOString() : 
+              String(task.completedAt)
+            ) : 'null',
+          completed: task.completed
+        });
       });
     }
   }, [tasks]);
@@ -51,10 +66,13 @@ export const useStrategicReviewState = (tasks: Task[]) => {
   // Calculate date range based on selected period
   const dateRange = useMemo(() => {
     if (period === 'custom-range' && customStartDate && customEndDate) {
-      return [startOfDay(customStartDate), endOfDay(customEndDate)] as [Date, Date];
+      // Ensure both dates are valid
+      if (isValid(customStartDate) && isValid(customEndDate)) {
+        return [startOfDay(customStartDate), endOfDay(customEndDate)] as [Date, Date];
+      }
     }
     
-    // Usar função auxiliar para calcular intervalo
+    // Use helper function to calculate range
     const range = getDateRangeByPeriod(period);
     console.log(`useStrategicReviewState: Calculado intervalo para ${period}:`, 
       range[0].toISOString(), "até", range[1].toISOString());
@@ -68,6 +86,30 @@ export const useStrategicReviewState = (tasks: Task[]) => {
     }
   }, [dateRange]);
   
+  // Function to safely convert any value to a Date object
+  const toSafeDate = (value: any): Date | null => {
+    if (!value) return null;
+    
+    try {
+      // If already a Date object
+      if (value instanceof Date && isValid(value)) {
+        return value;
+      }
+      
+      // Try to parse string or timestamp
+      const parsed = dateService.parseDate(value);
+      if (parsed && isValid(parsed)) {
+        return parsed;
+      }
+      
+      console.warn("useStrategicReviewState: Valor de data inválido:", value);
+      return null;
+    } catch (error) {
+      console.error("useStrategicReviewState: Erro ao converter data:", error);
+      return null;
+    }
+  };
+  
   // Filter tasks based on date range with improved handling
   const filteredTasks = useMemo(() => {
     const tasksSafe = Array.isArray(tasks) ? tasks : [];
@@ -79,64 +121,79 @@ export const useStrategicReviewState = (tasks: Task[]) => {
     
     console.log(`useStrategicReviewState: Filtrando ${tasksSafe.length} tarefas por data...`);
     
-    // Para o período "all-time", incluir todas as tarefas concluídas, ignorando datas
+    // For "all-time" period, include all completed tasks, ignoring dates
     if (period === 'all-time') {
       const allCompletedTasks = tasksSafe.filter(t => t.completed);
       console.log(`useStrategicReviewState: Modo 'Todo o Tempo' - Retornando ${allCompletedTasks.length} tarefas concluídas`);
       return allCompletedTasks;
     }
     
-    // Filtrar tarefas completadas com datas válidas de completedAt dentro do intervalo
+    // Filter completed tasks with valid completedAt dates within the range
     const filtered = tasksSafe.filter(task => {
-      if (!task.completed) return false;
+      if (!task.completed) {
+        return false;
+      }
       
-      // Lidar com tarefas sem data de conclusão - serão excluídas
+      // Handle tasks without completion date - exclude from filtered results
       if (!task.completedAt) {
         return false;
       }
       
       try {
-        // Garantir que a data é um objeto Date
-        const completedDate = task.completedAt instanceof Date ? 
-          task.completedAt : 
-          dateService.parseDate(task.completedAt);
-          
+        // Convert to Date object safely
+        const completedDate = toSafeDate(task.completedAt);
         if (!completedDate) return false;
         
-        // Verificar se está dentro do intervalo
+        // Check if within range
         const isAfterStart = completedDate >= dateRange[0];
         const isBeforeEnd = completedDate <= dateRange[1];
         
         return isAfterStart && isBeforeEnd;
       } catch (error) {
-        console.error("Erro ao filtrar tarefa por data:", error);
+        console.error("useStrategicReviewState: Erro ao filtrar tarefa por data:", error);
         return false;
       }
     });
     
     console.log(`useStrategicReviewState: Filtrado ${filtered.length} de ${tasksSafe.length} tarefas para análise`);
     
-    // Log detalhado sobre as tarefas filtradas
+    // Detailed debug for filtering issues
     if (filtered.length === 0 && tasksSafe.filter(t => t.completed).length > 0) {
       console.warn("useStrategicReviewState: ALERTA - Nenhuma tarefa filtrada apesar de existirem tarefas concluídas.");
       console.log("useStrategicReviewState: Verificando se as tarefas concluídas têm datas válidas.");
       
       tasksSafe.filter(t => t.completed).slice(0, 5).forEach((task, idx) => {
-        const completedDate = task.completedAt ? 
-          (task.completedAt instanceof Date ? task.completedAt : dateService.parseDate(task.completedAt)) : 
-          null;
-            
-        console.log(`Tarefa #${idx + 1}: "${task.title}" - Concluída: ${task.completed}, Data: ${completedDate ? completedDate.toISOString() : 'null'}`);
-          
+        const completedDate = toSafeDate(task.completedAt);
+        
+        console.log(`Tarefa #${idx + 1}: "${task.title}"`, {
+          concluída: task.completed,
+          dataOriginal: task.completedAt,
+          dataParsed: completedDate ? completedDate.toISOString() : 'null'
+        });
+        
         if (completedDate) {
           const isInRange = completedDate >= dateRange[0] && completedDate <= dateRange[1];
-          console.log(`  - Está no intervalo? ${isInRange}, Intervalo: ${dateRange[0].toISOString()} até ${dateRange[1].toISOString()}`);
+          console.log(`  - Está no intervalo? ${isInRange}`, {
+            dataInício: dateRange[0].toISOString(),
+            dataFim: dateRange[1].toISOString()
+          });
         }
       });
     }
     
     return filtered;
   }, [tasks, dateRange, period]);
+  
+  // Calculate task statistics
+  const taskStats = useMemo<TaskStats>(() => {
+    const totalCompletedTasks = tasks?.filter(t => t.completed)?.length || 0;
+    const totalFilteredTasks = filteredTasks?.length || 0;
+    
+    return {
+      totalCompletedTasks,
+      totalFilteredTasks
+    };
+  }, [tasks, filteredTasks]);
   
   // Format date range for display
   const dateRangeDisplay = useMemo(() => {
@@ -178,6 +235,7 @@ export const useStrategicReviewState = (tasks: Task[]) => {
     showCustomDatePicker,
     dateRangeDisplay,
     filteredTasks,
+    taskStats,
     setCustomStartDate,
     setCustomEndDate,
     handlePeriodChange
