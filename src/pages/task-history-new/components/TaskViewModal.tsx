@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { Task, Comment } from '@/types';
 import TaskDetailsModal from '@/components/task/TaskDetailsModal';
@@ -63,10 +64,13 @@ const TaskViewModal: React.FC<TaskViewModalProps> = ({
       await queryClient.invalidateQueries({ queryKey: ['comments', task.id] });
       await queryClient.invalidateQueries({ queryKey: ['task', task.id] });
       
-      // Explicitly refresh comments and update local state
-      const refreshed = await refreshComments();
-      if (refreshed) {
-        setLocalComments(refreshed);
+      // Explicitly refresh comments and update local state properly
+      await refreshComments();
+      
+      // Get the updated comments from the query cache directly
+      const updatedCommentsData = queryClient.getQueryData(['comments', task.id]) as Comment[] | undefined;
+      if (updatedCommentsData) {
+        setLocalComments(updatedCommentsData);
       }
     }
   }, [task?.id, queryClient, refreshComments]);
