@@ -20,15 +20,16 @@ export function LoadingOverlay({
   const [fading, setFading] = useState(false);
   const location = useLocation();
   
-  // Não mostrar o loading na página inicial
+  // Don't show loading on landing page or during logout process
   const isLandingPage = location.pathname === '/';
+  const isLogoutInProgress = localStorage.getItem('logout_in_progress') === 'true';
   
   useEffect(() => {
     let fadeTimeout: NodeJS.Timeout;
     let hideTimeout: NodeJS.Timeout;
 
-    // Se estiver na página inicial, não mostrar o loading
-    if (isLandingPage) {
+    // Don't show loading on landing page or during logout
+    if (isLandingPage || isLogoutInProgress) {
       setVisible(false);
       return;
     }
@@ -63,22 +64,22 @@ export function LoadingOverlay({
       clearTimeout(fadeTimeout);
       clearTimeout(hideTimeout);
     };
-  }, [show, delay, visible, onComplete, isLandingPage]);
+  }, [show, delay, visible, onComplete, isLandingPage, isLogoutInProgress]);
 
-  // Não renderizar nada se estivermos na página inicial ou se não for visível
-  if (!visible || isLandingPage) return null;
+  // Don't render if not visible, on landing page, or during logout
+  if (!visible || isLandingPage || isLogoutInProgress) return null;
 
   return (
     <div 
       className={cn(
-        "fixed inset-0 bg-white dark:bg-gray-950 z-50 flex flex-col items-center justify-center",
+        "fixed inset-0 bg-white z-50 flex flex-col items-center justify-center",
         fading ? "animate-fade-out" : "animate-fade-in"
       )}
     >
       <div className="flex flex-col items-center space-y-4">
         <LoaderCircle className="h-12 w-12 text-blue-500 animate-spin" />
-        <Skeleton className="w-24 h-2 bg-blue-200/50 dark:bg-blue-800/30" />
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-4">Carregando seu painel Zenn</p>
+        <Skeleton className="w-24 h-2 bg-blue-200/50" />
+        <p className="text-sm text-gray-500 mt-4">Carregando seu painel Zenn</p>
       </div>
     </div>
   );

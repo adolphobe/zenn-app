@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { toast } from '@/hooks/use-toast';
 import { processAuthError } from '@/utils/authErrorUtils';
@@ -72,18 +71,18 @@ export function useAuthActions({ setCurrentUser, setSession, setIsLoading }: Aut
     try {
       setIsLoading(true);
       
-      // Primeiro marque que um logout está em andamento para evitar redirecionamentos indevidos
+      // Set logout in progress flag to prevent loading overlay
       localStorage.setItem('logout_in_progress', 'true');
       
-      // Primeiro limpar estados locais 
+      // First clear local states 
       setCurrentUser(null);
       setSession(null);
       
-      // Remover quaisquer dados de autenticação armazenados localmente
+      // Remove any locally stored auth data
       localStorage.removeItem('sb-wbvxnapruffchikhrqrs-auth-token');
       localStorage.removeItem('supabase.auth.token');
       
-      // Chamar signOut do Supabase com escopo explícito para garantir que todos os dispositivos sejam deslogados
+      // Call Supabase signOut with explicit scope to ensure all devices are logged out
       const { error } = await supabase.auth.signOut({ scope: 'global' });
       
       if (error) {
@@ -111,13 +110,10 @@ export function useAuthActions({ setCurrentUser, setSession, setIsLoading }: Aut
       
       const errorDetails = processAuthError(error);
     } finally {
-      // Sempre limpar os estados do usuário e sessão ao fazer logout
+      // Always clear user and session states when logging out
       setCurrentUser(null);
       setSession(null);
       setIsLoading(false);
-      
-      // Remova a flag de logout quando terminar (isso será feito na rota de login)
-      // localStorage.removeItem('logout_in_progress');
     }
   };
 

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { LogOut, User } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -28,7 +27,10 @@ const SidebarUserProfile: React.FC<SidebarUserProfileProps> = ({ sidebarOpen }) 
         return;
       }
       
-      // Método centralizado de logout
+      // Set logout in progress flag before calling logout
+      localStorage.setItem('logout_in_progress', 'true');
+      
+      // Centralized logout method
       await performLogout(navigate);
       
     } catch (error) {
@@ -39,6 +41,9 @@ const SidebarUserProfile: React.FC<SidebarUserProfileProps> = ({ sidebarOpen }) 
         description: "Não foi possível fazer logout",
         variant: "destructive",
       });
+      
+      // Clear flag in case of error
+      localStorage.removeItem('logout_in_progress');
     }
   };
   

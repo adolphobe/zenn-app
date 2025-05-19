@@ -10,7 +10,7 @@ export const performLogout = async (navigate: any) => {
   try {
     console.log("[AuthUtils] Iniciando processo completo de logout");
     
-    // Set a flag to prevent multiple logout attempts
+    // Set a flag to prevent multiple logout attempts and disable loading overlay
     localStorage.setItem('logout_in_progress', 'true');
     
     // Clear any user-related data from localStorage
@@ -22,7 +22,7 @@ export const performLogout = async (navigate: any) => {
     // Log the user out from Supabase
     await supabase.auth.signOut({ scope: 'global' });
     
-    // Usando timeout para dar tempo ao Supabase para processar o logout
+    // Using timeout to give Supabase time to process the logout
     setTimeout(() => {
       // Redirect to the login page with a forced parameter to ensure fresh state
       const timestamp = new Date().getTime();

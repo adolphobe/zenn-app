@@ -23,7 +23,10 @@ const UserMenu: React.FC = () => {
         return;
       }
       
-      // Método centralizado de logout
+      // Set logout in progress flag before calling logout
+      localStorage.setItem('logout_in_progress', 'true');
+      
+      // Centralized logout method
       await performLogout(navigate);
       
     } catch (error) {
@@ -33,6 +36,9 @@ const UserMenu: React.FC = () => {
         description: "Não foi possível fazer logout",
         variant: "destructive",
       });
+      
+      // Clear flag in case of error
+      localStorage.removeItem('logout_in_progress');
     }
   };
   
