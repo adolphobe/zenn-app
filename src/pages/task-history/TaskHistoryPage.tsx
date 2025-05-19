@@ -1,17 +1,22 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '@/context/auth';
 import { useTaskDataContext } from '@/context/TaskDataProvider';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Loader2 } from 'lucide-react';
+import TaskSummaryCard from '@/components/strategic-review/TaskSummaryCard';
+import PillarsAnalysisCard from '@/components/strategic-review/PillarsAnalysisCard';
+import FeedbackAnalysisCard from '@/components/strategic-review/FeedbackAnalysisCard';
+import { TaskHistoryContent } from './TaskHistoryContent';
 
 /**
- * Simplified TaskHistoryPage component that displays completed tasks
+ * TaskHistoryPage component that displays completed tasks with analysis
  */
 const TaskHistoryPage = () => {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const { completedTasks, completedTasksLoading } = useTaskDataContext();
+  const [error, setError] = useState<string | null>(null);
   
   const isLoading = completedTasksLoading || authLoading;
 
@@ -39,46 +44,55 @@ const TaskHistoryPage = () => {
     );
   }
 
-  // Simplified content - just show a list of completed tasks
-  return (
-    <div className="container p-4 mx-auto">
-      <h1 className="text-2xl font-bold mb-4">Histórico de Tarefas</h1>
-      
-      <div className="text-muted-foreground mb-4">
-        {completedTasks.length > 0 ? 
-          `${completedTasks.length} ${completedTasks.length === 1 ? 'tarefa concluída' : 'tarefas concluídas'}` : 
-          'Nenhuma tarefa concluída para exibir'
-        }
+  // If there's an error, show it
+  if (error) {
+    return (
+      <div className="container p-4 mx-auto">
+        <Alert variant="destructive">
+          <AlertTitle>Erro ao carregar o histórico</AlertTitle>
+          <AlertDescription>
+            {error}
+          </AlertDescription>
+        </Alert>
       </div>
+    );
+  }
 
-      {completedTasks.length === 0 ? (
+  // If there are no tasks, show simplified content
+  if (!completedTasks || completedTasks.length === 0) {
+    return (
+      <div className="container p-4 mx-auto">
+        <h1 className="text-2xl font-bold mb-4">Histórico de Tarefas</h1>
         <Alert>
           <AlertTitle>Nenhuma tarefa concluída</AlertTitle>
           <AlertDescription>
             Quando você concluir tarefas, elas aparecerão aqui.
           </AlertDescription>
         </Alert>
-      ) : (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {completedTasks.map((task) => (
-            <Card key={task.id}>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-md font-medium">
-                  {task.title}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground line-clamp-2 mb-2">
-                  {task.description || 'Sem descrição'}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  Concluída em: {task.completedAt ? new Date(task.completedAt).toLocaleDateString('pt-BR') : 'Data desconhecida'}
-                </p>
-              </CardContent>
-            </Card>
-          ))}
+      </div>
+    );
+  }
+
+  // If we have tasks, show the full content with analysis
+  return (
+    <div className="container p-4 mx-auto flex flex-col space-y-8">
+      <h1 className="text-2xl font-bold">Histórico de Tarefas</h1>
+      
+      {/* Task Analysis Section */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="col-span-1">
+          <TaskSummaryCard tasks={completedTasks} />
         </div>
-      )}
+        <div className="col-span-1">
+          <FeedbackAnalysisCard tasks={completedTasks} />
+        </div>
+        <div className="col-span-1">
+          <PillarsAnalysisCard tasks={completedTasks} />
+        </div>
+      </div>
+      
+      {/* Task History Content with advanced features */}
+      <TaskHistoryContent setError={setError} />
     </div>
   );
 };

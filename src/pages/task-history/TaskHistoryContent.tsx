@@ -4,11 +4,7 @@ import { useTaskDataContext } from '@/context/TaskDataProvider';
 import { logError } from '@/utils/logUtils';
 import { Task } from '@/types';
 
-// Import refactored hooks
-import { useTaskFilters } from '@/components/task-history/hooks/useTaskFilters';
-import { useTaskPagination } from '@/components/task-history/hooks/useTaskPagination';
-
-// Import refactored components
+// Import components
 import { TaskHistoryStats } from '@/components/task-history/TaskHistoryStats';
 import { TaskSearchBar, TaskFiltersToggle, AdvancedFilters } from '@/components/task-history/TaskFilters';
 import { ViewToggle } from '@/components/task-history/ViewToggle';
@@ -16,6 +12,10 @@ import { TaskGroupGrid } from '@/components/task-history/task-cards';
 import { TasksTable } from '@/components/task-history/TaskTable';
 import { NoTasksMessage } from '@/components/task-history/NoTasksMessage';
 import { TaskPagination } from '@/components/task-history/TaskPagination';
+
+// Import hooks
+import { useTaskFilters } from '@/components/task-history/hooks/useTaskFilters';
+import { useTaskPagination } from '@/components/task-history/hooks/useTaskPagination';
 
 interface TaskHistoryContentProps {
   setError: (error: string | null) => void;
@@ -100,83 +100,84 @@ export const TaskHistoryContent: React.FC<TaskHistoryContentProps> = ({ setError
     setError(`Erro ao processar o histórico de tarefas: ${err instanceof Error ? err.message : String(err)}`);
   }
 
+  // Don't show content if no tasks
+  if (validatedTasks.length === 0) {
+    return null;
+  }
+
   return (
-    <div className="container p-4 mx-auto">
-      <div className="flex flex-col space-y-4">
-        <h1 className="text-2xl font-bold">Histórico de Tarefas</h1>
+    <div className="space-y-4">
+      {/* Always display task count */}
+      <div className="text-muted-foreground">
+        {completedTasks.length > 0 ? 
+          `${completedTasks.length} ${completedTasks.length === 1 ? 'tarefa concluída' : 'tarefas concluídas'}` : 
+          'Nenhuma tarefa concluída para exibir'
+        }
+      </div>
+      
+      {/* Stats only display when there are tasks */}
+      {sortedTasks.length > 0 && (
+        <TaskHistoryStats filteredTasks={sortedTasks} />
+      )}
+      
+      {/* Search and filter controls */}
+      <div className="flex flex-col md:flex-row justify-between gap-4">
+        <TaskSearchBar 
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          showFilters={showFilters}
+          setShowFilters={setShowFilters}
+        />
         
-        {/* Always display task count */}
-        <div className="text-muted-foreground">
-          {completedTasks.length > 0 ? 
-            `${completedTasks.length} ${completedTasks.length === 1 ? 'tarefa concluída' : 'tarefas concluídas'}` : 
-            'Nenhuma tarefa concluída para exibir'
-          }
-        </div>
-        
-        {/* Stats only display when there are tasks */}
-        {sortedTasks.length > 0 && (
-          <TaskHistoryStats filteredTasks={sortedTasks} />
-        )}
-        
-        {/* Search and filter controls */}
-        <div className="flex flex-col md:flex-row justify-between gap-4">
-          <TaskSearchBar 
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
+        <div className="flex gap-2">
+          <TaskFiltersToggle 
             showFilters={showFilters}
             setShowFilters={setShowFilters}
           />
           
-          <div className="flex gap-2">
-            <TaskFiltersToggle 
-              showFilters={showFilters}
-              setShowFilters={setShowFilters}
-            />
-            
-            <ViewToggle 
-              viewMode={viewMode}
-              setViewMode={setViewMode}
-              sortBy={sortBy}
-              setSortBy={setSortBy}
-            />
-          </div>
+          <ViewToggle 
+            viewMode={viewMode}
+            setViewMode={setViewMode}
+            sortBy={sortBy}
+            setSortBy={setSortBy}
+          />
         </div>
-        
-        {/* Advanced filters - only when enabled */}
-        {showFilters && (
-          <AdvancedFilters
-            periodFilter={periodFilter}
-            setPeriodFilter={setPeriodFilter}
-            scoreFilter={scoreFilter}
-            setScoreFilter={setScoreFilter}
-            feedbackFilter={feedbackFilter}
-            setFeedbackFilter={setFeedbackFilter}
-            pillarFilter={pillarFilter}
-            setPillarFilter={setPillarFilter}
-            startDate={startDate}
-            setStartDate={setStartDate}
-            endDate={endDate}
-            setEndDate={setEndDate}
-          />
-        )}
-
-        {/* No tasks message when needed */}
-        {(sortedTasks.length === 0 || completedTasks.length === 0) && <NoTasksMessage />}
-        
-        {/* Task display - either list or grid based on preference */}
-        {viewMode === 'list' && paginatedTasks.length > 0 && <TasksTable tasks={paginatedTasks} />}
-        {viewMode === 'grid' && paginatedTasks.length > 0 && <TaskGroupGrid groups={groupedTasks} />}
-        
-        {/* Pagination when there are tasks */}
-        {sortedTasks.length > 0 && (
-          <TaskPagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            handlePageChange={handlePageChange}
-            pageNumbers={pageNumbers}
-          />
-        )}
       </div>
+      
+      {/* Advanced filters - only when enabled */}
+      {showFilters && (
+        <AdvancedFilters
+          periodFilter={periodFilter}
+          setPeriodFilter={setPeriodFilter}
+          scoreFilter={scoreFilter}
+          setScoreFilter={setScoreFilter}
+          feedbackFilter={feedbackFilter}
+          setFeedbackFilter={setFeedbackFilter}
+          pillarFilter={pillarFilter}
+          setPillarFilter={setPillarFilter}
+          startDate={startDate}
+          setStartDate={setStartDate}
+          endDate={endDate}
+          setEndDate={setEndDate}
+        />
+      )}
+
+      {/* No tasks message when needed */}
+      {(sortedTasks.length === 0 || completedTasks.length === 0) && <NoTasksMessage />}
+      
+      {/* Task display - either list or grid based on preference */}
+      {viewMode === 'list' && paginatedTasks.length > 0 && <TasksTable tasks={paginatedTasks} />}
+      {viewMode === 'grid' && paginatedTasks.length > 0 && <TaskGroupGrid groups={groupedTasks} />}
+      
+      {/* Pagination when there are tasks */}
+      {sortedTasks.length > 0 && totalPages > 1 && (
+        <TaskPagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          handlePageChange={handlePageChange}
+          pageNumbers={pageNumbers}
+        />
+      )}
     </div>
   );
 };

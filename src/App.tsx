@@ -12,7 +12,7 @@ import { PrivateRoute } from './components/PrivateRoute';
 import { AppProvider } from './context/AppProvider';
 import { Toaster } from './components/ui/toaster';
 import Dashboard from './components/Dashboard';
-import TaskHistory from './pages/TaskHistory';
+import TaskHistoryPage from './pages/task-history';
 import StrategicReview from './pages/StrategicReview';
 import ResetPassword from './pages/ResetPassword';
 import Settings from './pages/Settings';
@@ -59,7 +59,7 @@ function App() {
                         <Route path="/app" element={<ActoApp />} />
                         <Route element={<PrivateRoute />}>
                           <Route path="/dashboard" element={<Dashboard />} />
-                          <Route path="/task-history" element={<TaskHistory />} />
+                          <Route path="/task-history" element={<TaskHistoryPage />} />
                           <Route path="/strategic-review" element={<StrategicReview />} />
                           <Route path="/settings" element={<Settings />} />
                         </Route>
