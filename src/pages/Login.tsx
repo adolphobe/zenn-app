@@ -258,7 +258,7 @@ const Login: React.FC = () => {
       <div className="hidden md:block md:w-1/2 relative">
         {/* Background image */}
         <img 
-          src="https://img.freepik.com/premium-photo/blue-gradient-vertical-background_7954-21189.jpg"
+          src="https://4kwallpapers.com/images/wallpapers/blue-abstract-blue-background-gradient-abstract-3440x1440-8985.jpg"
           alt="Blue sky gradient background"
           className="absolute inset-0 w-full h-full object-cover"
         />
