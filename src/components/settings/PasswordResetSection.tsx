@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -14,7 +13,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, CheckCircle } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 const PasswordResetSection = () => {
   const [currentPassword, setCurrentPassword] = useState('');
@@ -25,6 +25,7 @@ const PasswordResetSection = () => {
   const [passwordsMatch, setPasswordsMatch] = useState(true);
   const [passwordLongEnough, setPasswordLongEnough] = useState(true);
   const [currentPasswordError, setCurrentPasswordError] = useState(false);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
   const validateForm = () => {
     let valid = true;
@@ -60,6 +61,7 @@ const PasswordResetSection = () => {
   const handlePasswordChange = async () => {
     setIsLoading(true);
     setCurrentPasswordError(false);
+    setShowSuccessMessage(false);
     
     try {
       // First get the current session to retrieve the email
@@ -112,15 +114,25 @@ const PasswordResetSection = () => {
           variant: "destructive"
         });
       } else {
+        // Show success message with a more noticeable toast
         toast({
           title: "Senha alterada com sucesso",
-          description: "Sua senha foi atualizada. Sua sessão continua ativa."
+          description: "Sua senha foi atualizada. Sua sessão continua ativa.",
+          icon: <CheckCircle className="h-5 w-5 text-green-500" />
         });
+
+        // Show success message in the UI
+        setShowSuccessMessage(true);
 
         // Clear form inputs
         setCurrentPassword('');
         setNewPassword('');
         setConfirmPassword('');
+        
+        // Keep success message visible for 5 seconds
+        setTimeout(() => {
+          setShowSuccessMessage(false);
+        }, 5000);
       }
     } catch (error) {
       console.error('Erro ao alterar senha:', error);
@@ -146,6 +158,15 @@ const PasswordResetSection = () => {
         </CardHeader>
         
         <CardContent>
+          {showSuccessMessage && (
+            <Alert className="mb-4 bg-green-50 border-green-200">
+              <CheckCircle className="h-4 w-4 text-green-500" />
+              <AlertDescription className="text-green-700">
+                Senha alterada com sucesso! Sua sessão continua ativa.
+              </AlertDescription>
+            </Alert>
+          )}
+          
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="current-password">Senha atual</Label>
