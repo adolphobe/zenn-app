@@ -142,6 +142,7 @@ const TaskFormTabs: React.FC<TaskFormTabsProps> = ({
               </div>
             )}
             
+            {/* Fixed: Correctly render the CommentForm component */}
             <CommentForm 
               taskId={taskId}
               onCommentAdded={handleCommentAdded}
