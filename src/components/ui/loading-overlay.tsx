@@ -85,7 +85,6 @@ export function LoadingOverlay({
       <div className="flex flex-col items-center space-y-4">
         <LoaderCircle className="h-12 w-12 text-blue-500 animate-spin" />
         <Skeleton className="w-24 h-2 bg-blue-200/50" />
-        <p className="text-sm text-gray-500 mt-4">Carregando seu painel Zenn</p>
       </div>
     </div>
   );
