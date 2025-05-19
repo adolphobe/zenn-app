@@ -1,10 +1,10 @@
-
 import { useState, useMemo, useEffect } from 'react';
 import { PeriodType } from '../types';
 import { getDateRangeByPeriod } from '../utils';
 import { format, isSameDay, startOfDay, endOfDay, subDays, isValid } from 'date-fns';
 import { Task } from '@/types';
 import { dateService } from '@/services/dateService';
+import { logDiagnostics, logDateInfo } from '@/utils/diagnosticLog';
 
 // Interface for task statistics
 interface TaskStats {
@@ -17,6 +17,22 @@ export const useStrategicReviewState = (tasks: Task[]) => {
   const [customStartDate, setCustomStartDate] = useState<Date | undefined>(undefined);
   const [customEndDate, setCustomEndDate] = useState<Date | undefined>(undefined);
   const [showCustomDatePicker, setShowCustomDatePicker] = useState(false);
+  
+  // Log tasks received for diagnosis
+  useEffect(() => {
+    logDiagnostics('useStrategicReviewState', `Received ${tasks?.length || 0} tasks`);
+    
+    // Log details of each task for diagnosis
+    if (tasks?.length) {
+      tasks.forEach(task => {
+        logDateInfo(
+          'useStrategicReviewState', 
+          `Task ${task.id} (${task.title})`, 
+          task.completedAt
+        );
+      });
+    }
+  }, [tasks]);
   
   // Reset custom dates when changing to a non-custom period
   useEffect(() => {    
@@ -38,12 +54,15 @@ export const useStrategicReviewState = (tasks: Task[]) => {
     if (period === 'custom-range' && customStartDate && customEndDate) {
       // Ensure both dates are valid
       if (isValid(customStartDate) && isValid(customEndDate)) {
-        return [startOfDay(customStartDate), endOfDay(customEndDate)] as [Date, Date];
+        const range = [startOfDay(customStartDate), endOfDay(customEndDate)] as [Date, Date];
+        logDiagnostics('useStrategicReviewState', 'Custom date range', range);
+        return range;
       }
     }
     
     // Use helper function to calculate range
     const range = getDateRangeByPeriod(period);
+    logDiagnostics('useStrategicReviewState', `Date range for period ${period}`, range);
     return range;
   }, [period, customStartDate, customEndDate]);
   
@@ -70,41 +89,64 @@ export const useStrategicReviewState = (tasks: Task[]) => {
     }
   };
   
-  // Filter tasks based on date range with improved handling
+  // Filter tasks based on date range with improved handling and diagnostic logs
   const filteredTasks = useMemo(() => {
     const tasksSafe = Array.isArray(tasks) ? tasks : [];
     
     if (tasksSafe.length === 0) {
+      logDiagnostics('useStrategicReviewState', 'No tasks to filter');
       return [];
     }
     
     // For "all-time" period, include all completed tasks, ignoring dates
     if (period === 'all-time') {
-      return tasksSafe.filter(t => t.completed);
+      const allCompleted = tasksSafe.filter(t => t.completed);
+      logDiagnostics('useStrategicReviewState', `All-time filter: Found ${allCompleted.length} completed tasks`);
+      return allCompleted;
     }
     
     // Filter completed tasks with valid completedAt dates within the range
-    return tasksSafe.filter(task => {
+    const filtered = tasksSafe.filter(task => {
       if (!task.completed) {
         return false;
       }
       
+      // Detailed logging for diagnosis
+      logDateInfo('FILTER_TASK', `Filtering task ${task.id} (${task.title})`, task.completedAt);
+      
       // Handle tasks without completion date - exclude from filtered results
       if (!task.completedAt) {
+        logDiagnostics('FILTER_TASK', `Task ${task.id} has no completedAt, excluding`);
         return false;
       }
       
       try {
         // Convert to Date object safely
         const completedDate = toSafeDate(task.completedAt);
-        if (!completedDate) return false;
+        
+        if (!completedDate) {
+          logDiagnostics('FILTER_TASK', `Task ${task.id} completedAt could not be parsed: ${task.completedAt}`);
+          return false;
+        }
         
         // Check if within range
-        return completedDate >= dateRange[0] && completedDate <= dateRange[1];
+        const inRange = completedDate >= dateRange[0] && completedDate <= dateRange[1];
+        
+        logDiagnostics('FILTER_TASK', `Task ${task.id} date ${completedDate.toISOString()} in range: ${inRange}`, {
+          taskDate: completedDate,
+          rangeStart: dateRange[0],
+          rangeEnd: dateRange[1]
+        });
+        
+        return inRange;
       } catch (error) {
+        logDiagnostics('FILTER_TASK', `Error filtering task ${task.id}: ${error}`);
         return false;
       }
     });
+    
+    logDiagnostics('useStrategicReviewState', `Filtered ${filtered.length} tasks from ${tasks.length} total tasks for period ${period}`);
+    return filtered;
   }, [tasks, dateRange, period]);
   
   // Calculate task statistics
@@ -112,11 +154,17 @@ export const useStrategicReviewState = (tasks: Task[]) => {
     const totalCompletedTasks = tasks?.filter(t => t.completed)?.length || 0;
     const totalFilteredTasks = filteredTasks?.length || 0;
     
+    logDiagnostics('useStrategicReviewState', 'Task statistics', {
+      totalCompletedTasks,
+      totalFilteredTasks,
+      period
+    });
+    
     return {
       totalCompletedTasks,
       totalFilteredTasks
     };
-  }, [tasks, filteredTasks]);
+  }, [tasks, filteredTasks, period]);
   
   // Format date range for display
   const dateRangeDisplay = useMemo(() => {
@@ -147,6 +195,7 @@ export const useStrategicReviewState = (tasks: Task[]) => {
 
   // Handler for period changes
   const handlePeriodChange = (newPeriod: PeriodType) => {
+    logDiagnostics('useStrategicReviewState', `Changing period from ${period} to ${newPeriod}`);
     setPeriod(newPeriod);
   };
   

@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { Task } from '@/types';
 import { toggleTaskCompletion as toggleCompletionService } from '@/services/taskService';
 import { useAuth } from '@/context/auth';
+import { logDiagnostics, logDateInfo } from '@/utils/diagnosticLog';
 
 export const useTaskCompletionToggle = (
   tasks: Task[],
@@ -20,6 +21,9 @@ export const useTaskCompletionToggle = (
       const task = tasks.find(t => t.id === id);
       if (!task) throw new Error(`Task with id ${id} not found`);
       
+      logDiagnostics('TOGGLE_COMPLETION', `Toggling task completion for ${id}, current state: ${task.completed}`);
+      logDateInfo('TOGGLE_COMPLETION', 'Current completedAt', task.completedAt);
+      
       return toggleCompletionService(id, task.completed);
     },
     onMutate: (id) => {
@@ -31,9 +35,15 @@ export const useTaskCompletionToggle = (
         
         return old.map(t => {
           if (t.id === id) {
+            const newCompleted = !t.completed;
+            const newCompletedAt = newCompleted ? new Date() : null;
+            
+            logDateInfo('TOGGLE_COMPLETION', 'Setting optimistic completedAt', newCompletedAt);
+            
             return { 
               ...t, 
-              completed: !t.completed,
+              completed: newCompleted,
+              completedAt: newCompletedAt,
               _optimisticUpdateTime: Date.now()
             };
           }
@@ -41,11 +51,19 @@ export const useTaskCompletionToggle = (
         });
       });
     },
-    onSuccess: () => {
+    onSuccess: (updatedTask) => {
+      // Log success for diagnosis
+      logDiagnostics('TOGGLE_COMPLETION', 'Success, invalidating queries');
+      logDateInfo('TOGGLE_COMPLETION', 'Updated task completedAt from success', updatedTask.completedAt);
+      
+      // Invalidate all task-related queries to ensure consistency
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
     },
     onError: (error: any, id) => {
       console.error('Error toggling task completion:', error);
+      
+      // Log error for diagnosis
+      logDiagnostics('TOGGLE_COMPLETION', `Error: ${error.message || 'Unknown error'}`);
       
       // Revert optimistic update
       queryClient.setQueryData(['tasks', currentUser?.id, completed], (old: Task[] | undefined) => {
@@ -53,9 +71,12 @@ export const useTaskCompletionToggle = (
         
         return old.map(t => {
           if (t.id === id) {
+            const task = tasks.find(originalTask => originalTask.id === id);
+            
+            logDateInfo('TOGGLE_COMPLETION', 'Reverting to original completedAt', task?.completedAt);
+            
             return { 
-              ...t, 
-              completed: !t.completed,
+              ...(task || t), 
               _optimisticUpdateTime: Date.now()
             };
           }

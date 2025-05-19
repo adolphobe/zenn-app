@@ -5,6 +5,7 @@ import TaskSummaryCard from './TaskSummaryCard';
 import PillarsAnalysisCard from './PillarsAnalysisCard';
 import FeedbackAnalysisCard from './FeedbackAnalysisCard';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
+import { logDiagnostics } from '@/utils/diagnosticLog';
 
 interface AnalysisContentProps {
   tasks: Task[];
@@ -14,12 +15,23 @@ interface AnalysisContentProps {
 const AnalysisContent: React.FC<AnalysisContentProps> = ({ tasks, isLoading = false }) => {
   const hasCompletedTasks = tasks && tasks.length > 0;
   
-  // Simplified useEffect with less verbose logging
+  // Log for diagnosis but with less verbosity
   React.useEffect(() => {
+    logDiagnostics('AnalysisContent', `Rendering with ${tasks?.length || 0} tasks, loading: ${isLoading}`);
+    
+    // Add high-level task information for debugging
     if (tasks?.length) {
-      console.log(`AnalysisContent: Processando ${tasks.length} tarefas`);
+      const tasksInfo = tasks.map(t => ({
+        id: t.id,
+        title: t.title,
+        completed: t.completed,
+        hasCompletedAt: !!t.completedAt,
+        feedback: t.feedback,
+      }));
+      
+      logDiagnostics('AnalysisContent', 'Tasks summary:', tasksInfo);
     }
-  }, [tasks]);
+  }, [tasks, isLoading]);
   
   if (isLoading) {
     return (

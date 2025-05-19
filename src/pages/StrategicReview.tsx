@@ -1,5 +1,5 @@
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useCallback } from 'react';
 import { useAuth } from '@/context/auth';
 import { Tabs, TabsContent } from '@/components/ui/tabs';
 import { useTaskPillars } from '@/context/hooks';
@@ -9,16 +9,48 @@ import AnalysisContent from '@/components/strategic-review/AnalysisContent';
 import { useStrategicReviewState } from '@/components/strategic-review/hooks/useStrategicReviewState';
 import { useToast } from '@/hooks/use-toast';
 import { useTaskDataContext } from '@/context/TaskDataProvider';
+import { logDiagnostics } from '@/utils/diagnosticLog';
 
 // Main Strategic Review Page Component
 const StrategicReview: React.FC = () => {
   const { isAuthenticated } = useAuth();
-  const { completedTasks, completedTasksLoading } = useTaskDataContext();
+  const { completedTasks, completedTasksLoading, forceSynchronize } = useTaskDataContext();
   const { addToast } = useToast();
   const isFirstRender = useRef(true);
   
   // Use the task pillars hook to ensure all tasks have pillars assigned
   const { assignMissingPillars } = useTaskPillars();
+  
+  // Log for diagnosis
+  useEffect(() => {
+    logDiagnostics('StrategicReview', 
+      `Page rendered with ${completedTasks?.length || 0} completed tasks, loading: ${completedTasksLoading}`);
+  }, [completedTasks, completedTasksLoading]);
+  
+  // Force refresh data when the page loads
+  const refreshData = useCallback(async () => {
+    if (isAuthenticated) {
+      logDiagnostics('StrategicReview', 'Forcing data synchronization');
+      try {
+        await forceSynchronize();
+        logDiagnostics('StrategicReview', 'Data synchronization completed');
+      } catch (err) {
+        console.error('Failed to synchronize data:', err);
+      }
+    }
+  }, [forceSynchronize, isAuthenticated]);
+  
+  useEffect(() => {
+    refreshData();
+    
+    // Set up periodic refresh every 30 seconds
+    const intervalId = setInterval(() => {
+      logDiagnostics('StrategicReview', 'Performing periodic data refresh');
+      refreshData();
+    }, 30000); // 30 seconds
+    
+    return () => clearInterval(intervalId);
+  }, [refreshData]);
   
   // Use our custom hook for state management
   const {

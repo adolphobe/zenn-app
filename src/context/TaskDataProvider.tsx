@@ -1,7 +1,9 @@
+
 import React, { createContext, useContext, useMemo } from 'react';
 import { useTaskData } from '@/hooks/useTaskData';
 import { Task, TaskFormData } from '@/types';
 import { safeParseDate } from '@/utils';
+import { logDiagnostics, logDateInfo } from '@/utils/diagnosticLog';
 
 // Define the context type
 type TaskDataContextType = ReturnType<typeof useTaskData> & {
@@ -22,8 +24,14 @@ export const TaskDataProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   
   // Process completed tasks to ensure dates are valid
   const processedCompletedTasks = useMemo(() => {
-    return completedTasksData.tasks.map(task => {
+    const tasks = completedTasksData.tasks || [];
+    logDiagnostics('TaskDataProvider', `Processing ${tasks.length} completed tasks`);
+    
+    return tasks.map(task => {
       try {
+        // Log the original completedAt for diagnosis
+        logDateInfo('TaskDataProvider', `Task ${task.id} original completedAt`, task.completedAt);
+        
         // Ensure completedAt is always a valid Date
         let completedAt: Date | null = null;
         
@@ -35,6 +43,9 @@ export const TaskDataProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             completedAt = parsedDate || new Date(); // Use current date as fallback
           }
         }
+        
+        // Log the processed completedAt
+        logDateInfo('TaskDataProvider', `Task ${task.id} processed completedAt`, completedAt);
         
         return {
           ...task,

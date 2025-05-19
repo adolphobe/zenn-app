@@ -1,34 +1,54 @@
 
+import { useState } from 'react';
 import { Task } from '@/types';
 import { useTaskCompletionToggle } from './operations/useTaskCompletionToggle';
 import { useTaskVisibilityToggle } from './operations/useTaskVisibilityToggle';
 import { useTaskFeedback } from './operations/useTaskFeedback';
 import { useTaskRestore } from './operations/useTaskRestore';
+import { logDiagnostics } from '@/utils/diagnosticLog';
 
 export const useTaskStateOperations = (
   tasks: Task[],
   completed: boolean = false,
   setTaskOperationLoading: (taskId: string, operation: string, loading: boolean) => void
 ) => {
-  // Usar hooks especializados para cada operação
-  const completionToggle = useTaskCompletionToggle(tasks, completed, setTaskOperationLoading);
-  const visibilityToggle = useTaskVisibilityToggle(tasks, completed, setTaskOperationLoading);
-  const feedbackOperations = useTaskFeedback(setTaskOperationLoading);
-  const restoreOperations = useTaskRestore(setTaskOperationLoading);
+  // Logging for diagnosis
+  logDiagnostics('useTaskStateOperations', `Initializing with ${tasks.length} tasks, completed filter: ${completed}`);
+  
+  // Task completion toggle mutation
+  const { 
+    toggleTaskCompleted, 
+    toggleCompleteLoading 
+  } = useTaskCompletionToggle(tasks, completed, setTaskOperationLoading);
+  
+  // Task visibility toggle mutation
+  const { 
+    toggleTaskHidden, 
+    toggleVisibilityLoading 
+  } = useTaskVisibilityToggle(tasks, setTaskOperationLoading);
+  
+  // Task feedback mutation
+  const { 
+    setTaskFeedback, 
+    setFeedbackLoading 
+  } = useTaskFeedback(setTaskOperationLoading);
+  
+  // Task restore mutation
+  const { 
+    restoreTask, 
+    restoreLoading 
+  } = useTaskRestore(tasks, completed, setTaskOperationLoading);
   
   return {
-    // Exportar todas as operações dos hooks
-    toggleTaskCompleted: completionToggle.toggleTaskCompleted,
-    toggleTaskHidden: visibilityToggle.toggleTaskHidden,
-    setTaskFeedback: feedbackOperations.setTaskFeedback,
-    restoreTask: restoreOperations.restoreTask,
-    
-    // Combinar os estados de carregamento
+    toggleTaskCompleted,
+    toggleTaskHidden,
+    setTaskFeedback,
+    restoreTask,
     stateOperationsLoading: {
-      toggleComplete: completionToggle.toggleCompleteLoading,
-      toggleHidden: visibilityToggle.toggleHiddenLoading,
-      setFeedback: feedbackOperations.setFeedbackLoading,
-      restore: restoreOperations.restoreLoading
+      toggleComplete: toggleCompleteLoading,
+      toggleVisibility: toggleVisibilityLoading,
+      setFeedback: setFeedbackLoading,
+      restore: restoreLoading
     }
   };
 };

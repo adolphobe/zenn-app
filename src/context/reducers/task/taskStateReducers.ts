@@ -1,21 +1,55 @@
-
 import { AppState, Action } from '../../types';
 import { dateService } from '@/services/dateService';
+import { logTaskStateChange, logDateInfo } from '@/utils/diagnosticLog';
 
 // Status toggle reducers
 export const toggleTaskCompleted = (state: AppState, action: Action): AppState => {
   if (action.type !== 'TOGGLE_TASK_COMPLETED') return state;
+  
+  const taskId = action.payload;
+  const task = state.tasks.find(t => t.id === taskId);
+  
+  if (task) {
+    // Get values before update
+    const beforeState = {
+      completed: task.completed,
+      completedAt: task.completedAt
+    };
+    
+    // Calculate new values
+    const newCompleted = !task.completed;
+    const newCompletedAt = newCompleted ? new Date() : null;
+    
+    // Log the state change
+    logDateInfo('REDUCER', 'Setting completedAt in reducer', newCompletedAt);
+    
+    // Create updated state
+    const updatedState = {
+      ...state,
+      tasks: state.tasks.map(t =>
+        t.id === taskId ? { 
+          ...t, 
+          completed: newCompleted,
+          completedAt: newCompletedAt
+        } : t
+      )
+    };
+    
+    // Find the updated task for logging
+    const updatedTask = updatedState.tasks.find(t => t.id === taskId);
+    
+    if (updatedTask) {
+      // Log the after state
+      logTaskStateChange('REDUCER_TOGGLE_COMPLETED', taskId, task.title, beforeState, {
+        completed: updatedTask.completed,
+        completedAt: updatedTask.completedAt
+      });
+    }
+    
+    return updatedState;
+  }
 
-  return {
-    ...state,
-    tasks: state.tasks.map(task =>
-      task.id === action.payload ? { 
-        ...task, 
-        completed: !task.completed,
-        completedAt: !task.completed ? new Date() : null
-      } : task
-    )
-  };
+  return state;
 };
 
 export const toggleTaskHidden = (state: AppState, action: Action): AppState => {
@@ -65,13 +99,39 @@ export const setTaskOperationLoading = (state: AppState, action: Action): AppSta
 
 export const setTaskFeedback = (state: AppState, action: Action): AppState => {
   if (action.type !== 'SET_TASK_FEEDBACK') return state;
+  
+  const taskId = action.payload.id;
+  const task = state.tasks.find(t => t.id === taskId);
+  
+  if (task) {
+    // Log the before state
+    logTaskStateChange('SET_TASK_FEEDBACK_START', taskId, task.title, {
+      feedback: task.feedback,
+      completedAt: task.completedAt
+    });
+  }
 
-  return {
+  const updatedState = {
     ...state,
     tasks: state.tasks.map(task =>
       task.id === action.payload.id ? { ...task, feedback: action.payload.feedback } : task
     )
   };
+  
+  // Find the updated task for logging
+  const updatedTask = updatedState.tasks.find(t => t.id === taskId);
+  
+  if (task && updatedTask) {
+    // Log the after state - ensuring feedback is set without disrupting completedAt
+    logTaskStateChange('SET_TASK_FEEDBACK_END', taskId, task.title, {
+      feedback: task.feedback
+    }, {
+      feedback: updatedTask.feedback,
+      completedAt: updatedTask.completedAt // Verify completedAt is preserved
+    });
+  }
+
+  return updatedState;
 };
 
 export const setTaskFeedbackByTitle = (state: AppState, action: Action): AppState => {
@@ -86,4 +146,3 @@ export const setTaskFeedbackByTitle = (state: AppState, action: Action): AppStat
     )
   };
 };
-

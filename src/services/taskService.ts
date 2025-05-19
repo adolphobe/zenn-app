@@ -1,7 +1,7 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { Task, TaskFormData } from '@/types';
 import { dateService } from './dateService';
+import { logDiagnostics, logDateInfo } from '@/utils/diagnosticLog';
 
 // Helper function to map the response from Supabase to the Task type
 const mapToTask = (data: any): Task => ({
@@ -213,9 +213,19 @@ export const toggleTaskCompletion = async (id: string, currentStatus: boolean): 
   // First validate the task exists
   await validateTaskExists(id);
   
+  // Get the current timestamp in ISO format
+  const now = new Date();
+  const nowIso = now.toISOString();
+  
+  logDiagnostics('TASK_SERVICE', `Toggling task completion for ${id}, current status: ${currentStatus}`);
+  logDateInfo('TASK_SERVICE', 'Using completion timestamp', now);
+  
+  // Prepare completion data with explicit date handling
   const completionData = currentStatus ? 
     { completed: false, completed_at: null } : 
-    { completed: true, completed_at: new Date().toISOString() };
+    { completed: true, completed_at: nowIso };
+  
+  logDiagnostics('TASK_SERVICE', 'Setting completion data', completionData);
   
   const { data, error } = await supabase
     .from('tasks')
@@ -232,7 +242,16 @@ export const toggleTaskCompletion = async (id: string, currentStatus: boolean): 
     throw error;
   }
 
-  return mapToTask(data);
+  // Log the returned data for diagnosis
+  logDateInfo('TASK_SERVICE', 'DB returned completed_at', data.completed_at);
+  
+  // Map the data to our Task type
+  const mappedTask = mapToTask(data);
+  
+  // Log the mapped task
+  logDateInfo('TASK_SERVICE', 'Mapped task completedAt', mappedTask.completedAt);
+  
+  return mappedTask;
 };
 
 /**
