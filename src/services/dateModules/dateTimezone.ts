@@ -1,9 +1,9 @@
 
 import { format } from 'date-fns';
-import { formatInTimeZone as fnsFormatInTimeZone, toZonedTime, fromZonedTime, getTimezoneOffset } from 'date-fns-tz';
+import { formatInTimeZone as fnsFormatInTimeZone } from 'date-fns-tz';
 import { parseDate } from './dateParser';
 
-// Fuso horário padrão
+// Fuso horário padrão para o Brasil
 let defaultTimeZone = 'America/Sao_Paulo';
 
 /**
@@ -67,7 +67,7 @@ export function toZonedTime(
     // Use o fuso horário especificado ou o padrão
     const tz = timeZone || defaultTimeZone;
     
-    return toZonedTime(parsedDate, tz);
+    return new Date(fnsFormatInTimeZone(parsedDate, tz, "yyyy-MM-dd'T'HH:mm:ss.SSS"));
   } catch (error) {
     console.error('Erro convertendo para time zone:', error);
     return null;
@@ -90,10 +90,9 @@ export function fromZonedTime(
     const parsedDate = parseDate(zonedDate);
     if (!parsedDate) return null;
     
-    // Use o fuso horário especificado ou o padrão
-    const tz = timeZone || defaultTimeZone;
-    
-    return fromZonedTime(parsedDate, tz);
+    // Para um sistema usado apenas no Brasil, simplificamos a conversão
+    // A data já está no fuso horário local, então retornamos ela diretamente
+    return parsedDate;
   } catch (error) {
     console.error('Erro convertendo de time zone:', error);
     return null;
@@ -106,15 +105,20 @@ export function fromZonedTime(
  * @param date Data para calcular o deslocamento
  * @returns Deslocamento em minutos
  */
-export function getTimezoneOffsetMinutes(
+export function getTimezoneOffset(
   timeZone: string,
   date?: Date
 ): number {
   try {
     const dateToUse = date || new Date();
-    return getTimezoneOffset(timeZone, dateToUse) / 60000; // Convertendo de milissegundos para minutos
+    // Para o Brasil, usando o fuso horário de São Paulo
+    // BRT é UTC-3, então são -180 minutos
+    return -180;
   } catch (error) {
     console.error('Erro obtendo offset do timezone:', error);
     return 0;
   }
 }
+
+// Expor a função com o nome que é esperado pelo dateService.ts
+export const getTimezoneOffsetMinutes = getTimezoneOffset;

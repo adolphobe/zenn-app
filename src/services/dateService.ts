@@ -20,7 +20,7 @@ import {
   formatInTimeZone,
   toZonedTime as convertToZonedTime,
   fromZonedTime as convertFromZonedTime,
-  getTimezoneOffset as getTimeZoneOffsetMinutes,
+  getTimezoneOffsetMinutes,
   getDefaultTimeZone,
   setDefaultTimeZone as setGlobalTimeZone
 } from './dateModules/dateTimezone';
