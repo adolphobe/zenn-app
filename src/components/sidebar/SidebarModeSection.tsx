@@ -1,22 +1,25 @@
 
 import React from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { Clock, History, Power, Calendar } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import SidebarSection from './SidebarSection';
 import { useAppContext } from '@/context/AppContext';
-import { useNavigate } from 'react-router-dom';
 
 interface SidebarModeSectionProps {
   sidebarOpen: boolean;
 }
 
 const SidebarModeSection: React.FC<SidebarModeSectionProps> = ({ sidebarOpen }) => {
-  const { state: { viewMode }, toggleViewMode } = useAppContext();
+  const { state: { viewMode }, toggleViewMode, setViewMode } = useAppContext();
   const location = useLocation();
   const navigate = useNavigate();
   
-  // Helper to get active class
+  // Check if we're currently on the strategic review page
+  const isOnStrategicReview = location.pathname.includes('strategic-review');
+  const isOnTaskHistory = location.pathname.includes('task-history');
+  
+  // Helper to get active class for navigation links
   const getNavClass = ({ isActive }: { isActive: boolean }) =>
     cn(
       "flex items-center p-2 rounded-md transition-colors",
@@ -29,23 +32,22 @@ const SidebarModeSection: React.FC<SidebarModeSectionProps> = ({ sidebarOpen }) 
     cn(
       "flex items-center p-2 rounded-md transition-colors cursor-pointer",
       "hover:bg-gray-100 dark:hover:bg-gray-800",
-      viewMode === mode && !location.pathname.includes('task-history') 
+      viewMode === mode && !isOnStrategicReview && !isOnTaskHistory
         ? "bg-gray-100 dark:bg-gray-800 text-primary" 
         : "text-gray-700 dark:text-gray-300"
     );
 
   // Handler for mode switching
   const handleModeClick = (mode: string) => {
-    if (location.pathname.includes('task-history')) {
-      // Navigate to dashboard with the selected mode
+    // If we're on strategic review or task history, navigate to dashboard first
+    if (isOnStrategicReview || isOnTaskHistory) {
+      // Navigate to dashboard
       navigate('/dashboard');
       
-      // Only toggle view mode if we're switching to a different mode
-      if (viewMode !== mode) {
-        toggleViewMode();
-      }
+      // Set the view mode (not toggle - explicitly set the desired mode)
+      setViewMode(mode as any);
     } else {
-      // Standard behavior when not on a history page
+      // Standard behavior when on dashboard - only switch if different mode
       if (viewMode !== mode) {
         toggleViewMode();
       }
