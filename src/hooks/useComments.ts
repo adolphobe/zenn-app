@@ -69,7 +69,9 @@ export const useComments = (taskId: string) => {
         userId: comment.user_id
       }));
     },
-    enabled: !!taskId
+    enabled: !!taskId,
+    staleTime: 10000, // 10 segundos para considerar dados obsoletos
+    refetchInterval: false, // Não refetch automaticamente
   });
 
   // Add comment mutation with proper callback handling
@@ -171,6 +173,13 @@ export const useComments = (taskId: string) => {
       queryClient.invalidateQueries({ queryKey: ['comments', taskId] });
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       queryClient.invalidateQueries({ queryKey: ['task', taskId] });
+      
+      // Forçar o refetch imediatamente
+      setTimeout(() => {
+        queryClient.refetchQueries({ queryKey: ['comments', taskId] });
+        queryClient.refetchQueries({ queryKey: ['tasks'] });
+        queryClient.refetchQueries({ queryKey: ['task', taskId] });
+      }, 100);
     },
     onError: (error) => {
       logComment.error('Erro em mutação onError', error);
@@ -193,7 +202,10 @@ export const useComments = (taskId: string) => {
     mutate(text, {
       onSuccess: () => {
         logComment.success(taskId, 'callback-success');
-        if (callbacks?.onSuccess) callbacks.onSuccess();
+        if (callbacks?.onSuccess) {
+          // Chamar o callback após um pequeno delay para garantir que as atualizações de estado ocorreram
+          setTimeout(() => callbacks.onSuccess(), 50);
+        }
       },
       onError: (error) => {
         logComment.error('Erro em addComment callback', error);
@@ -236,6 +248,13 @@ export const useComments = (taskId: string) => {
       queryClient.invalidateQueries({ queryKey: ['comments', taskId] });
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       queryClient.invalidateQueries({ queryKey: ['task', taskId] });
+      
+      // Forçar o refetch imediatamente
+      setTimeout(() => {
+        queryClient.refetchQueries({ queryKey: ['comments', taskId] });
+        queryClient.refetchQueries({ queryKey: ['tasks'] });
+        queryClient.refetchQueries({ queryKey: ['task', taskId] });
+      }, 100);
     },
     onError: (error) => {
       logComment.error('Erro em deleteComment mutation', error);
@@ -258,7 +277,10 @@ export const useComments = (taskId: string) => {
     deleteCommentMutate(commentId, {
       onSuccess: () => {
         logComment.api.response('deleteComment callback', { success: true });
-        if (callbacks?.onSuccess) callbacks.onSuccess();
+        if (callbacks?.onSuccess) {
+          // Chamar o callback após um pequeno delay para garantir que as atualizações de estado ocorreram
+          setTimeout(() => callbacks.onSuccess(), 50);
+        }
       },
       onError: (error) => {
         logComment.error('Erro em deleteComment callback', error);
@@ -270,6 +292,15 @@ export const useComments = (taskId: string) => {
   // Função para forçar a atualização dos comentários
   const refreshComments = () => {
     logComment.api.request('refreshComments', { taskId });
+    queryClient.invalidateQueries({ queryKey: ['comments', taskId] });
+    queryClient.invalidateQueries({ queryKey: ['task', taskId] });
+    
+    // Forçar o refetch imediatamente
+    setTimeout(() => {
+      queryClient.refetchQueries({ queryKey: ['comments', taskId] });
+      queryClient.refetchQueries({ queryKey: ['task', taskId] });
+    }, 50);
+    
     return refetch();
   };
 

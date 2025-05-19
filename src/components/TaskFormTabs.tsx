@@ -68,38 +68,54 @@ const TaskFormTabs: React.FC<TaskFormTabsProps> = ({
   // Handler for when a comment is added
   const handleCommentAdded = (): void => {
     console.log('[TaskFormTabs] Comment added callback triggered');
-    // Update comment count to trigger scrollToBottom effect
-    if (task?.comments) {
-      setCommentCount(task.comments.length + 1);
-    } else {
-      setCommentCount(1);
-    }
     
-    // Try to scroll to bottom immediately and again after a delay
-    scrollToBottom();
-    setTimeout(scrollToBottom, 300);
-
-    // Invalidate queries to refresh task data
+    // Invalidate queries to refresh task data immediately
     if (taskId) {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       queryClient.invalidateQueries({ queryKey: ['task', taskId] });
       queryClient.invalidateQueries({ queryKey: ['comments', taskId] });
+      
+      // Forçar busca dos comentários atualizados
+      setTimeout(() => {
+        queryClient.refetchQueries({ queryKey: ['tasks'] });
+        queryClient.refetchQueries({ queryKey: ['task', taskId] });
+        queryClient.refetchQueries({ queryKey: ['comments', taskId] });
+        
+        // Update comment count to trigger scrollToBottom effect
+        if (task?.comments) {
+          setCommentCount(prev => prev + 1);
+        } else {
+          setCommentCount(1);
+        }
+        
+        // Try to scroll to bottom immediately and again after a delay
+        scrollToBottom();
+        setTimeout(scrollToBottom, 300);
+      }, 100);
     }
   };
 
   // Handler for comment deletion to update local state
   const handleCommentDeleted = (): void => {
     console.log('[TaskFormTabs] Comment deleted callback triggered');
-    // Update comment count to reflect deletion
-    if (task?.comments && task.comments.length > 0) {
-      setCommentCount(prevCount => Math.max(0, prevCount - 1));
-    }
-
-    // Invalidate queries to refresh task data
+    
+    // Invalidate queries to refresh task data immediately
     if (taskId) {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       queryClient.invalidateQueries({ queryKey: ['task', taskId] });
       queryClient.invalidateQueries({ queryKey: ['comments', taskId] });
+      
+      // Forçar busca dos comentários atualizados
+      setTimeout(() => {
+        queryClient.refetchQueries({ queryKey: ['tasks'] });
+        queryClient.refetchQueries({ queryKey: ['task', taskId] });
+        queryClient.refetchQueries({ queryKey: ['comments', taskId] });
+        
+        // Update comment count to reflect deletion
+        if (task?.comments && task.comments.length > 0) {
+          setCommentCount(prevCount => Math.max(0, prevCount - 1));
+        }
+      }, 100);
     }
   };
   

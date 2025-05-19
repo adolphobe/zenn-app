@@ -83,7 +83,10 @@ const CommentForm: React.FC<CommentFormProps> = ({ taskId, onCommentAdded }) => 
         
         if (onCommentAdded) {
           logComment.info('COMMENT_CALLBACK', 'Chamando callback onCommentAdded');
-          onCommentAdded();
+          // Garantir que o callback seja chamado após um delay para permitir a atualização dos dados
+          setTimeout(() => {
+            onCommentAdded();
+          }, 100);
         }
       },
       onError: (error) => {

@@ -82,6 +82,13 @@ const TaskCommentsContent: React.FC<TaskCommentsContentProps> = ({ task, onComme
     queryClient.invalidateQueries({ queryKey: ['task', task.id] });
     queryClient.invalidateQueries({ queryKey: ['comments', task.id] });
     
+    // Forçar refetch imediato
+    setTimeout(() => {
+      queryClient.refetchQueries({ queryKey: ['tasks'] });
+      queryClient.refetchQueries({ queryKey: ['task', task.id] });
+      queryClient.refetchQueries({ queryKey: ['comments', task.id] });
+    }, 100);
+    
     // Call parent callback if provided
     if (onCommentAdded) {
       logComment.info('COMMENT_CALLBACK', 'Chamando callback onCommentAdded do pai');
@@ -108,6 +115,13 @@ const TaskCommentsContent: React.FC<TaskCommentsContentProps> = ({ task, onComme
     queryClient.invalidateQueries({ queryKey: ['tasks'] });
     queryClient.invalidateQueries({ queryKey: ['task', task.id] });
     queryClient.invalidateQueries({ queryKey: ['comments', task.id] });
+    
+    // Forçar refetch imediato
+    setTimeout(() => {
+      queryClient.refetchQueries({ queryKey: ['tasks'] });
+      queryClient.refetchQueries({ queryKey: ['task', task.id] });
+      queryClient.refetchQueries({ queryKey: ['comments', task.id] });
+    }, 100);
   };
   
   // Handler para forçar atualização de comentários
@@ -119,6 +133,13 @@ const TaskCommentsContent: React.FC<TaskCommentsContentProps> = ({ task, onComme
     queryClient.invalidateQueries({ queryKey: ['tasks'] });
     queryClient.invalidateQueries({ queryKey: ['task', task.id] });
     queryClient.invalidateQueries({ queryKey: ['comments', task.id] });
+    
+    // Forçar refetch imediato
+    setTimeout(() => {
+      queryClient.refetchQueries({ queryKey: ['tasks'] });
+      queryClient.refetchQueries({ queryKey: ['task', task.id] });
+      queryClient.refetchQueries({ queryKey: ['comments', task.id] });
+    }, 100);
   };
 
   if (isLoading) {
