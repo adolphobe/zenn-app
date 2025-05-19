@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import { Task } from '@/types';
 import { Badge } from '@/components/ui/badge';
@@ -133,12 +132,14 @@ export const CompletedTaskCard: React.FC<CompletedTaskCardProps> = ({ task }) =>
                   <span title={dateError} className="text-orange-500">
                     (data indisponível)
                   </span>
-                ) : (
+                ) : task.idealDate ? (
                   <DateTimeDisplay 
                     date={completionDate} 
                     showRelative={false} 
                     fallback="(data não disponível)"
                   />
+                ) : (
+                  <span className="text-gray-400">SEM PRAZO</span>
                 )}
               </p>
             </div>

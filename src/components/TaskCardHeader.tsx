@@ -136,12 +136,16 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
         </div>
         
         <div className="flex items-center">
-          {parsedDate && shouldShowDate && (
+          {shouldShowDate && (
             <div className="text-xs text-right ml-3 flex items-center">
-              {taskIsOverdue && (
+              {taskIsOverdue && parsedDate && (
                 <Bell size={14} className="text-red-400 mr-1" />
               )}
-              {formatDate(parsedDate, dateDisplayOptions)}
+              {parsedDate ? (
+                formatDate(parsedDate, dateDisplayOptions)
+              ) : viewMode === 'chronological' ? (
+                <span className="text-gray-400">SEM PRAZO</span>
+              ) : null}
             </div>
           )}
           {shouldShowScore && (
