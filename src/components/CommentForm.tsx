@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from './ui/button';
 import { useAppContext } from '@/context/AppContext';
@@ -25,17 +24,15 @@ const CommentForm: React.FC<CommentFormProps> = ({ taskId, onCommentAdded }) => 
         console.log(`[CommentForm] Submitting comment for task ${taskId}`);
         
         // Add the comment and wait for response
-        const result = await addComment(taskId, commentText);
-        console.log('[CommentForm] Comment add result:', result);
+        await addComment(taskId, commentText);
+        console.log('[CommentForm] Comment added successfully');
         
-        if (result) {
-          setCommentText('');
-          
-          // Notify the parent component that a comment was added
-          if (onCommentAdded) {
-            console.log('[CommentForm] Calling onCommentAdded callback');
-            onCommentAdded();
-          }
+        setCommentText('');
+        
+        // Notify the parent component that a comment was added
+        if (onCommentAdded) {
+          console.log('[CommentForm] Calling onCommentAdded callback');
+          onCommentAdded();
         }
       } finally {
         setIsSubmitting(false);

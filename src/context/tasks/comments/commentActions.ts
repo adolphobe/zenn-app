@@ -6,28 +6,31 @@ import {
   addComment as addCommentService,
   deleteComment as deleteCommentService
 } from '@/services/task';
-import { useAuth } from '@/context/auth';
 import { Comment } from '@/types';
+import { supabase } from '@/integrations/supabase/client';
 
-// Helper to get the current user - this avoids the DOM dependency
-const getCurrentUser = () => {
-  // Try to get from localStorage as fallback if not in React context
+// Helper to get the current user through Supabase client directly
+const getCurrentUser = async () => {
   try {
-    const authStore = localStorage.getItem('sb-wbvxnapruffchikhrqrs-auth-token');
-    if (authStore) {
-      const authData = JSON.parse(authStore);
-      return authData.user || null;
+    // Get the current session
+    const { data: { session }, error } = await supabase.auth.getSession();
+    
+    if (error) {
+      console.error('[CommentActions] Error getting session:', error);
+      return null;
     }
+    
+    return session?.user || null;
   } catch (error) {
-    console.error('Error getting current user from localStorage:', error);
+    console.error('[CommentActions] Error in getCurrentUser:', error);
+    return null;
   }
-  return null;
 };
 
 export const addComment = async (dispatch: AppDispatch, taskId: string, text: string) => {
   try {
     // Get current user using the helper function
-    const currentUser = getCurrentUser();
+    const currentUser = await getCurrentUser();
     console.log('[CommentActions] Current user from auth store:', currentUser);
     
     if (!currentUser?.id) {
@@ -73,8 +76,6 @@ export const addComment = async (dispatch: AppDispatch, taskId: string, text: st
       title: "Comentário adicionado",
       description: "Seu comentário foi adicionado com sucesso."
     });
-    
-    return newComment;
   } catch (error) {
     console.error('[CommentActions] Error adding comment:', error);
     toast({
@@ -83,7 +84,6 @@ export const addComment = async (dispatch: AppDispatch, taskId: string, text: st
       description: "Não foi possível adicionar o comentário. Tente novamente.",
       variant: "destructive",
     });
-    return null;
   }
 };
 

@@ -28,6 +28,7 @@ export interface Comment {
   id: string;
   text: string;
   createdAt: string;
+  userId: string; // Added userId property to Comment interface
 }
 
 export interface TaskFormData {
