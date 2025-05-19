@@ -20,13 +20,19 @@ export const useComments = (taskId: string) => {
   } = useQuery({
     queryKey: ['comments', taskId],
     queryFn: async () => {
+      console.log(`[useComments] Fetching comments for task: ${taskId}`);
       const { data, error } = await supabase
         .from('task_comments')
         .select('*')
         .eq('task_id', taskId)
         .order('created_at', { ascending: true });
 
-      if (error) throw error;
+      if (error) {
+        console.error('[useComments] Error fetching comments:', error);
+        throw error;
+      }
+      
+      console.log(`[useComments] Fetched ${data?.length || 0} comments`);
       
       // Map database comments to our Comment type
       return data.map((comment: any): Comment => ({
@@ -43,13 +49,16 @@ export const useComments = (taskId: string) => {
   const { mutate: addComment } = useMutation({
     mutationFn: async (text: string) => {
       if (!isAuthenticated || !currentUser) {
+        console.error('[useComments] User not authenticated');
         throw new Error('User not authenticated');
       }
       
       if (!text.trim()) {
+        console.error('[useComments] Comment text is empty');
         throw new Error('Comment text cannot be empty');
       }
       
+      console.log(`[useComments] Adding comment to task ${taskId}`);
       setIsSubmitting(true);
       
       try {
@@ -63,7 +72,12 @@ export const useComments = (taskId: string) => {
           .select()
           .single();
         
-        if (error) throw error;
+        if (error) {
+          console.error('[useComments] Error inserting comment:', error);
+          throw error;
+        }
+
+        console.log('[useComments] Comment added successfully:', data);
         return data;
       } finally {
         setIsSubmitting(false);
@@ -102,12 +116,19 @@ export const useComments = (taskId: string) => {
   // Delete comment mutation
   const { mutate: deleteComment } = useMutation({
     mutationFn: async (commentId: string) => {
+      console.log(`[useComments] Deleting comment: ${commentId}`);
+      
       const { error } = await supabase
         .from('task_comments')
         .delete()
         .eq('id', commentId);
 
-      if (error) throw error;
+      if (error) {
+        console.error('[useComments] Error deleting comment:', error);
+        throw error;
+      }
+      
+      console.log('[useComments] Comment deleted successfully');
       return commentId;
     },
     onSuccess: (commentId) => {

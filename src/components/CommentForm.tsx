@@ -36,10 +36,10 @@ const CommentForm: React.FC<CommentFormProps> = ({ taskId, onCommentAdded }) => 
       return;
     }
     
-    // Call the addComment function from our hook
+    // Corrigindo chamada do método addComment para seguir a convenção do React Query
     addComment(text, {
       onSuccess: () => {
-        setText(''); // Clear form on success
+        setText(''); // Limpar o formulário em caso de sucesso
         
         if (onCommentAdded) {
           onCommentAdded();

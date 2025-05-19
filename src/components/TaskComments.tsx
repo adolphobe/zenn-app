@@ -98,7 +98,7 @@ const TaskComments: React.FC<TaskCommentsProps> = ({ taskId, comments: initialCo
   }
   
   const handleDeleteComment = async (commentId: string) => {
-    // Use the deleteComment function from our hook
+    // Corrigindo a chamada ao deleteComment para passar os callbacks corretamente
     deleteComment(commentId, {
       onSuccess: () => {
         // Call the callback since we're in the success handler

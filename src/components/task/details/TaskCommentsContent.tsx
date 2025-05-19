@@ -36,11 +36,14 @@ const TaskCommentsContent: React.FC<TaskCommentsContentProps> = ({ task, onComme
     );
   }
 
+  // Usar os comentários da tarefa ou do hook, priorizando os da tarefa se disponíveis
   const taskComments = task.comments || comments;
   const hasComments = taskComments && taskComments.length > 0;
   
   // Handler para quando um comentário é adicionado
   const handleCommentAdded = (): void => {
+    console.log('[TaskCommentsContent] Comment added handler called');
+    
     // Invalidate queries to refresh task data
     queryClient.invalidateQueries({ queryKey: ['tasks'] });
     queryClient.invalidateQueries({ queryKey: ['task', task.id] });
@@ -65,6 +68,8 @@ const TaskCommentsContent: React.FC<TaskCommentsContentProps> = ({ task, onComme
   
   // Handler para quando um comentário é removido
   const handleCommentDeleted = (): void => {
+    console.log('[TaskCommentsContent] Comment deleted handler called');
+    
     // Invalidate queries to refresh task data
     queryClient.invalidateQueries({ queryKey: ['tasks'] });
     queryClient.invalidateQueries({ queryKey: ['task', task.id] });
