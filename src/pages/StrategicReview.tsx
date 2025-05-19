@@ -14,28 +14,8 @@ import { useTaskDataContext } from '@/context/TaskDataProvider';
 const StrategicReview: React.FC = () => {
   const { isAuthenticated } = useAuth();
   const { completedTasks, completedTasksLoading } = useTaskDataContext();
-  const { addToast } = useToast(); // Correct usage of useToast
+  const { addToast } = useToast();
   const isFirstRender = useRef(true);
-  
-  // Debug logs
-  useEffect(() => {
-    console.log("StrategicReview: Estado de autenticação =>", isAuthenticated ? "Autenticado" : "Não autenticado");
-    console.log("StrategicReview: Total de tarefas completadas =>", completedTasks?.length || 0);
-
-    if (completedTasks && completedTasks.length > 0) {
-      console.log("StrategicReview: Há tarefas para análise");
-      console.log("StrategicReview: Amostra de tarefas completadas:", 
-        completedTasks.slice(0, 3).map(t => ({
-          id: t.id,
-          title: t.title,
-          completed: t.completed,
-          completedAt: t.completedAt
-        }))
-      );
-    } else {
-      console.log("StrategicReview: Sem tarefas para análise");
-    }
-  }, [isAuthenticated, completedTasks]);
   
   // Use the task pillars hook to ensure all tasks have pillars assigned
   const { assignMissingPillars } = useTaskPillars();
@@ -53,19 +33,10 @@ const StrategicReview: React.FC = () => {
     handlePeriodChange,
     taskStats
   } = useStrategicReviewState(completedTasks || []);
-
-  // Adicionar logs para diagnóstico
-  useEffect(() => {
-    console.log("StrategicReview: Total de tarefas disponíveis:", completedTasks?.length || 0);
-    console.log("StrategicReview: Tarefas filtradas para análise:", filteredTasks?.length || 0);
-    console.log("StrategicReview: Período selecionado:", period);
-    console.log("StrategicReview: Data range:", dateRangeDisplay);
-  }, [completedTasks, filteredTasks, period, dateRangeDisplay]);
   
   useEffect(() => {
     // Ensure all tasks have pillars assigned
     assignMissingPillars();
-    console.log("StrategicReview: assignMissingPillars() executado");
     
     // Show a toast to indicate the page is loaded - only on first render
     if (isFirstRender.current) {
@@ -78,7 +49,6 @@ const StrategicReview: React.FC = () => {
               ? "Mostrando análise das tarefas concluídas." 
               : "Nenhuma tarefa concluída encontrada.")
         });
-        console.log("StrategicReview: Toast de boas-vindas exibido");
       } catch (error) {
         console.error("Error showing toast:", error);
       }
@@ -102,14 +72,6 @@ const StrategicReview: React.FC = () => {
             <span className="font-medium">{taskStats.totalFilteredTasks}</span> tarefas concluídas 
             {period !== 'all-time' ? ' no período selecionado' : ''} 
             {' '}de um total de <span className="font-medium">{taskStats.totalCompletedTasks}</span>
-          </div>
-        )}
-        
-        {/* Debug info visible in development */}
-        {process.env.NODE_ENV !== 'production' && (
-          <div className="p-2 my-2 bg-yellow-50 border border-yellow-200 rounded text-xs">
-            <p>Debug: Encontradas {filteredTasks.length} tarefas de {completedTasks?.length || 0} totais.</p>
-            <p>Debug: Estado de carregamento: {completedTasksLoading ? 'Carregando' : 'Completo'}</p>
           </div>
         )}
       </div>

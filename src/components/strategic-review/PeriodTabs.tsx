@@ -23,12 +23,7 @@ const PeriodTabs: React.FC<PeriodTabsProps> = ({
         <TabsTrigger value="month">Este Mês</TabsTrigger>
         <TabsTrigger value="custom">Últimos 30 dias</TabsTrigger>
         <TabsTrigger value="custom-range">Personalizado</TabsTrigger>
-        <TabsTrigger 
-          value="all-time" 
-          className={showAllTimeProminent ? "bg-primary-foreground border-primary" : ""}
-        >
-          Todo o Tempo
-        </TabsTrigger>
+        <TabsTrigger value="all-time">Todo o Tempo</TabsTrigger>
       </TabsList>
     </Tabs>
   );

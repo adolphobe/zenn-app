@@ -5,8 +5,17 @@ const LOG_INTERVAL = 3000; // 3 segundos entre logs do mesmo tipo
 
 /**
  * Função que limita a frequência de logs por categoria
+ * Só exibe logs quando realmente necessário
  */
 export const throttledLog = (category: string, message: string, data?: any) => {
+  // Em produção, não exibe a maioria dos logs
+  if (process.env.NODE_ENV === 'production') {
+    // Em produção, só exibir logs críticos ou de erro
+    if (!category.includes('ERROR') && !category.includes('CRITICAL')) {
+      return false;
+    }
+  }
+  
   const now = Date.now();
   const lastLog = logThrottles[category] || 0;
   
