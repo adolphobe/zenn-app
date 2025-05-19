@@ -53,9 +53,7 @@ export const useComments = (taskId: string) => {
 
   // Add comment mutation with proper callback handling
   const { mutate } = useMutation({
-    mutationFn: async (payload: { text: string; callbacks?: MutationCallbacks }) => {
-      const { text, callbacks } = payload;
-      
+    mutationFn: async (text: string) => {
       if (!isAuthenticated || !currentUser) {
         console.error('[useComments] User not authenticated');
         throw new Error('User not authenticated');
@@ -67,6 +65,7 @@ export const useComments = (taskId: string) => {
       }
       
       console.log(`[useComments] Adding comment to task ${taskId} by user ${currentUser.id}`);
+      console.log(`[useComments] Authentication status: ${isAuthenticated ? 'Authenticated' : 'Not authenticated'}`);
       setIsSubmitting(true);
       
       try {
@@ -82,7 +81,16 @@ export const useComments = (taskId: string) => {
         
         if (error) {
           console.error('[useComments] Error inserting comment:', error);
-          throw error;
+          console.error('[useComments] Error details:', JSON.stringify(error));
+          
+          // Check for specific error types
+          if (error.code === '42501' || error.message?.includes('permission denied')) {
+            throw new Error('Permissão negada. Você pode não ter permissão para comentar nesta tarefa.');
+          } else if (error.code === '23503') {
+            throw new Error('A tarefa pode não existir mais ou o ID de usuário é inválido.');
+          } else {
+            throw error;
+          }
         }
 
         console.log('[useComments] Comment added successfully:', data);
@@ -91,7 +99,7 @@ export const useComments = (taskId: string) => {
         setIsSubmitting(false);
       }
     },
-    onSuccess: (_, variables) => {
+    onSuccess: (data) => {
       toast({
         id: uuidv4(),
         title: "Comentário adicionado",
@@ -102,15 +110,8 @@ export const useComments = (taskId: string) => {
       queryClient.invalidateQueries({ queryKey: ['comments', taskId] });
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       queryClient.invalidateQueries({ queryKey: ['task', taskId] });
-      
-      // Call the onSuccess callback if provided
-      if (variables.callbacks?.onSuccess) {
-        variables.callbacks.onSuccess();
-      }
-      
-      return true;
     },
-    onError: (error, variables) => {
+    onError: (error) => {
       console.error('[useComments] Error adding comment:', error);
       
       toast({
@@ -121,27 +122,28 @@ export const useComments = (taskId: string) => {
           : "Não foi possível adicionar seu comentário. Tente novamente.",
         variant: "destructive",
       });
-      
-      // Call the onError callback if provided
-      if (variables.callbacks?.onError) {
-        variables.callbacks.onError(error);
-      }
-      
-      return false;
     }
   });
 
   // Wrapper function for addComment with proper typing
   const addComment = (text: string, callbacks?: MutationCallbacks) => {
-    console.log('[useComments] addComment called with:', { text, callbacks });
-    return mutate({ text, callbacks });
+    console.log('[useComments] addComment called with text:', text);
+    
+    mutate(text, {
+      onSuccess: () => {
+        console.log('[useComments] Comment added successfully via callback');
+        if (callbacks?.onSuccess) callbacks.onSuccess();
+      },
+      onError: (error) => {
+        console.error('[useComments] Error in addComment callback:', error);
+        if (callbacks?.onError) callbacks.onError(error);
+      }
+    });
   };
 
   // Delete comment mutation with proper callback handling
   const { mutate: deleteCommentMutate } = useMutation({
-    mutationFn: async (payload: { commentId: string; callbacks?: MutationCallbacks }) => {
-      const { commentId } = payload;
-      
+    mutationFn: async (commentId: string) => {
       console.log(`[useComments] Deleting comment: ${commentId}`);
       
       const { error } = await supabase
@@ -157,7 +159,7 @@ export const useComments = (taskId: string) => {
       console.log('[useComments] Comment deleted successfully');
       return commentId;
     },
-    onSuccess: (_, variables) => {
+    onSuccess: (commentId) => {
       toast({
         id: uuidv4(),
         title: "Comentário excluído",
@@ -168,15 +170,8 @@ export const useComments = (taskId: string) => {
       queryClient.invalidateQueries({ queryKey: ['comments', taskId] });
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       queryClient.invalidateQueries({ queryKey: ['task', taskId] });
-      
-      // Call the onSuccess callback if provided
-      if (variables.callbacks?.onSuccess) {
-        variables.callbacks.onSuccess();
-      }
-      
-      return true;
     },
-    onError: (error, variables) => {
+    onError: (error) => {
       console.error('[useComments] Error deleting comment:', error);
       
       toast({
@@ -185,20 +180,23 @@ export const useComments = (taskId: string) => {
         description: "Não foi possível excluir o comentário. Tente novamente.",
         variant: "destructive",
       });
-      
-      // Call the onError callback if provided
-      if (variables.callbacks?.onError) {
-        variables.callbacks.onError(error);
-      }
-      
-      return false;
     }
   });
 
   // Wrapper function for deleteComment with proper typing
   const deleteComment = (commentId: string, callbacks?: MutationCallbacks) => {
-    console.log('[useComments] deleteComment called with:', { commentId, callbacks });
-    return deleteCommentMutate({ commentId, callbacks });
+    console.log('[useComments] deleteComment called with:', { commentId });
+    
+    deleteCommentMutate(commentId, {
+      onSuccess: () => {
+        console.log('[useComments] Comment deleted successfully via callback');
+        if (callbacks?.onSuccess) callbacks.onSuccess();
+      },
+      onError: (error) => {
+        console.error('[useComments] Error in deleteComment callback:', error);
+        if (callbacks?.onError) callbacks.onError(error);
+      }
+    });
   };
 
   return {

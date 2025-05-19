@@ -6,6 +6,7 @@ import CommentForm from '@/components/CommentForm';
 import { useQueryClient } from '@tanstack/react-query';
 import { useComments } from '@/hooks/useComments';
 import { useAuth } from '@/context/auth';
+import { AlertTriangle } from 'lucide-react';
 
 interface TaskCommentsContentProps {
   task: Task;
@@ -15,7 +16,7 @@ interface TaskCommentsContentProps {
 const TaskCommentsContent: React.FC<TaskCommentsContentProps> = ({ task, onCommentAdded }) => {
   const commentsRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
-  const { comments } = useComments(task?.id || '');
+  const { comments, isLoading, fetchError } = useComments(task?.id || '');
   const { isAuthenticated, currentUser } = useAuth();
   
   // Log task and authentication data for debugging
@@ -84,6 +85,19 @@ const TaskCommentsContent: React.FC<TaskCommentsContentProps> = ({ task, onComme
     queryClient.invalidateQueries({ queryKey: ['task', task.id] });
     queryClient.invalidateQueries({ queryKey: ['comments', task.id] });
   };
+
+  if (isLoading) {
+    return <div className="text-center p-4">Carregando comentários...</div>;
+  }
+
+  if (fetchError) {
+    return (
+      <div className="text-center p-4 text-red-500 flex flex-col items-center gap-2">
+        <AlertTriangle size={24} />
+        <p>Erro ao carregar comentários.</p>
+      </div>
+    );
+  }
 
   return (
     <div ref={commentsRef}>
