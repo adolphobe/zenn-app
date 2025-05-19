@@ -2,7 +2,7 @@
 import React from 'react';
 import { Task } from '@/types';
 import { CONSEQUENCE_PHRASES, PRIDE_PHRASES, CONSTRUCTION_PHRASES } from '@/constants';
-import RatingSliderReadOnly from './RatingSliderReadOnly';
+import RatingSliderReadOnly from '@/components/ui/rating-slider-readonly';
 
 interface TaskLevelsContentProps {
   task: Task;
