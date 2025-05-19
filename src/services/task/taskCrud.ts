@@ -57,6 +57,10 @@ export const createTask = async (taskData: TaskFormData, userId: string): Promis
 
   // Convert Date to ISO string for the database
   const idealDateISO = dateService.toISOString(taskData.idealDate);
+  
+  // Determinar se a tarefa deve ser oculta com base no score
+  // Se taskData.hidden estiver definido, use-o, caso contrário, defina como true se totalScore < 8
+  const isHidden = taskData.hidden !== undefined ? taskData.hidden : totalScore < 8;
 
   const { data, error } = await supabase
     .from('tasks')
@@ -69,7 +73,7 @@ export const createTask = async (taskData: TaskFormData, userId: string): Promis
       total_score: totalScore,
       ideal_date: idealDateISO,
       pillar: dominantPillar,
-      hidden: false,
+      hidden: isHidden,
       completed: false
     })
     .select()

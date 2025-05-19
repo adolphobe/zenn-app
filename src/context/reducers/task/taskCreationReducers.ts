@@ -11,15 +11,27 @@ export const addTask = (state: AppState, action: Action): AppState => {
   // Garantir que campos de data sejam Date objects
   const idealDate = dateService.parseDate(action.payload.idealDate);
   
+  // Calcular o score total
+  const consequenceScore = action.payload.consequenceScore || 3;
+  const prideScore = action.payload.prideScore || 3;
+  const constructionScore = action.payload.constructionScore || 3;
+  const totalScore = consequenceScore + prideScore + constructionScore;
+  
+  // Determinar se a tarefa deve ser oculta com base no score
+  // Se o payload já tiver a propriedade hidden definida, use-a, caso contrário calcule com base no score
+  const isHidden = action.payload.hidden !== undefined 
+    ? action.payload.hidden 
+    : totalScore < 8;
+  
   const newTask: Task = {
     id: uuidv4(),
     title: action.payload.title,
-    consequenceScore: action.payload.consequenceScore,
-    prideScore: action.payload.prideScore,
-    constructionScore: action.payload.constructionScore,
-    totalScore: action.payload.consequenceScore + action.payload.prideScore + action.payload.constructionScore,
+    consequenceScore: consequenceScore,
+    prideScore: prideScore,
+    constructionScore: constructionScore,
+    totalScore: totalScore,
     idealDate: idealDate,
-    hidden: (action.payload.consequenceScore + action.payload.prideScore + action.payload.constructionScore) < 8,
+    hidden: isHidden,
     completed: false,
     completedAt: null,
     createdAt: new Date(),

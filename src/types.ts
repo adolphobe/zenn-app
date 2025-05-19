@@ -33,14 +33,13 @@ export interface Comment {
 export interface TaskFormData {
   title: string;
   description?: string;
-  consequenceScore: number;
-  prideScore: number;
-  constructionScore: number;
-  idealDate: Date | null;
-  completedAt?: Date | null;
-  feedback?: 'transformed' | 'relief' | 'obligation';
+  consequenceScore?: number;
+  prideScore?: number;
+  constructionScore?: number;
+  idealDate?: Date | null | string;
   pillar?: string;
-  date?: ISODateString;
+  userId?: string;
+  hidden?: boolean;
 }
 
 export type ViewMode = 'power' | 'chronological' | 'strategic';
