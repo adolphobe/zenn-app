@@ -58,22 +58,29 @@ export const TaskTable: React.FC<TaskTableProps> = ({
             </TableRow>
           ) : (
             tasks.map((task) => (
-              <TableRow key={task.id} className="cursor-pointer hover:bg-muted/50">
+              <TableRow key={task.id} className="hover:bg-muted/50">
                 <TableCell 
-                  className="font-medium"
+                  className="font-medium cursor-pointer"
                   onClick={() => onSelectTask(task.id)}
                 >
                   {task.title}
                 </TableCell>
-                <TableCell onClick={() => onSelectTask(task.id)}>
+                <TableCell 
+                  className="cursor-pointer"
+                  onClick={() => onSelectTask(task.id)}
+                >
                   {task.totalScore || 0}/15
                 </TableCell>
-                <TableCell onClick={() => onSelectTask(task.id)}>
-                  <span className="capitalize">
-                    {getDominantPillar(task)}
-                  </span>
+                <TableCell 
+                  className="cursor-pointer capitalize"
+                  onClick={() => onSelectTask(task.id)}
+                >
+                  {getDominantPillar(task)}
                 </TableCell>
-                <TableCell onClick={() => onSelectTask(task.id)}>
+                <TableCell 
+                  className="cursor-pointer"
+                  onClick={() => onSelectTask(task.id)}
+                >
                   {task.completedAt 
                     ? format(new Date(task.completedAt), 'dd/MM/yyyy HH:mm') 
                     : 'Data desconhecida'}

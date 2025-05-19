@@ -74,34 +74,39 @@ export const TaskGrid: React.FC<TaskGridProps> = ({
         const borderColorClass = getBorderColor(task.totalScore);
 
         return (
-          <Card key={task.id} className={`mb-3 border-l-4 ${borderColorClass} cursor-pointer hover:bg-muted/10 transition-colors`}>
-            <CardContent className="p-4" onClick={() => onSelectTask(task.id)}>
-              <div className="flex justify-between items-start">
-                <h3 className="font-medium text-gray-900 dark:text-gray-100">{task.title}</h3>
-                <Badge variant="outline" className="bg-gray-100 text-gray-800">
-                  {task.totalScore}/15
-                </Badge>
-              </div>
-              
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                Concluída em {task.completedAt 
-                  ? format(new Date(task.completedAt), 'dd/MM/yyyy')
-                  : '(data não disponível)'}
-              </p>
-              
-              <div className="mt-3 flex flex-wrap gap-2">
-                {task.feedback && (
-                  <Badge className={feedbackColors[task.feedback] || 'bg-gray-100 text-gray-800'} variant="outline">
-                    {feedbackLabels[task.feedback] || '-'}
+          <Card key={task.id} className={`mb-3 border-l-4 ${borderColorClass} hover:bg-muted/10 transition-colors`}>
+            <CardContent className="p-4">
+              <div 
+                className="cursor-pointer"
+                onClick={() => onSelectTask(task.id)}
+              >
+                <div className="flex justify-between items-start">
+                  <h3 className="font-medium text-gray-900 dark:text-gray-100">{task.title}</h3>
+                  <Badge variant="outline" className="bg-gray-100 text-gray-800">
+                    {task.totalScore}/15
                   </Badge>
-                )}
+                </div>
                 
-                <Badge
-                  className={pillarColors[dominantPillar] || 'bg-gray-100 text-gray-800'}
-                  variant="outline"
-                >
-                  {dominantPillar}
-                </Badge>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                  Concluída em {task.completedAt 
+                    ? format(new Date(task.completedAt), 'dd/MM/yyyy')
+                    : '(data não disponível)'}
+                </p>
+                
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {task.feedback && (
+                    <Badge className={feedbackColors[task.feedback] || 'bg-gray-100 text-gray-800'} variant="outline">
+                      {feedbackLabels[task.feedback] || '-'}
+                    </Badge>
+                  )}
+                  
+                  <Badge
+                    className={pillarColors[dominantPillar] || 'bg-gray-100 text-gray-800'}
+                    variant="outline"
+                  >
+                    {dominantPillar}
+                  </Badge>
+                </div>
               </div>
               
               <div className="mt-4 flex justify-end gap-2">

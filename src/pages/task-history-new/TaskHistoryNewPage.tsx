@@ -13,7 +13,7 @@ import { TaskSearch } from './components/TaskSearch';
 import { ViewToggle } from './components/ViewToggle';
 import { AdvancedFilters } from './components/AdvancedFilters';
 import { TaskPagination } from './components/TaskPagination';
-import TaskModal from './components/TaskModal';
+import TaskViewModal from './components/TaskViewModal';
 import RestoreTaskDialog from './components/RestoreTaskDialog';
 import { restoreTask } from './services/taskActions';
 import { Task } from '@/types';
@@ -26,8 +26,6 @@ const TaskHistoryNewPage = () => {
     tasks: completedTasks, 
     isLoading: completedTasksLoading,
     stats,
-    selectedTaskId,
-    setSelectedTaskId,
     refetch
   } = useCompletedTasksData();
   
@@ -207,7 +205,7 @@ const TaskHistoryNewPage = () => {
       </div>
       
       {/* Task modals */}
-      <TaskModal
+      <TaskViewModal
         task={taskToView}
         isOpen={!!taskToView}
         onClose={() => setTaskToView(null)}
