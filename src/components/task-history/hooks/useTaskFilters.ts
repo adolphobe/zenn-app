@@ -1,7 +1,9 @@
+
 import { useState, useMemo, useCallback } from 'react';
 import { Task } from '@/types';
 import { dateService } from '@/services/dateService';
 import { logDateInfo } from '@/utils/diagnosticLog';
+import { logError } from '@/utils/logUtils';
 
 // Type definition for filter options
 interface FilterOptions {
@@ -40,6 +42,7 @@ export const useTaskFilters = (
   const [endDate, setEndDate] = useState<Date | undefined>(initialFilters.endDate);
   const [sortBy, setSortBy] = useState(initialFilters.sortBy);
   const [showFilters, setShowFilters] = useState(initialFilters.showFilters);
+  const [filterErrors, setFilterErrors] = useState<string[]>([]);
 
   // For date debugging
   useMemo(() => {
@@ -51,124 +54,160 @@ export const useTaskFilters = (
   // Filter tasks based on search query and filters
   const filteredTasks = useMemo(() => {
     if (!tasks || tasks.length === 0) return [];
+    const errors: string[] = [];
 
-    return tasks.filter((task) => {
-      // Apply search filter
-      const matchesSearch = !searchQuery || 
-        task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        // Only search in task title since notes property doesn't exist on Task type
-        (task.title.toLowerCase().includes(searchQuery.toLowerCase()));
+    // Reset previous errors
+    setFilterErrors([]);
 
-      if (!matchesSearch) return false;
-
-      // Apply period filter
-      let matchesPeriod = true;
-      if (periodFilter !== 'all') {
-        // Ensure we have a valid date to work with
-        if (!task.completedAt) return false;
-
-        const completedAt = task.completedAt instanceof Date 
-          ? task.completedAt 
-          : dateService.parseDate(task.completedAt);
-        
-        if (!completedAt) {
-          console.warn('useTaskFilters: Invalid completedAt date detected', task.completedAt);
+    try {
+      return tasks.filter((task) => {
+        // Validate task has required fields
+        if (!task.title) {
+          errors.push(`Task ${task.id} missing title`);
           return false;
         }
 
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        
-        const weekStart = new Date(today);
-        weekStart.setDate(today.getDate() - today.getDay()); // Start of week (Sunday)
-        
-        const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
-        
-        switch (periodFilter) {
-          case 'today':
-            matchesPeriod = completedAt >= today;
-            break;
-          case 'week':
-            matchesPeriod = completedAt >= weekStart;
-            break;
-          case 'month':
-            matchesPeriod = completedAt >= monthStart;
-            break;
-          case 'custom':
-            if (startDate && completedAt < startDate) matchesPeriod = false;
-            if (endDate) {
-              const nextDay = new Date(endDate);
-              nextDay.setDate(endDate.getDate() + 1);
-              if (completedAt >= nextDay) matchesPeriod = false;
-            }
-            break;
+        // Apply search filter - FIXED: Only search in title, not notes
+        const matchesSearch = !searchQuery || 
+          task.title.toLowerCase().includes(searchQuery.toLowerCase());
+
+        if (!matchesSearch) return false;
+
+        // Apply period filter with improved error handling
+        let matchesPeriod = true;
+        if (periodFilter !== 'all') {
+          // Ensure we have a valid date to work with
+          if (!task.completedAt) {
+            // This should not happen for completed tasks
+            errors.push(`Task ${task.id} is missing completedAt date`);
+            return false;
+          }
+
+          // Make sure completedAt is a valid date
+          const completedAt = task.completedAt instanceof Date 
+            ? task.completedAt 
+            : dateService.parseDate(task.completedAt);
+          
+          if (!completedAt) {
+            errors.push(`Task ${task.id} has invalid completedAt date: ${task.completedAt}`);
+            return false;
+          }
+
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          
+          const weekStart = new Date(today);
+          weekStart.setDate(today.getDate() - today.getDay()); // Start of week (Sunday)
+          
+          const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+          
+          switch (periodFilter) {
+            case 'today':
+              matchesPeriod = completedAt >= today;
+              break;
+            case 'week':
+              matchesPeriod = completedAt >= weekStart;
+              break;
+            case 'month':
+              matchesPeriod = completedAt >= monthStart;
+              break;
+            case 'custom':
+              if (startDate && completedAt < startDate) matchesPeriod = false;
+              if (endDate) {
+                const nextDay = new Date(endDate);
+                nextDay.setDate(endDate.getDate() + 1);
+                if (completedAt >= nextDay) matchesPeriod = false;
+              }
+              break;
+          }
         }
-      }
 
-      if (!matchesPeriod) return false;
+        if (!matchesPeriod) return false;
 
-      // Apply score filter
-      let matchesScore = true;
-      if (scoreFilter !== 'all') {
-        switch (scoreFilter) {
-          case 'high':
-            matchesScore = task.totalScore >= 12;
-            break;
-          case 'medium':
-            matchesScore = task.totalScore >= 8 && task.totalScore < 12;
-            break;
-          case 'low':
-            matchesScore = task.totalScore < 8;
-            break;
+        // Apply score filter - FIXED to handle undefined scores
+        let matchesScore = true;
+        if (scoreFilter !== 'all') {
+          // Make sure we have a total score
+          const totalScore = task.totalScore || 0;
+          
+          switch (scoreFilter) {
+            case 'high':
+              matchesScore = totalScore >= 12;
+              break;
+            case 'medium':
+              matchesScore = totalScore >= 8 && totalScore < 12;
+              break;
+            case 'low':
+              matchesScore = totalScore < 8;
+              break;
+          }
         }
+
+        if (!matchesScore) return false;
+
+        // Apply feedback filter
+        const matchesFeedback = feedbackFilter === 'all' || task.feedback === feedbackFilter;
+        if (!matchesFeedback) return false;
+
+        // Apply pillar filter with error handling
+        let matchesPillar = true;
+        if (pillarFilter !== 'all') {
+          // Make sure we have the required scores
+          const scores = {
+            'consequence': task.consequenceScore || 0,
+            'pride': task.prideScore || 0,
+            'construction': task.constructionScore || 0,
+          };
+
+          // Check if the filtered pillar is the dominant one
+          const highestScore = Math.max(...Object.values(scores));
+          matchesPillar = scores[pillarFilter as keyof typeof scores] === highestScore;
+        }
+
+        return matchesPillar;
+      });
+    } catch (err) {
+      const errorMsg = `Error filtering tasks: ${err instanceof Error ? err.message : String(err)}`;
+      errors.push(errorMsg);
+      logError('useTaskFilters', errorMsg, err);
+      setFilterErrors(errors);
+      // Return empty array on error
+      return [];
+    } finally {
+      if (errors.length > 0) {
+        setFilterErrors(errors);
       }
-
-      if (!matchesScore) return false;
-
-      // Apply feedback filter
-      const matchesFeedback = feedbackFilter === 'all' || task.feedback === feedbackFilter;
-      if (!matchesFeedback) return false;
-
-      // Apply pillar filter
-      let matchesPillar = true;
-      if (pillarFilter !== 'all') {
-        const scores = {
-          'consequence': task.consequenceScore,
-          'pride': task.prideScore,
-          'construction': task.constructionScore,
-        };
-
-        // Check if the filtered pillar is the dominant one
-        const highestScore = Math.max(...Object.values(scores));
-        matchesPillar = scores[pillarFilter as keyof typeof scores] === highestScore;
-      }
-
-      return matchesPillar;
-    });
+    }
   }, [tasks, searchQuery, periodFilter, scoreFilter, feedbackFilter, pillarFilter, startDate, endDate]);
 
-  // Sort filtered tasks
+  // Sort filtered tasks with improved error handling
   const sortedTasks = useMemo(() => {
     if (!filteredTasks.length) return [];
-
-    return [...filteredTasks].sort((a, b) => {
-      switch (sortBy) {
-        case 'newest':
-          return (b.completedAt instanceof Date ? +b.completedAt : 0) - 
-                 (a.completedAt instanceof Date ? +a.completedAt : 0);
-        case 'oldest':
-          return (a.completedAt instanceof Date ? +a.completedAt : 0) - 
-                 (b.completedAt instanceof Date ? +b.completedAt : 0);
-        case 'highScore':
-          return b.totalScore - a.totalScore;
-        case 'lowScore':
-          return a.totalScore - b.totalScore;
-        case 'alphabetical':
-          return a.title.localeCompare(b.title);
-        default:
-          return 0;
-      }
-    });
+    
+    try {
+      return [...filteredTasks].sort((a, b) => {
+        const aDate = a.completedAt instanceof Date ? a.completedAt : new Date();
+        const bDate = b.completedAt instanceof Date ? b.completedAt : new Date();
+        
+        switch (sortBy) {
+          case 'newest':
+            return (+bDate) - (+aDate);
+          case 'oldest':
+            return (+aDate) - (+bDate);
+          case 'highScore':
+            return (b.totalScore || 0) - (a.totalScore || 0);
+          case 'lowScore':
+            return (a.totalScore || 0) - (b.totalScore || 0);
+          case 'alphabetical':
+            return a.title.localeCompare(b.title);
+          default:
+            return 0;
+        }
+      });
+    } catch (err) {
+      logError('useTaskFilters', 'Error sorting tasks:', err);
+      return [...filteredTasks]; // Return unsorted array on error
+    }
   }, [filteredTasks, sortBy]);
 
   return {
@@ -191,6 +230,7 @@ export const useTaskFilters = (
     showFilters,
     setShowFilters,
     filteredTasks,
-    sortedTasks
+    sortedTasks,
+    filterErrors
   };
 };

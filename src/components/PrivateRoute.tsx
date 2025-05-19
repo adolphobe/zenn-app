@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils';
 import { useEffect, useState } from 'react';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { logWarn, logInfo, logError } from '@/utils/logUtils';
 
 /**
  * PrivateRoute - Protects routes that require authentication
@@ -22,6 +23,20 @@ export const PrivateRoute = () => {
 
   // Check if a logout is in progress to prevent login/logout loops
   const logoutInProgress = localStorage.getItem('logout_in_progress') === 'true';
+  
+  // Check for duplicated routes like `/task-history#/task-history`
+  useEffect(() => {
+    const currentPath = location.pathname;
+    const currentUrl = window.location.href;
+    
+    // Detect duplicated path patterns
+    if (currentUrl.includes(`${currentPath}#${currentPath}`)) {
+      logWarn('ROUTE', `Detected duplicated path: ${currentUrl}`, { path: currentPath });
+      
+      // We could implement automatic correction here if needed
+      // For now, just log the issue
+    }
+  }, [location]);
 
   // Additional check for authentication using localStorage directly
   useEffect(() => {
@@ -46,7 +61,7 @@ export const PrivateRoute = () => {
         const { data } = await supabase.auth.getSession();
         setLocalAuthCheck(!!data.session);
       } catch (err) {
-        console.error("[PrivateRoute] Erro ao verificar token local:", err);
+        logError("PrivateRoute", "Erro ao verificar token local:", err);
         setLocalAuthCheck(false);
       }
     };
@@ -61,11 +76,17 @@ export const PrivateRoute = () => {
     }
   }, [isLoading]);
 
-  console.log(`[PrivateRoute] Verificando autenticação em ${location.pathname}, isAuthenticated: ${isAuthenticated}, isLoading: ${isLoading}, authChecked: ${authChecked}, logoutInProgress: ${logoutInProgress}, localAuthCheck: ${localAuthCheck}`);
+  logInfo(`PrivateRoute`, `Verificando autenticação em ${location.pathname}`, { 
+    isAuthenticated, 
+    isLoading, 
+    authChecked, 
+    logoutInProgress, 
+    localAuthCheck 
+  });
 
   // Show loading state while checking authentication
   if (isLoading || !authChecked || localAuthCheck === null) {
-    console.log("[PrivateRoute] Ainda carregando estado de autenticação...");
+    logInfo("PrivateRoute", "Ainda carregando estado de autenticação...");
     return <div className="flex items-center justify-center min-h-screen">
       <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
     </div>;
@@ -77,9 +98,14 @@ export const PrivateRoute = () => {
   
   if (!actuallyAuthenticated) {
     const reason = logoutInProgress ? "logout em andamento" : "não autenticado";
-    console.error(`[PrivateRoute] ERRO DE AUTENTICAÇÃO: Usuário ${reason} em ${location.pathname}`);
-    console.error("[PrivateRoute] DETALHES TÉCNICOS: Redirecionando para /login");
-    console.error("[PrivateRoute] ESTADO DE AUTENTICAÇÃO:", { isAuthenticated, isLoading, localAuthCheck, logoutInProgress, path: location.pathname });
+    logError(`PrivateRoute`, `ERRO DE AUTENTICAÇÃO: Usuário ${reason} em ${location.pathname}`);
+    logError("PrivateRoute", "DETALHES TÉCNICOS: Redirecionando para /login", { 
+      isAuthenticated, 
+      isLoading, 
+      localAuthCheck, 
+      logoutInProgress, 
+      path: location.pathname 
+    });
     
     // Clear any lingering session data if we detect a logout in progress
     if (logoutInProgress) {
@@ -101,7 +127,7 @@ export const PrivateRoute = () => {
   }
 
   // User is authenticated, render the protected layout with sidebar
-  console.log(`[PrivateRoute] Usuário está autenticado, renderizando conteúdo protegido em ${location.pathname}`);
+  logInfo(`PrivateRoute`, `Usuário está autenticado, renderizando conteúdo protegido em ${location.pathname}`);
   
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 flex">

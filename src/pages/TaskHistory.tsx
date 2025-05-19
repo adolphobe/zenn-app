@@ -2,6 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '@/context/AppContext';
 import { useAuth } from '@/context/auth';
+import { useTaskDataContext } from '@/context/TaskDataProvider';
+import { logInfo, logError } from '@/utils/logUtils';
 
 // Import refactored hooks
 import { useTaskFilters } from '@/components/task-history/hooks/useTaskFilters';
@@ -17,8 +19,7 @@ import { NoTasksMessage } from '@/components/task-history/NoTasksMessage';
 import { TaskPagination } from '@/components/task-history/TaskPagination';
 import { Loader2 } from 'lucide-react';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
-import { logDateInfo } from '@/utils/diagnosticLog';
-import { useTaskDataContext } from '@/context/TaskDataProvider';
+import { dateService } from '@/services/dateService';
 
 const TaskHistory = () => {
   const { state } = useAppContext();
@@ -41,24 +42,39 @@ const TaskHistory = () => {
   const [sortBy, setSortBy] = useState('newest');
   const [showFilters, setShowFilters] = useState(false);
   
+  // Check for URL duplication and log relevant info at mount
   useEffect(() => {
-    console.log('TaskHistory: Montado, verificando autenticação...', { isAuthenticated, authLoading });
-    logDateInfo('TaskHistory', 'Página de histórico montada', new Date());
-    
-    if (completedTasks.length > 0) {
-      // Log the first few tasks to help diagnose date issues
-      completedTasks.slice(0, 3).forEach(task => {
-        logDateInfo('TaskHistory', `Task ${task.id} completedAt in list`, task.completedAt);
-      });
-    } else {
-      console.log('TaskHistory: Sem tarefas concluídas para mostrar');
-    }
+    const currentUrl = window.location.href;
+    logInfo('TaskHistory', 'Componente montado', { 
+      url: currentUrl,
+      isAuthenticated, 
+      authLoading,
+      tasksLoaded: completedTasks.length 
+    });
     
     // Verificar se temos uma URL com duplicação do path
-    const currentUrl = window.location.href;
     if (currentUrl.includes('/task-history#/task-history')) {
-      console.warn('TaskHistory: URL com duplicação detectada', currentUrl);
+      logError('TaskHistory', 'URL com duplicação detectada', currentUrl);
     }
+    
+    // Validate any tasks with completedAt dates
+    if (completedTasks.length > 0) {
+      completedTasks.forEach(task => {
+        if (task.completedAt) {
+          const isValid = task.completedAt instanceof Date && 
+            !isNaN(task.completedAt.getTime());
+          
+          if (!isValid) {
+            logError('TaskHistory', `Task ${task.id} tem data de conclusão inválida`, task.completedAt);
+          }
+        }
+      });
+    }
+    
+    // Clean up function to help with debugging
+    return () => {
+      logInfo('TaskHistory', 'Componente desmontado');
+    };
   }, [isAuthenticated, authLoading, completedTasks]);
   
   // Process filters and pagination
@@ -74,8 +90,17 @@ const TaskHistory = () => {
   try {
     // Use the filter hook with our state values
     if (completedTasks.length > 0) {
+      // Create a defensive copy of tasks with validated dates
+      const validatedTasks = completedTasks.map(task => ({
+        ...task,
+        // Ensure completedAt is a valid Date
+        completedAt: task.completedAt instanceof Date && !isNaN(task.completedAt.getTime())
+          ? task.completedAt
+          : new Date() // Use current date as fallback
+      }));
+      
       const filters = useTaskFilters(
-        completedTasks,
+        validatedTasks,
         {
           searchQuery,
           periodFilter,
@@ -102,7 +127,7 @@ const TaskHistory = () => {
       pageNumbers = pagination.getPageNumbers();
     }
   } catch (err) {
-    console.error('Erro ao processar tarefas no TaskHistory:', err);
+    logError('TaskHistory', 'Erro ao processar tarefas:', err);
     setError(`Erro ao processar o histórico de tarefas: ${err instanceof Error ? err.message : String(err)}`);
   }
 
@@ -145,6 +170,14 @@ const TaskHistory = () => {
     <div className="container p-4 mx-auto">
       <div className="flex flex-col space-y-4">
         <h1 className="text-2xl font-bold">Histórico de Tarefas</h1>
+        
+        {/* Display task count even if there's an error */}
+        <div className="text-muted-foreground">
+          {completedTasks.length > 0 ? 
+            `${completedTasks.length} ${completedTasks.length === 1 ? 'tarefa concluída' : 'tarefas concluídas'}` : 
+            'Nenhuma tarefa concluída para exibir'
+          }
+        </div>
         
         {/* Pass filtered tasks to TaskHistoryStats */}
         {sortedTasks.length > 0 && (

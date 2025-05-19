@@ -1,8 +1,10 @@
-import React, { createContext, useContext, useMemo } from 'react';
+
+import React, { createContext, useContext, useMemo, useEffect } from 'react';
 import { useTaskData } from '@/hooks/useTaskData';
 import { Task, TaskFormData } from '@/types';
 import { dateService } from '@/services/dateService';
 import { logDiagnostics, logDateInfo } from '@/utils/diagnosticLog';
+import { logWarn, logError } from '@/utils/logUtils';
 
 // Define the context type
 type TaskDataContextType = ReturnType<typeof useTaskData> & {
@@ -21,12 +23,26 @@ export const TaskDataProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   // Use a separate instance to manage completed tasks
   const completedTasksData = useTaskData(true);
   
+  // Track and log task processing errors
+  const [processingErrors, setProcessingErrors] = React.useState<string[]>([]);
+  
+  useEffect(() => {
+    // Log processing errors only when we have some
+    if (processingErrors.length > 0) {
+      logError('TaskDataProvider', 'Erros ao processar tarefas concluídas:', 
+        processingErrors.join(', ')
+      );
+    }
+  }, [processingErrors]);
+  
   // Process completed tasks to ensure dates are valid Date objects
   const processedCompletedTasks = useMemo(() => {
     const tasks = completedTasksData.tasks || [];
+    const errors: string[] = [];
+    
     logDiagnostics('TaskDataProvider', `Processing ${tasks.length} completed tasks`);
     
-    return tasks.map(task => {
+    const processed = tasks.map(task => {
       try {
         // Log the original completedAt for diagnosis
         logDateInfo('TaskDataProvider', `Task ${task.id} original completedAt`, task.completedAt);
@@ -65,7 +81,11 @@ export const TaskDataProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           createdAt: task.createdAt ? dateService.parseDate(task.createdAt) : new Date()
         };
       } catch (error) {
-        console.error('Error processing task date:', error);
+        // Track specific error
+        const errorMsg = `Error processing task ${task.id}: ${error instanceof Error ? error.message : String(error)}`;
+        errors.push(errorMsg);
+        logError('TaskDataProvider', errorMsg, task);
+        
         // Always return a valid object even if processing fails
         return {
           ...task,
@@ -75,6 +95,13 @@ export const TaskDataProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         };
       }
     });
+    
+    // Update error state
+    if (errors.length > 0) {
+      setProcessingErrors(errors);
+    }
+    
+    return processed;
   }, [completedTasksData.tasks]);
 
   // Create context value with both active and completed tasks
