@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Calendar, Clock, ListChecks, History, Power } from 'lucide-react';
+import { Clock, History, Power, Calendar } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import SidebarSection from './SidebarSection';
 import { useAppContext } from '@/context/AppContext';
@@ -37,14 +37,7 @@ const SidebarModeSection: React.FC<SidebarModeSectionProps> = ({ sidebarOpen }) 
       sidebarOpen={sidebarOpen}
     >
       <div className="space-y-1">
-        <NavLink 
-          to="/dashboard" 
-          className={getNavClass}
-          title="Dashboard"
-        >
-          <ListChecks className="w-5 h-5 mr-3" />
-          {sidebarOpen && <span>Dashboard</span>}
-        </NavLink>
+        {/* Removed Dashboard item as requested */}
         
         {/* Modo de Potência */}
         <div 

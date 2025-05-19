@@ -3,8 +3,10 @@ import React from 'react';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Loader2 } from 'lucide-react';
 import { useCompletedTasksData } from './hooks/useCompletedTasksData';
+import { useTaskFilters } from './hooks/useTaskFilters';
 import { TaskStats } from './components/TaskStats';
 import { TaskTable } from './components/TaskTable';
+import { TaskSearch } from './components/TaskSearch';
 
 /**
  * New Task History Page component that will gradually incorporate features from the existing one
@@ -17,6 +19,9 @@ const TaskHistoryNewPage = () => {
     selectedTaskId,
     setSelectedTaskId
   } = useCompletedTasksData();
+  
+  // Use the task filters hook
+  const { searchQuery, setSearchQuery, filteredTasks } = useTaskFilters(completedTasks);
   
   // Loading state
   if (completedTasksLoading) {
@@ -50,9 +55,26 @@ const TaskHistoryNewPage = () => {
     setSelectedTaskId(taskId);
   };
 
+  // Show search results message when filtering
+  const isFiltering = searchQuery.trim().length > 0;
+  const resultsMessage = isFiltering 
+    ? `${filteredTasks.length} ${filteredTasks.length === 1 ? 'resultado' : 'resultados'} para "${searchQuery}"`
+    : '';
+
   return (
     <div className="container p-4 mx-auto">
       <h1 className="text-2xl font-bold mb-6">Histórico de Tarefas (Novo)</h1>
+      
+      {/* Search bar */}
+      <TaskSearch 
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+      />
+      
+      {/* Display results count when filtering */}
+      {isFiltering && (
+        <p className="text-sm text-muted-foreground mb-4">{resultsMessage}</p>
+      )}
       
       {/* Display task statistics */}
       <TaskStats 
@@ -61,9 +83,9 @@ const TaskHistoryNewPage = () => {
         averageScore={stats.averageScore}
       />
       
-      {/* Display tasks table */}
+      {/* Display tasks table with filtered tasks */}
       <TaskTable 
-        tasks={completedTasks} 
+        tasks={filteredTasks} 
         onSelectTask={handleSelectTask}
       />
       
