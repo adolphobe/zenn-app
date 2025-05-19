@@ -106,7 +106,7 @@ const RatingSliderReadOnly: React.FC<RatingSliderReadOnlyProps> = ({
       
       {/* Description text */}
       <p className={cn("text-sm mt-3 text-[14px]", styles.text)}>
-        {description[value - 1]}
+        {description[value - 1] || ''}
       </p>
     </div>
   );

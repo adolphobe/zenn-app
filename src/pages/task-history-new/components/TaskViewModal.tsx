@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Task } from '@/types';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -7,8 +7,7 @@ import { RefreshCw } from 'lucide-react';
 import { AlwaysVisibleScrollArea } from '@/components/ui/always-visible-scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { useTabNavigation } from '@/context/hooks/useTabNavigation';
-import RatingSliderReadOnly from '@/components/task-history/completed-task-modal/RatingSliderReadOnly';
+import RatingSliderReadOnly from '@/components/RatingSliderReadOnly';
 import { CONSEQUENCE_PHRASES, PRIDE_PHRASES, CONSTRUCTION_PHRASES } from '@/constants';
 import TaskComments from '@/components/TaskComments';
 import CommentForm from '@/components/CommentForm';
@@ -28,7 +27,7 @@ const TaskViewModal: React.FC<TaskViewModalProps> = ({
   onClose,
   onRestore
 }) => {
-  const { activeTab, setActiveTab } = useTabNavigation('levels');
+  const [activeTab, setActiveTab] = React.useState('levels');
   const isMobile = useIsMobile();
   const commentsContainerRef = React.useRef<HTMLDivElement | null>(null);
 
@@ -40,14 +39,14 @@ const TaskViewModal: React.FC<TaskViewModalProps> = ({
   };
   
   // Helper for scrolling to bottom of comments
-  const scrollToBottom = () => {
+  const scrollToBottom = React.useCallback(() => {
     if (commentsContainerRef.current) {
       const scrollElement = commentsContainerRef.current.querySelector('.native-scrollbar');
       if (scrollElement) {
         scrollElement.scrollTop = scrollElement.scrollHeight;
       }
     }
-  };
+  }, []);
 
   // Helper to format dates
   const formatDate = (date: Date | string | null) => {
@@ -55,13 +54,14 @@ const TaskViewModal: React.FC<TaskViewModalProps> = ({
     return format(new Date(date), 'dd/MM/yyyy HH:mm', { locale: ptBR });
   };
 
-  // Scroll to bottom when tab changes to comments
+  // Effect to scroll to bottom when tab changes to comments
   React.useEffect(() => {
     if (activeTab === 'comments' && task?.comments?.length) {
       // Small delay to ensure DOM has updated
-      setTimeout(scrollToBottom, 100);
+      const timer = setTimeout(scrollToBottom, 100);
+      return () => clearTimeout(timer);
     }
-  }, [activeTab, task?.comments?.length]);
+  }, [activeTab, task?.comments?.length, scrollToBottom]);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
