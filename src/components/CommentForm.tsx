@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback } from 'react';
 import { useAuth } from '../context/auth';
 import { Button } from './ui/button';
@@ -61,7 +62,7 @@ const CommentForm: React.FC<CommentFormProps> = ({ taskId, onCommentAdded }) => 
           console.log('[CommentForm] Comment added successfully');
           setText(''); // Clear the input on success
           
-          // Force immediate refresh of ALL relevant queries without using refetchType
+          // Force immediate refresh of ALL relevant queries without refetchType parameter
           await Promise.all([
             queryClient.invalidateQueries({ 
               queryKey: ['comments', taskId]

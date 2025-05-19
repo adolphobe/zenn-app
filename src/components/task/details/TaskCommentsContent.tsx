@@ -31,7 +31,7 @@ const TaskCommentsContent: React.FC<TaskCommentsContentProps> = ({
   } = useComments(task.id);
   
   // Use forced comments if provided, otherwise use hook comments
-  const comments = forceComments || hookComments;
+  const comments = forceComments || hookComments || [];
   
   // Effect to scroll to bottom when comments change
   useEffect(() => {

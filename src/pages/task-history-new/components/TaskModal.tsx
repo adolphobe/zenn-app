@@ -56,17 +56,21 @@ const TaskModal: React.FC<TaskModalProps> = ({ task, isOpen, onClose, onRestore 
     if (task?.id) {
       console.log('[TaskModal] Comment added, forcing immediate refresh');
       
-      // Force immediate data refresh
-      await queryClient.invalidateQueries({ queryKey: ['comments', task.id] });
-      await queryClient.invalidateQueries({ queryKey: ['task', task.id] });
-      
-      // Explicitly refresh comments and update local state properly
-      await refreshComments();
-      
-      // Get the updated comments from the query cache directly
-      const updatedCommentsData = queryClient.getQueryData(['comments', task.id]) as Comment[] | undefined;
-      if (updatedCommentsData) {
-        setLocalComments(updatedCommentsData);
+      try {
+        // Force immediate data refresh
+        await queryClient.invalidateQueries({ queryKey: ['comments', task.id] });
+        await queryClient.invalidateQueries({ queryKey: ['task', task.id] });
+        
+        // Refresh comments without trying to use the return value directly
+        await refreshComments();
+        
+        // Get the updated comments from the query cache directly
+        const updatedCommentsData = queryClient.getQueryData<Comment[]>(['comments', task.id]);
+        if (updatedCommentsData) {
+          setLocalComments(updatedCommentsData);
+        }
+      } catch (error) {
+        console.error('[TaskModal] Error refreshing comments:', error);
       }
     }
   }, [task?.id, queryClient, refreshComments]);
