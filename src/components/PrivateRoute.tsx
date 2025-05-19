@@ -1,58 +1,43 @@
 
-import { Outlet, useLocation, Navigate } from 'react-router-dom';
+import { Outlet, useLocation, Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/auth';
 import Sidebar from './Sidebar';
 import { useSidebar } from '@/context/hooks';
 import { Menu } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useEffect, useState } from 'react';
-import { toast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
+import { useEffect, useState, useMemo } from 'react';
+import { logInfo } from '@/utils/logUtils';
 
 /**
  * PrivateRoute - Protects routes that require authentication
- * Logs and redirects when not authenticated
+ * Fixed to handle navigation properly with hash router
  */
 export const PrivateRoute = () => {
   const { isAuthenticated, isLoading } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const { isOpen: sidebarOpen, open: openSidebar, isMobile } = useSidebar();
   const [authChecked, setAuthChecked] = useState(false);
-  const [localAuthCheck, setLocalAuthCheck] = useState<boolean | null>(null);
-
-  // Check if a logout is in progress to prevent login/logout loops
-  const logoutInProgress = localStorage.getItem('logout_in_progress') === 'true';
-
-  // Additional check for authentication using localStorage directly
+  
+  // Check for logout in progress to prevent login/logout loops
+  const logoutInProgress = useMemo(() => 
+    localStorage.getItem('logout_in_progress') === 'true',
+  []);
+  
+  // Ensure current path is clean, without duplications
   useEffect(() => {
-    const checkLocalAuth = async () => {
-      try {
-        // Se um logout estiver em andamento, não tente verificar autenticação
-        if (logoutInProgress) {
-          setLocalAuthCheck(false);
-          return;
-        }
-        
-        // Check for token in localStorage
-        const hasToken = !!localStorage.getItem('sb-wbvxnapruffchikhrqrs-auth-token');
-        
-        // If no token in localStorage, we're definitely not authenticated
-        if (!hasToken) {
-          setLocalAuthCheck(false);
-          return;
-        }
-        
-        // Double-check with Supabase API
-        const { data } = await supabase.auth.getSession();
-        setLocalAuthCheck(!!data.session);
-      } catch (err) {
-        console.error("[PrivateRoute] Erro ao verificar token local:", err);
-        setLocalAuthCheck(false);
-      }
-    };
-
-    checkLocalAuth();
-  }, [logoutInProgress]);
+    const currentPath = location.pathname;
+    
+    // Log navigation without triggering extra renders
+    if (currentPath !== '/dashboard') {
+      logInfo('PrivateRoute', `Navegação detectada para: ${currentPath}`);
+    }
+    
+    // Private route paths should always start with /
+    if (currentPath && !currentPath.startsWith('/')) {
+      navigate(`/${currentPath}`, { replace: true });
+    }
+  }, [location.pathname, navigate]);
 
   // Use effect to ensure we've completed at least one auth check
   useEffect(() => {
@@ -61,48 +46,24 @@ export const PrivateRoute = () => {
     }
   }, [isLoading]);
 
-  console.log(`[PrivateRoute] Verificando autenticação em ${location.pathname}, isAuthenticated: ${isAuthenticated}, isLoading: ${isLoading}, authChecked: ${authChecked}, logoutInProgress: ${logoutInProgress}, localAuthCheck: ${localAuthCheck}`);
-
   // Show loading state while checking authentication
-  if (isLoading || !authChecked || localAuthCheck === null) {
-    console.log("[PrivateRoute] Ainda carregando estado de autenticação...");
+  if (isLoading || !authChecked) {
     return <div className="flex items-center justify-center min-h-screen">
       <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
     </div>;
   }
 
-  // Log auth status and redirect if not authenticated or logout in progress
-  // Use both checks - from context AND from local storage
-  const actuallyAuthenticated = isAuthenticated && !logoutInProgress && localAuthCheck === true;
+  // Simplified authentication check
+  const actuallyAuthenticated = isAuthenticated && !logoutInProgress;
   
   if (!actuallyAuthenticated) {
-    const reason = logoutInProgress ? "logout em andamento" : "não autenticado";
-    console.error(`[PrivateRoute] ERRO DE AUTENTICAÇÃO: Usuário ${reason} em ${location.pathname}`);
-    console.error("[PrivateRoute] DETALHES TÉCNICOS: Redirecionando para /login");
-    console.error("[PrivateRoute] ESTADO DE AUTENTICAÇÃO:", { isAuthenticated, isLoading, localAuthCheck, logoutInProgress, path: location.pathname });
-    
-    // Clear any lingering session data if we detect a logout in progress
-    if (logoutInProgress) {
-      localStorage.removeItem('sb-wbvxnapruffchikhrqrs-auth-token');
-      localStorage.removeItem('supabase.auth.token');
-      
-      // Return a redirect to login with current location stored for later redirect back
-      // Add a timestamp to avoid caching issues
-      return <Navigate to={`/login?loggedOut=true&_=${new Date().getTime()}`} state={{ 
-        from: location,
-        loggedOut: true,
-        timestamp: new Date().getTime(),
-        forceClear: true
-      }} replace />;
-    }
+    logInfo('PrivateRoute', `Usuário não autenticado, redirecionando de ${location.pathname}`);
     
     // Return a redirect to login with current location stored for later redirect back
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
   // User is authenticated, render the protected layout with sidebar
-  console.log(`[PrivateRoute] Usuário está autenticado, renderizando conteúdo protegido em ${location.pathname}`);
-  
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 flex">
       <Sidebar />
