@@ -6,14 +6,32 @@ import {
   addComment as addCommentService,
   deleteComment as deleteCommentService
 } from '@/services/task';
+import { useAuth } from '@/context/auth';
+import { Comment } from '@/types';
+
+// Helper to get the current user - this avoids the DOM dependency
+const getCurrentUser = () => {
+  // Try to get from localStorage as fallback if not in React context
+  try {
+    const authStore = localStorage.getItem('sb-wbvxnapruffchikhrqrs-auth-token');
+    if (authStore) {
+      const authData = JSON.parse(authStore);
+      return authData.user || null;
+    }
+  } catch (error) {
+    console.error('Error getting current user from localStorage:', error);
+  }
+  return null;
+};
 
 export const addComment = async (dispatch: AppDispatch, taskId: string, text: string) => {
   try {
-    // Get current user
-    const authStore = document.querySelector('#auth-store');
-    const currentUser = authStore ? JSON.parse(authStore.getAttribute('data-user') || '{}') : null;
+    // Get current user using the helper function
+    const currentUser = getCurrentUser();
+    console.log('[CommentActions] Current user from auth store:', currentUser);
     
     if (!currentUser?.id) {
+      console.error('[CommentActions] No user ID available for adding comment');
       toast({
         id: uuidv4(),
         title: "Erro ao adicionar comentário",
@@ -23,32 +41,59 @@ export const addComment = async (dispatch: AppDispatch, taskId: string, text: st
       return;
     }
 
-    // Add comment to database
-    await addCommentService(taskId, currentUser.id, text);
+    console.log(`[CommentActions] Adding comment to task ${taskId} by user ${currentUser.id}`);
     
-    // Update local state
-    dispatch({ type: 'ADD_COMMENT', payload: { taskId, text } });
+    // Add comment to database
+    const commentData = await addCommentService(taskId, currentUser.id, text);
+    console.log('[CommentActions] Comment added to database:', commentData);
+    
+    if (!commentData) {
+      throw new Error('Failed to add comment');
+    }
+    
+    // Create complete comment object for Redux state
+    const newComment: Comment = {
+      id: commentData.id,
+      text: text,
+      createdAt: commentData.created_at || new Date().toISOString(),
+      userId: currentUser.id
+    };
+    
+    // Update local state with the complete comment
+    dispatch({ 
+      type: 'ADD_COMMENT', 
+      payload: { 
+        taskId, 
+        comment: newComment 
+      } 
+    });
     
     toast({
       id: uuidv4(),
       title: "Comentário adicionado",
       description: "Seu comentário foi adicionado com sucesso."
     });
+    
+    return newComment;
   } catch (error) {
-    console.error('Error adding comment:', error);
+    console.error('[CommentActions] Error adding comment:', error);
     toast({
       id: uuidv4(),
       title: "Erro ao adicionar comentário",
       description: "Não foi possível adicionar o comentário. Tente novamente.",
       variant: "destructive",
     });
+    return null;
   }
 };
 
 export const deleteComment = async (dispatch: AppDispatch, taskId: string, commentId: string) => {
   try {
+    console.log(`[CommentActions] Deleting comment ${commentId} from task ${taskId}`);
+    
     // Delete from database
     await deleteCommentService(commentId);
+    console.log('[CommentActions] Comment deleted from database');
     
     // Update local state
     dispatch({ type: 'DELETE_COMMENT', payload: { taskId, commentId } });
@@ -58,13 +103,16 @@ export const deleteComment = async (dispatch: AppDispatch, taskId: string, comme
       title: "Comentário removido",
       description: "O comentário foi removido com sucesso."
     });
+    
+    return true;
   } catch (error) {
-    console.error('Error deleting comment:', error);
+    console.error('[CommentActions] Error deleting comment:', error);
     toast({
       id: uuidv4(),
       title: "Erro ao remover comentário",
       description: "Não foi possível remover o comentário. Tente novamente.",
       variant: "destructive",
     });
+    return false;
   }
 };

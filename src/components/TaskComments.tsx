@@ -28,6 +28,11 @@ const TaskComments: React.FC<TaskCommentsProps> = ({ taskId, comments }) => {
   const [commentToDelete, setCommentToDelete] = useState<string | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   
+  // Log comments when they change
+  useEffect(() => {
+    console.log(`[TaskComments] Rendering ${comments.length} comments for task ${taskId}`, comments);
+  }, [comments, taskId]);
+  
   // Add global CSS for scrollbar
   useEffect(() => {
     // Create a style element
@@ -78,6 +83,7 @@ const TaskComments: React.FC<TaskCommentsProps> = ({ taskId, comments }) => {
       
       // Add to head
       document.head.appendChild(style);
+      console.log('[TaskComments] Added scrollbar styles');
     }
     
     // No need to clean up, we want the style to remain.
@@ -88,15 +94,18 @@ const TaskComments: React.FC<TaskCommentsProps> = ({ taskId, comments }) => {
     if (scrollContainerRef.current && comments.length > 0) {
       // Scroll to bottom of comments div
       scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight;
+      console.log('[TaskComments] Scrolled to bottom of comments container');
     }
   }, [comments]); // Execute when comments change
   
   if (!comments || comments.length === 0) {
+    console.log('[TaskComments] No comments to display');
     return null;
   }
   
   const handleDeleteComment = (commentId: string) => {
     if (deleteComment) {
+      console.log(`[TaskComments] Deleting comment ${commentId} for task ${taskId}`);
       deleteComment(taskId, commentId);
       setCommentToDelete(null);
     }
@@ -120,14 +129,14 @@ const TaskComments: React.FC<TaskCommentsProps> = ({ taskId, comments }) => {
       
       // If date is invalid, return fallback text
       if (!parsedDate) {
-        console.warn('Invalid comment date encountered:', dateString);
+        console.warn('[TaskComments] Invalid comment date encountered:', dateString);
         return 'Data indisponível';
       }
       
       // Format valid date
       return format(parsedDate, 'dd/MM/yyyy HH:mm');
     } catch (error) {
-      console.error('Error formatting comment date:', error, dateString);
+      console.error('[TaskComments] Error formatting comment date:', error, dateString);
       return 'Data indisponível';
     }
   };

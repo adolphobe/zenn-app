@@ -12,25 +12,36 @@ interface CommentFormProps {
 
 const CommentForm: React.FC<CommentFormProps> = ({ taskId, onCommentAdded }) => {
   const [commentText, setCommentText] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { addComment } = useAppContext();
   
-  const handleSubmit = (e: React.MouseEvent<HTMLButtonElement> | React.FormEvent) => {
+  const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement> | React.FormEvent) => {
     e.preventDefault();
     e.stopPropagation();
     
     if (commentText.trim() && addComment) {
-      addComment(taskId, commentText);
-      setCommentText('');
-      
-      // Notify the parent component that a comment was added
-      if (onCommentAdded) {
-        onCommentAdded();
+      try {
+        setIsSubmitting(true);
+        console.log(`[CommentForm] Submitting comment for task ${taskId}`);
+        
+        // Add the comment and wait for response
+        const result = await addComment(taskId, commentText);
+        console.log('[CommentForm] Comment add result:', result);
+        
+        if (result) {
+          setCommentText('');
+          
+          // Notify the parent component that a comment was added
+          if (onCommentAdded) {
+            console.log('[CommentForm] Calling onCommentAdded callback');
+            onCommentAdded();
+          }
+        }
+      } finally {
+        setIsSubmitting(false);
       }
-      
-      toast({
-        title: "Comentário adicionado",
-        description: "Seu comentário foi adicionado com sucesso."
-      });
+    } else {
+      console.log('[CommentForm] Empty comment prevented submission');
     }
   };
   
@@ -48,19 +59,8 @@ const CommentForm: React.FC<CommentFormProps> = ({ taskId, onCommentAdded }) => 
       e.preventDefault(); // Prevent line break
       
       // Check if the comment is not empty
-      if (commentText.trim() && addComment) {
-        addComment(taskId, commentText);
-        setCommentText('');
-        
-        // Notify the parent component that a comment was added
-        if (onCommentAdded) {
-          onCommentAdded();
-        }
-        
-        toast({
-          title: "Comentário adicionado",
-          description: "Seu comentário foi adicionado com sucesso."
-        });
+      if (commentText.trim() && addComment && !isSubmitting) {
+        handleSubmit(e as any);
       }
     }
   };
@@ -103,10 +103,11 @@ const CommentForm: React.FC<CommentFormProps> = ({ taskId, onCommentAdded }) => 
           className="w-full p-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all resize-none"
           placeholder="Escreva seu comentário e pressione Enter para enviar..."
           rows={3}
+          disabled={isSubmitting}
         />
         <Button 
           type="button"
-          disabled={!commentText.trim()}
+          disabled={!commentText.trim() || isSubmitting}
           size="sm"
           className="self-end flex items-center gap-1 bg-blue-50 hover:bg-blue-100 text-blue-600"
           onClick={handleSubmit}
@@ -115,7 +116,7 @@ const CommentForm: React.FC<CommentFormProps> = ({ taskId, onCommentAdded }) => 
           }}
         >
           <MessageSquare size={16} />
-          Enviar
+          {isSubmitting ? 'Enviando...' : 'Enviar'}
         </Button>
       </div>
     </div>

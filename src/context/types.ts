@@ -57,7 +57,7 @@ export type Action =
   | { type: 'TOGGLE_SIDEBAR' }
   | { type: 'UPDATE_DATE_DISPLAY_OPTIONS'; payload: Partial<DateDisplayOptions> }
   | { type: 'UPDATE_SORT_OPTIONS'; payload: { viewMode: 'power' | 'chronological'; options: Partial<SortOption> } }
-  | { type: 'ADD_COMMENT'; payload: { taskId: string; text: string } }
+  | { type: 'ADD_COMMENT'; payload: { taskId: string; text?: string; comment?: any } }
   | { type: 'DELETE_COMMENT'; payload: { taskId: string; commentId: string } }
   | { type: 'TOGGLE_SHOW_PILLARS' }
   | { type: 'TOGGLE_SHOW_DATES' }
