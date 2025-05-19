@@ -3,7 +3,7 @@ import React, { useRef, useState } from 'react';
 import { Task } from '@/types';
 import TaskComments from '@/components/TaskComments';
 import CommentForm from '@/components/CommentForm';
-import { AlertTriangle, RefreshCcw } from 'lucide-react';
+import { AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/auth';
 import { useComments } from '@/hooks/useComments';
@@ -43,29 +43,11 @@ const TaskCommentsContent: React.FC<TaskCommentsContentProps> = ({ task, onComme
       onCommentAdded();
     }
   };
-  
-  // Handler para forçar atualização de comentários
-  const handleRefreshComments = async () => {
-    console.log('[TaskCommentsContent] Refresh comments clicked');
-    await refreshComments();
-  };
 
   return (
     <div ref={commentsRef}>
-      <div className="flex justify-between items-center mb-4">
+      <div className="mb-4">
         <h3 className="font-medium">Comentários</h3>
-        <div className="flex gap-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleRefreshComments}
-            className="flex items-center gap-1 text-xs"
-            disabled={isRefetching}
-          >
-            <RefreshCcw size={12} className={isRefetching ? "animate-spin" : ""} />
-            <span>{isRefetching ? "Atualizando..." : "Atualizar"}</span>
-          </Button>
-        </div>
       </div>
 
       {task.comments && task.comments.length > 0 ? (
@@ -73,7 +55,7 @@ const TaskCommentsContent: React.FC<TaskCommentsContentProps> = ({ task, onComme
           <TaskComments 
             taskId={task.id} 
             comments={task.comments} 
-            onCommentDeleted={handleRefreshComments}
+            onCommentDeleted={handleCommentAdded}
           />
           <CommentForm taskId={task.id} onCommentAdded={handleCommentAdded} />
         </div>

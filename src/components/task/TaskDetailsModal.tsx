@@ -19,6 +19,7 @@ export interface TaskDetailsModalProps {
   isOpen: boolean;
   onClose: () => void;
   onRestore?: (taskId: string) => void;
+  onCommentAdded?: () => void;
   title?: string;
   showRestoreButton?: boolean;
 }
@@ -28,6 +29,7 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
   isOpen,
   onClose,
   onRestore,
+  onCommentAdded,
   title = "Detalhes da Tarefa",
   showRestoreButton = false
 }) => {
@@ -60,6 +62,7 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
   useEffect(() => {
     if (isOpen && task?.id) {
       // Invalidate queries to refresh data
+      console.log('[TaskDetailsModal] Modal opened, refreshing data for task:', task.id);
       queryClient.invalidateQueries({ queryKey: ['comments', task.id] });
       queryClient.invalidateQueries({ queryKey: ['task', task.id] });
     }
@@ -79,12 +82,17 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
     if (task?.id) {
       console.log('[TaskDetailsModal] Comment added, refreshing data');
       queryClient.invalidateQueries({ queryKey: ['comments', task.id] });
-      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      queryClient.invalidateQueries({ queryKey: ['task', task.id] });
+      
+      // Call the parent's onCommentAdded if provided
+      if (onCommentAdded) {
+        onCommentAdded();
+      }
       
       // Scroll to bottom after a small delay
       setTimeout(scrollToBottom, 300);
     }
-  }, [task?.id, queryClient, scrollToBottom]);
+  }, [task?.id, queryClient, scrollToBottom, onCommentAdded]);
   
   // Se não tiver uma tarefa, renderiza um modal simplificado
   if (!task) {

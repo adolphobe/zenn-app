@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Task } from '@/types';
 import TaskDetailsModal from '@/components/task/TaskDetailsModal';
@@ -19,7 +18,7 @@ const TaskViewModal: React.FC<TaskViewModalProps> = ({
 }) => {
   const queryClient = useQueryClient();
 
-  // When opening the modal, refresh the task data
+  // When opening the modal or when task changes, refresh the task data
   React.useEffect(() => {
     if (isOpen && task?.id) {
       console.log('[TaskViewModal] Refreshing task data for task:', task.id);
@@ -27,6 +26,15 @@ const TaskViewModal: React.FC<TaskViewModalProps> = ({
       queryClient.invalidateQueries({ queryKey: ['task', task.id] });
     }
   }, [isOpen, task?.id, queryClient]);
+
+  // Create a handler to keep task data fresh when comments are added
+  const handleCommentAdded = () => {
+    if (task?.id) {
+      console.log('[TaskViewModal] Comment added, refreshing data');
+      queryClient.invalidateQueries({ queryKey: ['comments', task.id] });
+      queryClient.invalidateQueries({ queryKey: ['task', task.id] });
+    }
+  };
 
   return (
     <TaskDetailsModal
@@ -36,6 +44,7 @@ const TaskViewModal: React.FC<TaskViewModalProps> = ({
       onRestore={onRestore}
       title="Detalhes da Tarefa"
       showRestoreButton={true}
+      onCommentAdded={handleCommentAdded}
     />
   );
 };
