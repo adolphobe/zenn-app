@@ -1,6 +1,6 @@
 
 import React, { useState, useCallback, useRef, useEffect } from 'react';
-import { Task, Comment } from '@/types';
+import { Task } from '@/types';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { RefreshCw } from 'lucide-react';
@@ -23,7 +23,6 @@ export interface TaskDetailsModalProps {
   onCommentAdded?: () => void;
   title?: string;
   showRestoreButton?: boolean;
-  forceComments?: Comment[]; // New prop to force comments from parent
 }
 
 const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
@@ -33,8 +32,7 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
   onRestore,
   onCommentAdded,
   title = "Detalhes da Tarefa",
-  showRestoreButton = false,
-  forceComments
+  showRestoreButton = false
 }) => {
   // Estados e refs - IMPORTANTE: hooks ANTES de qualquer condicional
   const [activeTab, setActiveTab] = useState('levels');
@@ -43,16 +41,7 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
   const queryClient = useQueryClient();
   
   // Add a direct connection to the comments hook for real-time updates
-  const { 
-    comments: hookComments, 
-    refreshComments 
-  } = task?.id ? useComments(task.id) : { 
-    comments: [], 
-    refreshComments: () => Promise.resolve() 
-  };
-  
-  // Use forced comments if provided, otherwise use hook comments
-  const comments = forceComments || hookComments;
+  const { comments, refreshComments } = task?.id ? useComments(task.id) : { comments: [], refreshComments: () => Promise.resolve() };
   
   // Função para rolagem até o final dos comentários - definida fora de qualquer condicional
   const scrollToBottom = useCallback(() => {
@@ -73,15 +62,6 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
     }
   }, [activeTab, comments?.length, scrollToBottom]);
 
-  // When the modal is opened or comments change, scroll to bottom if on comments tab
-  useEffect(() => {
-    if (isOpen && activeTab === 'comments' && comments?.length) {
-      console.log('[TaskDetailsModal] Comments changed, scrolling to bottom');
-      // Allow DOM to update before scrolling
-      setTimeout(scrollToBottom, 100);
-    }
-  }, [isOpen, comments, activeTab, scrollToBottom]);
-
   // When the modal is opened, refresh the comments data
   useEffect(() => {
     if (isOpen && task?.id) {
@@ -95,10 +75,9 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
 
   // Handler for when a comment is added
   const handleCommentAdded = useCallback(async () => {
-    console.log('[TaskDetailsModal] Comment added, refreshing data');
-    
     // Force data refresh
     if (task?.id) {
+      console.log('[TaskDetailsModal] Comment added, refreshing data');
       await queryClient.invalidateQueries({ queryKey: ['comments', task.id] });
       await queryClient.invalidateQueries({ queryKey: ['task', task.id] });
       await refreshComments();
@@ -176,8 +155,7 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
                   <div ref={commentsContainerRef}>
                     <TaskCommentsContent 
                       task={task} 
-                      onCommentAdded={handleCommentAdded}
-                      forceComments={comments}
+                      onCommentAdded={handleCommentAdded} 
                     />
                   </div>
                 </TabsContent>
