@@ -59,9 +59,24 @@ const PasswordResetSection = () => {
     setIsLoading(true);
     
     try {
-      // First verify the current password by attempting to sign in
+      // First get the current session to retrieve the email
+      const { data: sessionData } = await supabase.auth.getSession();
+      const userEmail = sessionData.session?.user.email;
+      
+      if (!userEmail) {
+        toast({
+          title: "Erro ao recuperar informações",
+          description: "Não foi possível obter seu email. Por favor, faça login novamente.",
+          variant: "destructive"
+        });
+        setIsDialogOpen(false);
+        setIsLoading(false);
+        return;
+      }
+      
+      // Now verify the current password by attempting to sign in
       const { error: signInError } = await supabase.auth.signInWithPassword({
-        email: supabase.auth.getSession().then(({ data }) => data.session?.user.email || ''),
+        email: userEmail,
         password: currentPassword,
       });
 
