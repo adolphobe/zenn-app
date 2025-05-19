@@ -9,7 +9,7 @@ import { ExtendedToastProps } from '@/types/toast';
 // Create context for the toast functions
 type TaskToastContextType = {
   showToggleHiddenToast: (task: Task) => void;
-  showTaskCompletedToast: (task: Task) => void;
+  showCompletionToast: (task: Task) => void;  // Renamed function to match usage
   showTaskRestoredToast: (task: Task) => void;
 };
 
@@ -25,18 +25,16 @@ export const TaskToastProvider = ({ children }: { children: ReactNode }) => {
       description: task.hidden 
         ? "A tarefa foi ocultada e só será visível com o filtro ativado." 
         : "A tarefa agora está visível.",
-      // Icon as separate JSX element now works with our extended type
       icon: task.hidden ? <EyeOff size={16} /> : <Eye size={16} />
     });
   };
 
-  // Toast for task completion
-  const showTaskCompletedToast = (task: Task) => {
+  // Toast for task completion - renamed to match usage in the toggle hook
+  const showCompletionToast = (task: Task) => {
     toast({
       id: `task-completed-${task.id}-${Date.now()}`,
       title: "Tarefa concluída",
       description: `"${task.title}" foi marcada como concluída.`,
-      // Type-safe variant and use icon with our extended type
       variant: "default",
       icon: <Check size={16} />
     });
@@ -53,7 +51,7 @@ export const TaskToastProvider = ({ children }: { children: ReactNode }) => {
 
   const value = {
     showToggleHiddenToast,
-    showTaskCompletedToast,
+    showCompletionToast, // Renamed to match usage
     showTaskRestoredToast
   };
 

@@ -15,13 +15,13 @@ export const useTaskStateOperations = (
   // Logging for diagnosis
   logDiagnostics('useTaskStateOperations', `Initializing with ${tasks.length} tasks, completed filter: ${completed}`);
   
-  // Task completion toggle mutation
+  // Task completion toggle mutation - pass all required arguments
   const { 
     toggleTaskCompleted, 
     toggleCompleteLoading 
   } = useTaskCompletionToggle(tasks, completed, setTaskOperationLoading);
   
-  // Task visibility toggle mutation - Fix: Use the correct property name "toggleHiddenLoading"
+  // Task visibility toggle mutation
   const { 
     toggleTaskHidden, 
     toggleHiddenLoading 
@@ -33,7 +33,7 @@ export const useTaskStateOperations = (
     setFeedbackLoading 
   } = useTaskFeedback(setTaskOperationLoading);
   
-  // Task restore mutation - Fix: Pass only one argument as expected
+  // Task restore mutation
   const { 
     restoreTask, 
     restoreLoading 

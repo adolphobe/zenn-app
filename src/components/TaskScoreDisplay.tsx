@@ -27,7 +27,7 @@ const TaskScoreDisplay: React.FC<TaskScoreDisplayProps> = ({
     } else if (score >= 11) {
       return "task-score-important"; // Orange with animation
     } else if (score >= 8) {
-      return "task-score-moderate"; // Now uses blue without animation
+      return "task-score-moderate"; // Blue without animation
     } else {
       return "task-score-light"; // Light gray without animation
     }

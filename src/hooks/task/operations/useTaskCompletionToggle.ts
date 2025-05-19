@@ -1,4 +1,3 @@
-
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Task } from '@/types';
 import { toggleTaskCompletion } from '@/services/taskService';
@@ -13,7 +12,7 @@ export const useTaskCompletionToggle = (
 ) => {
   const { currentUser } = useAuth();
   const queryClient = useQueryClient();
-  const { showCompletionToast } = useTaskToasts();
+  const { showCompletionToast } = useTaskToasts(); // Using the renamed function
   
   // Toggle completion mutation
   const toggleCompletionMutation = useMutation({
