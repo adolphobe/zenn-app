@@ -1,6 +1,6 @@
 
 import React, { useRef, useState, useEffect } from 'react';
-import { Task } from '@/types';
+import { Task, Comment } from '@/types';
 import TaskComments from '@/components/TaskComments';
 import CommentForm from '@/components/CommentForm';
 import { AlertTriangle } from 'lucide-react';
@@ -11,23 +11,32 @@ import { useComments } from '@/hooks/useComments';
 interface TaskCommentsContentProps {
   task: Task;
   onCommentAdded?: () => void;
+  forceComments?: Comment[]; // New prop to force comments from parent
 }
 
-const TaskCommentsContent: React.FC<TaskCommentsContentProps> = ({ task, onCommentAdded }) => {
+const TaskCommentsContent: React.FC<TaskCommentsContentProps> = ({ 
+  task, 
+  onCommentAdded,
+  forceComments
+}) => {
   const commentsRef = useRef<HTMLDivElement>(null);
   const { isAuthenticated } = useAuth();
   
   // Use our comments hook to get real-time data
   const { 
-    comments, 
+    comments: hookComments, 
     refreshComments, 
     isLoading, 
     isRefetching 
   } = useComments(task.id);
   
+  // Use forced comments if provided, otherwise use hook comments
+  const comments = forceComments || hookComments;
+  
   // Effect to scroll to bottom when comments change
   useEffect(() => {
     if (comments?.length > 0 && commentsRef.current) {
+      console.log('[TaskCommentsContent] Comments updated, scrolling to bottom');
       const scrollElement = commentsRef.current.querySelector('.native-scrollbar');
       if (scrollElement) {
         setTimeout(() => {
@@ -60,7 +69,7 @@ const TaskCommentsContent: React.FC<TaskCommentsContentProps> = ({ task, onComme
     }
   };
 
-  // Use the comments from the hook instead of task.comments
+  // Use the comments from the hook or forced comments from props
   return (
     <div ref={commentsRef}>
       <div className="mb-4">
@@ -78,7 +87,7 @@ const TaskCommentsContent: React.FC<TaskCommentsContentProps> = ({ task, onComme
         </div>
       ) : (
         <div className="text-center p-6 text-gray-500 dark:text-gray-400">
-          <p>Nenhum comentário para esta tarefa.</p>
+          <p>{isLoading || isRefetching ? "Carregando comentários..." : "Nenhum comentário para esta tarefa."}</p>
           <div className="mt-4">
             <CommentForm taskId={task.id} onCommentAdded={handleCommentAdded} />
           </div>

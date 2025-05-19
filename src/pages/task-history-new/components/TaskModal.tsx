@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { Task } from '@/types';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Task, Comment } from '@/types';
 import TaskDetailsModal from '@/components/task/TaskDetailsModal';
 import { useQueryClient } from '@tanstack/react-query';
 import { useComments } from '@/hooks/useComments';
@@ -13,15 +13,35 @@ interface TaskModalProps {
 
 // Este componente agora simplificado, apenas utilizando o TaskDetailsModal padrão
 const TaskModal: React.FC<TaskModalProps> = ({ task, isOpen, onClose, onRestore }) => {
+  // Track local comments state to ensure UI updates
+  const [localComments, setLocalComments] = useState<Comment[]>([]);
   const queryClient = useQueryClient();
   
   // Use the comments hook directly to get real-time updates
-  const { refreshComments } = task?.id ? useComments(task.id) : { refreshComments: () => Promise.resolve() };
+  const { 
+    comments, 
+    refreshComments, 
+    isLoading, 
+    isRefetching 
+  } = task?.id ? useComments(task.id) : { 
+    comments: [], 
+    refreshComments: () => Promise.resolve(),
+    isLoading: false,
+    isRefetching: false 
+  };
+  
+  // Update local comments whenever the hook comments change
+  useEffect(() => {
+    if (comments) {
+      console.log('[TaskModal] Received updated comments:', comments.length);
+      setLocalComments(comments);
+    }
+  }, [comments]);
 
   // When opening the modal or when task changes, refresh the task data
   useEffect(() => {
     if (isOpen && task?.id) {
-      console.log('[TaskModal] Refreshing task data for task:', task.id);
+      console.log('[TaskModal] Modal opened, refreshing task data for task:', task.id);
       
       // Refresh all related data
       queryClient.invalidateQueries({ queryKey: ['comments', task.id] });
@@ -31,16 +51,21 @@ const TaskModal: React.FC<TaskModalProps> = ({ task, isOpen, onClose, onRestore 
   }, [isOpen, task?.id, queryClient, refreshComments]);
 
   // Create a handler to keep task data fresh when comments are added
-  const handleCommentAdded = async () => {
+  const handleCommentAdded = useCallback(async () => {
     if (task?.id) {
-      console.log('[TaskModal] Comment added, refreshing data');
+      console.log('[TaskModal] Comment added, forcing immediate refresh');
       
       // Force immediate data refresh
       await queryClient.invalidateQueries({ queryKey: ['comments', task.id] });
       await queryClient.invalidateQueries({ queryKey: ['task', task.id] });
-      await refreshComments();
+      
+      // Explicitly refresh comments and update local state
+      const refreshed = await refreshComments();
+      if (refreshed) {
+        setLocalComments(refreshed);
+      }
     }
-  };
+  }, [task?.id, queryClient, refreshComments]);
 
   return (
     <TaskDetailsModal
@@ -51,6 +76,7 @@ const TaskModal: React.FC<TaskModalProps> = ({ task, isOpen, onClose, onRestore 
       title="Visualizar Tarefa"
       showRestoreButton={true}
       onCommentAdded={handleCommentAdded}
+      forceComments={localComments}
     />
   );
 };

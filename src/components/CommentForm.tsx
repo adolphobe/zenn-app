@@ -19,10 +19,6 @@ const CommentForm: React.FC<CommentFormProps> = ({ taskId, onCommentAdded }) => 
   const { addComment, isSubmitting } = useComments(taskId);
   const queryClient = useQueryClient();
 
-  // Logs detalhados para debugging
-  console.log('[CommentForm] Props:', { taskId, onCommentAdded });
-  console.log('[CommentForm] Auth state:', { isAuthenticated, currentUser });
-
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -66,13 +62,31 @@ const CommentForm: React.FC<CommentFormProps> = ({ taskId, onCommentAdded }) => 
           console.log('[CommentForm] Comment added successfully');
           setText(''); // Clear the input on success
           
-          // Force immediate refresh of ALL relevant queries
+          // Force immediate refresh of ALL relevant queries with no debouncing
           await Promise.all([
-            queryClient.invalidateQueries({ queryKey: ['comments', taskId] }),
-            queryClient.invalidateQueries({ queryKey: ['task', taskId] }),
-            queryClient.invalidateQueries({ queryKey: ['tasks'] }),
-            queryClient.invalidateQueries({ queryKey: ['completedTasks'] })
+            queryClient.invalidateQueries({ 
+              queryKey: ['comments', taskId],
+              refetchType: 'all'
+            }),
+            queryClient.invalidateQueries({ 
+              queryKey: ['task', taskId],
+              refetchType: 'all'
+            }),
+            queryClient.invalidateQueries({ 
+              queryKey: ['tasks'],
+              refetchType: 'all'
+            }),
+            queryClient.invalidateQueries({ 
+              queryKey: ['completedTasks'],
+              refetchType: 'all' 
+            })
           ]);
+          
+          // Explicitly refetch comments query to ensure fresh data
+          await queryClient.fetchQuery({ 
+            queryKey: ['comments', taskId],
+            refetchType: 'all'
+          });
           
           // Call the callback to refresh the comments list and scroll to bottom
           if (onCommentAdded) {
