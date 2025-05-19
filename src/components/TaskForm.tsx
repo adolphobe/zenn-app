@@ -30,6 +30,9 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, initialData, taskId, task,
     idealDate: null
   });
   
+  // Log component rendering with props
+  console.log('[TaskForm] Render with props:', { initialData, taskId, isEditing });
+  
   const { addTask, updateTask } = useTaskDataContext();
   const { activeTab, setActiveTab } = useTabNavigation('levels');
   const isMobile = useIsMobile();
@@ -42,6 +45,8 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, initialData, taskId, task,
       // Show error
       return;
     }
+    
+    console.log('[TaskForm] Submitting task form. taskId:', taskId, 'formData:', formData);
     
     if (taskId) {
       updateTask(taskId, formData);
@@ -67,7 +72,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, initialData, taskId, task,
     if (!isNaN(date.getTime())) {
       setFormData(prev => ({ ...prev, idealDate: date }));
     } else {
-      console.warn('Data inválida fornecida no input:', e.target.value);
+      console.warn('[TaskForm] Invalid date provided:', e.target.value);
     }
   };
 

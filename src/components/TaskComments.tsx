@@ -19,6 +19,9 @@ const TaskComments: React.FC<TaskCommentsProps> = ({ taskId, comments: initialCo
   const { deleteComment } = useComments(taskId);
   const { currentUser } = useAuth();
   
+  // Log component props for debugging
+  console.log('[TaskComments] Props:', { taskId, initialComments, currentUser });
+  
   // Add global CSS for scrollbar
   useEffect(() => {
     // Create a style element
@@ -94,8 +97,10 @@ const TaskComments: React.FC<TaskCommentsProps> = ({ taskId, comments: initialCo
     e.stopPropagation();
     if (!confirm('Tem certeza que deseja excluir este comentário?')) return;
     
+    console.log('[TaskComments] Deleting comment:', commentId);
     await deleteComment(commentId, {
       onSuccess: () => {
+        console.log('[TaskComments] Comment deleted, calling onCommentDeleted callback');
         if (onCommentDeleted) {
           onCommentDeleted();
         }
@@ -123,8 +128,10 @@ const TaskComments: React.FC<TaskCommentsProps> = ({ taskId, comments: initialCo
   
   // Check if user can delete a comment
   const canUserDeleteComment = (comment: Comment) => {
-    // Corrigi aqui: user_id → userId para corresponder ao tipo Comment
-    return currentUser && currentUser.id === comment.userId;
+    // Using userId from Comment interface
+    const canDelete = currentUser && currentUser.id === comment.userId;
+    console.log('[TaskComments] Can user delete comment?', canDelete, 'comment:', comment, 'currentUser:', currentUser?.id);
+    return canDelete;
   };
   
   return (

@@ -5,6 +5,7 @@ import { Button } from './ui/button';
 import { AlertCircle } from 'lucide-react';
 import { useComments } from '@/hooks/useComments';
 import { toast } from '@/hooks/use-toast';
+import { v4 as uuidv4 } from 'uuid';
 
 interface CommentFormProps {
   taskId: string;
@@ -16,30 +17,51 @@ const CommentForm: React.FC<CommentFormProps> = ({ taskId, onCommentAdded }) => 
   const { isAuthenticated, currentUser } = useAuth();
   const { addComment, isSubmitting } = useComments(taskId);
 
+  // Log all props and state values for debugging
+  console.log('[CommentForm] Props:', { taskId, onCommentAdded });
+  console.log('[CommentForm] Auth state:', { isAuthenticated, currentUser });
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!text.trim() || !isAuthenticated) {
+      console.log('[CommentForm] Submit prevented: empty text or not authenticated');
       return;
     }
     
     try {
+      console.log('[CommentForm] Submitting comment:', text);
+      
       // Use the actual comment hook instead of the action
       await addComment(text.trim(), {
         onSuccess: () => {
+          console.log('[CommentForm] Comment added successfully');
           setText(''); // Clear the input on success
           
           // Call the callback to refresh the comments list and scroll to bottom
           if (onCommentAdded) {
+            console.log('[CommentForm] Calling onCommentAdded callback');
             onCommentAdded();
           }
         },
         onError: (error) => {
-          console.error('Error adding comment:', error);
+          console.error('[CommentForm] Error adding comment:', error);
+          toast({
+            id: uuidv4(),
+            title: "Erro ao adicionar comentário",
+            description: "Ocorreu um erro ao adicionar seu comentário. Por favor, tente novamente.",
+            variant: "destructive",
+          });
         }
       });
     } catch (error) {
-      console.error('Error in form submission:', error);
+      console.error('[CommentForm] Error in form submission:', error);
+      toast({
+        id: uuidv4(),
+        title: "Erro no formulário",
+        description: "Ocorreu um erro ao processar seu comentário. Por favor, tente novamente.",
+        variant: "destructive",
+      });
     }
   };
 
