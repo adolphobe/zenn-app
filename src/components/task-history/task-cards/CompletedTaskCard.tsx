@@ -1,7 +1,5 @@
 
 import React, { useState } from 'react';
-import { format, parseISO } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
 import { Task } from '@/types';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -13,6 +11,8 @@ import TaskPillarDetails from '@/components/TaskPillarDetails';
 import TaskComments from '@/components/TaskComments';
 import RestoreTaskConfirmation from '../RestoreTaskConfirmation';
 import CompletedTaskModal from '../completed-task-modal';
+import DateTimeDisplay from '@/components/DateTimeDisplay';
+import { dateService } from '@/services/dateService';
 
 interface CompletedTaskCardProps {
   task: Task;
@@ -70,25 +70,6 @@ export const CompletedTaskCard: React.FC<CompletedTaskCardProps> = ({ task }) =>
     obligation: 'Terminei por obrigação'
   };
 
-  // Format the completion date and time in Brazilian format (DD/MM/YYYY HH:MM)
-  const formatCompletionDateTime = (dateString: string | null | undefined) => {
-    if (!dateString) return '-';
-    try {
-      // Make sure we have a valid date string before parsing
-      const date = parseISO(dateString);
-      if (isNaN(date.getTime())) {
-        console.warn('Invalid date:', dateString);
-        return '-';
-      }
-      return format(date, 'dd/MM/yyyy HH:mm', { locale: ptBR });
-    } catch (e) {
-      console.error('Error formatting date:', e, dateString);
-      return '-';
-    }
-  };
-
-  const completedDateTime = formatCompletionDateTime(task.completedAt ? task.completedAt.toString() : null);
-
   const handleRestore = (e: React.MouseEvent) => {
     e.stopPropagation();
     setShowRestoreConfirmation(true);
@@ -115,7 +96,7 @@ export const CompletedTaskCard: React.FC<CompletedTaskCardProps> = ({ task }) =>
             <div>
               <h3 className="font-medium text-gray-900 dark:text-gray-100 opacity-70">{task.title}</h3>
               <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                Concluída em {completedDateTime}
+                Concluída em <DateTimeDisplay date={task.completedAt} showRelative={false} />
               </p>
             </div>
             <div className="flex gap-2">
@@ -192,4 +173,3 @@ export const CompletedTaskCard: React.FC<CompletedTaskCardProps> = ({ task }) =>
 };
 
 export default CompletedTaskCard;
-

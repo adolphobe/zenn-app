@@ -107,31 +107,46 @@ export const setTaskFeedback = (state: AppState, action: Action): AppState => {
     // Log the before state
     logTaskStateChange('SET_TASK_FEEDBACK_START', taskId, task.title, {
       feedback: task.feedback,
-      completedAt: task.completedAt
+      completedAt: task.completedAt,
+      completed: task.completed
     });
+    
+    // Ensure task is marked as completed when providing feedback
+    // This is a safeguard to make sure all feedback tasks have completedAt
+    const completedAt = task.completedAt || (task.completed ? new Date() : new Date());
+    
+    const updatedState = {
+      ...state,
+      tasks: state.tasks.map(t =>
+        t.id === action.payload.id ? { 
+          ...t, 
+          feedback: action.payload.feedback,
+          completed: true, // Ensure task is completed when setting feedback
+          completedAt // Ensure completedAt is set
+        } : t
+      )
+    };
+    
+    // Find the updated task for logging
+    const updatedTask = updatedState.tasks.find(t => t.id === taskId);
+    
+    if (task && updatedTask) {
+      // Log the after state to verify feedback and completedAt are both set
+      logTaskStateChange('SET_TASK_FEEDBACK_END', taskId, task.title, {
+        feedback: task.feedback,
+        completedAt: task.completedAt,
+        completed: task.completed
+      }, {
+        feedback: updatedTask.feedback,
+        completedAt: updatedTask.completedAt,
+        completed: updatedTask.completed
+      });
+    }
+
+    return updatedState;
   }
 
-  const updatedState = {
-    ...state,
-    tasks: state.tasks.map(task =>
-      task.id === action.payload.id ? { ...task, feedback: action.payload.feedback } : task
-    )
-  };
-  
-  // Find the updated task for logging
-  const updatedTask = updatedState.tasks.find(t => t.id === taskId);
-  
-  if (task && updatedTask) {
-    // Log the after state - ensuring feedback is set without disrupting completedAt
-    logTaskStateChange('SET_TASK_FEEDBACK_END', taskId, task.title, {
-      feedback: task.feedback
-    }, {
-      feedback: updatedTask.feedback,
-      completedAt: updatedTask.completedAt // Verify completedAt is preserved
-    });
-  }
-
-  return updatedState;
+  return state;
 };
 
 export const setTaskFeedbackByTitle = (state: AppState, action: Action): AppState => {

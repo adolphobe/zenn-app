@@ -1,41 +1,13 @@
 
 import React from 'react';
 import { Task } from '@/types';
-import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
-import { safeParseDate } from '@/utils';
+import DateTimeDisplay from '@/components/DateTimeDisplay';
 
 interface TaskDetailsProps {
   task: Task;
 }
 
 const TaskDetails: React.FC<TaskDetailsProps> = ({ task }) => {
-  const formatDateTime = (date: Date | string | null | undefined) => {
-    if (!date) return '-';
-    
-    try {
-      // Ensure we have a valid Date object
-      const dateObj = date instanceof Date ? date : safeParseDate(date);
-      if (!dateObj || isNaN(dateObj.getTime())) {
-        return '-';
-      }
-      return format(dateObj, 'dd/MM/yyyy HH:mm', { locale: ptBR });
-    } catch (error) {
-      console.error('Error formatting date:', error);
-      return '-';
-    }
-  };
-  
-  // Format the completion date and time in Brazilian format
-  const completedDateTime = task.completedAt 
-    ? formatDateTime(task.completedAt)
-    : '-';
-  
-  // Format the ideal date in Brazilian format
-  const idealDate = task.idealDate 
-    ? formatDateTime(task.idealDate)
-    : '-';
-
   return (
     <>
       <div>
@@ -51,12 +23,16 @@ const TaskDetails: React.FC<TaskDetailsProps> = ({ task }) => {
         <div className="flex flex-col sm:flex-row sm:justify-between">
           <div className="mb-2">
             <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Concluída em:</span>
-            <span className="ml-2 text-sm text-gray-600 dark:text-gray-400">{completedDateTime}</span>
+            <span className="ml-2 text-sm text-gray-600 dark:text-gray-400">
+              <DateTimeDisplay date={task.completedAt} showRelative={false} />
+            </span>
           </div>
           {task.idealDate && (
             <div className="mb-2">
               <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Data da tarefa:</span>
-              <span className="ml-2 text-sm text-gray-600 dark:text-gray-400">{idealDate}</span>
+              <span className="ml-2 text-sm text-gray-600 dark:text-gray-400">
+                <DateTimeDisplay date={task.idealDate} showRelative={false} />
+              </span>
             </div>
           )}
         </div>

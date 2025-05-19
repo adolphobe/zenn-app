@@ -1,21 +1,17 @@
 
-import { 
-  formatInTimeZone as fnsFormatInTimeZone, 
-  toZonedTime as fnsToZonedTime, 
-  fromZonedTime as fnsFromZonedTime,
-  getTimezoneOffset as fnsGetTimezoneOffset
-} from 'date-fns-tz';
-import { ISODateString } from '@/types/dates';
+import { format } from 'date-fns';
+import { formatInTimeZone as fnsFormatInTimeZone, toZonedTime, fromZonedTime, getTimezoneOffset } from 'date-fns-tz';
 import { parseDate } from './dateParser';
 
-// Estado global para o fuso horário padrão
+// Fuso horário padrão
 let defaultTimeZone = 'America/Sao_Paulo';
 
 /**
- * Define o fuso horário padrão
+ * Define o fuso horário padrão para o sistema
  */
 export function setDefaultTimeZone(timeZone: string): void {
   defaultTimeZone = timeZone;
+  console.log(`Timezone padrão definido para: ${timeZone}`);
 }
 
 /**
@@ -26,13 +22,15 @@ export function getDefaultTimeZone(): string {
 }
 
 /**
- * Formata uma data em um fuso horário específico
+ * Formata uma data para exibição em um fuso horário específico
+ * @param date Data a ser formatada
+ * @param formatStr String de formato (ex: 'dd/MM/yyyy HH:mm')
+ * @param timeZone Fuso horário (ex: 'America/Sao_Paulo')
  */
 export function formatInTimeZone(
-  date: Date | ISODateString | null | undefined,
-  format: string,
-  timeZone: string = defaultTimeZone,
-  options: any = {}
+  date: Date | string | null | undefined,
+  formatStr: string,
+  timeZone?: string
 ): string {
   if (!date) return '';
   
@@ -40,7 +38,10 @@ export function formatInTimeZone(
     const parsedDate = parseDate(date);
     if (!parsedDate) return '';
     
-    return fnsFormatInTimeZone(parsedDate, timeZone, format, options);
+    // Use o fuso horário especificado ou o padrão
+    const tz = timeZone || defaultTimeZone;
+    
+    return fnsFormatInTimeZone(parsedDate, tz, formatStr);
   } catch (error) {
     console.error('Erro formatando data no fuso horário:', error);
     return '';
@@ -48,11 +49,14 @@ export function formatInTimeZone(
 }
 
 /**
- * Converte uma data para um fuso horário específico
+ * Converte uma data UTC para uma data zonal
+ * @param date Data em UTC
+ * @param timeZone Fuso horário de destino
+ * @returns Data no fuso horário especificado
  */
 export function toZonedTime(
-  date: Date | ISODateString | null | undefined,
-  timeZone: string = defaultTimeZone
+  date: Date | string | null | undefined,
+  timeZone?: string
 ): Date | null {
   if (!date) return null;
   
@@ -60,56 +64,57 @@ export function toZonedTime(
     const parsedDate = parseDate(date);
     if (!parsedDate) return null;
     
-    return fnsToZonedTime(parsedDate, timeZone);
+    // Use o fuso horário especificado ou o padrão
+    const tz = timeZone || defaultTimeZone;
+    
+    return toZonedTime(parsedDate, tz);
   } catch (error) {
-    console.error('Erro convertendo data para fuso horário:', error);
+    console.error('Erro convertendo para time zone:', error);
     return null;
   }
 }
 
 /**
  * Converte uma data de um fuso horário específico para UTC
+ * @param zonedDate Data no fuso horário especificado
+ * @param timeZone Fuso horário de origem
+ * @returns Data em UTC
  */
 export function fromZonedTime(
-  date: Date | ISODateString | null | undefined,
-  timeZone: string = defaultTimeZone
+  zonedDate: Date | string | null | undefined,
+  timeZone?: string
 ): Date | null {
-  if (!date) return null;
+  if (!zonedDate) return null;
   
   try {
-    const parsedDate = parseDate(date);
+    const parsedDate = parseDate(zonedDate);
     if (!parsedDate) return null;
     
-    return fnsFromZonedTime(parsedDate, timeZone);
+    // Use o fuso horário especificado ou o padrão
+    const tz = timeZone || defaultTimeZone;
+    
+    return fromZonedTime(parsedDate, tz);
   } catch (error) {
-    console.error('Erro convertendo data do fuso horário para UTC:', error);
+    console.error('Erro convertendo de time zone:', error);
     return null;
   }
 }
 
 /**
- * Retorna o deslocamento do fuso horário em minutos
+ * Obtém o deslocamento do fuso horário em minutos
+ * @param timeZone Fuso horário
+ * @param date Data para calcular o deslocamento
+ * @returns Deslocamento em minutos
  */
-export function getTimezoneOffset(
-  timeZone: string = defaultTimeZone,
-  date: Date = new Date()
+export function getTimezoneOffsetMinutes(
+  timeZone: string,
+  date?: Date
 ): number {
   try {
-    return fnsGetTimezoneOffset(timeZone, date);
+    const dateToUse = date || new Date();
+    return getTimezoneOffset(timeZone, dateToUse) / 60000; // Convertendo de milissegundos para minutos
   } catch (error) {
-    console.error('Erro obtendo deslocamento do fuso horário:', error);
+    console.error('Erro obtendo offset do timezone:', error);
     return 0;
-  }
-}
-
-/**
- * Detecta automaticamente o fuso horário local do usuário
- */
-export function detectLocalTimeZone(): string {
-  try {
-    return Intl.DateTimeFormat().resolvedOptions().timeZone;
-  } catch (error) {
-    console.error('Erro ao detectar fuso horário local:', error);
-    return 'America/Sao_Paulo'; // Default para Brasil
   }
 }

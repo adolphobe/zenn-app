@@ -1,8 +1,7 @@
-
 import React, { createContext, useContext, useMemo } from 'react';
 import { useTaskData } from '@/hooks/useTaskData';
 import { Task, TaskFormData } from '@/types';
-import { safeParseDate } from '@/utils';
+import { dateService } from '@/services/dateService';
 import { logDiagnostics, logDateInfo } from '@/utils/diagnosticLog';
 
 // Define the context type
@@ -22,7 +21,7 @@ export const TaskDataProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   // Use a separate instance to manage completed tasks
   const completedTasksData = useTaskData(true);
   
-  // Process completed tasks to ensure dates are valid
+  // Process completed tasks to ensure dates are valid Date objects
   const processedCompletedTasks = useMemo(() => {
     const tasks = completedTasksData.tasks || [];
     logDiagnostics('TaskDataProvider', `Processing ${tasks.length} completed tasks`);
@@ -36,21 +35,14 @@ export const TaskDataProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         let completedAt: Date | null = null;
         
         if (task.completedAt) {
-          if (task.completedAt instanceof Date) {
-            completedAt = task.completedAt;
-            logDiagnostics('TaskDataProvider', `Task ${task.id}: completedAt is already a Date instance`);
+          completedAt = dateService.parseDate(task.completedAt);
+          
+          if (completedAt) {
+            logDiagnostics('TaskDataProvider', `Task ${task.id}: completedAt parsed successfully`);
           } else {
-            // Try harder to parse the date
-            const parsedDate = safeParseDate(task.completedAt);
-            
-            if (parsedDate) {
-              completedAt = parsedDate;
-              logDiagnostics('TaskDataProvider', `Task ${task.id}: completedAt parsed successfully`);
-            } else {
-              // If we can't parse it, use current date as fallback
-              completedAt = new Date();
-              logDiagnostics('TaskDataProvider', `Task ${task.id}: FALLBACK to current date for invalid completedAt`);
-            }
+            // If we can't parse it, use current date as fallback
+            completedAt = new Date();
+            logDiagnostics('TaskDataProvider', `Task ${task.id}: FALLBACK to current date for invalid completedAt`);
           }
         } else if (task.completed) {
           // If task is completed but has no completedAt, provide a fallback
@@ -65,13 +57,9 @@ export const TaskDataProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           ...task,
           completedAt,
           // Ensure idealDate is validated but keep original type structure
-          idealDate: task.idealDate ? 
-            (task.idealDate instanceof Date ? task.idealDate : safeParseDate(task.idealDate)) : 
-            null,
+          idealDate: dateService.parseDate(task.idealDate),
           // Ensure createdAt is validated but keep original type structure
-          createdAt: task.createdAt instanceof Date ? 
-            task.createdAt : 
-            (task.createdAt ? new Date(task.createdAt) : new Date())
+          createdAt: dateService.parseDate(task.createdAt) || new Date()
         };
       } catch (error) {
         console.error('Error processing task date:', error);

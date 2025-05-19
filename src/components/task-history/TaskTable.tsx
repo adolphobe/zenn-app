@@ -18,7 +18,7 @@ import { RefreshCw, Eye } from 'lucide-react';
 import { useAppContext } from '@/context/AppContext';
 import CompletedTaskModal from './completed-task-modal';
 import RestoreTaskConfirmation from './RestoreTaskConfirmation';
-import { dateService } from '@/services/dateService';
+import DateTimeDisplay from '@/components/DateTimeDisplay';
 
 // Table row component
 export const CompletedTaskRow: React.FC<{ task: Task }> = ({ task }) => {
@@ -49,16 +49,6 @@ export const CompletedTaskRow: React.FC<{ task: Task }> = ({ task }) => {
     obligation: 'Terminei por obrigação'
   };
 
-  // Format the completion date and time in Brazilian format (DD/MM/YYYY HH:MM)
-  const formatCompletionDateTime = (date: Date | null) => {
-    if (!date) return '-';
-    
-    // Use o dateService para formatar a data consistentemente
-    return dateService.formatForDisplay(date, { hideYear: false, hideTime: false, hideDate: false });
-  };
-
-  const completedDateTime = formatCompletionDateTime(task.completedAt);
-
   const handleRestore = (e: React.MouseEvent) => {
     e.stopPropagation();
     setShowRestoreConfirmation(true);
@@ -77,7 +67,13 @@ export const CompletedTaskRow: React.FC<{ task: Task }> = ({ task }) => {
     <>
       <TableRow onClick={handleRowClick} className="cursor-pointer">
         <TableCell className="opacity-70">{task.title}</TableCell>
-        <TableCell>{completedDateTime}</TableCell>
+        <TableCell>
+          <DateTimeDisplay 
+            date={task.completedAt} 
+            showTimeZone={false} 
+            showRelative={false} 
+          />
+        </TableCell>
         <TableCell>{task.totalScore}/15</TableCell>
         <TableCell className="capitalize">{dominantPillar}</TableCell>
         <TableCell>{task.feedback ? feedbackLabels[task.feedback] : '-'}</TableCell>

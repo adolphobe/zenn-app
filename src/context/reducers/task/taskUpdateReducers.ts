@@ -1,5 +1,6 @@
 import { AppState, Action } from '../../types';
 import { dateService } from '@/services/dateService';
+import { logDateInfo } from '@/utils/diagnosticLog';
 
 // Update task properties reducers
 export const updateTask = (state: AppState, action: Action): AppState => {
@@ -30,10 +31,12 @@ export const updateTask = (state: AppState, action: Action): AppState => {
         // Garantir que campos de data sejam Date objects
         if (action.payload.data.completedAt !== undefined) {
           updatedTask.completedAt = dateService.parseDate(action.payload.data.completedAt);
+          logDateInfo('UPDATE_TASK', `Parsing completedAt for task ${task.id}`, updatedTask.completedAt);
         }
         
         if (action.payload.data.idealDate !== undefined) {
           updatedTask.idealDate = dateService.parseDate(action.payload.data.idealDate);
+          logDateInfo('UPDATE_TASK', `Parsing idealDate for task ${task.id}`, updatedTask.idealDate);
         }
         
         return updatedTask;
@@ -78,7 +81,8 @@ export const completeTaskWithDate = (state: AppState, action: Action): AppState 
   if (action.type !== 'COMPLETE_TASK_WITH_DATE') return state;
   
   // Ensure completedAt is a Date object
-  const completedAtDate = dateService.parseDate(action.payload.completedAt);
+  const completedAt = dateService.parseDate(action.payload.completedAt) || new Date();
+  logDateInfo('COMPLETE_TASK_WITH_DATE', 'Setting completedAt', completedAt);
   
   return {
     ...state,
@@ -87,7 +91,7 @@ export const completeTaskWithDate = (state: AppState, action: Action): AppState 
         ? { 
             ...task, 
             completed: true,
-            completedAt: completedAtDate,
+            completedAt: completedAt,
           } 
         : task
     )

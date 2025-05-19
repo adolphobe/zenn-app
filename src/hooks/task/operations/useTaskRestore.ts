@@ -1,21 +1,23 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Task } from '@/types';
-import { restoreTask as restoreTaskService } from '@/services/taskService';
+import { restoreTask } from '@/services/taskService';
 import { useAuth } from '@/context/auth';
-import { logDiagnostics } from '@/utils/diagnosticLog';
+import { Task } from '@/types';
+import { useTaskToasts } from '@/components/task/utils/taskToasts';
+import { dateService } from '@/services/dateService';
+import { logDateInfo } from '@/utils/diagnosticLog';
 
 export const useTaskRestore = (
   setTaskOperationLoading: (taskId: string, operation: string, loading: boolean) => void
 ) => {
   const { currentUser } = useAuth();
   const queryClient = useQueryClient();
+  const { showRestoreToast } = useTaskToasts();
   
   // Restore task mutation
   const restoreMutation = useMutation({
     mutationFn: (id: string) => {
-      logDiagnostics('RESTORE_TASK', `Restoring task ${id}`);
-      return restoreTaskService(id);
+      return restoreTask(id);
     },
     onMutate: async (id) => {
       // Set loading state
@@ -24,32 +26,70 @@ export const useTaskRestore = (
       // Cancel any outgoing refetches
       await queryClient.cancelQueries({ queryKey: ['tasks'] });
       
-      // Get snapshot of the previous tasks
+      // Get the current task from the cache (from completed tasks)
       const previousTasks = queryClient.getQueryData(['tasks', currentUser?.id, true]);
+      const completedTask = queryClient.getQueryData<Task[]>(['tasks', currentUser?.id, true])?.find(t => t.id === id);
       
-      // Return context for potential rollback
+      if (!completedTask) {
+        return { previousTasks };
+      }
+      
+      // Log the task being restored
+      logDateInfo('RESTORE_TASK', `Restoring task ${id}`, {
+        before: {
+          completed: completedTask.completed,
+          completedAt: completedTask.completedAt
+        }
+      });
+      
+      // Remove the task from completed tasks (optimistic update)
+      queryClient.setQueryData(['tasks', currentUser?.id, true], (old: Task[] | undefined) => {
+        if (!old) return [];
+        return old.filter(t => t.id !== id);
+      });
+      
+      // Add the task to active tasks (optimistic update)
+      queryClient.setQueryData(['tasks', currentUser?.id, false], (old: Task[] | undefined) => {
+        if (!old) return [];
+        
+        // Create the restored task with cleared completion data and new ideal date
+        const restoredTask = {
+          ...completedTask,
+          completed: false,
+          completedAt: null,
+          idealDate: new Date(),
+          feedback: null
+        };
+        
+        // Log the restored task
+        logDateInfo('RESTORE_TASK', `Restored task ${id}`, {
+          after: {
+            completed: restoredTask.completed,
+            completedAt: restoredTask.completedAt,
+            idealDate: restoredTask.idealDate
+          }
+        });
+        
+        return [...old, restoredTask];
+      });
+      
       return { previousTasks };
     },
     onSuccess: (_, id) => {
-      logDiagnostics('RESTORE_TASK', `Task ${id} successfully restored, invalidating queries`);
-      
-      // Invalidate all task queries to refresh data
-      queryClient.invalidateQueries({ 
-        queryKey: ['tasks'],
-        exact: false 
-      });
+      // Show success toast
+      const taskTitle = queryClient.getQueryData<Task[]>(['tasks', currentUser?.id, false])?.find(t => t.id === id)?.title || 'Tarefa';
+      showRestoreToast(taskTitle);
     },
     onError: (error, id, context) => {
       console.error('Error restoring task:', error);
       
       if (context?.previousTasks) {
-        // Revert to the previous state on error
         queryClient.setQueryData(['tasks', currentUser?.id, true], context.previousTasks);
       }
     },
-    onSettled: (_, error, id) => {
-      // Always clear loading state
+    onSettled: (_, __, id) => {
       setTaskOperationLoading(id, 'restore', false);
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
     }
   });
   
