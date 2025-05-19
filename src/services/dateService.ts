@@ -1,4 +1,3 @@
-
 // Importações existentes permanecem as mesmas
 import { Locale } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -154,7 +153,7 @@ export const dateService = {
    * @param timeZone Fuso horário (ex: 'America/Sao_Paulo')
    * @param date Data para calcular o deslocamento (relevante para DST)
    */
-  getTimeZoneOffset: getTimeZoneOffsetMinutes,
+  getTimeZoneOffset: getTimezoneOffsetMinutes,
   
   /**
    * Compara duas datas e retorna informações detalhadas sobre a comparação
