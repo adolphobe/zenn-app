@@ -161,4 +161,8 @@ export const logComment = {
   // Renderização de componentes
   render: (component: string, props?: any) =>
     logDebug('COMMENT_RENDER', `Renderizando componente ${component}`, props),
+    
+  // Adiciona a função info que estava faltando - essa é a correção principal
+  info: (category: string, message: string, data?: any) =>
+    logInfo(category, message, data)
 };
