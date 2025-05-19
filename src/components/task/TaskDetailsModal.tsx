@@ -3,7 +3,7 @@ import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { Task } from '@/types';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { RefreshCw, X } from 'lucide-react';
+import { RefreshCw } from 'lucide-react';
 import { AlwaysVisibleScrollArea } from '@/components/ui/always-visible-scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -28,17 +28,14 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
   onClose,
   onRestore,
   title = "Detalhes da Tarefa",
-  showRestoreButton = true
+  showRestoreButton = false
 }) => {
-  // Estados e refs
+  // Estados e refs - IMPORTANTE: hooks ANTES de qualquer condicional
   const [activeTab, setActiveTab] = useState('levels');
   const isMobile = useIsMobile();
   const commentsContainerRef = useRef<HTMLDivElement | null>(null);
   
-  // Se não tiver uma tarefa, não renderiza nada
-  if (!task) return null;
-
-  // Função para rolagem até o final dos comentários
+  // Função para rolagem até o final dos comentários - definida fora de qualquer condicional
   const scrollToBottom = useCallback(() => {
     if (commentsContainerRef.current) {
       const scrollElement = commentsContainerRef.current.querySelector('.native-scrollbar');
@@ -64,6 +61,25 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
       onClose();
     }
   };
+  
+  // Se não tiver uma tarefa, renderiza um modal simplificado
+  if (!task) {
+    return (
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent className="bg-white dark:bg-gray-800 rounded-xl">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-semibold">{title}</DialogTitle>
+          </DialogHeader>
+          <div className="p-4">
+            <p className="text-center text-muted-foreground">Não foi possível carregar os detalhes da tarefa.</p>
+            <div className="mt-6 flex justify-end">
+              <Button onClick={onClose}>Fechar</Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>

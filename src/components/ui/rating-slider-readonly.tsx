@@ -12,14 +12,14 @@ interface RatingSliderReadOnlyProps {
   className?: string;
 }
 
-const RatingSliderReadOnly = ({
+const RatingSliderReadOnly: React.FC<RatingSliderReadOnlyProps> = ({
   value,
   maxValue = 5,
   color = 'blue',
   label,
   description = [],
   className
-}: RatingSliderReadOnlyProps) => {
+}) => {
   // Ensure value is within valid range (1 to maxValue)
   const safeValue = React.useMemo(() => {
     const parsedValue = Number(value);

@@ -10,6 +10,8 @@ interface TaskLevelsContentProps {
 }
 
 const TaskLevelsContent: React.FC<TaskLevelsContentProps> = ({ task, isMobile }) => {
+  if (!task) return null;
+
   return (
     <>
       {isMobile ? (
@@ -36,10 +38,10 @@ const TaskLevelsContent: React.FC<TaskLevelsContentProps> = ({ task, isMobile })
               description={CONSTRUCTION_PHRASES}
             />
             
-            <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg shadow-sm">
+            <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg shadow-sm">
               <div className="text-center">
-                <span className="text-3xl font-bold">{task.totalScore}/15</span>
-                <p className="text-sm text-gray-500 mt-1">Pontuação total</p>
+                <span className="text-3xl font-bold">{task.totalScore || 0}/15</span>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Pontuação total</p>
               </div>
             </div>
           </div>
@@ -76,10 +78,10 @@ const TaskLevelsContent: React.FC<TaskLevelsContentProps> = ({ task, isMobile })
           </div>
           
           <div className="space-y-6 mt-[33px]">
-            <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg shadow-sm p-[34px] rounded-[18px]">
+            <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg shadow-sm p-[34px] rounded-[18px]">
               <div className="text-center">
-                <span className="text-3xl font-bold">{task.totalScore}/15</span>
-                <p className="text-sm text-gray-500 mt-1">Pontuação total</p>
+                <span className="text-3xl font-bold">{task.totalScore || 0}/15</span>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Pontuação total</p>
               </div>
             </div>
           </div>

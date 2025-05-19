@@ -6,20 +6,38 @@ import CommentForm from '@/components/CommentForm';
 
 interface CommentsContentProps {
   task: Task;
-  onCommentAdded: () => void;
+  onCommentAdded?: () => void;
 }
 
 const CommentsContent: React.FC<CommentsContentProps> = ({ task, onCommentAdded }) => {
   const commentsContainerRef = useRef<HTMLDivElement | null>(null);
+  
+  // Verificar se a tarefa existe e tem um ID válido
+  if (!task || !task.id) {
+    return (
+      <div className="text-center p-6 text-gray-500 dark:text-gray-400">
+        <p>Não foi possível carregar os comentários.</p>
+      </div>
+    );
+  }
+
+  const hasComments = task.comments && task.comments.length > 0;
+  
+  // Handler para quando um comentário é adicionado
+  const handleCommentAdded = () => {
+    if (onCommentAdded) {
+      onCommentAdded();
+    }
+  };
 
   return (
     <div ref={commentsContainerRef} className="space-y-4">
-      {task.comments && task.comments.length > 0 && (
+      {hasComments && (
         <TaskComments taskId={task.id} comments={task.comments} />
       )}
       <CommentForm 
         taskId={task.id}
-        onCommentAdded={onCommentAdded} 
+        onCommentAdded={handleCommentAdded} 
       />
     </div>
   );
