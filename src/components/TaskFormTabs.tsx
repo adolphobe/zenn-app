@@ -1,4 +1,5 @@
-import React, { useRef, useState, useEffect } from 'react';
+
+import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { Task, TaskFormData } from '../types';
 import TaskFormFields from './TaskFormFields';
 import TaskComments from './TaskComments';
@@ -42,8 +43,10 @@ const TaskFormTabs: React.FC<TaskFormTabsProps> = ({
     isRefetching
   } = useComments(taskId || '');
   
+  console.log('[TaskFormTabs] Render with taskId:', taskId, 'comments:', comments?.length);
+  
   // Function to scroll to the bottom of the comments list
-  const scrollToBottom = () => {
+  const scrollToBottom = useCallback(() => {
     if (commentsContainerRef.current) {
       const scrollElement = commentsContainerRef.current.querySelector('.native-scrollbar');
       if (scrollElement) {
@@ -55,28 +58,33 @@ const TaskFormTabs: React.FC<TaskFormTabsProps> = ({
     } else {
       console.log('[TaskFormTabs] Comments container ref not found');
     }
-  };
+  }, []);
   
   // Effect to scroll to the bottom when the comments tab is selected or comments change
   useEffect(() => {
     if (activeTab === 'comments' && comments?.length > 0) {
+      console.log('[TaskFormTabs] Comments tab active, scrolling to bottom');
       // Small delay to ensure the DOM has been updated
-      setTimeout(scrollToBottom, 100);
+      setTimeout(scrollToBottom, 300);
     }
-  }, [activeTab, comments?.length]);
+  }, [activeTab, comments?.length, scrollToBottom]);
   
   // Handler for when a comment is added
-  const handleCommentAdded = (): void => {
+  const handleCommentAdded = useCallback((): void => {
     console.log('[TaskFormTabs] Comment added callback triggered');
     
     // Force refetch of comments
     if (taskId) {
+      console.log('[TaskFormTabs] Refreshing comments for taskId:', taskId);
       refreshComments();
       
       // Try to scroll to bottom immediately and again after a delay
-      setTimeout(scrollToBottom, 300);
+      setTimeout(() => {
+        console.log('[TaskFormTabs] Delayed scroll to bottom after comment added');
+        scrollToBottom();
+      }, 500);
     }
-  };
+  }, [taskId, refreshComments, scrollToBottom]);
   
   // If we're creating a new task (not editing), only show the basic fields
   if (!isEditing && !taskId) {
@@ -133,7 +141,10 @@ const TaskFormTabs: React.FC<TaskFormTabsProps> = ({
               <TaskComments 
                 taskId={taskId} 
                 comments={comments} 
-                onCommentDeleted={() => refreshComments()}
+                onCommentDeleted={() => {
+                  console.log('[TaskFormTabs] Comment deleted, refreshing comments');
+                  refreshComments();
+                }}
               />
             ) : (
               <div className="py-4 text-center text-gray-500 italic">

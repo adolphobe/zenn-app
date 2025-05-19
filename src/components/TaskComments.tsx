@@ -21,6 +21,7 @@ const TaskComments: React.FC<TaskCommentsProps> = ({ taskId, comments: initialCo
   
   // Log component props for debugging
   console.log('[TaskComments] Props:', { taskId, initialComments, currentUser });
+  console.log('[TaskComments] Comments count:', initialComments?.length);
   
   // Add global CSS for scrollbar
   useEffect(() => {
@@ -77,13 +78,19 @@ const TaskComments: React.FC<TaskCommentsProps> = ({ taskId, comments: initialCo
   
   // Effect to scroll to bottom whenever comments change
   useEffect(() => {
-    if (scrollContainerRef.current && initialComments.length > 0) {
-      // Scroll to bottom of comments div
-      scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight;
+    if (scrollContainerRef.current && initialComments?.length > 0) {
+      console.log('[TaskComments] Scrolling to bottom, comments length:', initialComments.length);
+      // Scroll to bottom of comments div with a slight delay to ensure rendering
+      setTimeout(() => {
+        if (scrollContainerRef.current) {
+          scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight;
+        }
+      }, 100);
     }
   }, [initialComments]); // Execute when comments change
   
   if (!initialComments || initialComments.length === 0) {
+    console.log('[TaskComments] No comments to display');
     return null;
   }
   

@@ -11,9 +11,12 @@ export const addComment = async (taskId: string, userId: string, text: string): 
   await validateTaskExists(taskId);
   
   if (!userId) throw new Error('User ID is required');
-  if (!text) throw new Error('Comment text is required');
   
-  console.log(`[taskComments] Adding comment to task ${taskId} by user ${userId}`);
+  // Ensure text is string and not empty
+  const trimmedText = String(text).trim();
+  if (trimmedText.length === 0) throw new Error('Comment text is required');
+  
+  console.log(`[taskComments] Adding comment to task ${taskId} by user ${userId}, text: "${trimmedText}"`);
   
   try {
     const { data, error } = await supabase
@@ -21,7 +24,7 @@ export const addComment = async (taskId: string, userId: string, text: string): 
       .insert({
         task_id: taskId,
         user_id: userId,
-        text
+        text: trimmedText
       })
       .select()
       .single();

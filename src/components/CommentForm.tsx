@@ -17,23 +17,29 @@ const CommentForm: React.FC<CommentFormProps> = ({ taskId, onCommentAdded }) => 
   const { isAuthenticated, currentUser } = useAuth();
   const { addComment, isSubmitting } = useComments(taskId);
 
-  // Log all props and state values for debugging
+  // Logs detalhados para debugging
   console.log('[CommentForm] Props:', { taskId, onCommentAdded });
   console.log('[CommentForm] Auth state:', { isAuthenticated, currentUser });
+  console.log('[CommentForm] Texto do comentário:', text, 'Tipo:', typeof text);
 
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!text.trim() || !isAuthenticated) {
+    // Melhor validação para handling de strings e números
+    const trimmedText = String(text).trim();
+    console.log('[CommentForm] Texto após trim:', trimmedText, 'Comprimento:', trimmedText.length);
+    
+    if (trimmedText.length === 0 || !isAuthenticated) {
       console.log('[CommentForm] Submit prevented: empty text or not authenticated');
       return;
     }
     
     try {
-      console.log('[CommentForm] Submitting comment:', text, 'for taskId:', taskId);
+      console.log('[CommentForm] Submitting comment:', trimmedText, 'for taskId:', taskId);
+      console.log('[CommentForm] Current user:', currentUser);
       
       // Use the actual comment hook instead of the action
-      await addComment(text.trim(), {
+      await addComment(trimmedText, {
         onSuccess: () => {
           console.log('[CommentForm] Comment added successfully');
           setText(''); // Clear the input on success
@@ -63,7 +69,7 @@ const CommentForm: React.FC<CommentFormProps> = ({ taskId, onCommentAdded }) => 
         variant: "destructive",
       });
     }
-  }, [text, isAuthenticated, taskId, addComment, onCommentAdded]);
+  }, [text, isAuthenticated, taskId, addComment, onCommentAdded, currentUser]);
 
   return (
     <form onSubmit={handleSubmit} className="mt-2">
@@ -77,7 +83,11 @@ const CommentForm: React.FC<CommentFormProps> = ({ taskId, onCommentAdded }) => 
       <div className="flex flex-col space-y-2">
         <textarea
           value={text}
-          onChange={(e) => setText(e.target.value)}
+          onChange={(e) => {
+            const newValue = e.target.value;
+            console.log('[CommentForm] Input changed:', newValue, 'Type:', typeof newValue);
+            setText(newValue);
+          }}
           placeholder={isAuthenticated ? "Adicionar comentário..." : "Faça login para comentar"}
           className="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200"
           rows={3}
@@ -93,7 +103,7 @@ const CommentForm: React.FC<CommentFormProps> = ({ taskId, onCommentAdded }) => 
           </div>
           <Button 
             type="submit" 
-            disabled={!text.trim() || isSubmitting || !isAuthenticated}
+            disabled={String(text).trim().length === 0 || isSubmitting || !isAuthenticated}
             className="bg-blue-600 hover:bg-blue-700 text-white"
             size="sm"
           >

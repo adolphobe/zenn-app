@@ -36,7 +36,7 @@ export const useComments = (taskId: string) => {
   } = useQuery({
     queryKey: ['comments', taskId],
     queryFn: () => getTaskComments(taskId),
-    // Don't fetch if no taskId or we're not authenticated
+    // Enable if we have taskId and are authenticated
     enabled: !!taskId && isAuthenticated,
     staleTime: 1000 * 60, // 1 minute
     select: (data) => {
@@ -102,12 +102,23 @@ export const useComments = (taskId: string) => {
       return;
     }
 
-    console.log('[useComments] Adding comment, text:', text, 'taskId:', taskId, 'userId:', currentUser.id);
+    // Garantir que o texto está em string e não vazio
+    const trimmedText = String(text).trim();
+    
+    if (trimmedText.length === 0) {
+      console.error('[useComments] Cannot add comment: Empty text');
+      if (callbacks?.onError) {
+        callbacks.onError(new Error('Comment text cannot be empty'));
+      }
+      return;
+    }
+
+    console.log('[useComments] Adding comment, text:', trimmedText, 'taskId:', taskId, 'userId:', currentUser.id);
     setIsSubmitting(true);
     
     try {
       // Add comment using the mutation
-      const newComment = await addCommentMutation.mutateAsync({ text });
+      const newComment = await addCommentMutation.mutateAsync({ text: trimmedText });
       console.log('[useComments] Comment added successfully:', newComment);
       
       // Force refresh of the comments
