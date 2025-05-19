@@ -26,39 +26,40 @@ export const TaskTable: React.FC<TaskTableProps> = ({
   onSelectTask, 
   onRestoreTask 
 }) => {
-  // Helper to determine dominant pillar
-  const getDominantPillar = (task: Task) => {
-    const scores = [
-      { name: 'risco', value: task.consequenceScore },
-      { name: 'orgulho', value: task.prideScore },
-      { name: 'crescimento', value: task.constructionScore },
-    ];
-    const max = scores.reduce((prev, current) => 
-      (prev.value > current.value) ? prev : current
-    );
-    return max.name;
-  };
-
-  // Helper for pillar badge styling
-  const getPillarStyles = (pillar: string) => {
-    switch(pillar) {
-      case 'risco':
-        return 'bg-orange-100 text-orange-800 border-orange-200';
-      case 'orgulho':
-        return 'bg-purple-100 text-purple-800 border-purple-200';
-      case 'crescimento':
-        return 'bg-blue-100 text-blue-800 border-blue-200';
-      default:
-        return 'bg-gray-100 text-gray-800 border-gray-200';
-    }
-  };
-
   // Helper for score color
   const getScoreColor = (score: number) => {
     if (score >= 12) return 'text-green-600';
     if (score >= 9) return 'text-blue-600';
     if (score >= 6) return 'text-orange-600';
     return 'text-gray-600';
+  };
+
+  // Helper for feedback badge styling
+  const getFeedbackStyles = (feedback: string | null) => {
+    switch(feedback) {
+      case 'transformed':
+        return 'bg-green-100 text-green-800 border-green-200';
+      case 'relief':
+        return 'bg-blue-100 text-blue-800 border-blue-200';
+      case 'obligation':
+        return 'bg-orange-100 text-orange-800 border-orange-200';
+      default:
+        return 'bg-gray-100 text-gray-800 border-gray-200';
+    }
+  };
+
+  // Helper for feedback label
+  const getFeedbackLabel = (feedback: string | null) => {
+    switch(feedback) {
+      case 'transformed':
+        return 'Transformador';
+      case 'relief':
+        return 'Alívio';
+      case 'obligation':
+        return 'Obrigação';
+      default:
+        return 'Sem feedback';
+    }
   };
 
   // Animation variants
@@ -79,13 +80,13 @@ export const TaskTable: React.FC<TaskTableProps> = ({
   const MotionTableRow = motion(TableRow);
 
   return (
-    <div className="border rounded-md overflow-hidden shadow-sm">
+    <div className="border rounded-md overflow-hidden shadow-sm bg-white">
       <Table>
-        <TableHeader>
+        <TableHeader className="bg-gray-50">
           <TableRow>
             <TableHead>Tarefa</TableHead>
             <TableHead>Pontuação</TableHead>
-            <TableHead>Pilar</TableHead>
+            <TableHead>Feedback</TableHead>
             <TableHead>Data de Conclusão</TableHead>
             <TableHead>Ações</TableHead>
           </TableRow>
@@ -107,14 +108,14 @@ export const TaskTable: React.FC<TaskTableProps> = ({
               </TableRow>
             ) : (
               tasks.map((task) => {
-                const dominantPillar = getDominantPillar(task);
-                const pillarStyle = getPillarStyles(dominantPillar);
                 const scoreColor = getScoreColor(task.totalScore);
+                const feedbackStyle = getFeedbackStyles(task.feedback);
+                const feedbackLabel = getFeedbackLabel(task.feedback);
                 
                 return (
                   <MotionTableRow
                     key={task.id}
-                    className="hover:bg-muted/50 transition-colors"
+                    className="hover:bg-gray-50 transition-colors"
                     variants={tableRowVariants}
                     initial="hidden"
                     animate="visible"
@@ -135,8 +136,8 @@ export const TaskTable: React.FC<TaskTableProps> = ({
                       className="cursor-pointer"
                       onClick={() => onSelectTask(task.id)}
                     >
-                      <Badge className={`${pillarStyle} capitalize`} variant="outline">
-                        {dominantPillar}
+                      <Badge className={`${feedbackStyle} capitalize`} variant="outline">
+                        {feedbackLabel}
                       </Badge>
                     </TableCell>
                     <TableCell 

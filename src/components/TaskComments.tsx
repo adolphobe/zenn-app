@@ -1,5 +1,5 @@
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { format } from 'date-fns';
 import { Comment } from '@/types';
 import { safeParseDate } from '@/utils';
@@ -7,6 +7,7 @@ import { Trash2 } from 'lucide-react';
 import { Button } from './ui/button';
 import { useAuth } from '@/context/auth';
 import { useComments } from '@/hooks/useComments';
+import DeleteCommentConfirmation from './DeleteCommentConfirmation';
 
 interface TaskCommentsProps {
   taskId: string;
@@ -18,6 +19,7 @@ const TaskComments: React.FC<TaskCommentsProps> = ({ taskId, comments: initialCo
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const { deleteComment } = useComments(taskId);
   const { currentUser } = useAuth();
+  const [commentToDelete, setCommentToDelete] = useState<string | null>(null);
   
   // Log component props for debugging
   console.log('[TaskComments] Props:', { taskId, initialComments, currentUser });
@@ -99,11 +101,14 @@ const TaskComments: React.FC<TaskCommentsProps> = ({ taskId, comments: initialCo
     e.stopPropagation();
   };
   
-  // Handle comment deletion
-  const handleDeleteComment = async (commentId: string, e: React.MouseEvent) => {
+  // Handle comment deletion confirmation dialog
+  const handleDeleteClick = (commentId: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    if (!confirm('Tem certeza que deseja excluir este comentário?')) return;
-    
+    setCommentToDelete(commentId);
+  };
+  
+  // Handle confirmed comment deletion
+  const handleConfirmDelete = async (commentId: string) => {
     console.log('[TaskComments] Deleting comment:', commentId);
     await deleteComment(commentId, {
       onSuccess: () => {
@@ -168,7 +173,7 @@ const TaskComments: React.FC<TaskCommentsProps> = ({ taskId, comments: initialCo
                     variant="ghost" 
                     size="sm"
                     className="h-7 w-7 p-0 text-gray-400 hover:text-red-500"
-                    onClick={(e) => handleDeleteComment(comment.id, e)}
+                    onClick={(e) => handleDeleteClick(comment.id, e)}
                   >
                     <Trash2 size={14} />
                     <span className="sr-only">Excluir comentário</span>
@@ -179,6 +184,14 @@ const TaskComments: React.FC<TaskCommentsProps> = ({ taskId, comments: initialCo
           ))}
         </div>
       </div>
+      
+      {/* Delete Comment Confirmation Dialog */}
+      <DeleteCommentConfirmation
+        commentId={commentToDelete || ''}
+        isOpen={!!commentToDelete}
+        onClose={() => setCommentToDelete(null)}
+        onConfirm={handleConfirmDelete}
+      />
     </div>
   );
 };

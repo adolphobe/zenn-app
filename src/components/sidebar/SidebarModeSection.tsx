@@ -5,6 +5,7 @@ import { Clock, History, Power, Calendar } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import SidebarSection from './SidebarSection';
 import { useAppContext } from '@/context/AppContext';
+import SidebarNavItem from './SidebarNavItem';
 
 interface SidebarModeSectionProps {
   sidebarOpen: boolean;
@@ -19,24 +20,6 @@ const SidebarModeSection: React.FC<SidebarModeSectionProps> = ({ sidebarOpen }) 
   const isOnStrategicReview = location.pathname.includes('strategic-review');
   const isOnTaskHistory = location.pathname.includes('task-history');
   
-  // Helper to get active class for navigation links
-  const getNavClass = ({ isActive }: { isActive: boolean }) =>
-    cn(
-      "flex items-center p-2 rounded-md transition-colors",
-      "hover:bg-gray-100 dark:hover:bg-gray-800",
-      isActive ? "bg-gray-100 dark:bg-gray-800 text-primary" : "text-gray-700 dark:text-gray-300"
-    );
-
-  // Helper for mode button active state
-  const getModeClass = (mode: string) =>
-    cn(
-      "flex items-center p-2 rounded-md transition-colors cursor-pointer",
-      "hover:bg-gray-100 dark:hover:bg-gray-800",
-      viewMode === mode && !isOnStrategicReview && !isOnTaskHistory
-        ? "bg-gray-100 dark:bg-gray-800 text-primary" 
-        : "text-gray-700 dark:text-gray-300"
-    );
-
   // Handler for mode switching
   const handleModeClick = (mode: string) => {
     // Always navigate to dashboard when clicking a mode button
@@ -46,49 +29,48 @@ const SidebarModeSection: React.FC<SidebarModeSectionProps> = ({ sidebarOpen }) 
     setViewMode(mode as any);
   };
 
+  // Determine if a mode is active
+  const isModeActive = (mode: string) => {
+    return viewMode === mode && !isOnStrategicReview && !isOnTaskHistory;
+  };
+
   return (
     <SidebarSection 
       title="Navegação"
       sidebarOpen={sidebarOpen}
     >
-      <div className="space-y-1">
+      <div className="space-y-1 px-1">
         {/* Modo de Potência */}
-        <div 
-          className={getModeClass('power')}
+        <SidebarNavItem 
+          icon={Power}
+          label="Modo de Potência"
+          path="#"
+          isActive={isModeActive('power')}
           onClick={() => handleModeClick('power')}
-          title="Modo de Potência"
-        >
-          <Power className="w-5 h-5 mr-3" />
-          {sidebarOpen && <span>Modo de Potência</span>}
-        </div>
+        />
         
         {/* Modo Cronológico */}
-        <div 
-          className={getModeClass('chronological')}
+        <SidebarNavItem 
+          icon={Clock}
+          label="Modo Cronológico"
+          path="#"
+          isActive={isModeActive('chronological')}
           onClick={() => handleModeClick('chronological')}
-          title="Modo Cronológico"
-        >
-          <Clock className="w-5 h-5 mr-3" />
-          {sidebarOpen && <span>Modo Cronológico</span>}
-        </div>
+        />
         
-        <NavLink 
-          to="/task-history-new" 
-          className={getNavClass}
-          title="Histórico"
-        >
-          <History className="w-5 h-5 mr-3" />
-          {sidebarOpen && <span>Histórico</span>}
-        </NavLink>
+        {/* Histórico */}
+        <SidebarNavItem 
+          icon={History}
+          label="Histórico"
+          path="/task-history-new"
+        />
         
-        <NavLink 
-          to="/strategic-review" 
-          className={getNavClass}
-          title="Análise Estratégica"
-        >
-          <Calendar className="w-5 h-5 mr-3" />
-          {sidebarOpen && <span>Análise Estratégica</span>}
-        </NavLink>
+        {/* Análise Estratégica */}
+        <SidebarNavItem 
+          icon={Calendar}
+          label="Análise Estratégica"
+          path="/strategic-review"
+        />
       </div>
     </SidebarSection>
   );
