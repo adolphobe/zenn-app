@@ -22,7 +22,7 @@ const TaskCommentsContent: React.FC<TaskCommentsContentProps> = ({ task, onComme
   const queryClient = useQueryClient();
   const { comments, isLoading, fetchError, refreshComments } = useComments(task?.id || '');
   const { isAuthenticated, currentUser } = useAuth();
-  const [showLogs, setShowLogs] = React.useState(false);
+  const [showLogs, setShowLogs] = React.useState(true); // Set to true by default
   
   // Log inicial do componente
   useEffect(() => {
@@ -150,11 +150,11 @@ const TaskCommentsContent: React.FC<TaskCommentsContentProps> = ({ task, onComme
 
   return (
     <div ref={commentsRef}>
-      <div className="flex justify-between items-center mb-2">
+      <div className="flex justify-between items-center mb-4">
         <h3 className="font-medium">Comentários</h3>
         <div className="flex gap-2">
           <Button
-            variant="ghost"
+            variant={showLogs ? "default" : "outline"}
             size="sm"
             onClick={() => setShowLogs(!showLogs)}
             className="flex items-center gap-1 text-xs"
@@ -173,7 +173,7 @@ const TaskCommentsContent: React.FC<TaskCommentsContentProps> = ({ task, onComme
         </div>
       </div>
 
-      {/* Visualizador de logs */}
+      {/* Visualizador de logs - Sempre visível por padrão */}
       {showLogs && (
         <div className="mb-6">
           <CommentLogs />
