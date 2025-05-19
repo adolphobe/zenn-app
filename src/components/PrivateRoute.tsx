@@ -6,11 +6,11 @@ import { useSidebar } from '@/context/hooks';
 import { Menu } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useEffect, useState, useMemo } from 'react';
-import { logWarn, logInfo } from '@/utils/logUtils';
+import { logInfo } from '@/utils/logUtils';
 
 /**
  * PrivateRoute - Protects routes that require authentication
- * Fixed to handle URL duplication issues
+ * Fixed to handle navigation properly with hash router
  */
 export const PrivateRoute = () => {
   const { isAuthenticated, isLoading } = useAuth();
@@ -24,43 +24,20 @@ export const PrivateRoute = () => {
     localStorage.getItem('logout_in_progress') === 'true',
   []);
   
-  // Clean up duplicated routes like `/task-history#/task-history`
+  // Ensure current path is clean, without duplications
   useEffect(() => {
     const currentPath = location.pathname;
-    const currentHash = location.hash;
     
-    // Only run this logic if we have a hash that might be causing issues
-    if (currentHash && currentHash.length > 1) {
-      // Extract the path from the hash
-      const hashPath = currentHash.substring(1); // Remove the leading #
-      
-      // Check if the hash path repeats the main path
-      if (currentPath === hashPath || 
-          (currentPath.endsWith('/') && hashPath === currentPath.slice(0, -1)) ||
-          (hashPath.endsWith('/') && currentPath === hashPath.slice(0, -1))) {
-        
-        logWarn('ROUTE', `Detectado caminho duplicado: ${currentPath} no hash ${currentHash}`, 
-                { path: currentPath });
-        
-        // Navigate to the correct path without duplication
-        navigate(currentPath, { replace: true });
-        return;
-      }
-      
-      // Also handle case where path is already in the hash
-      const pathInHash = currentPath.includes('#') && currentPath.split('#')[1] === hashPath;
-      if (pathInHash) {
-        const cleanPath = currentPath.split('#')[0];
-        logWarn('ROUTE', `Corrigindo rota com caminho duplicado no hash`, 
-                { from: currentPath, to: cleanPath });
-        navigate(cleanPath, { replace: true });
-        return;
-      }
+    // Log navigation without triggering extra renders
+    if (currentPath !== '/dashboard') {
+      logInfo('PrivateRoute', `Navegação detectada para: ${currentPath}`);
     }
     
-    // Log current location for debugging
-    logInfo('PrivateRoute', `Rota atual: ${currentPath}${currentHash}`);
-  }, [location, navigate]);
+    // Private route paths should always start with /
+    if (currentPath && !currentPath.startsWith('/')) {
+      navigate(`/${currentPath}`, { replace: true });
+    }
+  }, [location.pathname, navigate]);
 
   // Use effect to ensure we've completed at least one auth check
   useEffect(() => {
@@ -80,7 +57,7 @@ export const PrivateRoute = () => {
   const actuallyAuthenticated = isAuthenticated && !logoutInProgress;
   
   if (!actuallyAuthenticated) {
-    logInfo(`PrivateRoute`, `Usuário não autenticado, redirecionando de ${location.pathname}`);
+    logInfo('PrivateRoute', `Usuário não autenticado, redirecionando de ${location.pathname}`);
     
     // Return a redirect to login with current location stored for later redirect back
     return <Navigate to="/login" state={{ from: location }} replace />;

@@ -15,7 +15,7 @@ initializeDateTimeSettings();
 // Use HashRouter with a simplified configuration - render App component for all routes
 const router = createHashRouter([
   {
-    path: '*', // Catch all routes and let App handle them
+    path: '*', // Single catch-all route to let App handle the routing
     element: <App />
   },
 ]);

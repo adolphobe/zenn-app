@@ -29,10 +29,15 @@ const SidebarNavItem: React.FC<SidebarNavItemProps> = ({
   const navigate = useNavigate();
   const { isOpen } = useSidebar();
   
-  // Compare only the actual path, ignoring hash parts to prevent double paths
+  // Compare only the actual path part, ignoring hash parts
   const currentPath = location.pathname;
-  const targetPath = path.split('#')[0];
-  const isActive = propIsActive !== undefined ? propIsActive : currentPath === targetPath;
+  // Normalize path, ensuring it has a leading slash
+  const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+  
+  // Handle custom active state or compute from current path
+  const isActive = propIsActive !== undefined 
+    ? propIsActive 
+    : currentPath === normalizedPath || currentPath.replace(/^\/+/, '') === normalizedPath.replace(/^\/+/, '');
   
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -41,12 +46,14 @@ const SidebarNavItem: React.FC<SidebarNavItemProps> = ({
     if (onClick) {
       onClick();
     } else if (path !== '#') {
-      // Log navigation for debugging
-      logInfo('SidebarNavItem', `Navegando para: ${path}`);
+      // Ensure path is properly formatted with leading slash if needed
+      const formattedPath = path.startsWith('/') ? path : `/${path}`;
       
-      // Clean up path to prevent duplicated segments
-      const cleanPath = path.replace(/\/([^/]+)#\/\1/, '/$1');
-      navigate(cleanPath);
+      // Log action for debugging
+      logInfo('SidebarNavItem', `Navegação para: ${formattedPath}`, { from: currentPath });
+      
+      // Navigate to the path directly without hash manipulation
+      navigate(formattedPath);
     }
   };
   

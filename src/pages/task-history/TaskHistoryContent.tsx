@@ -36,21 +36,26 @@ export const TaskHistoryContent: React.FC<TaskHistoryContentProps> = ({ setError
   const [sortBy, setSortBy] = useState('newest');
   const [showFilters, setShowFilters] = useState(false);
   
-  // Create validated tasks array using memo to prevent repeated calculations
+  // Validate tasks with safe date handling - only calculate once with useMemo
   const validatedTasks = useMemo(() => {
-    if (!completedTasks.length) return [];
-    
-    // Defensive copy of tasks with validated dates - only calculate once
-    return completedTasks.map(task => ({
-      ...task,
-      // Ensure completedAt is a valid Date
-      completedAt: task.completedAt instanceof Date && !isNaN(task.completedAt.getTime())
-        ? task.completedAt
-        : new Date() // Use current date as fallback
-    }));
-  }, [completedTasks]);
+    try {
+      if (!completedTasks || !completedTasks.length) return [];
+      
+      return completedTasks.map(task => ({
+        ...task,
+        // Ensure completedAt is a valid Date
+        completedAt: task.completedAt instanceof Date && !isNaN(task.completedAt.getTime())
+          ? task.completedAt
+          : new Date() // Use current date as fallback
+      }));
+    } catch (error) {
+      logError('TaskHistory', 'Erro ao validar tarefas:', error);
+      setError(`Erro ao processar tarefas: ${error instanceof Error ? error.message : String(error)}`);
+      return [];
+    }
+  }, [completedTasks, setError]);
   
-  // Process filters and pagination
+  // Process filters and pagination - handle errors gracefully
   let filteredTasks: Task[] = [];
   let sortedTasks: Task[] = [];
   let groupedTasks = [];
@@ -61,14 +66,14 @@ export const TaskHistoryContent: React.FC<TaskHistoryContentProps> = ({ setError
   let handlePageChange = (page: number) => {};
   
   try {
-    // Use the filter hook with our state values
     if (validatedTasks.length > 0) {
+      // Use filter hook with current state
       const filters = useTaskFilters(
         validatedTasks,
         {
           searchQuery,
           periodFilter,
-          scoreFilter,
+          scoreFilter, 
           feedbackFilter,
           pillarFilter,
           startDate,
@@ -78,11 +83,10 @@ export const TaskHistoryContent: React.FC<TaskHistoryContentProps> = ({ setError
         }
       );
       
-      // Use useMemo values from the filter hook
       filteredTasks = filters.filteredTasks;
       sortedTasks = filters.sortedTasks;
       
-      // Use the pagination hook with filtered results
+      // Use pagination hook for the filtered results
       const pagination = useTaskPagination(sortedTasks, periodFilter);
       currentPage = pagination.currentPage;
       totalPages = pagination.totalPages;
@@ -101,7 +105,7 @@ export const TaskHistoryContent: React.FC<TaskHistoryContentProps> = ({ setError
       <div className="flex flex-col space-y-4">
         <h1 className="text-2xl font-bold">Histórico de Tarefas</h1>
         
-        {/* Display task count even if there's an error */}
+        {/* Always display task count */}
         <div className="text-muted-foreground">
           {completedTasks.length > 0 ? 
             `${completedTasks.length} ${completedTasks.length === 1 ? 'tarefa concluída' : 'tarefas concluídas'}` : 
@@ -109,12 +113,12 @@ export const TaskHistoryContent: React.FC<TaskHistoryContentProps> = ({ setError
           }
         </div>
         
-        {/* Pass filtered tasks to TaskHistoryStats */}
+        {/* Stats only display when there are tasks */}
         {sortedTasks.length > 0 && (
           <TaskHistoryStats filteredTasks={sortedTasks} />
         )}
         
-        {/* Search and filter bar */}
+        {/* Search and filter controls */}
         <div className="flex flex-col md:flex-row justify-between gap-4">
           <TaskSearchBar 
             searchQuery={searchQuery}
@@ -138,7 +142,7 @@ export const TaskHistoryContent: React.FC<TaskHistoryContentProps> = ({ setError
           </div>
         </div>
         
-        {/* Advanced filters */}
+        {/* Advanced filters - only when enabled */}
         {showFilters && (
           <AdvancedFilters
             periodFilter={periodFilter}
@@ -156,16 +160,14 @@ export const TaskHistoryContent: React.FC<TaskHistoryContentProps> = ({ setError
           />
         )}
 
-        {/* No results message */}
+        {/* No tasks message when needed */}
         {(sortedTasks.length === 0 || completedTasks.length === 0) && <NoTasksMessage />}
         
-        {/* Task list view */}
+        {/* Task display - either list or grid based on preference */}
         {viewMode === 'list' && paginatedTasks.length > 0 && <TasksTable tasks={paginatedTasks} />}
-        
-        {/* Grid view with timeline grouping */}
         {viewMode === 'grid' && paginatedTasks.length > 0 && <TaskGroupGrid groups={groupedTasks} />}
         
-        {/* Pagination */}
+        {/* Pagination when there are tasks */}
         {sortedTasks.length > 0 && (
           <TaskPagination
             currentPage={currentPage}

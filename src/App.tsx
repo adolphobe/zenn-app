@@ -14,7 +14,6 @@ import { Toaster } from './components/ui/toaster';
 import Dashboard from './components/Dashboard';
 import TaskHistory from './pages/TaskHistory';
 import StrategicReview from './pages/StrategicReview';
-import Dashboard2 from './components/Dashboard2';
 import ResetPassword from './pages/ResetPassword';
 import Settings from './pages/Settings';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -60,9 +59,9 @@ function App() {
                         <Route path="/app" element={<ActoApp />} />
                         <Route element={<PrivateRoute />}>
                           <Route path="/dashboard" element={<Dashboard />} />
-                          <Route path="/dashboard2" element={<Dashboard2 />} />
+                          {/* Removed dashboard2 route */}
                           <Route path="/task-history" element={<TaskHistory />} />
-                          <Route path="task-history" element={<TaskHistory />} /> {/* Also handle without leading slash */}
+                          {/* No longer need duplicate task-history route without leading slash */}
                           <Route path="/strategic-review" element={<StrategicReview />} />
                           <Route path="/settings" element={<Settings />} />
                         </Route>

@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useAppContext } from '@/context/AppContext';
 import { useAuth } from '@/context/auth';
 import { useTaskDataContext } from '@/context/TaskDataProvider';
-import { logInfo, logError } from '@/utils/logUtils';
+import { logInfo } from '@/utils/logUtils';
 import { TaskHistoryContent } from './TaskHistoryContent';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Loader2 } from 'lucide-react';
@@ -16,16 +16,14 @@ const TaskHistoryPage = () => {
   const { completedTasks, completedTasksLoading } = useTaskDataContext();
   const isLoading = completedTasksLoading || authLoading;
   
-  // Check for URL duplication and log relevant info at mount
+  // Log page load only once to reduce console noise
   useEffect(() => {
-    const currentUrl = window.location.href;
-    logInfo('TaskHistory', 'Componente montado', { 
-      url: currentUrl,
-      isAuthenticated, 
-      authLoading,
-      tasksLoaded: completedTasks.length 
+    logInfo('TaskHistory', 'Página de histórico de tarefas carregada', {
+      autenticado: isAuthenticated,
+      carregando: isLoading,
+      tarefas: completedTasks.length
     });
-  }, [isAuthenticated, authLoading, completedTasks.length]);
+  }, []);
 
   if (isLoading) {
     return (
