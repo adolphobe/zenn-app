@@ -62,25 +62,30 @@ const CommentForm: React.FC<CommentFormProps> = ({ taskId, onCommentAdded }) => 
           console.log('[CommentForm] Comment added successfully');
           setText(''); // Clear the input on success
           
-          // Force immediate refresh of ALL relevant queries
+          // Force immediate refresh of ALL relevant queries with no debouncing
           await Promise.all([
             queryClient.invalidateQueries({ 
-              queryKey: ['comments', taskId]
+              queryKey: ['comments', taskId],
+              refetchType: 'all'
             }),
             queryClient.invalidateQueries({ 
-              queryKey: ['task', taskId]
+              queryKey: ['task', taskId],
+              refetchType: 'all'
             }),
             queryClient.invalidateQueries({ 
-              queryKey: ['tasks']
+              queryKey: ['tasks'],
+              refetchType: 'all'
             }),
             queryClient.invalidateQueries({ 
-              queryKey: ['completedTasks']
+              queryKey: ['completedTasks'],
+              refetchType: 'all' 
             })
           ]);
           
-          // Explicitly fetch fresh comments data
+          // Explicitly refetch comments query to ensure fresh data
           await queryClient.fetchQuery({ 
-            queryKey: ['comments', taskId]
+            queryKey: ['comments', taskId],
+            refetchType: 'all'
           });
           
           // Call the callback to refresh the comments list and scroll to bottom

@@ -11,7 +11,7 @@ import { useComments } from '@/hooks/useComments';
 interface TaskCommentsContentProps {
   task: Task;
   onCommentAdded?: () => void;
-  forceComments?: Comment[]; // Prop to force comments from parent
+  forceComments?: Comment[]; // New prop to force comments from parent
 }
 
 const TaskCommentsContent: React.FC<TaskCommentsContentProps> = ({ 
@@ -31,12 +31,11 @@ const TaskCommentsContent: React.FC<TaskCommentsContentProps> = ({
   } = useComments(task.id);
   
   // Use forced comments if provided, otherwise use hook comments
-  // Always fallback to empty array to prevent undefined errors
-  const comments = forceComments || hookComments || [];
+  const comments = forceComments || hookComments;
   
   // Effect to scroll to bottom when comments change
   useEffect(() => {
-    if (comments.length > 0 && commentsRef.current) {
+    if (comments?.length > 0 && commentsRef.current) {
       console.log('[TaskCommentsContent] Comments updated, scrolling to bottom');
       const scrollElement = commentsRef.current.querySelector('.native-scrollbar');
       if (scrollElement) {
@@ -70,6 +69,7 @@ const TaskCommentsContent: React.FC<TaskCommentsContentProps> = ({
     }
   };
 
+  // Use the comments from the hook or forced comments from props
   return (
     <div ref={commentsRef}>
       <div className="mb-4">
