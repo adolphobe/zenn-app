@@ -1,11 +1,12 @@
 
-import React from 'react';
+import React, { useCallback } from 'react';
 import { Task } from '@/types';
 import TaskPillarDetails from '../TaskPillarDetails';
 import TaskCardActions from '../TaskCardActions';
 import TaskComments from '../TaskComments';
 import { motion } from 'framer-motion';
 import { ViewMode } from '@/types';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface TaskCardExpandedProps {
   task: Task;
@@ -60,6 +61,18 @@ const TaskCardExpanded: React.FC<TaskCardExpandedProps> = ({
   viewMode,
   onCollapseTask
 }) => {
+  const queryClient = useQueryClient();
+  
+  // Handler for comment deletion
+  const handleCommentDeleted = useCallback(() => {
+    console.log('[TaskCardExpanded] Comment deleted, refreshing task data');
+    
+    // Invalidate queries to refresh task data across the app
+    queryClient.invalidateQueries({ queryKey: ['tasks'] });
+    queryClient.invalidateQueries({ queryKey: ['task', task.id] });
+    queryClient.invalidateQueries({ queryKey: ['completedTasks'] });
+  }, [queryClient, task.id]);
+  
   return (
     <motion.div 
       className="mt-4 overflow-hidden"
@@ -74,7 +87,11 @@ const TaskCardExpanded: React.FC<TaskCardExpandedProps> = ({
       {/* Display comments if they exist - shown in both modes */}
       {task.comments && task.comments.length > 0 && (
         <div className="mt-4 cursor-default">
-          <TaskComments taskId={task.id} comments={task.comments} />
+          <TaskComments 
+            taskId={task.id} 
+            comments={task.comments} 
+            onCommentDeleted={handleCommentDeleted} 
+          />
         </div>
       )}
       

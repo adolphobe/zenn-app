@@ -1,5 +1,5 @@
 
-import React, { useRef } from 'react';
+import React, { useRef, useCallback } from 'react';
 import { Task } from '@/types';
 import TaskComments from '@/components/TaskComments';
 import CommentForm from '@/components/CommentForm';
@@ -26,7 +26,7 @@ const CommentsContent: React.FC<CommentsContentProps> = ({ task, onCommentAdded 
   const hasComments = task.comments && task.comments.length > 0;
   
   // Handler para quando um comentário é adicionado
-  const handleCommentAdded = (): void => {
+  const handleCommentAdded = useCallback((): void => {
     console.log('[CommentsContent] Comment added');
     
     // Invalidate queries to refresh task data
@@ -37,17 +37,17 @@ const CommentsContent: React.FC<CommentsContentProps> = ({ task, onCommentAdded 
     if (onCommentAdded) {
       onCommentAdded();
     }
-  };
+  }, [queryClient, task.id, onCommentAdded]);
   
   // Handler para quando um comentário é excluído
-  const handleCommentDeleted = (): void => {
+  const handleCommentDeleted = useCallback((): void => {
     console.log('[CommentsContent] Comment deleted');
     
     // Invalidate queries to refresh task data
     queryClient.invalidateQueries({ queryKey: ['tasks'] });
     queryClient.invalidateQueries({ queryKey: ['task', task.id] });
     queryClient.invalidateQueries({ queryKey: ['completedTasks'] });
-  };
+  }, [queryClient, task.id]);
 
   return (
     <div ref={commentsContainerRef} className="space-y-4">

@@ -5,6 +5,7 @@ import TaskFormFields from './TaskFormFields';
 import TaskComments from './TaskComments';
 import CommentForm from './CommentForm';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface TaskFormTabsProps {
   activeTab: string;
@@ -32,6 +33,7 @@ const TaskFormTabs: React.FC<TaskFormTabsProps> = ({
   // Reference for the comments container in the DOM
   const commentsContainerRef = useRef<HTMLDivElement | null>(null);
   const [commentCount, setCommentCount] = useState<number>(task?.comments?.length || 0);
+  const queryClient = useQueryClient();
   
   // Update comment count when task changes
   useEffect(() => {
@@ -76,6 +78,12 @@ const TaskFormTabs: React.FC<TaskFormTabsProps> = ({
     // Try to scroll to bottom immediately and again after a delay
     scrollToBottom();
     setTimeout(scrollToBottom, 300);
+
+    // Invalidate queries to refresh task data
+    if (taskId) {
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      queryClient.invalidateQueries({ queryKey: ['task', taskId] });
+    }
   };
 
   // Handler for comment deletion to update local state
@@ -84,6 +92,12 @@ const TaskFormTabs: React.FC<TaskFormTabsProps> = ({
     // Update comment count to reflect deletion
     if (task?.comments && task.comments.length > 0) {
       setCommentCount(prevCount => Math.max(0, prevCount - 1));
+    }
+
+    // Invalidate queries to refresh task data
+    if (taskId) {
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      queryClient.invalidateQueries({ queryKey: ['task', taskId] });
     }
   };
   

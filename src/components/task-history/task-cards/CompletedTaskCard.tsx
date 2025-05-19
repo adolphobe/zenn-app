@@ -1,4 +1,5 @@
-import React, { useState, useMemo } from 'react';
+
+import React, { useState, useMemo, useCallback } from 'react';
 import { Task } from '@/types';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -14,6 +15,7 @@ import DateTimeDisplay from '@/components/DateTimeDisplay';
 import { dateService } from '@/services/dateService';
 import { logDateInfo } from '@/utils/diagnosticLog';
 import { logError } from '@/utils/logUtils';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface CompletedTaskCardProps {
   task: Task;
@@ -25,6 +27,7 @@ export const CompletedTaskCard: React.FC<CompletedTaskCardProps> = ({ task }) =>
   const [showRestoreConfirmation, setShowRestoreConfirmation] = useState(false);
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [dateError, setDateError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
 
   // Validate and format the completion date
   const completionDate = useMemo(() => {
@@ -116,6 +119,16 @@ export const CompletedTaskCard: React.FC<CompletedTaskCardProps> = ({ task }) =>
   const handleExpandedContentClick = (e: React.MouseEvent) => {
     e.stopPropagation();
   };
+  
+  // Handle comment deletion in the card
+  const handleCommentDeleted = useCallback(() => {
+    console.log('[CompletedTaskCard] Comment deleted, refreshing task data');
+    
+    // Refresh task data across the application
+    queryClient.invalidateQueries({ queryKey: ['tasks'] });
+    queryClient.invalidateQueries({ queryKey: ['task', task.id] });
+    queryClient.invalidateQueries({ queryKey: ['completedTasks'] });
+  }, [queryClient, task.id]);
 
   return (
     <>
@@ -168,7 +181,11 @@ export const CompletedTaskCard: React.FC<CompletedTaskCardProps> = ({ task }) =>
               {/* Display comments if they exist */}
               {task.comments && task.comments.length > 0 && (
                 <div className="mt-4">
-                  <TaskComments taskId={task.id} comments={task.comments} />
+                  <TaskComments 
+                    taskId={task.id} 
+                    comments={task.comments} 
+                    onCommentDeleted={handleCommentDeleted}
+                  />
                 </div>
               )}
               
