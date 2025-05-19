@@ -1,6 +1,5 @@
 
 import React, { useEffect, useRef } from 'react';
-import { useAppContext } from '@/context/AppContext';
 import { useAuth } from '@/context/auth';
 import { Tabs, TabsContent } from '@/components/ui/tabs';
 import { useTaskPillars } from '@/context/hooks';
@@ -9,32 +8,34 @@ import DateRangePicker from '@/components/strategic-review/DateRangePicker';
 import AnalysisContent from '@/components/strategic-review/AnalysisContent';
 import { useStrategicReviewState } from '@/components/strategic-review/hooks/useStrategicReviewState';
 import { useToast } from '@/hooks/use-toast';
+import { useTaskDataContext } from '@/context/TaskDataProvider';
 
 // Main Strategic Review Page Component
 const StrategicReview: React.FC = () => {
-  const { state } = useAppContext();
   const { isAuthenticated } = useAuth();
-  const { addToast } = useToast(); // Usando addToast do hook
+  const { completedTasks, completedTasksLoading } = useTaskDataContext();
+  const { toast } = useToast();
   const isFirstRender = useRef(true);
   
   // Debug logs
   useEffect(() => {
     console.log("StrategicReview: Estado de autenticação =>", isAuthenticated ? "Autenticado" : "Não autenticado");
-    console.log("StrategicReview: Total de tarefas no estado:", state.tasks.length);
+    console.log("StrategicReview: Total de tarefas completadas =>", completedTasks?.length || 0);
 
-    const completedTasks = state.tasks.filter(t => t.completed);
-    console.log("StrategicReview: Tarefas concluídas:", completedTasks.length);
-    console.log("StrategicReview: Estado tasks:", state.tasks);
-    
-    // Log das primeiras tarefas para debug
-    if (completedTasks.length > 0) {
-      completedTasks.slice(0, 3).forEach((task, i) => {
-        console.log(`Tarefa concluída #${i+1}: "${task.title}", completedAt:`, task.completedAt);
-      });
+    if (completedTasks && completedTasks.length > 0) {
+      console.log("StrategicReview: Há tarefas para análise");
+      console.log("StrategicReview: Amostra de tarefas completadas:", 
+        completedTasks.slice(0, 3).map(t => ({
+          id: t.id,
+          title: t.title,
+          completed: t.completed,
+          completedAt: t.completedAt
+        }))
+      );
     } else {
-      console.log("StrategicReview: Nenhuma tarefa concluída encontrada");
+      console.log("StrategicReview: Sem tarefas para análise");
     }
-  }, [isAuthenticated, state.tasks]);
+  }, [isAuthenticated, completedTasks]);
   
   // Use the task pillars hook to ensure all tasks have pillars assigned
   const { assignMissingPillars } = useTaskPillars();
@@ -50,27 +51,31 @@ const StrategicReview: React.FC = () => {
     setCustomStartDate,
     setCustomEndDate,
     handlePeriodChange
-  } = useStrategicReviewState(state.tasks);
+  } = useStrategicReviewState(completedTasks || []);
 
   // Adicionar logs para diagnóstico
   useEffect(() => {
-    console.log("StrategicReview: Total de tarefas disponíveis:", state.tasks.length);
-    console.log("StrategicReview: Tarefas filtradas para análise:", filteredTasks.length);
+    console.log("StrategicReview: Total de tarefas disponíveis:", completedTasks?.length || 0);
+    console.log("StrategicReview: Tarefas filtradas para análise:", filteredTasks?.length || 0);
     console.log("StrategicReview: Período selecionado:", period);
     console.log("StrategicReview: Data range:", dateRangeDisplay);
-  }, [state.tasks, filteredTasks, period, dateRangeDisplay]);
+  }, [completedTasks, filteredTasks, period, dateRangeDisplay]);
   
   useEffect(() => {
-    // Ensure all tasks have pillars assigned - explicitly call this
+    // Ensure all tasks have pillars assigned
     assignMissingPillars();
     console.log("StrategicReview: assignMissingPillars() executado");
     
     // Show a toast to indicate the page is loaded - only on first render
     if (isFirstRender.current) {
       try {
-        addToast({
+        toast({
           title: "Revisão Estratégica",
-          description: "Mostrando análise das tarefas concluídas."
+          description: completedTasksLoading 
+            ? "Carregando suas tarefas concluídas..." 
+            : (completedTasks?.length 
+              ? "Mostrando análise das tarefas concluídas." 
+              : "Nenhuma tarefa concluída encontrada.")
         });
         console.log("StrategicReview: Toast de boas-vindas exibido");
       } catch (error) {
@@ -78,19 +83,23 @@ const StrategicReview: React.FC = () => {
       }
       isFirstRender.current = false;
     }
-  }, [assignMissingPillars, addToast]);
+  }, [assignMissingPillars, toast, completedTasksLoading, completedTasks]);
   
   return (
     <div className="w-full">
       <div className="mb-6">
         <h1 className="text-3xl font-bold tracking-tight">Insights das suas tarefas</h1>
-        <p className="text-muted-foreground">Período: {dateRangeDisplay || "Carregando..."}</p>
+        <p className="text-muted-foreground">
+          {completedTasksLoading ? "Carregando..." : (
+            dateRangeDisplay || "Nenhum período selecionado"
+          )}
+        </p>
         
         {/* Debug info visible in development */}
         {process.env.NODE_ENV !== 'production' && (
           <div className="p-2 my-2 bg-yellow-50 border border-yellow-200 rounded text-xs">
-            <p>Debug: Encontradas {filteredTasks.length} tarefas de {state.tasks.length} totais.</p>
-            <p>Debug: Tarefas concluídas: {state.tasks.filter(t => t.completed).length}</p>
+            <p>Debug: Encontradas {filteredTasks.length} tarefas de {completedTasks?.length || 0} totais.</p>
+            <p>Debug: Estado de carregamento: {completedTasksLoading ? 'Carregando' : 'Completo'}</p>
           </div>
         )}
       </div>
@@ -118,7 +127,10 @@ const StrategicReview: React.FC = () => {
         
         {/* Analysis Content */}
         <TabsContent value={period} className="space-y-6">
-          <AnalysisContent tasks={filteredTasks} />
+          <AnalysisContent 
+            tasks={filteredTasks} 
+            isLoading={completedTasksLoading} 
+          />
         </TabsContent>
       </Tabs>
     </div>

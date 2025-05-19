@@ -1,4 +1,4 @@
-import React, { createContext, useContext } from 'react';
+import React, { createContext, useContext, useEffect } from 'react';
 import { useTaskData } from '@/hooks/useTaskData';
 import { Task, TaskFormData } from '@/types';
 import { safeParseDate } from '@/utils';
@@ -20,6 +20,22 @@ export const TaskDataProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   // Use a separate instance to manage completed tasks
   const completedTasksData = useTaskData(true);
   
+  // Debug logs
+  useEffect(() => {
+    console.log("TaskDataProvider: Tarefas ativas carregadas:", activeTasksData.tasks?.length || 0);
+    console.log("TaskDataProvider: Tarefas completadas carregadas:", completedTasksData.tasks?.length || 0);
+    
+    if (completedTasksData.tasks && completedTasksData.tasks.length > 0) {
+      console.log("TaskDataProvider: Amostra das tarefas completadas:", 
+        completedTasksData.tasks.slice(0, 2).map(t => ({
+          id: t.id,
+          title: t.title,
+          completedAt: t.completedAt
+        }))
+      );
+    }
+  }, [activeTasksData.tasks, completedTasksData.tasks]);
+  
   // Create context value with both active and completed tasks
   const contextValue: TaskDataContextType = {
     ...activeTasksData,
@@ -29,8 +45,10 @@ export const TaskDataProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       try {
         return {
           ...task,
-          // Keep completedAt as string (matching Task interface) but validate it exists
-          completedAt: task.completedAt || null,
+          // Keep completedAt as consistent type - prefer Date object
+          completedAt: task.completedAt instanceof Date ? 
+            task.completedAt : 
+            (task.completedAt ? safeParseDate(task.completedAt) : null),
           // Ensure idealDate is validated but keep original type structure
           idealDate: task.idealDate ? 
             (task.idealDate instanceof Date ? task.idealDate : safeParseDate(task.idealDate)) : 

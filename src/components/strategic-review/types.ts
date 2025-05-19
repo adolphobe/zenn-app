@@ -1,3 +1,4 @@
+
 export type PeriodType = 'today' | 'yesterday' | 'week' | 'month' | 'custom' | 'custom-range' | 'all-time';
 
 export interface InsightMessage {
@@ -5,7 +6,7 @@ export interface InsightMessage {
   title: string;
   classification: 'prioridade_alta' | 'equilibrado' | 'negligenciado';
   messages: string[];
-  customTitle?: string; // Adicionando o campo customTitle
+  customTitle?: string;
 }
 
 export interface PillarDataType {
@@ -33,4 +34,16 @@ export interface FeedbackDistributionItem {
   value: number;
   percent: number;
   color: string;
+}
+
+export interface TaskStatistics {
+  totalTasks: number;
+  completedTasks: number;
+  avgTotal: number;
+  avgConsequence: number;
+  avgPride: number;
+  avgConstruction: number;
+  criticalCount: number;
+  importantCount: number;
+  moderateCount: number;
 }
