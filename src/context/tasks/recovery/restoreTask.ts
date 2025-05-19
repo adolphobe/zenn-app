@@ -2,7 +2,7 @@
 import { toast } from '@/hooks/use-toast';
 import { v4 as uuidv4 } from 'uuid';
 import { AppDispatch } from '../../types';
-import { restoreTask as restoreTaskService } from '@/services/taskService';
+import { restoreTask as restoreTaskService } from '@/services/task';
 
 export const restoreTask = async (dispatch: AppDispatch, taskId: string) => {
   try {

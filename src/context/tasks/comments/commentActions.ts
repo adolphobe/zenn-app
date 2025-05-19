@@ -5,7 +5,7 @@ import { AppDispatch } from '../../types';
 import { 
   addComment as addCommentService,
   deleteComment as deleteCommentService
-} from '@/services/taskService';
+} from '@/services/task';
 
 export const addComment = async (dispatch: AppDispatch, taskId: string, text: string) => {
   try {
