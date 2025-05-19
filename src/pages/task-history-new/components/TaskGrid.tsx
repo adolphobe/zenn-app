@@ -31,6 +31,14 @@ export const TaskGrid: React.FC<TaskGridProps> = ({
     relief: 'Tive alívio ao finalizar',
     obligation: 'Terminei por obrigação'
   };
+  
+  // Helper for score color - UPDATED to match TaskScoreDisplay colors
+  const getScoreColor = (score: number) => {
+    if (score >= 14) return 'bg-red-50 text-red-800 border-red-200';
+    if (score >= 11) return 'bg-orange-50 text-orange-800 border-orange-200';
+    if (score >= 8) return 'bg-blue-50 text-blue-800 border-blue-200';
+    return 'bg-gray-100 text-gray-800 border-gray-200';
+  };
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -67,6 +75,8 @@ export const TaskGrid: React.FC<TaskGridProps> = ({
       animate="visible"
     >
       {tasks.map((task) => {
+        const scoreColorClass = getScoreColor(task.totalScore);
+        
         return (
           <motion.div key={task.id} variants={itemVariants}>
             <Card className="mb-3 border-l-4 border-l-green-500 hover:bg-muted/10 transition-colors shadow-sm hover:shadow-md">
@@ -77,7 +87,7 @@ export const TaskGrid: React.FC<TaskGridProps> = ({
                 >
                   <div className="flex justify-between items-start mb-2">
                     <h3 className="font-medium text-gray-900 dark:text-gray-100 line-clamp-2">{task.title}</h3>
-                    <Badge variant="outline" className={`bg-gray-100 text-gray-800 ml-2 ${task.totalScore >= 12 ? 'bg-green-50 text-green-800' : ''}`}>
+                    <Badge variant="outline" className={scoreColorClass}>
                       {task.totalScore}/15
                     </Badge>
                   </div>

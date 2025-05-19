@@ -26,12 +26,12 @@ export const TaskTable: React.FC<TaskTableProps> = ({
   onSelectTask, 
   onRestoreTask 
 }) => {
-  // Helper for score color
+  // Helper for score color - UPDATED to match TaskScoreDisplay colors
   const getScoreColor = (score: number) => {
-    if (score >= 12) return 'text-green-600';
-    if (score >= 9) return 'text-blue-600';
-    if (score >= 6) return 'text-orange-600';
-    return 'text-gray-600';
+    if (score >= 14) return 'text-red-600';
+    if (score >= 11) return 'text-orange-500';
+    if (score >= 8) return 'text-blue-600';
+    return 'text-slate-500';
   };
 
   // Helper for feedback badge styling
@@ -48,15 +48,15 @@ export const TaskTable: React.FC<TaskTableProps> = ({
     }
   };
 
-  // Helper for feedback label
+  // Helper for feedback label - UPDATED to use full messages
   const getFeedbackLabel = (feedback: string | null) => {
     switch(feedback) {
       case 'transformed':
-        return 'Transformador';
+        return 'Foi transformador terminar';
       case 'relief':
-        return 'Alívio';
+        return 'Tive alívio ao finalizar';
       case 'obligation':
-        return 'Obrigação';
+        return 'Terminei por obrigação';
       default:
         return 'Sem feedback';
     }

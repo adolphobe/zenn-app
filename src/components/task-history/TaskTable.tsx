@@ -46,7 +46,16 @@ export const CompletedTaskRow: React.FC<{ task: Task }> = ({ task }) => {
     return max.name;
   };
 
+  // Updated score color getter to match TaskScoreDisplay
+  const getScoreColor = (score: number) => {
+    if (score >= 14) return 'text-red-600';
+    if (score >= 11) return 'text-orange-500';
+    if (score >= 8) return 'text-blue-600';
+    return 'text-slate-500';
+  };
+
   const dominantPillar = getDominantPillar();
+  const scoreColor = getScoreColor(task.totalScore);
   
   // Consistent feedback mapping across the application
   const feedbackLabels = {
@@ -81,7 +90,7 @@ export const CompletedTaskRow: React.FC<{ task: Task }> = ({ task }) => {
             fallback="(data não disponível)" 
           />
         </TableCell>
-        <TableCell>{task.totalScore}/15</TableCell>
+        <TableCell className={scoreColor}>{task.totalScore}/15</TableCell>
         <TableCell className="capitalize">{dominantPillar}</TableCell>
         <TableCell>{task.feedback ? feedbackLabels[task.feedback as keyof typeof feedbackLabels] || '-' : '-'}</TableCell>
         <TableCell>

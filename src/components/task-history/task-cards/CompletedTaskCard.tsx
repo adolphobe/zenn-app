@@ -58,6 +58,14 @@ export const CompletedTaskCard: React.FC<CompletedTaskCardProps> = ({ task }) =>
       return new Date(); // Fallback to current date
     }
   }, [task.completedAt, task.completed, task.id]);
+  
+  // Updated to match TaskScoreDisplay colors
+  const getScoreColor = (score: number) => {
+    if (score >= 14) return 'text-red-600';
+    if (score >= 11) return 'text-orange-500';
+    if (score >= 8) return 'text-blue-600';
+    return 'text-slate-500';
+  };
 
   const feedbackColors = {
     transformed: 'bg-[#deffe0] text-[#3d8c40] border-[#a8d9aa]',
@@ -97,6 +105,8 @@ export const CompletedTaskCard: React.FC<CompletedTaskCardProps> = ({ task }) =>
     queryClient.invalidateQueries({ queryKey: ['completedTasks'] });
   }, [queryClient, task.id]);
 
+  const scoreColor = getScoreColor(task.totalScore);
+
   return (
     <>
       <Card 
@@ -129,7 +139,7 @@ export const CompletedTaskCard: React.FC<CompletedTaskCardProps> = ({ task }) =>
                   {feedbackLabels[task.feedback] || '-'}
                 </Badge>
               )}
-              <Badge variant="outline" className="bg-gray-100 text-gray-800">
+              <Badge variant="outline" className={`bg-gray-100 ${scoreColor}`}>
                 {task.totalScore}/15
               </Badge>
             </div>
