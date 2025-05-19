@@ -98,7 +98,7 @@ const PostCompletionFeedback: React.FC<PostCompletionFeedbackProps> = ({ task, i
           <Button 
             onClick={handleConfirm}
             disabled={!selectedFeedback}
-            className="w-full sm:w-auto bg-green-600 text-white"
+            className="w-full sm:w-auto"
           >
             ✓ Confirmar
           </Button>
