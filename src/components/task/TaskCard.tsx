@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Task } from '@/types';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -173,6 +174,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
           consequenceScore={task.consequenceScore}
           prideScore={task.prideScore}
           constructionScore={task.constructionScore}
+          isPowerExtra={viewMode === 'power' && task.is_power_extra && task.totalScore >= 14}
         />
 
         <AnimatePresence initial={false}>
