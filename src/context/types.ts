@@ -97,6 +97,7 @@ export interface AppContextType {
   toggleShowScores: () => void;
   updateDateDisplayOptions: (options: Partial<DateDisplayOptions>) => void;
   setSortOptions: (options: SortOptionsUpdate) => void;
+  toggleViewMode: () => void; // Adding the missing toggleViewMode function
 }
 
 // Reuse TaskFormData from main types file

@@ -7,6 +7,10 @@ export const setViewMode = (dispatch: AppDispatch, mode: ViewMode) => {
   dispatch({ type: 'SET_VIEW_MODE', payload: mode });
 };
 
+export const toggleViewMode = (dispatch: AppDispatch) => {
+  dispatch({ type: 'TOGGLE_VIEW_MODE' });
+};
+
 export const toggleShowHiddenTasks = (dispatch: AppDispatch) => {
   dispatch({ type: 'TOGGLE_SHOW_HIDDEN_TASKS' });
 };

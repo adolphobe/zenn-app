@@ -252,7 +252,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     toggleShowDates: () => uiActions.toggleShowDates(dispatch),
     toggleShowScores: () => uiActions.toggleShowScores(dispatch),
     updateDateDisplayOptions: (options) => uiActions.updateDateDisplayOptions(dispatch, options),
-    setSortOptions: (options) => uiActions.setSortOptions(dispatch, options)
+    setSortOptions: (options) => uiActions.setSortOptions(dispatch, options),
+    toggleViewMode: () => dispatch({ type: 'TOGGLE_VIEW_MODE' }) // Add toggleViewMode function
   };
 
   return (
