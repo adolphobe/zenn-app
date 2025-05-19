@@ -12,6 +12,8 @@ import {
 import { Button } from '@/components/ui/button';
 import { Eye, RefreshCw } from 'lucide-react';
 import { Task } from '@/types';
+import { Badge } from '@/components/ui/badge';
+import { motion } from 'framer-motion';
 
 interface TaskTableProps {
   tasks: Task[];
@@ -37,8 +39,43 @@ export const TaskTable: React.FC<TaskTableProps> = ({
     return max.name;
   };
 
+  // Helper for pillar badge styling
+  const getPillarStyles = (pillar: string) => {
+    switch(pillar) {
+      case 'risco':
+        return 'bg-orange-100 text-orange-800 border-orange-200';
+      case 'orgulho':
+        return 'bg-purple-100 text-purple-800 border-purple-200';
+      case 'crescimento':
+        return 'bg-blue-100 text-blue-800 border-blue-200';
+      default:
+        return 'bg-gray-100 text-gray-800 border-gray-200';
+    }
+  };
+
+  // Helper for score color
+  const getScoreColor = (score: number) => {
+    if (score >= 12) return 'text-green-600';
+    if (score >= 9) return 'text-blue-600';
+    if (score >= 6) return 'text-orange-600';
+    return 'text-gray-600';
+  };
+
+  const tableVariants = {
+    hidden: { opacity: 0 },
+    visible: { 
+      opacity: 1,
+      transition: { staggerChildren: 0.05 }
+    }
+  };
+
+  const tableRowVariants = {
+    hidden: { opacity: 0, x: -20 },
+    visible: { opacity: 1, x: 0 }
+  };
+
   return (
-    <div className="border rounded-md">
+    <div className="border rounded-md overflow-hidden shadow-sm">
       <Table>
         <TableHeader>
           <TableRow>
@@ -49,7 +86,12 @@ export const TaskTable: React.FC<TaskTableProps> = ({
             <TableHead>Ações</TableHead>
           </TableRow>
         </TableHeader>
-        <TableBody>
+        <motion.tbody
+          variants={tableVariants}
+          initial="hidden"
+          animate="visible"
+          component={TableBody}
+        >
           {tasks.length === 0 ? (
             <TableRow>
               <TableCell colSpan={5} className="text-center py-6 text-muted-foreground">
@@ -57,69 +99,82 @@ export const TaskTable: React.FC<TaskTableProps> = ({
               </TableCell>
             </TableRow>
           ) : (
-            tasks.map((task) => (
-              <TableRow key={task.id} className="hover:bg-muted/50">
-                <TableCell 
-                  className="font-medium cursor-pointer"
-                  onClick={() => onSelectTask(task.id)}
+            tasks.map((task) => {
+              const dominantPillar = getDominantPillar(task);
+              const pillarStyle = getPillarStyles(dominantPillar);
+              const scoreColor = getScoreColor(task.totalScore);
+              
+              return (
+                <motion.tr
+                  key={task.id}
+                  className="hover:bg-muted/50 transition-colors"
+                  variants={tableRowVariants}
+                  component={TableRow}
                 >
-                  {task.title}
-                </TableCell>
-                <TableCell 
-                  className="cursor-pointer"
-                  onClick={() => onSelectTask(task.id)}
-                >
-                  {task.totalScore || 0}/15
-                </TableCell>
-                <TableCell 
-                  className="cursor-pointer capitalize"
-                  onClick={() => onSelectTask(task.id)}
-                >
-                  {getDominantPillar(task)}
-                </TableCell>
-                <TableCell 
-                  className="cursor-pointer"
-                  onClick={() => onSelectTask(task.id)}
-                >
-                  {task.completedAt 
-                    ? format(new Date(task.completedAt), 'dd/MM/yyyy HH:mm') 
-                    : 'Data desconhecida'}
-                </TableCell>
-                <TableCell>
-                  <div className="flex gap-2">
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="flex items-center gap-1"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onSelectTask(task.id);
-                      }}
-                    >
-                      <Eye size={16} />
-                      Ver
-                    </Button>
-                    
-                    {onRestoreTask && (
+                  <TableCell 
+                    className="font-medium cursor-pointer"
+                    onClick={() => onSelectTask(task.id)}
+                  >
+                    {task.title}
+                  </TableCell>
+                  <TableCell 
+                    className={`cursor-pointer font-semibold ${scoreColor}`}
+                    onClick={() => onSelectTask(task.id)}
+                  >
+                    {task.totalScore || 0}/15
+                  </TableCell>
+                  <TableCell 
+                    className="cursor-pointer"
+                    onClick={() => onSelectTask(task.id)}
+                  >
+                    <Badge className={`${pillarStyle} capitalize`} variant="outline">
+                      {dominantPillar}
+                    </Badge>
+                  </TableCell>
+                  <TableCell 
+                    className="cursor-pointer"
+                    onClick={() => onSelectTask(task.id)}
+                  >
+                    {task.completedAt 
+                      ? format(new Date(task.completedAt), 'dd/MM/yyyy HH:mm') 
+                      : 'Data desconhecida'}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex gap-2">
                       <Button 
                         variant="outline" 
                         size="sm" 
                         className="flex items-center gap-1"
                         onClick={(e) => {
                           e.stopPropagation();
-                          onRestoreTask(task.id);
+                          onSelectTask(task.id);
                         }}
                       >
-                        <RefreshCw size={16} />
-                        Restaurar
+                        <Eye size={16} />
+                        Ver
                       </Button>
-                    )}
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))
+                      
+                      {onRestoreTask && (
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="flex items-center gap-1"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onRestoreTask(task.id);
+                          }}
+                        >
+                          <RefreshCw size={16} />
+                          Restaurar
+                        </Button>
+                      )}
+                    </div>
+                  </TableCell>
+                </motion.tr>
+              );
+            })
           )}
-        </TableBody>
+        </motion.tbody>
       </Table>
     </div>
   );

@@ -1,7 +1,8 @@
 
 import React, { useState } from 'react';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
-import { Loader2 } from 'lucide-react';
+import { Loader2, BarChart2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { useCompletedTasksData } from './hooks/useCompletedTasksData';
 import { useTaskFilters } from './hooks/useTaskFilters';
 import { useTaskPagination } from './hooks/useTaskPagination';
@@ -17,9 +18,11 @@ import TaskViewModal from './components/TaskViewModal';
 import RestoreTaskDialog from './components/RestoreTaskDialog';
 import { restoreTask } from './services/taskActions';
 import { Task } from '@/types';
+import TaskAnalyticsSection from './components/TaskAnalyticsSection';
+import { motion } from 'framer-motion';
 
 /**
- * New Task History Page component that will gradually incorporate features from the existing one
+ * New Task History Page component with advanced analytics
  */
 const TaskHistoryNewPage = () => {
   const { 
@@ -53,9 +56,10 @@ const TaskHistoryNewPage = () => {
     handlePageChange
   } = useTaskPagination(filteredTasks);
 
-  // State for modals
+  // State for modals and analytics
   const [taskToView, setTaskToView] = useState<Task | null>(null);
   const [taskToRestore, setTaskToRestore] = useState<Task | null>(null);
+  const [showAnalytics, setShowAnalytics] = useState<boolean>(false);
   
   // Task selection handler
   const handleSelectTask = (taskId: string) => {
@@ -76,6 +80,11 @@ const TaskHistoryNewPage = () => {
   const handleRestoreConfirm = async (taskId: string) => {
     await restoreTask(taskId);
     refetch(); // Refresh task list after restoration
+  };
+  
+  // Toggle analytics section
+  const toggleAnalytics = () => {
+    setShowAnalytics(prev => !prev);
   };
   
   // Loading state
@@ -117,8 +126,30 @@ const TaskHistoryNewPage = () => {
     : '';
 
   return (
-    <div className="container p-4 mx-auto">
-      <h1 className="text-2xl font-bold mb-6">Histórico de Tarefas</h1>
+    <motion.div 
+      className="container p-4 mx-auto"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3 }}
+    >
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-bold">Histórico de Tarefas</h1>
+        
+        <Button 
+          variant={showAnalytics ? "default" : "outline"} 
+          onClick={toggleAnalytics}
+          className="gap-2"
+        >
+          <BarChart2 size={18} />
+          {showAnalytics ? "Ocultar Análises" : "Mostrar Análises"}
+        </Button>
+      </div>
+      
+      {/* Analytics section */}
+      <TaskAnalyticsSection 
+        tasks={completedTasks} 
+        isVisible={showAnalytics} 
+      />
       
       <div className="flex flex-col md:flex-row justify-between gap-4 mb-4">
         {/* Search bar */}
@@ -140,20 +171,27 @@ const TaskHistoryNewPage = () => {
       
       {/* Advanced filters */}
       {showFilters && (
-        <AdvancedFilters
-          periodFilter={periodFilter}
-          setPeriodFilter={setPeriodFilter}
-          scoreFilter={scoreFilter}
-          setScoreFilter={setScoreFilter}
-          feedbackFilter={feedbackFilter}
-          setFeedbackFilter={setFeedbackFilter}
-          pillarFilter={pillarFilter}
-          setPillarFilter={setPillarFilter}
-          startDate={startDate}
-          setStartDate={setStartDate}
-          endDate={endDate}
-          setEndDate={setEndDate}
-        />
+        <motion.div
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: 'auto' }}
+          exit={{ opacity: 0, height: 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          <AdvancedFilters
+            periodFilter={periodFilter}
+            setPeriodFilter={setPeriodFilter}
+            scoreFilter={scoreFilter}
+            setScoreFilter={setScoreFilter}
+            feedbackFilter={feedbackFilter}
+            setFeedbackFilter={setFeedbackFilter}
+            pillarFilter={pillarFilter}
+            setPillarFilter={setPillarFilter}
+            startDate={startDate}
+            setStartDate={setStartDate}
+            endDate={endDate}
+            setEndDate={setEndDate}
+          />
+        </motion.div>
       )}
       
       {/* Display results count when filtering */}
@@ -169,7 +207,12 @@ const TaskHistoryNewPage = () => {
       />
       
       {/* Display tasks */}
-      <div className="mt-6">
+      <motion.div 
+        className="mt-6"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.2 }}
+      >
         {/* If grouping is enabled, show grouped tasks */}
         {periodFilter !== 'all' || searchQuery ? (
           viewMode === 'list' ? (
@@ -202,7 +245,7 @@ const TaskHistoryNewPage = () => {
             onPageChange={handlePageChange}
           />
         )}
-      </div>
+      </motion.div>
       
       {/* Task modals */}
       <TaskViewModal
@@ -218,7 +261,7 @@ const TaskHistoryNewPage = () => {
         onClose={() => setTaskToRestore(null)}
         onConfirm={handleRestoreConfirm}
       />
-    </div>
+    </motion.div>
   );
 };
 

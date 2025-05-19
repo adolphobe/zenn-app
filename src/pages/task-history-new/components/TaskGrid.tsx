@@ -6,6 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Eye, RefreshCw } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 interface TaskGridProps {
   tasks: Task[];
@@ -53,10 +54,29 @@ export const TaskGrid: React.FC<TaskGridProps> = ({
 
   // Determine border color based on task score
   const getBorderColor = (score: number) => {
-    if (score >= 12) return 'border-l-red-300';
-    if (score >= 9) return 'border-l-orange-300';
-    if (score >= 6) return 'border-l-blue-300';
+    if (score >= 12) return 'border-l-green-500';
+    if (score >= 9) return 'border-l-blue-500';
+    if (score >= 6) return 'border-l-orange-500';
     return 'border-l-gray-300';
+  };
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.05
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: { duration: 0.3 }
+    }
   };
 
   if (!tasks.length) {
@@ -68,80 +88,87 @@ export const TaskGrid: React.FC<TaskGridProps> = ({
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    <motion.div 
+      className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+    >
       {tasks.map((task) => {
         const dominantPillar = getDominantPillar(task);
         const borderColorClass = getBorderColor(task.totalScore);
 
         return (
-          <Card key={task.id} className={`mb-3 border-l-4 ${borderColorClass} hover:bg-muted/10 transition-colors`}>
-            <CardContent className="p-4">
-              <div 
-                className="cursor-pointer"
-                onClick={() => onSelectTask(task.id)}
-              >
-                <div className="flex justify-between items-start">
-                  <h3 className="font-medium text-gray-900 dark:text-gray-100">{task.title}</h3>
-                  <Badge variant="outline" className="bg-gray-100 text-gray-800">
-                    {task.totalScore}/15
-                  </Badge>
-                </div>
-                
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                  Concluída em {task.completedAt 
-                    ? format(new Date(task.completedAt), 'dd/MM/yyyy')
-                    : '(data não disponível)'}
-                </p>
-                
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {task.feedback && (
-                    <Badge className={feedbackColors[task.feedback] || 'bg-gray-100 text-gray-800'} variant="outline">
-                      {feedbackLabels[task.feedback] || '-'}
-                    </Badge>
-                  )}
-                  
-                  <Badge
-                    className={pillarColors[dominantPillar] || 'bg-gray-100 text-gray-800'}
-                    variant="outline"
-                  >
-                    {dominantPillar}
-                  </Badge>
-                </div>
-              </div>
-              
-              <div className="mt-4 flex justify-end gap-2">
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="flex items-center gap-1"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onSelectTask(task.id);
-                  }}
+          <motion.div key={task.id} variants={itemVariants}>
+            <Card className={`mb-3 border-l-4 ${borderColorClass} hover:bg-muted/10 transition-colors shadow-sm hover:shadow-md`}>
+              <CardContent className="p-4">
+                <div 
+                  className="cursor-pointer"
+                  onClick={() => onSelectTask(task.id)}
                 >
-                  <Eye size={16} />
-                  Visualizar
-                </Button>
+                  <div className="flex justify-between items-start mb-2">
+                    <h3 className="font-medium text-gray-900 dark:text-gray-100 line-clamp-2">{task.title}</h3>
+                    <Badge variant="outline" className={`bg-gray-100 text-gray-800 ml-2 ${task.totalScore >= 12 ? 'bg-green-50 text-green-800' : ''}`}>
+                      {task.totalScore}/15
+                    </Badge>
+                  </div>
+                  
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                    Concluída em {task.completedAt 
+                      ? format(new Date(task.completedAt), 'dd/MM/yyyy')
+                      : '(data não disponível)'}
+                  </p>
+                  
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {task.feedback && (
+                      <Badge className={feedbackColors[task.feedback] || 'bg-gray-100 text-gray-800'} variant="outline">
+                        {feedbackLabels[task.feedback] || '-'}
+                      </Badge>
+                    )}
+                    
+                    <Badge
+                      className={pillarColors[dominantPillar] || 'bg-gray-100 text-gray-800'}
+                      variant="outline"
+                    >
+                      {dominantPillar}
+                    </Badge>
+                  </div>
+                </div>
                 
-                {onRestoreTask && (
+                <div className="mt-4 flex justify-end gap-2">
                   <Button 
                     variant="outline" 
                     size="sm" 
                     className="flex items-center gap-1"
                     onClick={(e) => {
                       e.stopPropagation();
-                      onRestoreTask(task.id);
+                      onSelectTask(task.id);
                     }}
                   >
-                    <RefreshCw size={16} />
-                    Restaurar
+                    <Eye size={16} />
+                    Visualizar
                   </Button>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+                  
+                  {onRestoreTask && (
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="flex items-center gap-1 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onRestoreTask(task.id);
+                      }}
+                    >
+                      <RefreshCw size={16} />
+                      Restaurar
+                    </Button>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
         );
       })}
-    </div>
+    </motion.div>
   );
 };
