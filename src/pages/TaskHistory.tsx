@@ -18,6 +18,7 @@ import { NoTasksMessage } from '@/components/task-history/NoTasksMessage';
 import { TaskPagination } from '@/components/task-history/TaskPagination';
 import { Loader2 } from 'lucide-react';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
+import { logDateInfo } from '@/utils/diagnosticLog';
 
 const TaskHistory = () => {
   const { state } = useAppContext();
@@ -26,6 +27,15 @@ const TaskHistory = () => {
   
   // Use our custom hooks to manage the task data, filtering and pagination
   const { completedTasks, isLoading, error } = useCompletedTasks(state.tasks);
+  
+  React.useEffect(() => {
+    if (completedTasks.length > 0) {
+      // Log the first few tasks to help diagnose date issues
+      completedTasks.slice(0, 3).forEach(task => {
+        logDateInfo('TaskHistory', `Task ${task.id} completedAt in list`, task.completedAt);
+      });
+    }
+  }, [completedTasks]);
   
   const { 
     searchQuery, setSearchQuery,

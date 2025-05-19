@@ -15,6 +15,7 @@ interface DateTimeDisplayProps {
 
 /**
  * Componente reutilizável para exibição formatada de datas e horas
+ * Com melhor tratamento para datas inválidas
  */
 const DateTimeDisplay: React.FC<DateTimeDisplayProps> = ({
   date,
@@ -31,14 +32,18 @@ const DateTimeDisplay: React.FC<DateTimeDisplayProps> = ({
   
   // Tenta formatar a data
   try {
+    // Verifica se a data é válida antes de tentar formatar
+    const validDate = dateService.parseDate(date);
+    if (!validDate) return <span className={className}>{fallback}</span>;
+    
     let formattedDate: string;
     
     if (showRelative) {
       // Usa formato relativo (hoje, ontem, etc)
-      formattedDate = formatRelative(date);
+      formattedDate = formatRelative(validDate);
     } else {
       // Usa formato padrão com as opções fornecidas
-      formattedDate = formatDate(date, {
+      formattedDate = formatDate(validDate, {
         ...options,
         useTimeZone: showTimeZone
       });
@@ -49,16 +54,17 @@ const DateTimeDisplay: React.FC<DateTimeDisplayProps> = ({
     
     return (
       <time 
-        dateTime={dateService.toISOString(date) || ''} 
+        dateTime={dateService.toISOString(validDate) || ''} 
         className={className}
       >
         {formattedDate}
       </time>
     );
   } catch (error) {
-    console.error('Erro ao renderizar data:', error);
+    console.error('Erro ao renderizar data:', error, { date });
     return <span className={className}>{fallback}</span>;
   }
 };
 
 export default DateTimeDisplay;
+

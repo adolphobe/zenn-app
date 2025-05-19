@@ -13,6 +13,7 @@ import RestoreTaskConfirmation from '../RestoreTaskConfirmation';
 import CompletedTaskModal from '../completed-task-modal';
 import DateTimeDisplay from '@/components/DateTimeDisplay';
 import { dateService } from '@/services/dateService';
+import { logDateInfo } from '@/utils/diagnosticLog';
 
 interface CompletedTaskCardProps {
   task: Task;
@@ -23,6 +24,11 @@ export const CompletedTaskCard: React.FC<CompletedTaskCardProps> = ({ task }) =>
   const expanded = isTaskExpanded(task.id);
   const [showRestoreConfirmation, setShowRestoreConfirmation] = useState(false);
   const [showTaskModal, setShowTaskModal] = useState(false);
+
+  // Log the task's completedAt for diagnosis
+  React.useEffect(() => {
+    logDateInfo('CompletedTaskCard', `Task ${task.id} completedAt render`, task.completedAt);
+  }, [task.id, task.completedAt]);
 
   // Determine dominant pillar based on scores
   const getDominantPillar = () => {
@@ -96,7 +102,11 @@ export const CompletedTaskCard: React.FC<CompletedTaskCardProps> = ({ task }) =>
             <div>
               <h3 className="font-medium text-gray-900 dark:text-gray-100 opacity-70">{task.title}</h3>
               <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                Concluída em <DateTimeDisplay date={task.completedAt} showRelative={false} />
+                Concluída em <DateTimeDisplay 
+                  date={task.completedAt} 
+                  showRelative={false} 
+                  fallback="(data não disponível)"
+                />
               </p>
             </div>
             <div className="flex gap-2">

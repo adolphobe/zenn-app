@@ -19,6 +19,7 @@ import { useAppContext } from '@/context/AppContext';
 import CompletedTaskModal from './completed-task-modal';
 import RestoreTaskConfirmation from './RestoreTaskConfirmation';
 import DateTimeDisplay from '@/components/DateTimeDisplay';
+import { logDateInfo } from '@/utils/diagnosticLog';
 
 // Table row component
 export const CompletedTaskRow: React.FC<{ task: Task }> = ({ task }) => {
@@ -26,6 +27,11 @@ export const CompletedTaskRow: React.FC<{ task: Task }> = ({ task }) => {
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [showRestoreConfirmation, setShowRestoreConfirmation] = useState(false);
   const { restoreTask } = useAppContext();
+
+  // Log the task's completedAt for diagnosis
+  React.useEffect(() => {
+    logDateInfo('CompletedTaskRow', `Task ${task.id} completedAt in table`, task.completedAt);
+  }, [task.id, task.completedAt]);
 
   // Determine dominant pillar based on scores
   const getDominantPillar = () => {
@@ -71,7 +77,8 @@ export const CompletedTaskRow: React.FC<{ task: Task }> = ({ task }) => {
           <DateTimeDisplay 
             date={task.completedAt} 
             showTimeZone={false} 
-            showRelative={false} 
+            showRelative={false}
+            fallback="(data não disponível)" 
           />
         </TableCell>
         <TableCell>{task.totalScore}/15</TableCell>

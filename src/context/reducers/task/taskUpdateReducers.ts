@@ -61,6 +61,7 @@ export const completeTaskByTitle = (state: AppState, action: Action): AppState =
   if (action.type !== 'COMPLETE_TASK_BY_TITLE') return state;
 
   const now = new Date();
+  logDateInfo('COMPLETE_TASK_BY_TITLE', 'Setting completedAt to now', now);
   
   return {
     ...state,

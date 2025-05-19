@@ -3,6 +3,7 @@ import { Task } from '@/types';
 import { format, startOfWeek, startOfMonth, differenceInMonths } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { dateService } from '@/services/dateService';
+import { logDateInfo } from '@/utils/diagnosticLog';
 
 // Timeline grouping function
 export const groupTasksByTimeline = (tasks: Task[], periodFilter: string = 'all') => {
@@ -33,28 +34,40 @@ export const groupTasksByTimeline = (tasks: Task[], periodFilter: string = 'all'
   
   tasks.forEach(task => {
     // Skip tasks without completedAt
-    if (!task.completedAt) return;
+    if (!task.completedAt) {
+      logDateInfo('groupTasksByTimeline', 'Skipping task without completedAt', { taskId: task.id, task });
+      return;
+    }
     
     try {
       // Garantir que completedAt seja um objeto Date usando dateService
       // e converta para o timezone configurado
-      const completedDate = dateService.toTimeZone(task.completedAt);
+      const completedDate = dateService.parseDate(task.completedAt);
+      logDateInfo('groupTasksByTimeline', `Parsing date for task ${task.id}`, completedDate);
       
       if (!completedDate) {
+        logDateInfo('groupTasksByTimeline', `Invalid date for task ${task.id}, placing in "older"`, task.completedAt);
         groups.older.tasks.push(task);
         return;
       }
       
-      if (dateService.isToday(completedDate)) {
+      // Convert to local timezone for comparison
+      const timezonedDate = dateService.toTimeZone(completedDate);
+      if (!timezonedDate) {
+        groups.older.tasks.push(task);
+        return;
+      }
+      
+      if (dateService.isToday(timezonedDate)) {
         groups.today.tasks.push(task);
-      } else if (dateService.isYesterday(completedDate)) {
+      } else if (dateService.isYesterday(timezonedDate)) {
         groups.yesterday.tasks.push(task);
-      } else if (completedDate >= thisWeekStart && completedDate < today) {
+      } else if (timezonedDate >= thisWeekStart && timezonedDate < today) {
         groups.thisWeek.tasks.push(task);
-      } else if (completedDate >= thisMonthStart && completedDate < thisWeekStart) {
+      } else if (timezonedDate >= thisMonthStart && timezonedDate < thisWeekStart) {
         groups.thisMonth.tasks.push(task);
       } else {
-        const monthsDifference = differenceInMonths(today, completedDate);
+        const monthsDifference = differenceInMonths(today, timezonedDate);
         
         if (monthsDifference === 1) {
           groups.lastMonth.tasks.push(task);
@@ -66,6 +79,7 @@ export const groupTasksByTimeline = (tasks: Task[], periodFilter: string = 'all'
       }
     } catch (error) {
       console.error("Erro ao processar data de conclusão:", error);
+      logDateInfo('groupTasksByTimeline', 'Error processing date', { taskId: task.id, error, completedAt: task.completedAt });
       groups.older.tasks.push(task); // Fallback to "older" if date parsing fails
     }
   });
