@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Task } from '@/types';
-import TaskForm from '../TaskForm';
+import EditTaskModal from './EditTaskModal';
 import PostCompletionFeedback from '../PostCompletionFeedback';
 import DeleteTaskConfirmation from '../DeleteTaskConfirmation';
 import { useTaskDataContext } from '@/context/TaskDataProvider';
@@ -70,18 +70,10 @@ const TaskModals: React.FC<TaskModalsProps> = ({
       )}
       
       {editTaskModalOpen && (
-        <TaskForm
-          onClose={onCloseEditModal}
-          initialData={{
-            title: task.title,
-            consequenceScore: task.consequenceScore,
-            prideScore: task.prideScore,
-            constructionScore: task.constructionScore,
-            idealDate: task.idealDate
-          }}
-          taskId={task.id}
+        <EditTaskModal
           task={task}
-          isEditing={true}
+          isOpen={editTaskModalOpen}
+          onClose={onCloseEditModal}
         />
       )}
       

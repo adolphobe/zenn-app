@@ -36,7 +36,7 @@ export const useComments = (taskId: string) => {
   } = useQuery({
     queryKey: ['comments', taskId],
     queryFn: () => getTaskComments(taskId),
-    // Enable if we have taskId and are authenticated
+    // Enable if we have taskId
     enabled: !!taskId,
     staleTime: 1000 * 60, // 1 minute
     select: (data) => {
