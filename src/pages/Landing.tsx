@@ -1,14 +1,12 @@
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/context/auth';
 import { throttledLog } from '@/utils/logUtils';
 import { modalDataContent } from '@/components/landing/ExplanationModal';
 import useImagePreloader from '@/hooks/useImagePreloader';
 import '../styles/animations.css';
-import { SupabaseTest } from '@/components/SupabaseTest';
 
-// Componentes
+// Components
 import HeroSection from '@/components/landing/HeroSection';
 import FeaturesSection from '@/components/landing/FeaturesSection';
 import HowItWorksSection from '@/components/landing/HowItWorksSection';
@@ -24,8 +22,7 @@ const Landing: React.FC = () => {
   const [activeTestimonial, setActiveTestimonial] = useState(0);
   const [circlesKey, setCirclesKey] = useState(Date.now());
   
-  const { isAuthenticated, isLoading } = useAuth();
-
+  // Modal state
   const [isExplanationModalOpen, setIsExplanationModalOpen] = useState(false);
   const [currentModalData, setCurrentModalData] = useState<{ title: string; content: JSX.Element } | null>(null);
 
@@ -37,13 +34,6 @@ const Landing: React.FC = () => {
       "https://cdn.shopify.com/s/files/1/0629/1993/4061/files/Sem_Titulo-14_57956f3d-9daf-4aee-a20b-68f3bb0f3858.webp?v=1747464720"
     ]
   });
-
-  // Check if user is authenticated and redirect if needed
-  useEffect(() => {
-    if (!isLoading && isAuthenticated) {
-      navigate('/dashboard');
-    }
-  }, [isAuthenticated, isLoading, navigate]);
 
   // Combinando os efeitos de carregamento para garantir uma inicialização suave
   useEffect(() => {
@@ -72,17 +62,17 @@ const Landing: React.FC = () => {
     }
   }, [showLogin]);
 
-  const openExplanationModal = useCallback((type: 'pilares' | 'clareza' | 'estrategia') => {
+  const openExplanationModal = (type: 'pilares' | 'clareza' | 'estrategia') => {
     setCurrentModalData(modalDataContent[type]); 
     setIsExplanationModalOpen(true);
     document.body.style.overflow = 'hidden'; 
-  }, []); 
+  }; 
 
-  const closeExplanationModal = useCallback(() => {
+  const closeExplanationModal = () => {
     setIsExplanationModalOpen(false);
     setCurrentModalData(null);
     document.body.style.overflow = 'auto'; 
-  }, []);
+  };
 
   useEffect(() => {
     const handleEsc = (event: KeyboardEvent) => {
@@ -99,26 +89,15 @@ const Landing: React.FC = () => {
         document.body.style.overflow = 'auto';
       }
     };
-  }, [isExplanationModalOpen, closeExplanationModal]); 
+  }, [isExplanationModalOpen]); 
 
   useEffect(() => {
     const interval = setInterval(() => setActiveTestimonial(prev => (prev + 1) % 3), 5000);
     return () => clearInterval(interval);
   }, []);
 
-  if (isLoading) {
-    return <div className="min-h-screen flex items-center justify-center">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-    </div>;
-  }
-
   return (
     <div className="min-h-screen overflow-x-hidden">
-      {/* Add Supabase test component at the top */}
-      <div className="container mx-auto px-4 pt-4">
-        <SupabaseTest />
-      </div>
-      
       <HeroSection 
         loaded={loaded}
         showLogin={showLogin}
