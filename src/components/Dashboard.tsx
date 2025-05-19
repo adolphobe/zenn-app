@@ -44,12 +44,8 @@ const Dashboard: React.FC = () => {
     if (authLoading || tasksLoading) {
       setIsLoading(true);
     } else {
-      // Small delay to avoid flicker for quick loads
-      const timer = setTimeout(() => {
-        setIsLoading(false);
-      }, 500);
-      
-      return () => clearTimeout(timer);
+      // Don't add artificial delay here anymore, the loading overlay handles this
+      setIsLoading(false);
     }
   }, [authLoading, tasksLoading, tasks]);
   
@@ -168,15 +164,10 @@ const Dashboard: React.FC = () => {
     }
   };
   
+  // We don't need the loading indicator here anymore as it's handled by LoadingOverlay
+  // Just return null instead of a loading spinner
   if (isLoading || authLoading) {
-    return (
-      <div className="container p-4 mx-auto flex justify-center items-center h-[60vh]">
-        <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-primary" />
-          <p className="text-muted-foreground">Carregando suas tarefas...</p>
-        </div>
-      </div>
-    );
+    return null;
   }
   
   if (!isAuthenticated) {

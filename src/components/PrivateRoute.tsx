@@ -5,7 +5,6 @@ import { useSidebar } from '@/context/hooks';
 import { Menu } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useEffect, useState, useMemo } from 'react';
-import { logInfo } from '@/utils/logUtils';
 import { LoadingOverlay } from './ui/loading-overlay';
 
 /**
@@ -16,6 +15,10 @@ export const PrivateRoute = () => {
   const location = useLocation();
   const { isOpen: sidebarOpen, open: openSidebar, isMobile } = useSidebar();
   const [authChecked, setAuthChecked] = useState(false);
+  const [showLoading, setShowLoading] = useState(true);
+  
+  // Check if the current route is the dashboard
+  const isDashboardRoute = location.pathname === '/dashboard';
   
   // Check for logout in progress to prevent login/logout loops
   const logoutInProgress = useMemo(() => 
@@ -29,18 +32,30 @@ export const PrivateRoute = () => {
     }
   }, [isLoading]);
 
-  // Check if login is successful and we should show the loading overlay
-  const loginSuccess = localStorage.getItem('login_success') === 'true';
+  // Set initial loading state based on route
+  useEffect(() => {
+    if (isDashboardRoute && isAuthenticated) {
+      setShowLoading(true);
+      
+      // Auto-hide loading after content is likely rendered
+      const timer = setTimeout(() => {
+        setShowLoading(false);
+      }, 1800);
+      
+      return () => clearTimeout(timer);
+    } else {
+      setShowLoading(false);
+    }
+  }, [isDashboardRoute, isAuthenticated]);
 
   // Show loading overlay while checking authentication
   if (isLoading || !authChecked) {
-    if (loginSuccess) {
-      // Show the consistent loading overlay instead of the simple spinner
-      return <LoadingOverlay show={true} />;
-    }
-    
     // Don't show any loading UI during logout
     if (logoutInProgress) return null;
+    
+    if (isDashboardRoute) {
+      return <LoadingOverlay show={true} />;
+    }
     
     // Otherwise, hide any loading UI to avoid flashing
     return null;
@@ -54,40 +69,39 @@ export const PrivateRoute = () => {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  // Clear the login_success flag once authenticated route is rendered
-  if (loginSuccess) {
-    localStorage.removeItem('login_success');
-  }
-
   // User is authenticated, render the protected layout with sidebar
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 flex">
-      <Sidebar />
+    <>
+      {isDashboardRoute && <LoadingOverlay show={showLoading} />}
       
-      {/* Mobile menu toggle button */}
-      {isMobile && !sidebarOpen && (
-        <button 
-          onClick={openSidebar}
-          className="fixed bottom-4 right-4 z-40 p-2 rounded-md bg-gray-500/50 text-white shadow-md hover:bg-gray-600/70 transition-colors"
-          aria-label="Abrir menu"
-        >
-          <Menu size={24} />
-        </button>
-      )}
-      
-      <main 
-        className={cn(
-          "transition-all duration-300 p-4 md:p-6 lg:p-8 flex-grow",
-          sidebarOpen 
-            ? isMobile ? "ml-0" : "md:ml-64" 
-            : isMobile ? "ml-0" : "md:ml-20",
-          "flex justify-center"
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 flex">
+        <Sidebar />
+        
+        {/* Mobile menu toggle button */}
+        {isMobile && !sidebarOpen && (
+          <button 
+            onClick={openSidebar}
+            className="fixed bottom-4 right-4 z-40 p-2 rounded-md bg-gray-500/50 text-white shadow-md hover:bg-gray-600/70 transition-colors"
+            aria-label="Abrir menu"
+          >
+            <Menu size={24} />
+          </button>
         )}
-      >
-        <div className="w-full max-w-6xl"> 
-          <Outlet />
-        </div>
-      </main>
-    </div>
+        
+        <main 
+          className={cn(
+            "transition-all duration-300 p-4 md:p-6 lg:p-8 flex-grow",
+            sidebarOpen 
+              ? isMobile ? "ml-0" : "md:ml-64" 
+              : isMobile ? "ml-0" : "md:ml-20",
+            "flex justify-center"
+          )}
+        >
+          <div className="w-full max-w-6xl"> 
+            <Outlet />
+          </div>
+        </main>
+      </div>
+    </>
   );
 };

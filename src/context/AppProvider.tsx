@@ -42,14 +42,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [isLoadingPreferences, setIsLoadingPreferences] = useState<boolean>(true);
   const location = useLocation();
   
-  // Check if we're on the landing page
-  const isLandingPage = location.pathname === '/';
+  // Check if we're on the dashboard page
+  const isDashboardPage = location.pathname === '/dashboard';
   
-  // Check if we're on the login page
-  const isLoginPage = location.pathname.includes('/login');
-  
-  // Only show loading overlay when authenticated user is going to dashboard
-  const isNavigatingToDashboard = isAuthenticated && !isLandingPage && !isLoginPage;
+  // We no longer need to show loading overlay from here
+  // This will be handled directly by the PrivateRoute component
   
   // Store tasks in DOM for access by non-React components
   useTaskStore(state.tasks);
@@ -252,7 +249,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     isAuthenticated
   ]);
 
-  // Create context value object with all actions - updated for mode-specific toggleShowPillars
+  // Create context value object with all actions
   const contextValue: AppContextType = {
     state,
     dispatch,
@@ -280,16 +277,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     toggleViewMode: () => dispatch({ type: 'TOGGLE_VIEW_MODE' })
   };
 
-  // Only show loading overlay when authenticated user is going to dashboard
-  // and we're loading preferences or still in auth loading state
-  const showLoadingOverlay = isNavigatingToDashboard && (isLoadingPreferences || isLoading);
-
   return (
     <AppContext.Provider value={contextValue}>
-      <LoadingOverlay 
-        show={showLoadingOverlay} 
-        delay={1500}
-      />
       {children}
     </AppContext.Provider>
   );
