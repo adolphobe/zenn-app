@@ -70,7 +70,6 @@ export const addComment = async (dispatch: AppDispatch, taskId: string, text: st
     
     // After comments are updated, refresh task data to ensure sync
     try {
-      // Changed from 'SYNC_TASK_REQUESTED' to 'UPDATE_TASK' action type
       dispatch({
         type: 'UPDATE_TASK',
         payload: { 
@@ -95,7 +94,7 @@ export const addComment = async (dispatch: AppDispatch, taskId: string, text: st
   }
 };
 
-export const deleteComment = async (dispatch: AppDispatch, taskId: string, commentId: string) => {
+export const deleteComment = async (dispatch: AppDispatch, taskId: string, commentId: string): Promise<boolean> => {
   try {
     console.log(`[CommentActions] Deleting comment ${commentId} from task ${taskId}`);
     
@@ -106,7 +105,7 @@ export const deleteComment = async (dispatch: AppDispatch, taskId: string, comme
     // Update local state
     dispatch({ type: 'DELETE_COMMENT', payload: { taskId, commentId } });
     
-    // Sync task data after comment deletion - Fixed to use UPDATE_TASK type
+    // Sync task data after comment deletion
     try {
       dispatch({
         type: 'UPDATE_TASK',

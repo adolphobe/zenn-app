@@ -63,7 +63,7 @@ const TaskFormTabs: React.FC<TaskFormTabsProps> = ({
     }
   }, [activeTab, commentCount]);
   
-  // Handler for when a comment is added - FIX: removed explicit return undefined
+  // Handler for when a comment is added - fixed to no longer return undefined
   const handleCommentAdded = () => {
     console.log('[TaskFormTabs] Comment added callback triggered');
     // Update comment count to trigger scrollToBottom effect

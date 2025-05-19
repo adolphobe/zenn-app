@@ -21,7 +21,7 @@ import {
 interface TaskCommentsProps {
   taskId: string;
   comments: Comment[];
-  onCommentDeleted?: () => void; // Added callback prop
+  onCommentDeleted?: () => void; 
 }
 
 const TaskComments: React.FC<TaskCommentsProps> = ({ taskId, comments, onCommentDeleted }) => {
@@ -125,23 +125,26 @@ const TaskComments: React.FC<TaskCommentsProps> = ({ taskId, comments, onComment
       // Update local state immediately for instant UI feedback
       setLocalComments(prev => prev.filter(comment => comment.id !== commentId));
       
-      // Delete from database and global state
-      deleteComment(taskId, commentId).then(success => {
-        if (success) {
-          // Notify parent component that a comment was deleted
-          if (onCommentDeleted) {
-            console.log('[TaskComments] Calling onCommentDeleted callback');
-            onCommentDeleted();
-          }
-        } else {
-          // If deletion failed in the backend, restore the comment in the UI
-          console.log('[TaskComments] Comment deletion failed, restoring in UI');
-          const deletedComment = comments.find(c => c.id === commentId);
-          if (deletedComment) {
-            setLocalComments(prev => [...prev, deletedComment]);
-          }
-        }
-      });
+      // Delete from database and global state - Make sure we properly handle the Promise
+      if (deleteComment) {
+        deleteComment(taskId, commentId)
+          .then(success => {
+            if (success) {
+              // Notify parent component that a comment was deleted
+              if (onCommentDeleted) {
+                console.log('[TaskComments] Calling onCommentDeleted callback');
+                onCommentDeleted();
+              }
+            } else {
+              // If deletion failed in the backend, restore the comment in the UI
+              console.log('[TaskComments] Comment deletion failed, restoring in UI');
+              const deletedComment = comments.find(c => c.id === commentId);
+              if (deletedComment) {
+                setLocalComments(prev => [...prev, deletedComment]);
+              }
+            }
+          });
+      }
       
       setCommentToDelete(null);
     }
