@@ -7,6 +7,7 @@ import TaskComments from '../TaskComments';
 import { motion } from 'framer-motion';
 import { ViewMode } from '@/types';
 import { useQueryClient } from '@tanstack/react-query';
+import { useComments } from '@/hooks/useComments';
 
 interface TaskCardExpandedProps {
   task: Task;
@@ -63,6 +64,9 @@ const TaskCardExpanded: React.FC<TaskCardExpandedProps> = ({
 }) => {
   const queryClient = useQueryClient();
   
+  // Use the comments hook to get real-time comments
+  const { comments, refreshComments } = useComments(task.id);
+  
   // Handler for comment deletion
   const handleCommentDeleted = useCallback(() => {
     console.log('[TaskCardExpanded] Comment deleted, refreshing task data');
@@ -70,8 +74,15 @@ const TaskCardExpanded: React.FC<TaskCardExpandedProps> = ({
     // Invalidate queries to refresh task data across the app
     queryClient.invalidateQueries({ queryKey: ['tasks'] });
     queryClient.invalidateQueries({ queryKey: ['task', task.id] });
+    queryClient.invalidateQueries({ queryKey: ['comments', task.id] });
     queryClient.invalidateQueries({ queryKey: ['completedTasks'] });
-  }, [queryClient, task.id]);
+    
+    // Refresh comments
+    refreshComments();
+  }, [queryClient, task.id, refreshComments]);
+  
+  // Get the comments to display - either from the hook (preferred) or fallback to task.comments
+  const commentsToShow = comments?.length > 0 ? comments : task.comments;
   
   return (
     <motion.div 
@@ -85,11 +96,11 @@ const TaskCardExpanded: React.FC<TaskCardExpandedProps> = ({
       <TaskPillarDetails task={task} onCollapseTask={onCollapseTask} />
       
       {/* Display comments if they exist - shown in both modes */}
-      {task.comments && task.comments.length > 0 && (
+      {commentsToShow && commentsToShow.length > 0 && (
         <div className="mt-4 cursor-default">
           <TaskComments 
             taskId={task.id} 
-            comments={task.comments} 
+            comments={commentsToShow} 
             onCommentDeleted={handleCommentDeleted} 
           />
         </div>

@@ -1,7 +1,10 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Comment } from '@/types';
 import { useAuth } from '@/context/auth';
+import { getTaskComments } from '@/services/task/taskComments';
+import { useQueryClient, useQuery, useMutation } from '@tanstack/react-query';
+import { addComment as addCommentService, deleteComment as deleteCommentService } from '@/services/task/taskComments';
 
 // Define types for callbacks
 type MutationCallbacks = {
@@ -11,39 +14,79 @@ type MutationCallbacks = {
 
 export const useComments = (taskId: string) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [fetchError, setFetchError] = useState<Error | null>(null);
-  const [comments, setComments] = useState<Comment[]>([]);
   const { currentUser, isAuthenticated } = useAuth();
+  const queryClient = useQueryClient();
 
-  // Mock function to simulate adding a comment (visual only)
-  const addComment = (text: string, callbacks?: MutationCallbacks) => {
+  // Use React Query to fetch comments
+  const { 
+    data: comments = [], 
+    isLoading, 
+    error: fetchError,
+    refetch: refreshComments
+  } = useQuery({
+    queryKey: ['comments', taskId],
+    queryFn: () => getTaskComments(taskId),
+    // Don't fetch if no taskId or we're not authenticated
+    enabled: !!taskId && isAuthenticated,
+    staleTime: 1000 * 60, // 1 minute
+  });
+
+  // Mutation for adding a comment
+  const addComment = async (text: string, callbacks?: MutationCallbacks) => {
+    if (!isAuthenticated || !currentUser?.id) {
+      console.error('Cannot add comment: User not authenticated');
+      if (callbacks?.onError) {
+        callbacks.onError(new Error('User not authenticated'));
+      }
+      return;
+    }
+
     setIsSubmitting(true);
     
-    // Simulate API delay
-    setTimeout(() => {
-      setIsSubmitting(false);
+    try {
+      // Add comment to database
+      const newComment = await addCommentService(taskId, currentUser.id, text);
+      
+      // Invalidate queries to refresh data
+      queryClient.invalidateQueries({ queryKey: ['comments', taskId] });
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      queryClient.invalidateQueries({ queryKey: ['task', taskId] });
       
       if (callbacks?.onSuccess) {
         callbacks.onSuccess();
       }
-    }, 500);
+      
+      return newComment;
+    } catch (error) {
+      console.error('Error adding comment:', error);
+      if (callbacks?.onError) {
+        callbacks.onError(error);
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  // Mock function to simulate comment deletion (visual only)
-  const deleteComment = (commentId: string, callbacks?: MutationCallbacks) => {
-    // Simulate API delay
-    setTimeout(() => {
+  // Mutation for deleting a comment
+  const deleteComment = async (commentId: string, callbacks?: MutationCallbacks) => {
+    try {
+      // Delete comment from database
+      await deleteCommentService(commentId);
+      
+      // Invalidate queries to refresh data
+      queryClient.invalidateQueries({ queryKey: ['comments', taskId] });
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      queryClient.invalidateQueries({ queryKey: ['task', taskId] });
+      
       if (callbacks?.onSuccess) {
         callbacks.onSuccess();
       }
-    }, 300);
-  };
-
-  // Mock function to refresh comments (visual only)
-  const refreshComments = () => {
-    console.log('Refresh comments triggered (visual only)');
-    return Promise.resolve();
+    } catch (error) {
+      console.error('Error deleting comment:', error);
+      if (callbacks?.onError) {
+        callbacks.onError(error);
+      }
+    }
   };
 
   return {

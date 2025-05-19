@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/auth';
 import { Button } from './ui/button';
 import { AlertCircle } from 'lucide-react';
+import { addComment } from '@/context/tasks/comments/commentActions';
+import { useAppContext } from '@/context/AppContext';
 
 interface CommentFormProps {
   taskId: string;
@@ -13,26 +15,34 @@ const CommentForm: React.FC<CommentFormProps> = ({ taskId, onCommentAdded }) => 
   const [text, setText] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { isAuthenticated, currentUser } = useAuth();
+  const { dispatch } = useAppContext();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!text.trim()) {
+    if (!text.trim() || !isAuthenticated) {
       return;
     }
     
-    // Simulate submission (visual only)
     setIsSubmitting(true);
     
-    setTimeout(() => {
-      setIsSubmitting(false);
-      setText('');
+    try {
+      // Use the actual comment action instead of the timeout simulation
+      const success = await addComment(dispatch, taskId, text.trim(), currentUser?.id);
       
-      // For UI feedback only
-      if (onCommentAdded) {
-        onCommentAdded();
+      if (success) {
+        setText('');
+        
+        // Call the callback to refresh the comments list
+        if (onCommentAdded) {
+          onCommentAdded();
+        }
       }
-    }, 500);
+    } catch (error) {
+      console.error('Error adding comment:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
