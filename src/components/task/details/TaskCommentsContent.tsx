@@ -1,8 +1,9 @@
 
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { Task } from '@/types';
 import TaskComments from '@/components/TaskComments';
 import CommentForm from '@/components/CommentForm';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface TaskCommentsContentProps {
   task: Task;
@@ -11,6 +12,8 @@ interface TaskCommentsContentProps {
 
 const TaskCommentsContent: React.FC<TaskCommentsContentProps> = ({ task, onCommentAdded }) => {
   const commentsRef = useRef<HTMLDivElement>(null);
+  const queryClient = useQueryClient();
+  const [localCommentsCount, setLocalCommentsCount] = useState<number>(task?.comments?.length || 0);
   
   // Log task data for debugging
   useEffect(() => {
@@ -19,6 +22,9 @@ const TaskCommentsContent: React.FC<TaskCommentsContentProps> = ({ task, onComme
       hasComments: task?.comments && task.comments.length > 0,
       commentsCount: task?.comments?.length
     });
+    
+    // Update local count when task comments change
+    setLocalCommentsCount(task?.comments?.length || 0);
   }, [task]);
   
   // Verificar se a tarefa existe e tem um ID válido
@@ -35,6 +41,15 @@ const TaskCommentsContent: React.FC<TaskCommentsContentProps> = ({ task, onComme
   // Handler para quando um comentário é adicionado
   const handleCommentAdded = () => {
     console.log('[TaskCommentsContent] Comment added, calling parent callback');
+    
+    // Increment local counter to help UI update immediately
+    setLocalCommentsCount(prev => prev + 1);
+    
+    // Invalidate queries to refresh task data
+    queryClient.invalidateQueries({ queryKey: ['tasks'] });
+    queryClient.invalidateQueries({ queryKey: ['task', task.id] });
+    
+    // Call parent callback if provided
     if (onCommentAdded) {
       onCommentAdded();
     }

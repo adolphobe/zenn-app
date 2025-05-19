@@ -63,8 +63,8 @@ const TaskFormTabs: React.FC<TaskFormTabsProps> = ({
     }
   }, [activeTab, commentCount]);
   
-  // Handler for when a comment is added
-  const handleCommentAdded = () => {
+  // Handler for when a comment is added - fixing TypeScript error by returning undefined explicitly
+  const handleCommentAdded = (): undefined => {
     console.log('[TaskFormTabs] Comment added callback triggered');
     // Update comment count to trigger scrollToBottom effect
     if (task?.comments) {
@@ -76,6 +76,7 @@ const TaskFormTabs: React.FC<TaskFormTabsProps> = ({
     // Try to scroll to bottom immediately and again after a delay
     scrollToBottom();
     setTimeout(scrollToBottom, 300);
+    return undefined;
   };
   
   // If we're creating a new task (not editing), only show the basic fields
@@ -143,7 +144,6 @@ const TaskFormTabs: React.FC<TaskFormTabsProps> = ({
               </div>
             )}
             
-            {/* Fixed: Correctly render the CommentForm component as JSX element */}
             <CommentForm 
               taskId={taskId}
               onCommentAdded={handleCommentAdded}

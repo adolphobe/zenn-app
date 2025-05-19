@@ -4,6 +4,7 @@ import { Button } from './ui/button';
 import { useAppContext } from '@/context/AppContext';
 import { MessageSquare } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface CommentFormProps {
   taskId: string;
@@ -14,6 +15,7 @@ const CommentForm: React.FC<CommentFormProps> = ({ taskId, onCommentAdded }) => 
   const [commentText, setCommentText] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { addComment } = useAppContext();
+  const queryClient = useQueryClient();
   
   const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement> | React.FormEvent) => {
     e.preventDefault();
@@ -25,16 +27,32 @@ const CommentForm: React.FC<CommentFormProps> = ({ taskId, onCommentAdded }) => 
         console.log(`[CommentForm] Submitting comment for task ${taskId}`);
         
         // Add the comment and wait for response
-        await addComment(taskId, commentText);
-        console.log('[CommentForm] Comment added successfully');
+        const newComment = await addComment(taskId, commentText);
+        console.log('[CommentForm] Comment added successfully:', newComment);
         
         setCommentText('');
+        
+        // Invalidate any queries related to this task to trigger refetching
+        queryClient.invalidateQueries({ queryKey: ['tasks'] });
+        queryClient.invalidateQueries({ queryKey: ['task', taskId] });
         
         // Notify the parent component that a comment was added
         if (onCommentAdded) {
           console.log('[CommentForm] Calling onCommentAdded callback');
           onCommentAdded();
         }
+
+        toast({
+          title: "Comentário adicionado",
+          description: "Seu comentário foi adicionado com sucesso."
+        });
+      } catch (error) {
+        console.error('[CommentForm] Error adding comment:', error);
+        toast({
+          title: "Erro ao adicionar comentário",
+          description: "Ocorreu um erro ao adicionar o comentário. Tente novamente.",
+          variant: "destructive",
+        });
       } finally {
         setIsSubmitting(false);
       }

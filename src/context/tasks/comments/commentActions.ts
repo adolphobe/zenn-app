@@ -42,7 +42,7 @@ export const addComment = async (dispatch: AppDispatch, taskId: string, text: st
         description: "Você precisa estar logado para adicionar comentários.",
         variant: "destructive",
       });
-      return;
+      return null;
     }
 
     console.log(`[CommentActions] Adding comment to task ${taskId} by user ${currentUser.id}`);
@@ -68,11 +68,16 @@ export const addComment = async (dispatch: AppDispatch, taskId: string, text: st
       } 
     });
     
-    toast({
-      id: uuidv4(),
-      title: "Comentário adicionado",
-      description: "Seu comentário foi adicionado com sucesso."
-    });
+    // After comments are updated, refresh task data to ensure sync
+    try {
+      // This will trigger a refresh of any React Query hooks observing this task
+      dispatch({
+        type: 'SYNC_TASK_REQUESTED',
+        payload: taskId
+      });
+    } catch (syncError) {
+      console.error('[CommentActions] Error syncing task after comment added:', syncError);
+    }
 
     return newComment;
   } catch (error) {
@@ -97,6 +102,16 @@ export const deleteComment = async (dispatch: AppDispatch, taskId: string, comme
     
     // Update local state
     dispatch({ type: 'DELETE_COMMENT', payload: { taskId, commentId } });
+    
+    // Sync task data after comment deletion
+    try {
+      dispatch({
+        type: 'SYNC_TASK_REQUESTED',
+        payload: taskId
+      });
+    } catch (syncError) {
+      console.error('[CommentActions] Error syncing task after comment deleted:', syncError);
+    }
     
     toast({
       id: uuidv4(),
