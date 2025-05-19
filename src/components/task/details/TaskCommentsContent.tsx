@@ -1,5 +1,5 @@
 
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { Task } from '@/types';
 import TaskComments from '@/components/TaskComments';
 import CommentForm from '@/components/CommentForm';
@@ -16,10 +16,26 @@ interface TaskCommentsContentProps {
 const TaskCommentsContent: React.FC<TaskCommentsContentProps> = ({ task, onCommentAdded }) => {
   const commentsRef = useRef<HTMLDivElement>(null);
   const { isAuthenticated } = useAuth();
-  const [localComments, setLocalComments] = useState(task.comments || []);
   
-  // Use our comments hook to get real-time data and refresh capability
-  const { refreshComments, isRefetching } = useComments(task.id);
+  // Use our comments hook to get real-time data
+  const { 
+    comments, 
+    refreshComments, 
+    isLoading, 
+    isRefetching 
+  } = useComments(task.id);
+  
+  // Effect to scroll to bottom when comments change
+  useEffect(() => {
+    if (comments?.length > 0 && commentsRef.current) {
+      const scrollElement = commentsRef.current.querySelector('.native-scrollbar');
+      if (scrollElement) {
+        setTimeout(() => {
+          scrollElement.scrollTop = scrollElement.scrollHeight;
+        }, 100);
+      }
+    }
+  }, [comments]);
   
   // Verificar se a tarefa existe e tem um ID válido
   if (!task || !task.id) {
@@ -44,17 +60,18 @@ const TaskCommentsContent: React.FC<TaskCommentsContentProps> = ({ task, onComme
     }
   };
 
+  // Use the comments from the hook instead of task.comments
   return (
     <div ref={commentsRef}>
       <div className="mb-4">
         <h3 className="font-medium">Comentários</h3>
       </div>
 
-      {task.comments && task.comments.length > 0 ? (
+      {comments && comments.length > 0 ? (
         <div className="space-y-4">
           <TaskComments 
             taskId={task.id} 
-            comments={task.comments} 
+            comments={comments} 
             onCommentDeleted={handleCommentAdded}
           />
           <CommentForm taskId={task.id} onCommentAdded={handleCommentAdded} />

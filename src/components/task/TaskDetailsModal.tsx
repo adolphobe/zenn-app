@@ -8,6 +8,7 @@ import { AlwaysVisibleScrollArea } from '@/components/ui/always-visible-scroll-a
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useQueryClient } from '@tanstack/react-query';
+import { useComments } from '@/hooks/useComments';
 
 // Importando componentes auxiliares
 import TaskDetailsHeader from './details/TaskDetailsHeader';
@@ -39,6 +40,9 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
   const commentsContainerRef = useRef<HTMLDivElement | null>(null);
   const queryClient = useQueryClient();
   
+  // Add a direct connection to the comments hook for real-time updates
+  const { comments, refreshComments } = task?.id ? useComments(task.id) : { comments: [], refreshComments: () => Promise.resolve() };
+  
   // Função para rolagem até o final dos comentários - definida fora de qualquer condicional
   const scrollToBottom = useCallback(() => {
     if (commentsContainerRef.current) {
@@ -51,12 +55,12 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
 
   // Efeito para rolar para o final quando a tab de comentários é selecionada
   useEffect(() => {
-    if (activeTab === 'comments' && task?.comments?.length) {
+    if (activeTab === 'comments' && comments?.length) {
       // Pequeno delay para garantir que o DOM foi atualizado
       const timer = setTimeout(scrollToBottom, 100);
       return () => clearTimeout(timer);
     }
-  }, [activeTab, task?.comments?.length, scrollToBottom]);
+  }, [activeTab, comments?.length, scrollToBottom]);
 
   // When the modal is opened, refresh the comments data
   useEffect(() => {
@@ -65,24 +69,18 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
       console.log('[TaskDetailsModal] Modal opened, refreshing data for task:', task.id);
       queryClient.invalidateQueries({ queryKey: ['comments', task.id] });
       queryClient.invalidateQueries({ queryKey: ['task', task.id] });
+      refreshComments();
     }
-  }, [isOpen, task?.id, queryClient]);
+  }, [isOpen, task?.id, queryClient, refreshComments]);
 
-  // Handler para restaurar tarefa
-  const handleRestore = () => {
-    if (onRestore && task?.id) {
-      onRestore(task.id);
-      onClose();
-    }
-  };
-  
   // Handler for when a comment is added
-  const handleCommentAdded = useCallback(() => {
+  const handleCommentAdded = useCallback(async () => {
     // Force data refresh
     if (task?.id) {
       console.log('[TaskDetailsModal] Comment added, refreshing data');
-      queryClient.invalidateQueries({ queryKey: ['comments', task.id] });
-      queryClient.invalidateQueries({ queryKey: ['task', task.id] });
+      await queryClient.invalidateQueries({ queryKey: ['comments', task.id] });
+      await queryClient.invalidateQueries({ queryKey: ['task', task.id] });
+      await refreshComments();
       
       // Call the parent's onCommentAdded if provided
       if (onCommentAdded) {
@@ -92,7 +90,15 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
       // Scroll to bottom after a small delay
       setTimeout(scrollToBottom, 300);
     }
-  }, [task?.id, queryClient, scrollToBottom, onCommentAdded]);
+  }, [task?.id, queryClient, refreshComments, scrollToBottom, onCommentAdded]);
+  
+  // Handler para restaurar tarefa
+  const handleRestore = () => {
+    if (onRestore && task?.id) {
+      onRestore(task.id);
+      onClose();
+    }
+  };
   
   // Se não tiver uma tarefa, renderiza um modal simplificado
   if (!task) {
@@ -136,7 +142,7 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
                     Níveis
                   </TabsTrigger>
                   <TabsTrigger value="comments">
-                    Comentários {task.comments && task.comments.length > 0 ? `(${task.comments.length})` : ''}
+                    Comentários {comments && comments.length > 0 ? `(${comments.length})` : ''}
                   </TabsTrigger>
                 </TabsList>
                 

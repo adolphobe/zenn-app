@@ -62,15 +62,17 @@ const CommentForm: React.FC<CommentFormProps> = ({ taskId, onCommentAdded }) => 
       
       // Use the actual comment hook instead of the action
       await addComment(trimmedText, {
-        onSuccess: () => {
+        onSuccess: async () => {
           console.log('[CommentForm] Comment added successfully');
           setText(''); // Clear the input on success
           
-          // Invalidate all relevant queries to update UI everywhere
-          queryClient.invalidateQueries({ queryKey: ['comments', taskId] });
-          queryClient.invalidateQueries({ queryKey: ['tasks'] });
-          queryClient.invalidateQueries({ queryKey: ['task', taskId] });
-          queryClient.invalidateQueries({ queryKey: ['completedTasks'] });
+          // Force immediate refresh of ALL relevant queries
+          await Promise.all([
+            queryClient.invalidateQueries({ queryKey: ['comments', taskId] }),
+            queryClient.invalidateQueries({ queryKey: ['task', taskId] }),
+            queryClient.invalidateQueries({ queryKey: ['tasks'] }),
+            queryClient.invalidateQueries({ queryKey: ['completedTasks'] })
+          ]);
           
           // Call the callback to refresh the comments list and scroll to bottom
           if (onCommentAdded) {
