@@ -48,7 +48,7 @@ const PostCompletionFeedback: React.FC<PostCompletionFeedbackProps> = ({ task, i
             onClick={() => setSelectedFeedback('satisfaction')}
           >
             <div className="flex flex-col items-center h-full justify-between py-2">
-              <span className="text-2xl mt-2">😊</span>
+              <span className="text-2xl mt-2">🤩</span>
               <div className="font-medium text-center mt-4">Me transformou</div>
               <p className="text-xs text-center mt-3 mb-2 text-gray-600 dark:text-gray-300">
                 Esta tarefa me fortaleceu e expandiu
