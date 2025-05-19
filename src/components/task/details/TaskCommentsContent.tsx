@@ -1,5 +1,5 @@
 
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Task } from '@/types';
 import TaskComments from '@/components/TaskComments';
 import CommentForm from '@/components/CommentForm';
@@ -20,7 +20,6 @@ const TaskCommentsContent: React.FC<TaskCommentsContentProps> = ({ task, onComme
   // Use our comments hook to get real-time data
   const { 
     comments, 
-    refreshComments, 
     isLoading, 
     isRefetching 
   } = useComments(task.id);
@@ -51,27 +50,26 @@ const TaskCommentsContent: React.FC<TaskCommentsContentProps> = ({ task, onComme
   const handleCommentAdded = async (): Promise<void> => {
     console.log('[TaskCommentsContent] Comment added, refreshing comments');
     
-    // Force comments refresh
-    await refreshComments();
-    
     // Call parent callback if provided
     if (onCommentAdded) {
       onCommentAdded();
     }
   };
 
-  // Use the comments from the hook instead of task.comments
+  // Ensure we have a valid comments array or use empty array
+  const taskComments = comments || [];
+
   return (
     <div ref={commentsRef}>
       <div className="mb-4">
         <h3 className="font-medium">Comentários</h3>
       </div>
 
-      {comments && comments.length > 0 ? (
+      {taskComments.length > 0 ? (
         <div className="space-y-4">
           <TaskComments 
             taskId={task.id} 
-            comments={comments} 
+            comments={taskComments} 
             onCommentDeleted={handleCommentAdded}
           />
           <CommentForm taskId={task.id} onCommentAdded={handleCommentAdded} />
