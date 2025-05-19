@@ -25,9 +25,9 @@ const TaskDetailsHeader: React.FC<TaskDetailsHeaderProps> = ({ task }) => {
     if (!task.feedback) return null;
     
     const feedbackLabels = {
-      transformed: 'Foi transformador terminar',
-      relief: 'Tive alívio ao finalizar',
-      obligation: 'Terminei por obrigação'
+      transformed: '😊 Foi transformador terminar',
+      relief: '🍃 Tive alívio ao finalizar',
+      obligation: '😐 Terminei por obrigação'
     };
     
     const feedbackStyles = {
