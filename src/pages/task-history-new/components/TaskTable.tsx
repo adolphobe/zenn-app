@@ -61,6 +61,7 @@ export const TaskTable: React.FC<TaskTableProps> = ({
     return 'text-gray-600';
   };
 
+  // Animation variants
   const tableVariants = {
     hidden: { opacity: 0 },
     visible: { 
@@ -86,95 +87,102 @@ export const TaskTable: React.FC<TaskTableProps> = ({
             <TableHead>Ações</TableHead>
           </TableRow>
         </TableHeader>
-        <motion.tbody
+        
+        {/* Properly wrapping TableBody with motion */}
+        <motion.div
           variants={tableVariants}
           initial="hidden"
           animate="visible"
-          component={TableBody}
+          className="contents"
         >
-          {tasks.length === 0 ? (
-            <TableRow>
-              <TableCell colSpan={5} className="text-center py-6 text-muted-foreground">
-                Nenhuma tarefa encontrada
-              </TableCell>
-            </TableRow>
-          ) : (
-            tasks.map((task) => {
-              const dominantPillar = getDominantPillar(task);
-              const pillarStyle = getPillarStyles(dominantPillar);
-              const scoreColor = getScoreColor(task.totalScore);
-              
-              return (
-                <motion.tr
-                  key={task.id}
-                  className="hover:bg-muted/50 transition-colors"
-                  variants={tableRowVariants}
-                  component={TableRow}
-                >
-                  <TableCell 
-                    className="font-medium cursor-pointer"
-                    onClick={() => onSelectTask(task.id)}
+          <TableBody>
+            {tasks.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={5} className="text-center py-6 text-muted-foreground">
+                  Nenhuma tarefa encontrada
+                </TableCell>
+              </TableRow>
+            ) : (
+              tasks.map((task) => {
+                const dominantPillar = getDominantPillar(task);
+                const pillarStyle = getPillarStyles(dominantPillar);
+                const scoreColor = getScoreColor(task.totalScore);
+                
+                return (
+                  <motion.tr
+                    key={task.id}
+                    className="hover:bg-muted/50 transition-colors"
+                    variants={tableRowVariants}
+                    initial="hidden"
+                    animate="visible"
+                    // Using the 'as' prop instead of 'component'
+                    as={TableRow}
                   >
-                    {task.title}
-                  </TableCell>
-                  <TableCell 
-                    className={`cursor-pointer font-semibold ${scoreColor}`}
-                    onClick={() => onSelectTask(task.id)}
-                  >
-                    {task.totalScore || 0}/15
-                  </TableCell>
-                  <TableCell 
-                    className="cursor-pointer"
-                    onClick={() => onSelectTask(task.id)}
-                  >
-                    <Badge className={`${pillarStyle} capitalize`} variant="outline">
-                      {dominantPillar}
-                    </Badge>
-                  </TableCell>
-                  <TableCell 
-                    className="cursor-pointer"
-                    onClick={() => onSelectTask(task.id)}
-                  >
-                    {task.completedAt 
-                      ? format(new Date(task.completedAt), 'dd/MM/yyyy HH:mm') 
-                      : 'Data desconhecida'}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex gap-2">
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="flex items-center gap-1"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onSelectTask(task.id);
-                        }}
-                      >
-                        <Eye size={16} />
-                        Ver
-                      </Button>
-                      
-                      {onRestoreTask && (
+                    <TableCell 
+                      className="font-medium cursor-pointer"
+                      onClick={() => onSelectTask(task.id)}
+                    >
+                      {task.title}
+                    </TableCell>
+                    <TableCell 
+                      className={`cursor-pointer font-semibold ${scoreColor}`}
+                      onClick={() => onSelectTask(task.id)}
+                    >
+                      {task.totalScore || 0}/15
+                    </TableCell>
+                    <TableCell 
+                      className="cursor-pointer"
+                      onClick={() => onSelectTask(task.id)}
+                    >
+                      <Badge className={`${pillarStyle} capitalize`} variant="outline">
+                        {dominantPillar}
+                      </Badge>
+                    </TableCell>
+                    <TableCell 
+                      className="cursor-pointer"
+                      onClick={() => onSelectTask(task.id)}
+                    >
+                      {task.completedAt 
+                        ? format(new Date(task.completedAt), 'dd/MM/yyyy HH:mm') 
+                        : 'Data desconhecida'}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex gap-2">
                         <Button 
                           variant="outline" 
                           size="sm" 
                           className="flex items-center gap-1"
                           onClick={(e) => {
                             e.stopPropagation();
-                            onRestoreTask(task.id);
+                            onSelectTask(task.id);
                           }}
                         >
-                          <RefreshCw size={16} />
-                          Restaurar
+                          <Eye size={16} />
+                          Ver
                         </Button>
-                      )}
-                    </div>
-                  </TableCell>
-                </motion.tr>
-              );
-            })
-          )}
-        </motion.tbody>
+                        
+                        {onRestoreTask && (
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="flex items-center gap-1"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onRestoreTask(task.id);
+                            }}
+                          >
+                            <RefreshCw size={16} />
+                            Restaurar
+                          </Button>
+                        )}
+                      </div>
+                    </TableCell>
+                  </motion.tr>
+                );
+              })
+            )}
+          </TableBody>
+        </motion.div>
       </Table>
     </div>
   );
