@@ -15,7 +15,7 @@ const SidebarModeSection: React.FC<SidebarModeSectionProps> = ({ sidebarOpen }) 
   const location = useLocation();
   const navigate = useNavigate();
   
-  // Check if we're currently on the strategic review page
+  // Check if we're currently on non-dashboard pages
   const isOnStrategicReview = location.pathname.includes('strategic-review');
   const isOnTaskHistory = location.pathname.includes('task-history');
   
@@ -39,19 +39,11 @@ const SidebarModeSection: React.FC<SidebarModeSectionProps> = ({ sidebarOpen }) 
 
   // Handler for mode switching
   const handleModeClick = (mode: string) => {
-    // If we're on strategic review or task history, navigate to dashboard first
-    if (isOnStrategicReview || isOnTaskHistory) {
-      // Navigate to dashboard
-      navigate('/dashboard');
-      
-      // Set the view mode (not toggle - explicitly set the desired mode)
-      setViewMode(mode as any);
-    } else {
-      // Standard behavior when on dashboard - only switch if different mode
-      if (viewMode !== mode) {
-        toggleViewMode();
-      }
-    }
+    // Always navigate to dashboard when clicking a mode button
+    navigate('/dashboard');
+    
+    // Explicitly set the view mode to ensure it works correctly
+    setViewMode(mode as any);
   };
 
   return (
