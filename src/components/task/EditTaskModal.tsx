@@ -234,6 +234,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ task, isOpen, onClose }) 
           <Button
             type="button"
             onClick={handleSaveTask}
+            className="btn-green"
           >
             Salvar
           </Button>
