@@ -6,7 +6,10 @@ import { useCompletedTasksData } from './hooks/useCompletedTasksData';
 import { useTaskFilters } from './hooks/useTaskFilters';
 import { TaskStats } from './components/TaskStats';
 import { TaskTable } from './components/TaskTable';
+import { TaskGrid } from './components/TaskGrid';
 import { TaskSearch } from './components/TaskSearch';
+import { ViewToggle } from './components/ViewToggle';
+import { AdvancedFilters } from './components/AdvancedFilters';
 
 /**
  * New Task History Page component that will gradually incorporate features from the existing one
@@ -20,8 +23,20 @@ const TaskHistoryNewPage = () => {
     setSelectedTaskId
   } = useCompletedTasksData();
   
-  // Use the task filters hook
-  const { searchQuery, setSearchQuery, filteredTasks } = useTaskFilters(completedTasks);
+  // Use the task filters hook with all filtering capabilities
+  const { 
+    searchQuery, setSearchQuery,
+    viewMode, setViewMode,
+    sortBy, setSortBy,
+    filteredTasks,
+    showFilters, setShowFilters,
+    periodFilter, setPeriodFilter,
+    scoreFilter, setScoreFilter,
+    feedbackFilter, setFeedbackFilter,
+    pillarFilter, setPillarFilter,
+    startDate, setStartDate,
+    endDate, setEndDate
+  } = useTaskFilters(completedTasks);
   
   // Loading state
   if (completedTasksLoading) {
@@ -56,20 +71,55 @@ const TaskHistoryNewPage = () => {
   };
 
   // Show search results message when filtering
-  const isFiltering = searchQuery.trim().length > 0;
+  const isFiltering = searchQuery.trim().length > 0 || 
+    periodFilter !== 'all' || 
+    scoreFilter !== 'all' || 
+    feedbackFilter !== 'all' || 
+    pillarFilter !== 'all';
+    
   const resultsMessage = isFiltering 
-    ? `${filteredTasks.length} ${filteredTasks.length === 1 ? 'resultado' : 'resultados'} para "${searchQuery}"`
+    ? `${filteredTasks.length} ${filteredTasks.length === 1 ? 'resultado' : 'resultados'} encontrados`
     : '';
 
   return (
     <div className="container p-4 mx-auto">
       <h1 className="text-2xl font-bold mb-6">Histórico de Tarefas (Novo)</h1>
       
-      {/* Search bar */}
-      <TaskSearch 
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-      />
+      <div className="flex flex-col md:flex-row justify-between gap-4 mb-4">
+        {/* Search bar */}
+        <TaskSearch 
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          showFilters={showFilters}
+          setShowFilters={setShowFilters}
+        />
+        
+        {/* View toggle */}
+        <ViewToggle
+          viewMode={viewMode}
+          setViewMode={setViewMode}
+          sortBy={sortBy}
+          setSortBy={setSortBy}
+        />
+      </div>
+      
+      {/* Advanced filters */}
+      {showFilters && (
+        <AdvancedFilters
+          periodFilter={periodFilter}
+          setPeriodFilter={setPeriodFilter}
+          scoreFilter={scoreFilter}
+          setScoreFilter={setScoreFilter}
+          feedbackFilter={feedbackFilter}
+          setFeedbackFilter={setFeedbackFilter}
+          pillarFilter={pillarFilter}
+          setPillarFilter={setPillarFilter}
+          startDate={startDate}
+          setStartDate={setStartDate}
+          endDate={endDate}
+          setEndDate={setEndDate}
+        />
+      )}
       
       {/* Display results count when filtering */}
       {isFiltering && (
@@ -83,11 +133,18 @@ const TaskHistoryNewPage = () => {
         averageScore={stats.averageScore}
       />
       
-      {/* Display tasks table with filtered tasks */}
-      <TaskTable 
-        tasks={filteredTasks} 
-        onSelectTask={handleSelectTask}
-      />
+      {/* Display tasks in appropriate view mode */}
+      {viewMode === 'list' ? (
+        <TaskTable 
+          tasks={filteredTasks} 
+          onSelectTask={handleSelectTask}
+        />
+      ) : (
+        <TaskGrid
+          tasks={filteredTasks}
+          onSelectTask={handleSelectTask}
+        />
+      )}
       
       {/* Add simple task info selection message */}
       {selectedTaskId && (
