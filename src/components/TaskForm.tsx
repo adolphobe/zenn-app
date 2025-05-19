@@ -182,8 +182,9 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, initialData, taskId, task,
                   <Button
                     type="submit"
                     variant="default"
+                    className="btn-green"
                   >
-                    Salvar
+                    Adicionar tarefa
                   </Button>
                 </div>
               </form>
