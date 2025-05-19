@@ -1,4 +1,3 @@
-
 import { Task, DateDisplayOptions, ViewMode, SortOption, TaskFormData as BaseTaskFormData } from '../types';
 import { Dispatch } from 'react';
 
@@ -59,7 +58,7 @@ export type Action =
   | { type: 'UPDATE_SORT_OPTIONS'; payload: { viewMode: 'power' | 'chronological'; options: Partial<SortOption> } }
   | { type: 'ADD_COMMENT'; payload: { taskId: string; text?: string; comment?: any } }
   | { type: 'DELETE_COMMENT'; payload: { taskId: string; commentId: string } }
-  | { type: 'TOGGLE_SHOW_PILLARS' }
+  | { type: 'TOGGLE_SHOW_PILLARS'; payload?: 'power' | 'chronological' }
   | { type: 'TOGGLE_SHOW_DATES' }
   | { type: 'TOGGLE_SHOW_SCORES' }
   | { type: 'SET_SORT_OPTIONS'; payload: { sortDirection: 'asc' | 'desc'; noDateAtEnd?: boolean } }
@@ -83,9 +82,6 @@ export interface AppContextType {
   updateTaskTitle: (id: string, title: string) => void;
   setTaskFeedback: (id: string, feedback: 'transformed' | 'relief' | 'obligation') => void;
   restoreTask: (id: string) => void;
-  // Note: We're removing these from the context as they are now handled by the hook
-  // addComment: (taskId: string, text: string) => void;
-  // deleteComment: (taskId: string, commentId: string) => void;
   syncTasksWithDatabase: (forceSync?: boolean) => Promise<Task[] | null>;
   
   // UI actions
@@ -93,12 +89,12 @@ export interface AppContextType {
   toggleShowHiddenTasks: () => void;
   toggleDarkMode: () => void;
   toggleSidebar: () => void;
-  toggleShowPillars: () => void;
+  toggleShowPillars: (mode?: 'power' | 'chronological') => void;
   toggleShowDates: () => void;
   toggleShowScores: () => void;
   updateDateDisplayOptions: (options: Partial<DateDisplayOptions>) => void;
   setSortOptions: (options: SortOptionsUpdate) => void;
-  toggleViewMode: () => void; // Adding the missing toggleViewMode function
+  toggleViewMode: () => void;
 }
 
 // Reuse TaskFormData from main types file

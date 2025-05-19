@@ -9,13 +9,14 @@ import { useLocation } from 'react-router-dom';
 
 const SidebarFilterSection: React.FC<{ sidebarOpen: boolean }> = ({ sidebarOpen }) => {
   const { 
-    state: { showHiddenTasks, showPillars, showDates, showScores }, 
+    state, 
     toggleShowHiddenTasks,
     toggleShowPillars,
     toggleShowDates,
     toggleShowScores
   } = useAppContext();
-  const { viewMode } = useAppState();
+  
+  const { viewMode } = state;
   const location = useLocation();
   
   // Only show filters on the main dashboard route (/) and when in power or chronological view mode
@@ -30,6 +31,12 @@ const SidebarFilterSection: React.FC<{ sidebarOpen: boolean }> = ({ sidebarOpen 
   // Check if we're in chronological mode
   const isChronologicalMode = viewMode === 'chronological';
   
+  // Get the current mode settings
+  const currentModeSettings = state.viewModeSettings[viewMode];
+  
+  // Handle mode-specific toggles
+  const handleTogglePillars = () => toggleShowPillars(viewMode);
+  
   return (
     <div className="animate-fade-in">
       <SidebarSection title="Exibir" sidebarOpen={sidebarOpen}>
@@ -39,7 +46,7 @@ const SidebarFilterSection: React.FC<{ sidebarOpen: boolean }> = ({ sidebarOpen 
             icon={ClipboardList}
             label="Tarefas ocultas"
             path="#"
-            isActive={showHiddenTasks}
+            isActive={currentModeSettings.showHiddenTasks}
             onClick={toggleShowHiddenTasks}
             isFilter={true} // Mark as a filter item
           />
@@ -48,8 +55,8 @@ const SidebarFilterSection: React.FC<{ sidebarOpen: boolean }> = ({ sidebarOpen 
           icon={Layers}
           label="Pilares no card"
           path="#"
-          isActive={showPillars}
-          onClick={toggleShowPillars}
+          isActive={currentModeSettings.showPillars}
+          onClick={handleTogglePillars}
           isFilter={true} // Mark as a filter item
         />
         {/* Only show date toggle in power mode */}
@@ -58,7 +65,7 @@ const SidebarFilterSection: React.FC<{ sidebarOpen: boolean }> = ({ sidebarOpen 
             icon={Calendar}
             label="Data visível"
             path="#"
-            isActive={showDates}
+            isActive={currentModeSettings.showDates}
             onClick={toggleShowDates}
             isFilter={true} // Mark as a filter item
           />
@@ -67,9 +74,9 @@ const SidebarFilterSection: React.FC<{ sidebarOpen: boolean }> = ({ sidebarOpen 
         {isChronologicalMode && (
           <SidebarNavItem
             icon={Hash}
-            label={showScores ? "Ocultar Score" : "Mostrar Score"}
+            label={currentModeSettings.showScores ? "Ocultar Score" : "Mostrar Score"}
             path="#"
-            isActive={showScores}
+            isActive={currentModeSettings.showScores}
             onClick={toggleShowScores}
             isFilter={true} // Mark as a filter item
           />

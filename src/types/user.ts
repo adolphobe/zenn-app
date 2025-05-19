@@ -1,4 +1,5 @@
 
+
 import { ViewMode, SortOption } from '../types';
 
 export interface UserPreferences {

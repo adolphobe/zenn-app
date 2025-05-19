@@ -19,6 +19,9 @@ export const useAppActions = () => {
     toggleShowHiddenTasks,
     toggleDarkMode,
     toggleSidebar,
+    toggleShowPillars,
+    toggleShowDates,
+    toggleShowScores,
     updateDateDisplayOptions,
     setSortOptions,
     dispatch
@@ -53,6 +56,9 @@ export const useAppActions = () => {
       toggleShowHiddenTasks,
       toggleDarkMode,
       toggleSidebar,
+      toggleShowPillars,
+      toggleShowDates,
+      toggleShowScores,
       updateDateDisplayOptions,
       setSortOptions,
     }

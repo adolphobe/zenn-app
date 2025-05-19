@@ -33,15 +33,17 @@ export const extractPreferencesFromState = (state: AppState): UserPreferences =>
 
 // Function to apply preferences to app state
 export const applyPreferencesToState = (preferences: UserPreferences, state: AppState): AppState => {
+  const currentViewMode = preferences.activeViewMode;
+  
   return {
     ...state,
     darkMode: preferences.darkMode,
     viewMode: preferences.activeViewMode,
     sidebarOpen: preferences.sidebarOpen,
-    showHiddenTasks: preferences.viewModeSettings[preferences.activeViewMode].showHiddenTasks,
-    showPillars: preferences.viewModeSettings[preferences.activeViewMode].showPillars,
-    showDates: preferences.viewModeSettings[preferences.activeViewMode].showDates,
-    showScores: preferences.viewModeSettings[preferences.activeViewMode].showScores,
+    showHiddenTasks: preferences.viewModeSettings[currentViewMode].showHiddenTasks,
+    showPillars: preferences.viewModeSettings[currentViewMode].showPillars,
+    showDates: preferences.viewModeSettings[currentViewMode].showDates,
+    showScores: preferences.viewModeSettings[currentViewMode].showScores,
     viewModeSettings: preferences.viewModeSettings,
     dateDisplayOptions: preferences.dateDisplayOptions,
     sortOptions: {

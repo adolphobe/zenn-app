@@ -224,7 +224,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     isAuthenticated
   ]);
 
-  // Create context value object with all actions - removed addComment and deleteComment
+  // Create context value object with all actions - updated for mode-specific toggleShowPillars
   const contextValue: AppContextType = {
     state,
     dispatch,
@@ -244,7 +244,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     toggleShowHiddenTasks: () => uiActions.toggleShowHiddenTasks(dispatch),
     toggleDarkMode: () => uiActions.toggleDarkMode(dispatch),
     toggleSidebar: () => uiActions.toggleSidebar(dispatch),
-    toggleShowPillars: () => uiActions.toggleShowPillars(dispatch),
+    toggleShowPillars: (mode) => uiActions.toggleShowPillars(dispatch, mode),
     toggleShowDates: () => uiActions.toggleShowDates(dispatch),
     toggleShowScores: () => uiActions.toggleShowScores(dispatch),
     updateDateDisplayOptions: (options) => uiActions.updateDateDisplayOptions(dispatch, options),
