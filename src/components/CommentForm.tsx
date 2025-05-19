@@ -1,10 +1,9 @@
 
 import React, { useState } from 'react';
+import { useAppContext } from '../context/AppContext';
+import { useAuth } from '../context/auth';
 import { Button } from './ui/button';
-import { useAppContext } from '@/context/AppContext';
-import { MessageSquare } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
-import { useQueryClient } from '@tanstack/react-query';
 
 interface CommentFormProps {
   taskId: string;
@@ -12,130 +11,75 @@ interface CommentFormProps {
 }
 
 const CommentForm: React.FC<CommentFormProps> = ({ taskId, onCommentAdded }) => {
-  const [commentText, setCommentText] = useState('');
+  const [text, setText] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { addComment } = useAppContext();
-  const queryClient = useQueryClient();
-  
-  const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement> | React.FormEvent) => {
+  const { currentUser, isAuthenticated } = useAuth();
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    e.stopPropagation();
     
-    if (commentText.trim() && addComment) {
-      try {
-        setIsSubmitting(true);
-        console.log(`[CommentForm] Submitting comment for task ${taskId}`);
+    if (!text.trim()) {
+      toast({
+        title: "Comentário vazio",
+        description: "Por favor, digite um comentário.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    if (!isAuthenticated || !currentUser) {
+      toast({
+        title: "Não autenticado",
+        description: "Você precisa estar conectado para adicionar comentários.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    try {
+      setIsSubmitting(true);
+      
+      // Use the actual user ID from the authentication context
+      const success = await addComment(taskId, text.trim(), currentUser.id);
+      
+      if (success) {
+        setText(''); // Clear form on success
         
-        // Add the comment and wait for response
-        const newComment = await addComment(taskId, commentText);
-        console.log('[CommentForm] Comment added successfully:', newComment);
-        
-        setCommentText('');
-        
-        // Invalidate any queries related to this task to trigger refetching
-        queryClient.invalidateQueries({ queryKey: ['tasks'] });
-        queryClient.invalidateQueries({ queryKey: ['task', taskId] });
-        
-        // Notify the parent component that a comment was added
         if (onCommentAdded) {
-          console.log('[CommentForm] Calling onCommentAdded callback');
           onCommentAdded();
         }
+      }
+    } catch (error) {
+      console.error('[CommentForm] Error adding comment:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
-        toast({
-          title: "Comentário adicionado",
-          description: "Seu comentário foi adicionado com sucesso."
-        });
-      } catch (error) {
-        console.error('[CommentForm] Error adding comment:', error);
-        toast({
-          title: "Erro ao adicionar comentário",
-          description: "Ocorreu um erro ao adicionar o comentário. Tente novamente.",
-          variant: "destructive",
-        });
-      } finally {
-        setIsSubmitting(false);
-      }
-    } else {
-      console.log('[CommentForm] Empty comment prevented submission');
-    }
-  };
-  
-  const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    e.stopPropagation();
-    setCommentText(e.target.value);
-  };
-  
-  // Handle key press events
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    e.stopPropagation();
-    
-    // Check if Enter was pressed without Shift
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault(); // Prevent line break
-      
-      // Check if the comment is not empty
-      if (commentText.trim() && !isSubmitting) {
-        handleSubmit(e as any);
-      }
-    }
-  };
-  
-  // Prevent all events in the comment form from bubbling up
-  const handleContainerClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-  };
-  
-  // Prevent mousedown in the comment form from bubbling up
-  const handleContainerMouseDown = (e: React.MouseEvent) => {
-    e.stopPropagation();
-  };
-  
   return (
-    <div 
-      className="mt-4" 
-      onClick={handleContainerClick}
-      onMouseDown={handleContainerMouseDown}
-    >
-      <h4 className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">
-        Adicionar comentário
-      </h4>
-      <div 
-        className="flex flex-col space-y-2"
-        onClick={handleContainerClick}
-        onMouseDown={handleContainerMouseDown}
-      >
+    <form onSubmit={handleSubmit} className="mt-2">
+      <div className="flex flex-col space-y-2">
         <textarea
-          value={commentText}
-          onChange={handleTextChange}
-          onKeyDown={handleKeyDown}
-          onClick={(e) => {
-            e.stopPropagation();
-          }}
-          onMouseDown={(e) => {
-            e.stopPropagation();
-          }}
-          className="w-full p-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all resize-none"
-          placeholder="Escreva seu comentário e pressione Enter para enviar..."
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          placeholder="Adicionar comentário..."
+          className="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200"
           rows={3}
-          disabled={isSubmitting}
+          disabled={isSubmitting || !isAuthenticated}
         />
-        <Button 
-          type="button"
-          disabled={!commentText.trim() || isSubmitting}
-          size="sm"
-          className="self-end flex items-center gap-1 bg-blue-50 hover:bg-blue-100 text-blue-600"
-          onClick={handleSubmit}
-          onMouseDown={(e) => {
-            e.stopPropagation();
-          }}
-        >
-          <MessageSquare size={16} />
-          {isSubmitting ? 'Enviando...' : 'Enviar'}
-        </Button>
+        <div className="flex justify-end">
+          <Button 
+            type="submit" 
+            disabled={!text.trim() || isSubmitting || !isAuthenticated}
+            className="bg-blue-600 hover:bg-blue-700 text-white"
+            size="sm"
+          >
+            {isSubmitting ? "Enviando..." : "Comentar"}
+          </Button>
+        </div>
       </div>
-    </div>
+    </form>
   );
 };
 

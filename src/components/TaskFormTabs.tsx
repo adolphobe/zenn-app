@@ -1,4 +1,3 @@
-
 import React, { useRef, useEffect, useState } from 'react';
 import { Task, TaskFormData } from '../types';
 import TaskFormFields from './TaskFormFields';
@@ -115,6 +114,17 @@ const TaskFormTabs: React.FC<TaskFormTabsProps> = ({
     );
   }
   
+  // Log rendering info outside of JSX to avoid TypeScript error
+  useEffect(() => {
+    if (taskId && task) {
+      console.log('[TaskFormTabs] Rendering comments section', { 
+        taskId, 
+        hasComments: task.comments && task.comments.length > 0,
+        commentsCount: task.comments?.length
+      });
+    }
+  }, [taskId, task]);
+  
   // Otherwise, show the full tabs interface when editing
   return (
     <Tabs 
@@ -152,15 +162,6 @@ const TaskFormTabs: React.FC<TaskFormTabsProps> = ({
       <TabsContent value="comments">
         {taskId ? (
           <div ref={commentsContainerRef} className="space-y-4">
-            {/* Moved console.log out of JSX rendering to fix type error */}
-            <div className="hidden">
-              {console.log('[TaskFormTabs] Rendering comments section', { 
-                taskId, 
-                hasComments: task?.comments && task.comments.length > 0,
-                commentsCount: task?.comments?.length
-              })}
-            </div>
-            
             {task && task.comments && task.comments.length > 0 ? (
               <TaskComments 
                 taskId={taskId} 
