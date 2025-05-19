@@ -25,6 +25,7 @@ interface TaskCardHeaderProps {
   consequenceScore?: number;
   prideScore?: number;
   constructionScore?: number;
+  isPowerExtra?: boolean; // Added this prop
 }
 
 const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
