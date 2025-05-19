@@ -7,19 +7,16 @@ import './index.css';
 import './styles/animations.css';
 import './styles/task-score.css'; // Added task score styling
 import './components/task/task-card.css';
-import { initializeDateTimeSettings } from './utils/dateUtils';
 
-// Initialize date settings before app renders
-initializeDateTimeSettings();
-
-// Improved HashRouter configuration to fix nested routes issues
+// Setting up React Router
 const router = createHashRouter([
   {
-    path: '/*', // This pattern captures all routes in the application
-    element: <App />
+    path: '/*',
+    element: <App />,
   },
 ]);
 
+// Render the app
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <RouterProvider router={router} />

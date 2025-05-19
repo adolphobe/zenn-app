@@ -1,11 +1,10 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useAppContext } from '@/context/AppContext';
 import { useAuth } from '@/context/auth';
-import { useTaskDataContext } from '@/context/TaskDataProvider';
-import { logInfo, logError } from '@/utils/logUtils';
 
 // Import refactored hooks
+import { useCompletedTasks } from '@/components/task-history/hooks/useCompletedTasks';
 import { useTaskFilters } from '@/components/task-history/hooks/useTaskFilters';
 import { useTaskPagination } from '@/components/task-history/hooks/useTaskPagination';
 
@@ -19,119 +18,50 @@ import { NoTasksMessage } from '@/components/task-history/NoTasksMessage';
 import { TaskPagination } from '@/components/task-history/TaskPagination';
 import { Loader2 } from 'lucide-react';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
-import { dateService } from '@/services/dateService';
+import { logDateInfo } from '@/utils/diagnosticLog';
 
 const TaskHistory = () => {
   const { state } = useAppContext();
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('grid');
-  const [error, setError] = useState<string | null>(null);
   
-  // Use the TaskDataContext for completed tasks
-  const { completedTasks, completedTasksLoading } = useTaskDataContext();
-  const isLoading = completedTasksLoading || authLoading;
+  // Use our custom hooks to manage the task data, filtering and pagination
+  const { completedTasks, isLoading, error } = useCompletedTasks(state.tasks);
   
-  // Initialize state variables for filters
-  const [searchQuery, setSearchQuery] = useState('');
-  const [periodFilter, setPeriodFilter] = useState('all');
-  const [scoreFilter, setScoreFilter] = useState('all');
-  const [feedbackFilter, setFeedbackFilter] = useState('all');
-  const [pillarFilter, setPillarFilter] = useState('all');
-  const [startDate, setStartDate] = useState<Date | undefined>(undefined);
-  const [endDate, setEndDate] = useState<Date | undefined>(undefined);
-  const [sortBy, setSortBy] = useState('newest');
-  const [showFilters, setShowFilters] = useState(false);
-  
-  // Check for URL duplication and log relevant info at mount
-  useEffect(() => {
-    const currentUrl = window.location.href;
-    logInfo('TaskHistory', 'Componente montado', { 
-      url: currentUrl,
-      isAuthenticated, 
-      authLoading,
-      tasksLoaded: completedTasks.length 
-    });
-    
-    // Verificar se temos uma URL com duplicação do path
-    if (currentUrl.includes('/task-history#/task-history')) {
-      logError('TaskHistory', 'URL com duplicação detectada', currentUrl);
-    }
-    
-    // Validate any tasks with completedAt dates
+  React.useEffect(() => {
     if (completedTasks.length > 0) {
-      completedTasks.forEach(task => {
-        if (task.completedAt) {
-          const isValid = task.completedAt instanceof Date && 
-            !isNaN(task.completedAt.getTime());
-          
-          if (!isValid) {
-            logError('TaskHistory', `Task ${task.id} tem data de conclusão inválida`, task.completedAt);
-          }
-        }
+      // Log the first few tasks to help diagnose date issues
+      completedTasks.slice(0, 3).forEach(task => {
+        logDateInfo('TaskHistory', `Task ${task.id} completedAt in list`, task.completedAt);
       });
     }
-    
-    // Clean up function to help with debugging
-    return () => {
-      logInfo('TaskHistory', 'Componente desmontado');
-    };
-  }, [isAuthenticated, authLoading, completedTasks]);
+  }, [completedTasks]);
   
-  // Process filters and pagination
-  let filteredTasks = [];
-  let sortedTasks = [];
-  let groupedTasks = [];
-  let paginatedTasks = [];
-  let currentPage = 1;
-  let totalPages = 1;
-  let pageNumbers: (number | string)[] = [];
-  let handlePageChange = (page: number) => {};
+  const { 
+    searchQuery, setSearchQuery,
+    periodFilter, setPeriodFilter,
+    scoreFilter, setScoreFilter,
+    feedbackFilter, setFeedbackFilter, 
+    pillarFilter, setPillarFilter,
+    startDate, setStartDate,
+    endDate, setEndDate,
+    sortBy, setSortBy,
+    showFilters, setShowFilters,
+    filteredTasks,
+    sortedTasks
+  } = useTaskFilters(completedTasks);
   
-  try {
-    // Use the filter hook with our state values
-    if (completedTasks.length > 0) {
-      // Create a defensive copy of tasks with validated dates
-      const validatedTasks = completedTasks.map(task => ({
-        ...task,
-        // Ensure completedAt is a valid Date
-        completedAt: task.completedAt instanceof Date && !isNaN(task.completedAt.getTime())
-          ? task.completedAt
-          : new Date() // Use current date as fallback
-      }));
-      
-      const filters = useTaskFilters(
-        validatedTasks,
-        {
-          searchQuery,
-          periodFilter,
-          scoreFilter,
-          feedbackFilter,
-          pillarFilter,
-          startDate,
-          endDate,
-          sortBy,
-          showFilters
-        }
-      );
-      
-      filteredTasks = filters.filteredTasks;
-      sortedTasks = filters.sortedTasks;
-      
-      // Use the pagination hook with filtered results
-      const pagination = useTaskPagination(sortedTasks, periodFilter);
-      currentPage = pagination.currentPage;
-      totalPages = pagination.totalPages;
-      paginatedTasks = pagination.paginatedTasks;
-      groupedTasks = pagination.groupedTasks;
-      handlePageChange = pagination.handlePageChange;
-      pageNumbers = pagination.getPageNumbers();
-    }
-  } catch (err) {
-    logError('TaskHistory', 'Erro ao processar tarefas:', err);
-    setError(`Erro ao processar o histórico de tarefas: ${err instanceof Error ? err.message : String(err)}`);
-  }
+  // Pass periodFilter to useTaskPagination
+  const {
+    currentPage,
+    totalPages,
+    paginatedTasks,
+    groupedTasks,
+    handlePageChange,
+    getPageNumbers
+  } = useTaskPagination(sortedTasks, periodFilter);
 
-  if (isLoading) {
+  if (isLoading || authLoading) {
     return (
       <div className="container p-4 mx-auto flex justify-center items-center h-[60vh]">
         <div className="text-center">
@@ -169,20 +99,8 @@ const TaskHistory = () => {
   return (
     <div className="container p-4 mx-auto">
       <div className="flex flex-col space-y-4">
-        <h1 className="text-2xl font-bold">Histórico de Tarefas</h1>
-        
-        {/* Display task count even if there's an error */}
-        <div className="text-muted-foreground">
-          {completedTasks.length > 0 ? 
-            `${completedTasks.length} ${completedTasks.length === 1 ? 'tarefa concluída' : 'tarefas concluídas'}` : 
-            'Nenhuma tarefa concluída para exibir'
-          }
-        </div>
-        
-        {/* Pass filtered tasks to TaskHistoryStats */}
-        {sortedTasks.length > 0 && (
-          <TaskHistoryStats filteredTasks={sortedTasks} />
-        )}
+        {/* Pass filtered tasks to TaskHistoryStats instead of all completed tasks */}
+        <TaskHistoryStats filteredTasks={sortedTasks} />
         
         {/* Search and filter bar */}
         <div className="flex flex-col md:flex-row justify-between gap-4">
@@ -227,7 +145,7 @@ const TaskHistory = () => {
         )}
 
         {/* No results message */}
-        {(sortedTasks.length === 0 || completedTasks.length === 0) && <NoTasksMessage />}
+        {sortedTasks.length === 0 && <NoTasksMessage />}
         
         {/* Task list view */}
         {viewMode === 'list' && paginatedTasks.length > 0 && <TasksTable tasks={paginatedTasks} />}
@@ -241,7 +159,7 @@ const TaskHistory = () => {
             currentPage={currentPage}
             totalPages={totalPages}
             handlePageChange={handlePageChange}
-            pageNumbers={pageNumbers}
+            pageNumbers={getPageNumbers()}
           />
         )}
       </div>
