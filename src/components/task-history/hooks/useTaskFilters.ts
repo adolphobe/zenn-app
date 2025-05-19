@@ -2,7 +2,6 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import { Task } from '@/types';
 import { dateService } from '@/services/dateService';
-import { logDateInfo } from '@/utils/diagnosticLog';
 import { logError } from '@/utils/logUtils';
 
 // Type definition for filter options
@@ -44,13 +43,6 @@ export const useTaskFilters = (
   const [showFilters, setShowFilters] = useState(initialFilters.showFilters);
   const [filterErrors, setFilterErrors] = useState<string[]>([]);
 
-  // For date debugging - MOVED to useEffect to prevent render loops
-  useEffect(() => {
-    if (startDate || endDate) {
-      logDateInfo('useTaskFilters', 'Date filters changed', { startDate, endDate });
-    }
-  }, [startDate, endDate]);
-
   // Filter tasks based on search query and filters - PROPERLY MEMOIZED
   const filteredTasks = useMemo(() => {
     if (!tasks || tasks.length === 0) return [];
@@ -64,7 +56,7 @@ export const useTaskFilters = (
           return false;
         }
 
-        // Apply search filter - FIXED: Only search in title, not notes
+        // Apply search filter
         const matchesSearch = !searchQuery || 
           task.title.toLowerCase().includes(searchQuery.toLowerCase());
 
@@ -75,7 +67,6 @@ export const useTaskFilters = (
         if (periodFilter !== 'all') {
           // Ensure we have a valid date to work with
           if (!task.completedAt) {
-            // This should not happen for completed tasks
             errors.push(`Task ${task.id} is missing completedAt date`);
             return false;
           }
@@ -121,7 +112,7 @@ export const useTaskFilters = (
 
         if (!matchesPeriod) return false;
 
-        // Apply score filter - FIXED to handle undefined scores
+        // Apply score filter
         let matchesScore = true;
         if (scoreFilter !== 'all') {
           // Make sure we have a total score
@@ -169,10 +160,8 @@ export const useTaskFilters = (
       const errorMsg = `Error filtering tasks: ${err instanceof Error ? err.message : String(err)}`;
       errors.push(errorMsg);
       logError('useTaskFilters', errorMsg, err);
-      // Return empty array on error
       return [];
     } finally {
-      // Only update errors via useEffect to prevent render loop
       if (errors.length > 0) {
         setTimeout(() => {
           setFilterErrors(errors);

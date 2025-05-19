@@ -23,7 +23,7 @@ export const ViewToggle: React.FC<ViewToggleProps> = ({
         <SelectValue placeholder="Ordenar por" />
       </SelectTrigger>
       <SelectContent className="p-1.5">
-        <SelectItem value="recent">Mais recentes</SelectItem>
+        <SelectItem value="newest">Mais recentes</SelectItem>
         <SelectItem value="oldest">Mais antigas</SelectItem>
         <SelectItem value="highScore">Maior pontuação</SelectItem>
         <SelectItem value="lowScore">Menor pontuação</SelectItem>
