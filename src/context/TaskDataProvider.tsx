@@ -1,116 +1,94 @@
-import React, { createContext, useContext, useMemo, useEffect } from 'react';
+
+import React, { createContext, useContext, useMemo, useCallback } from 'react';
 import { useTaskData } from '@/hooks/useTaskData';
 import { Task, TaskFormData } from '@/types';
 import { dateService } from '@/services/dateService';
 import { logInfo } from '@/utils/logUtils';
 
-// Define the context type
+// Define o tipo do contexto
 type TaskDataContextType = ReturnType<typeof useTaskData> & {
   completedTasks: Task[];
   completedTasksLoading: boolean;
 };
 
-// Create the context
+// Cria o contexto
 const TaskDataContext = createContext<TaskDataContextType | undefined>(undefined);
 
-// Provider component
+// Provider component com otimizações para evitar re-renderizações
 export const TaskDataProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Use our hook to manage active tasks
+  // Usa o hook para gerenciar tarefas ativas
   const activeTasksData = useTaskData(false);
   
-  // Use a separate instance to manage completed tasks
+  // Usa uma instância separada para gerenciar tarefas concluídas
   const completedTasksData = useTaskData(true);
   
-  // Track processing errors
-  const [processingErrors, setProcessingErrors] = React.useState<string[]>([]);
-  
-  // Log diagnostics about completed tasks - reduce frequency with deps array
-  useEffect(() => {
-    if (processingErrors.length > 0) {
-      console.error('TaskDataProvider: Errors processing completed tasks:', processingErrors.join(', '));
+  // Função otimizada para processar uma única tarefa - evita recalcular em cada renderização
+  const processCompletedTask = useCallback((task: Task): Task => {
+    try {
+      // Cache local para evitar processamento redundante de datas
+      const processedTask = { ...task };
+      
+      // Processa apenas datas se precisar
+      // Fast path: se já for uma Data válida, reuse-a
+      if (!(task.completedAt instanceof Date) || isNaN(task.completedAt.getTime())) {
+        if (task.completedAt) {
+          processedTask.completedAt = dateService.parseDate(task.completedAt) || new Date();
+        } else if (task.completed) {
+          processedTask.completedAt = new Date();
+        } else {
+          processedTask.completedAt = null;
+        }
+      }
+      
+      // Otimiza processamento de outras datas também
+      if (!(task.createdAt instanceof Date) || isNaN(task.createdAt.getTime())) {
+        processedTask.createdAt = task.createdAt ? 
+          dateService.parseDate(task.createdAt) || new Date() : 
+          new Date();
+      }
+      
+      // Garante que idealDate seja validado mas mantenha a estrutura de tipo original
+      if (task.idealDate && (!(task.idealDate instanceof Date) || isNaN(task.idealDate.getTime()))) {
+        processedTask.idealDate = dateService.parseDate(task.idealDate);
+      }
+      
+      return processedTask;
+    } catch (error) {
+      // Em caso de erro, retorna objeto com valores de fallback
+      console.error('Erro ao processar tarefa', error);
+      return {
+        ...task,
+        completedAt: task.completed ? new Date() : null,
+        idealDate: null,
+        createdAt: new Date()
+      };
     }
-
-    // Simplified logging to reduce console noise
-    if (completedTasksData.tasks.length > 0) {
-      logInfo('TaskDataProvider', `${completedTasksData.tasks.length} tarefas concluídas carregadas`);
-    }
-  }, [processingErrors.length, completedTasksData.tasks.length]);
+  }, []);
   
-  // Process completed tasks to ensure dates are valid Date objects - OPTIMIZED
+  // Processa tarefas concluídas - otimizado com useMemo e cache
   const processedCompletedTasks = useMemo(() => {
     const tasks = completedTasksData.tasks || [];
-    const errors: string[] = [];
     
     if (tasks.length === 0) {
       return [];
     }
     
-    const processed = tasks.map(task => {
-      try {
-        // Only process dates if we need to
-        let completedAt: Date | null = null;
-        
-        // Fast path: if it's already a valid Date, reuse it
-        if (task.completedAt instanceof Date && !isNaN(task.completedAt.getTime())) {
-          completedAt = task.completedAt;
-        } 
-        // Parse the date if it's not already a valid Date
-        else if (task.completedAt) {
-          completedAt = dateService.parseDate(task.completedAt) || new Date();
-        } 
-        // Default fallback for completed tasks without dates
-        else if (task.completed) {
-          completedAt = new Date();
-        }
-        
-        // Optimize other date processing too
-        const createdAt = task.createdAt instanceof Date ? 
-          task.createdAt : 
-          (task.createdAt ? dateService.parseDate(task.createdAt) : null) || 
-          new Date();
-        
-        // Ensure idealDate is validated but keep original type structure - only process if needed
-        const idealDate = !task.idealDate ? null :
-          (task.idealDate instanceof Date ? task.idealDate : dateService.parseDate(task.idealDate));
-        
-        // Return a new object with properly processed dates
-        return {
-          ...task,
-          completedAt,
-          idealDate,
-          createdAt
-        };
-      } catch (error) {
-        // Track error but return valid object with fallback values
-        errors.push(`Error processing task ${task.id}: ${error instanceof Error ? error.message : String(error)}`);
-        
-        return {
-          ...task,
-          completedAt: task.completed ? new Date() : null,
-          idealDate: null,
-          createdAt: new Date()
-        };
-      }
-    });
-    
-    // Update error state only if there are errors - reduce renders
-    if (errors.length > 0) {
-      // Use setTimeout to avoid render loop from setState during render
-      setTimeout(() => setProcessingErrors(errors), 0);
-    } else if (processingErrors.length > 0) {
-      // Only clear if needed
-      setTimeout(() => setProcessingErrors([]), 0);
+    return tasks.map(processCompletedTask);
+  }, [completedTasksData.tasks, processCompletedTask]);
+  
+  // Logs apenas em desenvolvimento e apenas quando realmente muda
+  React.useEffect(() => {
+    if (process.env.NODE_ENV === 'development' && processedCompletedTasks.length > 0) {
+      logInfo('TaskDataProvider', `${processedCompletedTasks.length} tarefas concluídas processadas`);
     }
-    
-    return processed;
-  }, [completedTasksData.tasks, processingErrors.length]);
+  }, [processedCompletedTasks.length]);
 
-  // Create context value with both active and completed tasks
-  const contextValue: TaskDataContextType = {
+  // Cria valor do contexto com tarefas ativas e concluídas
+  const contextValue: TaskDataContextType = useMemo(() => ({
     ...activeTasksData,
     completedTasks: processedCompletedTasks,
     completedTasksLoading: completedTasksData.isLoading,
-  };
+  }), [activeTasksData, processedCompletedTasks, completedTasksData.isLoading]);
 
   return (
     <TaskDataContext.Provider value={contextValue}>
@@ -119,11 +97,11 @@ export const TaskDataProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   );
 };
 
-// Custom hook for using the context
+// Hook personalizado para usar o contexto
 export const useTaskDataContext = (): TaskDataContextType => {
   const context = useContext(TaskDataContext);
   if (context === undefined) {
-    throw new Error('useTaskDataContext must be used within a TaskDataProvider');
+    throw new Error('useTaskDataContext deve ser usado dentro de um TaskDataProvider');
   }
   return context;
 };

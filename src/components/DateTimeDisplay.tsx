@@ -1,9 +1,8 @@
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { dateService } from '@/services/dateService';
 import { DateDisplayOptions, AdvancedDateFormatOptions } from '@/types/dates';
 import { useDateFormatter } from '@/hooks/useDateFormatter';
-import { logDateInfo } from '@/utils/diagnosticLog';
 
 interface DateTimeDisplayProps {
   date: Date | string | null;
@@ -16,9 +15,9 @@ interface DateTimeDisplayProps {
 
 /**
  * Componente reutilizável para exibição formatada de datas e horas
- * Com melhor tratamento para datas inválidas
+ * Otimizado para evitar re-renderizações desnecessárias e logs excessivos
  */
-const DateTimeDisplay: React.FC<DateTimeDisplayProps> = ({
+const DateTimeDisplay: React.FC<DateTimeDisplayProps> = React.memo(({
   date,
   options,
   className = '',
@@ -28,59 +27,43 @@ const DateTimeDisplay: React.FC<DateTimeDisplayProps> = ({
 }) => {
   const { formatDate, formatRelative } = useDateFormatter();
   
-  // Log para diagnóstico da data recebida
-  React.useEffect(() => {
-    logDateInfo('DateTimeDisplay', 'Recebido prop date', date);
-  }, [date]);
-  
-  // Se não há data, exibe o fallback
-  if (!date) {
-    console.debug('DateTimeDisplay: Sem data, exibindo fallback', fallback);
-    return <span className={className}>{fallback}</span>;
-  }
-  
-  // Tenta formatar a data
-  try {
-    // Verifica se a data é válida antes de tentar formatar
-    const validDate = dateService.parseDate(date);
-    logDateInfo('DateTimeDisplay', 'Data após parseDate', validDate);
-    
-    if (!validDate) {
-      console.debug('DateTimeDisplay: Data inválida após parseDate, exibindo fallback', { 
-        date, 
-        fallback 
-      });
-      return <span className={className}>{fallback}</span>;
+  // Processamento e formatação da data - apenas uma vez para cada conjunto de props
+  const { formattedDate, isoString } = useMemo(() => {
+    // Se não há data, retorna valores vazios
+    if (!date) {
+      return { formattedDate: fallback, isoString: null };
     }
     
-    let formattedDate: string;
-    
-    if (showRelative) {
-      // Usa formato relativo (hoje, ontem, etc)
-      formattedDate = formatRelative(validDate);
-      logDateInfo('DateTimeDisplay', 'Data formatada como relativa', formattedDate);
-    } else {
-      // Usa formato padrão com as opções fornecidas
-      formattedDate = formatDate(validDate, {
-        ...options,
-        useTimeZone: showTimeZone
-      });
-      logDateInfo('DateTimeDisplay', 'Data formatada padrão', formattedDate);
+    try {
+      // Verifica se a data é válida antes de tentar formatar
+      const validDate = dateService.parseDate(date);
+      if (!validDate) {
+        return { formattedDate: fallback, isoString: null };
+      }
+      
+      // Formata a data de acordo com as opções
+      const displayText = showRelative 
+        ? formatRelative(validDate)
+        : formatDate(validDate, { ...options, useTimeZone: showTimeZone });
+      
+      // Gera ISO string para o atributo dateTime
+      const iso = dateService.toISOString(validDate);
+      
+      return { 
+        formattedDate: displayText || fallback, 
+        isoString: iso 
+      };
+    } catch (error) {
+      // Em caso de erro, usa o fallback
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Erro ao renderizar data:', error);
+      }
+      return { formattedDate: fallback, isoString: null };
     }
-    
-    // Se não conseguiu formatar, exibe o fallback
-    if (!formattedDate) {
-      console.debug('DateTimeDisplay: Falha na formatação, exibindo fallback');
-      return <span className={className}>{fallback}</span>;
-    }
-    
-    // Garantir que temos um ISO string válido para o atributo dateTime
-    const isoString = dateService.toISOString(validDate);
-    if (!isoString) {
-      console.debug('DateTimeDisplay: Falha ao gerar ISO string, usando span simples');
-      return <span className={className}>{formattedDate}</span>;
-    }
-    
+  }, [date, options, showRelative, showTimeZone, fallback, formatDate, formatRelative]);
+
+  // Renderiza um time tag se tiver um ISO string válido, caso contrário um span simples
+  if (isoString) {
     return (
       <time 
         dateTime={isoString} 
@@ -89,10 +72,12 @@ const DateTimeDisplay: React.FC<DateTimeDisplayProps> = ({
         {formattedDate}
       </time>
     );
-  } catch (error) {
-    console.error('Erro ao renderizar data:', error, { date });
-    return <span className={className}>{fallback}</span>;
   }
-};
+  
+  return <span className={className}>{formattedDate}</span>;
+});
+
+// Definição explícita de displayName para ferramentas de desenvolvimento
+DateTimeDisplay.displayName = 'DateTimeDisplay';
 
 export default DateTimeDisplay;

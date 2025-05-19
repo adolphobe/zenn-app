@@ -1,56 +1,51 @@
 
-import React, { useState, useEffect } from 'react';
-import { useAppContext } from '@/context/AppContext';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '@/context/auth';
 import { useTaskDataContext } from '@/context/TaskDataProvider';
-import { logInfo, logError } from '@/utils/logUtils';
+import { logInfo } from '@/utils/logUtils';
 import { TaskHistoryContent } from './TaskHistoryContent';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Loader2 } from 'lucide-react';
 
+// Componente otimizado para reduzir re-renderizações
 const TaskHistoryPage = () => {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const [error, setError] = useState<string | null>(null);
-  
-  // Use the TaskDataContext for completed tasks
   const { completedTasks, completedTasksLoading } = useTaskDataContext();
-  const isLoading = completedTasksLoading || authLoading;
   
-  // Check for URL duplication and log relevant info at mount
-  useEffect(() => {
-    const currentUrl = window.location.href;
-    logInfo('TaskHistory', 'Componente montado', { 
-      url: currentUrl,
-      isAuthenticated, 
-      authLoading,
-      tasksLoaded: completedTasks.length 
-    });
-    
-    // Verificar se temos uma URL com duplicação do path
-    if (currentUrl.includes('/task-history#/task-history')) {
-      logError('TaskHistory', 'URL com duplicação detectada', currentUrl);
-    }
-    
-    // Validate any tasks with completedAt dates
-    if (completedTasks.length > 0) {
-      completedTasks.forEach(task => {
-        if (task.completedAt) {
-          const isValid = task.completedAt instanceof Date && 
-            !isNaN(task.completedAt.getTime());
-          
-          if (!isValid) {
-            logError('TaskHistory', `Task ${task.id} tem data de conclusão inválida`, task.completedAt);
-          }
-        }
-      });
-    }
-    
-    // Clean up function to help with debugging
-    return () => {
-      logInfo('TaskHistory', 'Componente desmontado');
-    };
-  }, [isAuthenticated, authLoading, completedTasks]);
+  // Memoiza o estado de carregamento para evitar re-renderizações
+  const isLoading = useMemo(
+    () => completedTasksLoading || authLoading,
+    [completedTasksLoading, authLoading]
+  );
 
+  // Log de diagnóstico - apenas uma vez na montagem e com debounce
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      const currentUrl = window.location.href;
+      
+      // Detecta problemas de URL que podem causar loops
+      const hasURLDuplication = currentUrl.includes('/task-history#/task-history');
+      const hasNestedPath = currentUrl.includes('/dashboard/task-history');
+      
+      logInfo('TaskHistory', `Componente montado com ${completedTasks.length} tarefas`, { 
+        url: currentUrl,
+        isAuthenticated,
+        hasURLDuplication,
+        hasNestedPath
+      });
+      
+      // Auto-correção de URLs problemáticas
+      if (hasURLDuplication || hasNestedPath) {
+        // Substitui a URL sem recarregar a página
+        window.history.replaceState({}, document.title, '/task-history');
+      }
+    }, 100);
+    
+    return () => clearTimeout(timeoutId);
+  }, []);
+
+  // Renderização condicional baseada no estado
   if (isLoading) {
     return (
       <div className="container p-4 mx-auto flex justify-center items-center h-[60vh]">
@@ -86,6 +81,7 @@ const TaskHistoryPage = () => {
     );
   }
 
+  // Usuário autenticado e sem erros - renderiza o conteúdo
   return <TaskHistoryContent setError={setError} />;
 };
 

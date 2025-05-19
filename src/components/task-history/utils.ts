@@ -3,84 +3,136 @@ import { Task } from '@/types';
 import { startOfWeek, startOfMonth, differenceInMonths } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { dateService } from '@/services/dateService';
-import { logDateInfo } from '@/utils/diagnosticLog';
 
-// Cached values to prevent recalculations
-const today = dateService.startOfDay(new Date()) || new Date();
-const thisWeekStart = startOfWeek(today, { locale: ptBR });
-const thisMonthStart = startOfMonth(today);
+// Cache global para períodos comuns - calculados apenas uma vez
+// Isso melhora significativamente a performance do agrupamento de tarefas
+const dateCache = {
+  today: dateService.startOfDay(new Date()),
+  thisWeekStart: startOfWeek(new Date(), { locale: ptBR }),
+  thisMonthStart: startOfMonth(new Date()),
+  get yesterday() {
+    const yesterday = new Date(this.today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    return yesterday;
+  }
+};
 
-// Timeline grouping function - optimized for performance
+/**
+ * Agrupa tarefas por linha do tempo - otimizado para melhor performance
+ * Versão refatorada para minimizar recálculos e evitar problemas de datas
+ */
 export const groupTasksByTimeline = (tasks: Task[], periodFilter: string = 'all') => {
-  // Early exit if no tasks, prevent further processing
+  // Saída antecipada se não houver tarefas, evita processamento
   if (!tasks || tasks.length === 0) {
     return [];
   }
   
-  // If a specific period filter is active (except custom), return all tasks in a single group
+  // Se um filtro de período específico estiver ativo, retorna todas as tarefas em um único grupo
   if (periodFilter !== 'all' && periodFilter !== 'custom') {
     return [{
-      label: '',  // Empty label means no timeline division header
+      label: '',  // Rótulo vazio significa sem cabeçalho de divisão de linha do tempo
       tasks: [...tasks]
     }];
   }
   
-  const groups = {
-    today: { label: 'Hoje', tasks: [] as Task[] },
-    yesterday: { label: 'Ontem', tasks: [] as Task[] },
-    thisWeek: { label: 'Esta semana', tasks: [] as Task[] },
-    thisMonth: { label: 'Este mês', tasks: [] as Task[] },
-    lastMonth: { label: 'Mês passado', tasks: [] as Task[] },
-    twoMonthsAgo: { label: 'Dois meses atrás', tasks: [] as Task[] },
-    older: { label: 'Anteriores', tasks: [] as Task[] },
+  // Grupos predefinidos com tipagem forte
+  const groups: Record<string, {label: string, tasks: Task[]}> = {
+    today: { label: 'Hoje', tasks: [] },
+    yesterday: { label: 'Ontem', tasks: [] },
+    thisWeek: { label: 'Esta semana', tasks: [] },
+    thisMonth: { label: 'Este mês', tasks: [] },
+    lastMonth: { label: 'Mês passado', tasks: [] },
+    twoMonthsAgo: { label: 'Dois meses atrás', tasks: [] },
+    older: { label: 'Anteriores', tasks: [] },
   };
   
-  const allTasks = [...tasks]; // Defensive copy
+  // Cópia defensiva das tarefas
+  const allTasks = [...tasks]; 
   
+  // Mapeamento de tarefas para grupos - otimização para reduzir chamadas de função
   allTasks.forEach(task => {
-    // Skip tasks without completedAt
+    // Pular tarefas sem completedAt
     if (!task.completedAt) {
-      groups.older.tasks.push(task);  // Place in "older" as fallback
+      groups.older.tasks.push(task);
       return;
     }
     
     try {
-      // Parse date only once - reuse the result
+      // Parse da data apenas uma vez - reutiliza o resultado
       const completedDate = task.completedAt instanceof Date ? 
         task.completedAt : 
         dateService.parseDate(task.completedAt);
       
-      if (!completedDate) {
+      if (!completedDate || isNaN(completedDate.getTime())) {
         groups.older.tasks.push(task);
         return;
       }
       
-      // Group tasks by date - simplified logic with fewer calculations
+      // Verifica se é hoje (comparação de data sem hora)
       if (dateService.isToday(completedDate)) {
         groups.today.tasks.push(task);
-      } else if (dateService.isYesterday(completedDate)) {
+        return;
+      }
+      
+      // Verifica se é ontem
+      if (dateService.isYesterday(completedDate)) {
         groups.yesterday.tasks.push(task);
-      } else if (completedDate >= thisWeekStart && completedDate < today) {
+        return;
+      }
+      
+      // Referências em cache para comparação rápida
+      const { today, thisWeekStart, thisMonthStart } = dateCache;
+      
+      // Verifica se é esta semana (mas não hoje ou ontem)
+      if (completedDate >= thisWeekStart && completedDate < today) {
         groups.thisWeek.tasks.push(task);
-      } else if (completedDate >= thisMonthStart && completedDate < thisWeekStart) {
+        return;
+      }
+      
+      // Verifica se é este mês (mas não esta semana)
+      if (completedDate >= thisMonthStart && completedDate < thisWeekStart) {
         groups.thisMonth.tasks.push(task);
+        return;
+      }
+      
+      // Verifica meses anteriores com memoização para evitar recálculos
+      const monthsDifference = differenceInMonths(today, completedDate);
+      
+      if (monthsDifference === 1) {
+        groups.lastMonth.tasks.push(task);
+      } else if (monthsDifference === 2) {
+        groups.twoMonthsAgo.tasks.push(task);
       } else {
-        const monthsDifference = differenceInMonths(today, completedDate);
-        
-        if (monthsDifference === 1) {
-          groups.lastMonth.tasks.push(task);
-        } else if (monthsDifference === 2) {
-          groups.twoMonthsAgo.tasks.push(task);
-        } else {
-          groups.older.tasks.push(task);
-        }
+        groups.older.tasks.push(task);
       }
     } catch (error) {
-      // Fallback to "older" if date processing fails
+      // Fallback para "older" se o processamento de data falhar
       groups.older.tasks.push(task);
     }
   });
   
-  // Filter out empty groups and return
+  // Filtra grupos vazios e retorna
   return Object.values(groups).filter(group => group.tasks.length > 0);
+};
+
+/**
+ * Limpa o cache de datas para forçar recálculos - útil para testes
+ * ou quando a data atual muda significativamente
+ */
+export const clearTimelineCache = () => {
+  // Redefine as datas em cache
+  Object.defineProperties(dateCache, {
+    today: {
+      value: dateService.startOfDay(new Date()),
+      writable: true
+    },
+    thisWeekStart: {
+      value: startOfWeek(new Date(), { locale: ptBR }),
+      writable: true
+    },
+    thisMonthStart: {
+      value: startOfMonth(new Date()),
+      writable: true
+    }
+  });
 };
