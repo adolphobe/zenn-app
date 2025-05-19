@@ -22,11 +22,20 @@ export const useComments = (taskId: string) => {
   const { 
     data: comments = [], 
     isLoading, 
-    error: fetchError 
+    error: fetchError,
+    refetch
   } = useQuery({
     queryKey: ['comments', taskId],
     queryFn: async () => {
       console.log(`[useComments] Fetching comments for task: ${taskId}`);
+      
+      // Verificação extra de autenticação
+      const sessionCheck = await supabase.auth.getSession();
+      console.log('[useComments] Session check:', { 
+        hasSession: !!sessionCheck.data.session,
+        userId: sessionCheck.data.session?.user?.id || 'none'
+      });
+      
       const { data, error } = await supabase
         .from('task_comments')
         .select('*')
@@ -35,6 +44,7 @@ export const useComments = (taskId: string) => {
 
       if (error) {
         console.error('[useComments] Error fetching comments:', error);
+        console.error('[useComments] Error details:', JSON.stringify(error));
         throw error;
       }
       
@@ -56,12 +66,27 @@ export const useComments = (taskId: string) => {
     mutationFn: async (text: string) => {
       if (!isAuthenticated || !currentUser) {
         console.error('[useComments] User not authenticated');
-        throw new Error('User not authenticated');
+        
+        // Verificação detalhada de sessão
+        const { data: sessionData } = await supabase.auth.getSession();
+        console.error('[useComments] Session check details:', { 
+          hasSession: !!sessionData.session,
+          sessionUserId: sessionData.session?.user?.id,
+          currentUser: currentUser?.id,
+          isAuthenticated
+        });
+        
+        throw new Error('Usuário não autenticado. Por favor, faça login novamente.');
       }
       
       if (!text.trim()) {
         console.error('[useComments] Comment text is empty');
-        throw new Error('Comment text cannot be empty');
+        throw new Error('O texto do comentário não pode estar vazio');
+      }
+      
+      if (!taskId) {
+        console.error('[useComments] Task ID is missing');
+        throw new Error('ID da tarefa ausente');
       }
       
       console.log(`[useComments] Adding comment to task ${taskId} by user ${currentUser.id}`);
@@ -69,6 +94,19 @@ export const useComments = (taskId: string) => {
       setIsSubmitting(true);
       
       try {
+        // Primeiro, vamos verificar se a tarefa existe
+        const { data: taskCheck, error: taskError } = await supabase
+          .from('tasks')
+          .select('id')
+          .eq('id', taskId)
+          .single();
+          
+        if (taskError || !taskCheck) {
+          console.error('[useComments] Task does not exist:', { taskId, error: taskError });
+          throw new Error(`A tarefa (${taskId}) não foi encontrada. Verifique se a tarefa existe.`);
+        }
+        
+        // Agora temos certeza que o taskId é válido, vamos adicionar o comentário
         const { data, error } = await supabase
           .from('task_comments')
           .insert({
@@ -88,8 +126,14 @@ export const useComments = (taskId: string) => {
             throw new Error('Permissão negada. Você pode não ter permissão para comentar nesta tarefa.');
           } else if (error.code === '23503') {
             throw new Error('A tarefa pode não existir mais ou o ID de usuário é inválido.');
+          } else if (error.code === '23502') {
+            // Violação de não nulo
+            throw new Error('Dados obrigatórios não fornecidos: ' + error.message);
+          } else if (error.code === '23514') {
+            // Violação de restrição de verificação
+            throw new Error('Dados inválidos: ' + error.message);
           } else {
-            throw error;
+            throw new Error(`Erro desconhecido (${error.code}): ${error.message}`);
           }
         }
 
@@ -146,6 +190,11 @@ export const useComments = (taskId: string) => {
     mutationFn: async (commentId: string) => {
       console.log(`[useComments] Deleting comment: ${commentId}`);
       
+      if (!isAuthenticated || !currentUser) {
+        console.error('[useComments] User not authenticated when trying to delete');
+        throw new Error('Usuário não autenticado. Por favor, faça login novamente.');
+      }
+      
       const { error } = await supabase
         .from('task_comments')
         .delete()
@@ -153,6 +202,7 @@ export const useComments = (taskId: string) => {
 
       if (error) {
         console.error('[useComments] Error deleting comment:', error);
+        console.error('[useComments] Error details:', JSON.stringify(error));
         throw error;
       }
       
@@ -177,7 +227,9 @@ export const useComments = (taskId: string) => {
       toast({
         id: uuidv4(),
         title: "Erro ao excluir comentário",
-        description: "Não foi possível excluir o comentário. Tente novamente.",
+        description: error instanceof Error
+          ? error.message
+          : "Não foi possível excluir o comentário. Tente novamente.",
         variant: "destructive",
       });
     }
@@ -199,6 +251,12 @@ export const useComments = (taskId: string) => {
     });
   };
 
+  // Função para forçar a atualização dos comentários
+  const refreshComments = () => {
+    console.log('[useComments] Forcing comment refresh');
+    return refetch();
+  };
+
   return {
     comments,
     isLoading,
@@ -206,5 +264,6 @@ export const useComments = (taskId: string) => {
     fetchError,
     addComment,
     deleteComment,
+    refreshComments
   };
 };

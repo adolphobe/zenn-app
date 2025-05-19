@@ -17,15 +17,16 @@ const CommentForm: React.FC<CommentFormProps> = ({ taskId, onCommentAdded }) => 
   const { addComment, isSubmitting } = useComments(taskId);
   const [authChecked, setAuthChecked] = useState(false);
   
-  // Check authentication status when component mounts
+  // Verificação detalhada do status de autenticação
   useEffect(() => {
     console.log('[CommentForm] Auth status:', { 
       isAuthenticated, 
       hasUser: !!currentUser,
-      userId: currentUser?.id 
+      userId: currentUser?.id,
+      taskId: taskId
     });
     setAuthChecked(true);
-  }, [isAuthenticated, currentUser]);
+  }, [isAuthenticated, currentUser, taskId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,7 +41,12 @@ const CommentForm: React.FC<CommentFormProps> = ({ taskId, onCommentAdded }) => 
     }
     
     if (!isAuthenticated || !currentUser) {
-      console.log('[CommentForm] User not authenticated:', { isAuthenticated, currentUser });
+      console.error('[CommentForm] User not authenticated:', { 
+        isAuthenticated, 
+        currentUser,
+        sessionExists: localStorage.getItem('sb-wbvxnapruffchikhrqrs-auth-token') ? 'yes' : 'no'
+      });
+      
       toast({
         title: "Não autenticado",
         description: "Você precisa estar conectado para adicionar comentários.",
@@ -49,25 +55,35 @@ const CommentForm: React.FC<CommentFormProps> = ({ taskId, onCommentAdded }) => 
       return;
     }
     
-    console.log('[CommentForm] Submitting comment:', { 
+    console.log('[CommentForm] Submitting comment with detailed data:', { 
       taskId, 
       userId: currentUser.id, 
-      text 
+      text,
+      textLength: text.length,
+      isAuthenticated
     });
     
-    // Usando a versão simplificada da função addComment
+    // Usando a versão aprimorada da função addComment com mais detalhes de erro
     addComment(text, {
       onSuccess: () => {
         console.log('[CommentForm] Comment added successfully');
         setText(''); // Limpar o formulário em caso de sucesso
         
         if (onCommentAdded) {
-          console.log('[CommentForm] Calling onCommentAdded callback');
+          console.log('[CommentForm] Calling onCommentDeleted callback');
           onCommentAdded();
         }
       },
       onError: (error) => {
         console.error('[CommentForm] Error adding comment:', error);
+        const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
+        
+        // Toast mais detalhado para erros
+        toast({
+          title: "Erro ao adicionar comentário",
+          description: `Não foi possível adicionar o comentário: ${errorMessage}`,
+          variant: "destructive"
+        });
       }
     });
   };
@@ -94,7 +110,14 @@ const CommentForm: React.FC<CommentFormProps> = ({ taskId, onCommentAdded }) => 
           rows={3}
           disabled={isSubmitting || !isAuthenticated}
         />
-        <div className="flex justify-end">
+        <div className="flex justify-between">
+          <div className="text-xs text-gray-500">
+            {isAuthenticated ? (
+              <span>Comentando como: {currentUser?.email || 'Usuário autenticado'}</span>
+            ) : (
+              <a href="/#/login" className="text-blue-500 hover:underline">Faça login para comentar</a>
+            )}
+          </div>
           <Button 
             type="submit" 
             disabled={!text.trim() || isSubmitting || !isAuthenticated}
