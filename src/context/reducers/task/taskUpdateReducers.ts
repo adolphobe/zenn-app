@@ -1,3 +1,4 @@
+
 import { AppState, Action } from '../../types';
 import { dateService } from '@/services/dateService';
 import { logDateInfo } from '@/utils/diagnosticLog';
@@ -5,6 +6,8 @@ import { logDateInfo } from '@/utils/diagnosticLog';
 // Update task properties reducers
 export const updateTask = (state: AppState, action: Action): AppState => {
   if (action.type !== 'UPDATE_TASK') return state;
+  
+  logDateInfo('UPDATE_TASK', 'Atualizando tarefa', action.payload);
 
   return {
     ...state,
@@ -28,10 +31,21 @@ export const updateTask = (state: AppState, action: Action): AppState => {
           updatedTask.hidden = updatedTask.totalScore < 8;
         }
         
-        // Garantir que campos de data sejam Date objects
+        // Garantir que campos de data sejam Date objects válidos
         if (action.payload.data.completedAt !== undefined) {
-          updatedTask.completedAt = dateService.parseDate(action.payload.data.completedAt);
-          logDateInfo('UPDATE_TASK', `Parsing completedAt for task ${task.id}`, updatedTask.completedAt);
+          const parsedDate = dateService.parseDate(action.payload.data.completedAt);
+          updatedTask.completedAt = parsedDate;
+          
+          logDateInfo('UPDATE_TASK', `Parsing completedAt for task ${task.id}`, {
+            original: action.payload.data.completedAt,
+            parsed: updatedTask.completedAt
+          });
+          
+          // Garantir que tarefas concluídas tenham uma data válida
+          if (updatedTask.completed && !updatedTask.completedAt) {
+            updatedTask.completedAt = new Date();
+            logDateInfo('UPDATE_TASK', `Atribuindo data atual para task ${task.id} concluída sem data`, updatedTask.completedAt);
+          }
         }
         
         if (action.payload.data.idealDate !== undefined) {
@@ -81,9 +95,16 @@ export const completeTaskByTitle = (state: AppState, action: Action): AppState =
 export const completeTaskWithDate = (state: AppState, action: Action): AppState => {
   if (action.type !== 'COMPLETE_TASK_WITH_DATE') return state;
   
-  // Ensure completedAt is a Date object
-  const completedAt = dateService.parseDate(action.payload.completedAt) || new Date();
-  logDateInfo('COMPLETE_TASK_WITH_DATE', 'Setting completedAt', completedAt);
+  // Ensure completedAt is a valid Date object
+  const completedAt = dateService.parseDate(action.payload.completedAt);
+  // Se não conseguir converter, usa data atual
+  const dateToUse = completedAt || new Date();
+  
+  logDateInfo('COMPLETE_TASK_WITH_DATE', 'Setting completedAt', {
+    original: action.payload.completedAt,
+    parsed: completedAt,
+    used: dateToUse
+  });
   
   return {
     ...state,
@@ -92,7 +113,7 @@ export const completeTaskWithDate = (state: AppState, action: Action): AppState 
         ? { 
             ...task, 
             completed: true,
-            completedAt: completedAt,
+            completedAt: dateToUse,
           } 
         : task
     )

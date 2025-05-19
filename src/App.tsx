@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Landing from './pages/Landing';
@@ -32,6 +33,15 @@ const queryClient = new QueryClient({
   },
 });
 
+// Configuração padrão do fuso horário brasileiro
+React.useEffect(() => {
+  // Inicializar configurações de data na montagem do aplicativo
+  import('./utils/dateUtils').then(({ initializeDateTimeSettings }) => {
+    initializeDateTimeSettings();
+    console.log('Configurações de data e hora inicializadas');
+  });
+}, []);
+
 function App() {
   return (
     <div className="App">
@@ -52,7 +62,9 @@ function App() {
                         <Route element={<PrivateRoute />}>
                           <Route path="/dashboard" element={<Dashboard />} />
                           <Route path="/dashboard2" element={<Dashboard2 />} />
+                          {/* Corrigindo a rota de histórico de tarefas */}
                           <Route path="/task-history" element={<TaskHistory />} />
+                          <Route path="task-history" element={<TaskHistory />} />
                           <Route path="/strategic-review" element={<StrategicReview />} />
                           <Route path="/settings" element={<Settings />} />
                         </Route>

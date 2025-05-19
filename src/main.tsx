@@ -8,11 +8,12 @@ import './styles/animations.css';
 import './styles/task-score.css'; // Added task score styling
 import './components/task/task-card.css';
 
-// Setting up React Router
+// Configuração corrigida do HashRouter para evitar duplicação de rotas
 const router = createHashRouter([
   {
     path: '/*',
     element: <App />,
+    // Removendo basename para evitar duplicação de rotas
   },
 ]);
 

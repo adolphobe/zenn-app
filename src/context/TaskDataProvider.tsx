@@ -42,7 +42,9 @@ export const TaskDataProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           } else {
             // If we can't parse it, use current date as fallback
             completedAt = new Date();
-            logDiagnostics('TaskDataProvider', `Task ${task.id}: FALLBACK to current date for invalid completedAt`);
+            logDiagnostics('TaskDataProvider', `Task ${task.id}: FALLBACK to current date for invalid completedAt`, {
+              original: task.completedAt
+            });
           }
         } else if (task.completed) {
           // If task is completed but has no completedAt, provide a fallback
@@ -53,20 +55,24 @@ export const TaskDataProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         // Log the processed completedAt
         logDateInfo('TaskDataProvider', `Task ${task.id} processed completedAt`, completedAt);
         
+        // Ensure we return a new object (immutability) with properly processed dates
         return {
           ...task,
           completedAt,
           // Ensure idealDate is validated but keep original type structure
-          idealDate: dateService.parseDate(task.idealDate),
+          idealDate: task.idealDate ? dateService.parseDate(task.idealDate) : null,
           // Ensure createdAt is validated but keep original type structure
-          createdAt: dateService.parseDate(task.createdAt) || new Date()
+          createdAt: task.createdAt ? dateService.parseDate(task.createdAt) : new Date()
         };
       } catch (error) {
         console.error('Error processing task date:', error);
+        // Always return a valid object even if processing fails
         return {
           ...task,
-          completedAt: task.completed ? new Date() : null
-        }; // Return task with fixed completedAt if processing fails
+          completedAt: task.completed ? new Date() : null,
+          idealDate: null,
+          createdAt: new Date()
+        };
       }
     });
   }, [completedTasksData.tasks]);
