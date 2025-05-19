@@ -4,6 +4,7 @@ import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Loader2 } from 'lucide-react';
 import { useCompletedTasksData } from './hooks/useCompletedTasksData';
 import { TaskStats } from './components/TaskStats';
+import { TaskTable } from './components/TaskTable';
 
 /**
  * New Task History Page component that will gradually incorporate features from the existing one
@@ -12,7 +13,9 @@ const TaskHistoryNewPage = () => {
   const { 
     tasks: completedTasks, 
     isLoading: completedTasksLoading,
-    stats
+    stats,
+    selectedTaskId,
+    setSelectedTaskId
   } = useCompletedTasksData();
   
   // Loading state
@@ -42,7 +45,11 @@ const TaskHistoryNewPage = () => {
     );
   }
 
-  // Basic content with task stats
+  // Handle task selection
+  const handleSelectTask = (taskId: string) => {
+    setSelectedTaskId(taskId);
+  };
+
   return (
     <div className="container p-4 mx-auto">
       <h1 className="text-2xl font-bold mb-6">Histórico de Tarefas (Novo)</h1>
@@ -54,12 +61,25 @@ const TaskHistoryNewPage = () => {
         averageScore={stats.averageScore}
       />
       
-      {/* Placeholder for future task list/grid */}
-      <div className="bg-muted p-8 rounded-lg text-center">
-        <p className="text-muted-foreground">
-          Lista de tarefas será implementada nas próximas fases
-        </p>
-      </div>
+      {/* Display tasks table */}
+      <TaskTable 
+        tasks={completedTasks} 
+        onSelectTask={handleSelectTask}
+      />
+      
+      {/* Add simple task info selection message */}
+      {selectedTaskId && (
+        <div className="mt-4 p-4 bg-muted rounded-md">
+          <p className="text-sm">
+            Tarefa selecionada: <span className="font-medium">{
+              completedTasks.find(task => task.id === selectedTaskId)?.title
+            }</span>
+          </p>
+          <p className="text-xs text-muted-foreground mt-1">
+            Na próxima fase, implementaremos uma visualização detalhada da tarefa.
+          </p>
+        </div>
+      )}
     </div>
   );
 };
