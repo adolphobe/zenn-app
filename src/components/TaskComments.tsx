@@ -123,7 +123,8 @@ const TaskComments: React.FC<TaskCommentsProps> = ({ taskId, comments: initialCo
   
   // Check if user can delete a comment
   const canUserDeleteComment = (comment: Comment) => {
-    return currentUser && currentUser.id === comment.user_id;
+    // Corrigi aqui: user_id → userId para corresponder ao tipo Comment
+    return currentUser && currentUser.id === comment.userId;
   };
   
   return (

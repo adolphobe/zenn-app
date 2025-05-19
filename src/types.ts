@@ -28,7 +28,7 @@ export interface Comment {
   id: string;
   text: string;
   createdAt: string;
-  userId: string; // Added userId property to Comment interface
+  userId: string; // Usamos userId em vez de user_id para ser consistente com o padrão camelCase do TypeScript
 }
 
 export interface TaskFormData {

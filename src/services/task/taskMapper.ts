@@ -1,4 +1,3 @@
-
 import { Task, Comment } from '@/types';
 import { dateService } from '../dateService';
 
@@ -9,7 +8,7 @@ export const mapToComment = (data: any): Comment => ({
   id: data.id,
   text: data.text,
   createdAt: data.created_at || new Date().toISOString(),
-  userId: data.user_id
+  userId: data.user_id // Garantindo que estamos mapeando user_id para userId
 });
 
 /**

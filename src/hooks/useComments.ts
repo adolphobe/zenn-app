@@ -35,6 +35,15 @@ export const useComments = (taskId: string) => {
     // Don't fetch if no taskId or we're not authenticated
     enabled: !!taskId && isAuthenticated,
     staleTime: 1000 * 60, // 1 minute
+    select: (data) => {
+      // Garantir que o dado retornado do banco corresponde ao formato esperado pela UI
+      return data.map(comment => ({
+        id: comment.id,
+        text: comment.text,
+        createdAt: comment.created_at || new Date().toISOString(),
+        userId: comment.user_id // Aqui garantimos que user_id do banco é mapeado para userId na interface
+      }));
+    }
   });
 
   // Mutation for adding a comment
