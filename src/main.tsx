@@ -9,15 +9,15 @@ import './styles/task-score.css';
 import './components/task/task-card.css';
 import { initializeDateTimeSettings } from './utils/dateUtils';
 
-// Initialize date settings before app renders
+// Inicializa configurações de data antes da renderização do app
 initializeDateTimeSettings();
 
-// HashRouter configurado corretamente para evitar duplicação de rotas
+// Configura o HashRouter para evitar duplicação de rotas
 const router = createHashRouter([
   {
     path: '/',
     element: <App />,
-    children: [], // App handles all child routes internally
+    children: [] // App gerencia todas as rotas filhas internamente
   }
 ]);
 

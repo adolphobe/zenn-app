@@ -15,7 +15,7 @@ interface DateTimeDisplayProps {
 
 /**
  * Componente reutilizável para exibição formatada de datas e horas
- * Otimizado para evitar re-renderizações desnecessárias e logs excessivos
+ * Otimizado para evitar re-renderizações desnecessárias
  */
 const DateTimeDisplay: React.FC<DateTimeDisplayProps> = React.memo(({
   date,
@@ -27,7 +27,7 @@ const DateTimeDisplay: React.FC<DateTimeDisplayProps> = React.memo(({
 }) => {
   const { formatDate, formatRelative } = useDateFormatter();
   
-  // Processamento e formatação da data - apenas uma vez para cada conjunto de props
+  // Processamento e formatação da data - apenas uma vez por conjunto de props
   const { formattedDate, isoString } = useMemo(() => {
     // Se não há data, retorna valores vazios
     if (!date) {
@@ -35,7 +35,7 @@ const DateTimeDisplay: React.FC<DateTimeDisplayProps> = React.memo(({
     }
     
     try {
-      // Verifica se a data é válida antes de tentar formatar
+      // Verifica se a data é válida antes de formatar
       const validDate = dateService.parseDate(date);
       if (!validDate) {
         return { formattedDate: fallback, isoString: null };
@@ -62,7 +62,7 @@ const DateTimeDisplay: React.FC<DateTimeDisplayProps> = React.memo(({
     }
   }, [date, options, showRelative, showTimeZone, fallback, formatDate, formatRelative]);
 
-  // Renderiza um time tag se tiver um ISO string válido, caso contrário um span simples
+  // Renderiza uma tag time se tiver um ISO string válido, caso contrário um span simples
   if (isoString) {
     return (
       <time 

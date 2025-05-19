@@ -37,28 +37,27 @@ const queryClient = new QueryClient({
 function App() {
   const location = useLocation();
   
-  // Inicializa configurações de data uma vez na montagem do aplicativo
-  useEffect(() => {
-    import('./utils/dateUtils').then(({ initializeDateTimeSettings }) => {
-      initializeDateTimeSettings();
-      console.log('Configurações de data e hora inicializadas');
-    });
-  }, []);
-
   // Detecta e corrige URLs duplicadas (como /task-history#/task-history)
   useEffect(() => {
     const currentPath = location.pathname;
     const currentHash = location.hash;
 
-    // Corrige URLs duplicadas como /task-history#/task-history
+    // Verifica se há hash e se contém um caminho duplicado
     if (currentHash && currentHash.length > 1) {
-      // Se o hash contém o mesmo caminho que já estamos, limpa-o
-      if (currentPath.includes(currentHash.substring(1))) {
+      // Se o hash contém o mesmo caminho que já estamos, ou se o hash contém outro caminho
+      // conhecido, isso indica um problema de rota duplicada
+      const hashPath = currentHash.substring(1);
+      if (currentPath === hashPath || 
+          (currentPath === '/task-history' && hashPath.includes('/dashboard')) ||
+          currentPath.includes(hashPath)) {
+        
+        // Corrige a URL sem recarregar a página
         window.history.replaceState(
           {},
           document.title,
           window.location.pathname
         );
+        console.log('URL corrigida para evitar duplicação:', window.location.pathname);
       }
     }
   }, [location]);

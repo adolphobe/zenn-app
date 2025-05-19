@@ -28,30 +28,39 @@ const SidebarNavItem: React.FC<SidebarNavItemProps> = ({
   const navigate = useNavigate();
   const { isOpen } = useSidebar();
   
-  // Melhoria: Determina se está ativo verificando se o caminho atual acaba com o caminho do item
-  // Isto resolve problemas com HashRouter e duplicação de caminhos
+  // Determina se o item está ativo verificando o caminho
   const currentPath = location.pathname;
+  
+  // Remove o hash do caminho atual para comparação
+  const cleanCurrentPath = currentPath.split('#')[0];
+  
+  // Verifica se o caminho do item corresponde ao caminho atual
   const isActive = propIsActive !== undefined 
     ? propIsActive 
-    : (path !== '#' && (currentPath === path || currentPath.endsWith(`/${path.replace(/^\//, '')}`)));
+    : (path !== '#' && (
+        cleanCurrentPath === path || 
+        cleanCurrentPath.endsWith(`/${path.replace(/^\//, '')}`)
+      ));
   
-  // Melhoria: Navegação mais robusta para evitar duplicação de rotas
+  // Navegação aprimorada para evitar duplicação de rotas
   const handleClick = (e: React.MouseEvent) => {
     if (disabled) return;
     
-    // Evita comportamento padrão para garantir controle sobre a navegação
+    // Evita comportamento padrão para controlar a navegação
     e.preventDefault();
     
     if (onClick) {
       onClick();
     } else if (path !== '#') {
-      // Remove qualquer duplicação de hash e navegação
+      // Limpa o caminho para garantir que não haja duplicação
       const cleanPath = path.startsWith('/') ? path : `/${path}`;
+      
+      // Usa replace se já estiver no mesmo caminho para evitar duplicações no histórico
       navigate(cleanPath, { replace: location.pathname === cleanPath });
     }
   };
   
-  // Ajusta tamanho do ícone quando a sidebar está compacta
+  // Ajusta tamanho do ícone para sidebar compacta
   const iconSize = isOpen ? 20 : 24;
   
   return (
