@@ -248,7 +248,7 @@ const Dashboard: React.FC = () => {
             {/* Overdue tasks box - only show in chronological mode */}
             {viewMode === 'chronological' && sortedOverdueTasks.length > 0 && (
               <div className="border-2 border-[#ea384c]/30 rounded-lg p-4 relative mb-2 bg-[#ffafaf24] dark:bg-[#ff000024]">
-                <div className="absolute -top-3 left-4 bg-background px-2">
+                <div className="absolute -top-3 left-4 px-2">
                   <Badge 
                     className="bg-[#ffe7e7] dark:bg-[#3e0515] text-[#ea384c] border-[#ea384c]/30 flex items-center gap-1 cursor-pointer hover:bg-[#ffd2d2] dark:hover:bg-[#59071e] transition-colors"
                     onClick={toggleOverdueTasks}
