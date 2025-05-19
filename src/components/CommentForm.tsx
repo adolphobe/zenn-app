@@ -3,8 +3,8 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/auth';
 import { Button } from './ui/button';
 import { AlertCircle } from 'lucide-react';
-import { addComment } from '@/context/tasks/comments/commentActions';
-import { useAppContext } from '@/context/AppContext';
+import { useComments } from '@/hooks/useComments';
+import { toast } from '@/hooks/use-toast';
 
 interface CommentFormProps {
   taskId: string;
@@ -13,9 +13,8 @@ interface CommentFormProps {
 
 const CommentForm: React.FC<CommentFormProps> = ({ taskId, onCommentAdded }) => {
   const [text, setText] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const { isAuthenticated, currentUser } = useAuth();
-  const { dispatch } = useAppContext();
+  const { addComment, isSubmitting } = useComments(taskId);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,24 +23,23 @@ const CommentForm: React.FC<CommentFormProps> = ({ taskId, onCommentAdded }) => 
       return;
     }
     
-    setIsSubmitting(true);
-    
     try {
-      // Use the actual comment action instead of the timeout simulation
-      const success = await addComment(dispatch, taskId, text.trim(), currentUser?.id);
-      
-      if (success) {
-        setText('');
-        
-        // Call the callback to refresh the comments list
-        if (onCommentAdded) {
-          onCommentAdded();
+      // Use the actual comment hook instead of the action
+      await addComment(text.trim(), {
+        onSuccess: () => {
+          setText(''); // Clear the input on success
+          
+          // Call the callback to refresh the comments list and scroll to bottom
+          if (onCommentAdded) {
+            onCommentAdded();
+          }
+        },
+        onError: (error) => {
+          console.error('Error adding comment:', error);
         }
-      }
+      });
     } catch (error) {
-      console.error('Error adding comment:', error);
-    } finally {
-      setIsSubmitting(false);
+      console.error('Error in form submission:', error);
     }
   };
 

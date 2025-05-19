@@ -3,15 +3,21 @@ import React, { useEffect, useRef } from 'react';
 import { format } from 'date-fns';
 import { Comment } from '@/types';
 import { safeParseDate } from '@/utils';
+import { Trash2 } from 'lucide-react';
+import { Button } from './ui/button';
+import { useAuth } from '@/context/auth';
+import { useComments } from '@/hooks/useComments';
 
 interface TaskCommentsProps {
   taskId: string;
   comments: Comment[];
-  onCommentDeleted?: () => void;  // Adicionado como opcional
+  onCommentDeleted?: () => void;
 }
 
 const TaskComments: React.FC<TaskCommentsProps> = ({ taskId, comments: initialComments, onCommentDeleted }) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const { deleteComment } = useComments(taskId);
+  const { currentUser } = useAuth();
   
   // Add global CSS for scrollbar
   useEffect(() => {
@@ -83,6 +89,20 @@ const TaskComments: React.FC<TaskCommentsProps> = ({ taskId, comments: initialCo
     e.stopPropagation();
   };
   
+  // Handle comment deletion
+  const handleDeleteComment = async (commentId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!confirm('Tem certeza que deseja excluir este comentário?')) return;
+    
+    await deleteComment(commentId, {
+      onSuccess: () => {
+        if (onCommentDeleted) {
+          onCommentDeleted();
+        }
+      }
+    });
+  };
+  
   // Safe function to format dates
   const formatCommentDate = (dateString: string) => {
     try {
@@ -99,6 +119,11 @@ const TaskComments: React.FC<TaskCommentsProps> = ({ taskId, comments: initialCo
     } catch (error) {
       return 'Data indisponível';
     }
+  };
+  
+  // Check if user can delete a comment
+  const canUserDeleteComment = (comment: Comment) => {
+    return currentUser && currentUser.id === comment.user_id;
   };
   
   return (
@@ -123,6 +148,17 @@ const TaskComments: React.FC<TaskCommentsProps> = ({ taskId, comments: initialCo
                 <p className="text-xs text-gray-400">
                   {formatCommentDate(comment.createdAt)}
                 </p>
+                {canUserDeleteComment(comment) && (
+                  <Button
+                    variant="ghost" 
+                    size="sm"
+                    className="h-7 w-7 p-0 text-gray-400 hover:text-red-500"
+                    onClick={(e) => handleDeleteComment(comment.id, e)}
+                  >
+                    <Trash2 size={14} />
+                    <span className="sr-only">Excluir comentário</span>
+                  </Button>
+                )}
               </div>
             </div>
           ))}

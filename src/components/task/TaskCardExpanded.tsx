@@ -70,16 +70,8 @@ const TaskCardExpanded: React.FC<TaskCardExpandedProps> = ({
   // Handler for comment deletion
   const handleCommentDeleted = useCallback(() => {
     console.log('[TaskCardExpanded] Comment deleted, refreshing task data');
-    
-    // Invalidate queries to refresh task data across the app
-    queryClient.invalidateQueries({ queryKey: ['tasks'] });
-    queryClient.invalidateQueries({ queryKey: ['task', task.id] });
-    queryClient.invalidateQueries({ queryKey: ['comments', task.id] });
-    queryClient.invalidateQueries({ queryKey: ['completedTasks'] });
-    
-    // Refresh comments
     refreshComments();
-  }, [queryClient, task.id, refreshComments]);
+  }, [refreshComments]);
   
   // Get the comments to display - either from the hook (preferred) or fallback to task.comments
   const commentsToShow = comments?.length > 0 ? comments : task.comments;

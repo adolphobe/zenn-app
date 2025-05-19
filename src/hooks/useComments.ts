@@ -2,9 +2,14 @@
 import { useState, useEffect } from 'react';
 import { Comment } from '@/types';
 import { useAuth } from '@/context/auth';
-import { getTaskComments } from '@/services/task/taskComments';
 import { useQueryClient, useQuery, useMutation } from '@tanstack/react-query';
-import { addComment as addCommentService, deleteComment as deleteCommentService } from '@/services/task/taskComments';
+import { 
+  getTaskComments, 
+  addComment as addCommentService, 
+  deleteComment as deleteCommentService 
+} from '@/services/task/taskComments';
+import { toast } from '@/hooks/use-toast';
+import { v4 as uuidv4 } from 'uuid';
 
 // Define types for callbacks
 type MutationCallbacks = {
@@ -22,7 +27,8 @@ export const useComments = (taskId: string) => {
     data: comments = [], 
     isLoading, 
     error: fetchError,
-    refetch: refreshComments
+    refetch: refreshComments,
+    isRefetching
   } = useQuery({
     queryKey: ['comments', taskId],
     queryFn: () => getTaskComments(taskId),
@@ -32,6 +38,38 @@ export const useComments = (taskId: string) => {
   });
 
   // Mutation for adding a comment
+  const addCommentMutation = useMutation({
+    mutationFn: async ({ text }: { text: string }) => {
+      if (!isAuthenticated || !currentUser?.id) {
+        throw new Error('User not authenticated');
+      }
+      return addCommentService(taskId, currentUser.id, text);
+    },
+    onSuccess: () => {
+      // Invalidate queries to refresh data
+      queryClient.invalidateQueries({ queryKey: ['comments', taskId] });
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      queryClient.invalidateQueries({ queryKey: ['task', taskId] });
+      
+      toast({
+        id: uuidv4(),
+        title: "Comentário adicionado",
+        description: "Seu comentário foi adicionado com sucesso."
+      });
+    },
+    onError: (error) => {
+      console.error('Error adding comment:', error);
+      
+      toast({
+        id: uuidv4(),
+        title: "Erro ao adicionar comentário",
+        description: "Não foi possível adicionar seu comentário. Tente novamente.",
+        variant: "destructive",
+      });
+    }
+  });
+
+  // Wrapper function for adding a comment
   const addComment = async (text: string, callbacks?: MutationCallbacks) => {
     if (!isAuthenticated || !currentUser?.id) {
       console.error('Cannot add comment: User not authenticated');
@@ -44,14 +82,10 @@ export const useComments = (taskId: string) => {
     setIsSubmitting(true);
     
     try {
-      // Add comment to database
-      const newComment = await addCommentService(taskId, currentUser.id, text);
+      // Add comment using the mutation
+      const newComment = await addCommentMutation.mutateAsync({ text });
       
-      // Invalidate queries to refresh data
-      queryClient.invalidateQueries({ queryKey: ['comments', taskId] });
-      queryClient.invalidateQueries({ queryKey: ['tasks'] });
-      queryClient.invalidateQueries({ queryKey: ['task', taskId] });
-      
+      // Call success callback if provided
       if (callbacks?.onSuccess) {
         callbacks.onSuccess();
       }
@@ -78,11 +112,25 @@ export const useComments = (taskId: string) => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       queryClient.invalidateQueries({ queryKey: ['task', taskId] });
       
+      toast({
+        id: uuidv4(),
+        title: "Comentário excluído",
+        description: "O comentário foi excluído com sucesso."
+      });
+      
       if (callbacks?.onSuccess) {
         callbacks.onSuccess();
       }
     } catch (error) {
       console.error('Error deleting comment:', error);
+      
+      toast({
+        id: uuidv4(),
+        title: "Erro ao excluir comentário",
+        description: "Não foi possível excluir o comentário. Tente novamente.",
+        variant: "destructive",
+      });
+      
       if (callbacks?.onError) {
         callbacks.onError(error);
       }
@@ -93,6 +141,7 @@ export const useComments = (taskId: string) => {
     comments,
     isLoading,
     isSubmitting,
+    isRefetching,
     fetchError,
     addComment,
     deleteComment,

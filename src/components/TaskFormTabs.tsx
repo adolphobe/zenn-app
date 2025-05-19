@@ -32,23 +32,15 @@ const TaskFormTabs: React.FC<TaskFormTabsProps> = ({
 }) => {
   // Reference for the comments container in the DOM
   const commentsContainerRef = useRef<HTMLDivElement | null>(null);
-  const [commentCount, setCommentCount] = useState<number>(task?.comments?.length || 0);
   const queryClient = useQueryClient();
   
-  // Use our real comments hook instead of just using task.comments
+  // Use our comments hook to fetch and manage comments
   const { 
     comments, 
     isLoading: loadingComments, 
-    refreshComments 
+    refreshComments,
+    isRefetching
   } = useComments(taskId || '');
-  
-  // Update comment count when comments change
-  useEffect(() => {
-    if (comments) {
-      setCommentCount(comments.length);
-      console.log(`[TaskFormTabs] Comments updated: ${comments.length} comments`);
-    }
-  }, [comments]);
   
   // Function to scroll to the bottom of the comments list
   const scrollToBottom = () => {
@@ -67,54 +59,22 @@ const TaskFormTabs: React.FC<TaskFormTabsProps> = ({
   
   // Effect to scroll to the bottom when the comments tab is selected or comments change
   useEffect(() => {
-    if (activeTab === 'comments') {
-      console.log(`[TaskFormTabs] Comments tab active, comments count: ${comments?.length || 0}`);
+    if (activeTab === 'comments' && comments?.length > 0) {
       // Small delay to ensure the DOM has been updated
       setTimeout(scrollToBottom, 100);
     }
-  }, [activeTab, commentCount, comments?.length]);
+  }, [activeTab, comments?.length]);
   
   // Handler for when a comment is added
   const handleCommentAdded = (): void => {
     console.log('[TaskFormTabs] Comment added callback triggered');
     
-    // Invalidate queries to refresh task data immediately
+    // Force refetch of comments
     if (taskId) {
-      queryClient.invalidateQueries({ queryKey: ['tasks'] });
-      queryClient.invalidateQueries({ queryKey: ['task', taskId] });
-      queryClient.invalidateQueries({ queryKey: ['comments', taskId] });
+      refreshComments();
       
-      // Force refetch of comments
-      setTimeout(() => {
-        refreshComments();
-        
-        // Update comment count to trigger scrollToBottom effect
-        setCommentCount(prev => prev + 1);
-        
-        // Try to scroll to bottom immediately and again after a delay
-        scrollToBottom();
-        setTimeout(scrollToBottom, 300);
-      }, 100);
-    }
-  };
-
-  // Handler for comment deletion to update local state
-  const handleCommentDeleted = (): void => {
-    console.log('[TaskFormTabs] Comment deleted callback triggered');
-    
-    // Invalidate queries to refresh task data immediately
-    if (taskId) {
-      queryClient.invalidateQueries({ queryKey: ['tasks'] });
-      queryClient.invalidateQueries({ queryKey: ['task', taskId] });
-      queryClient.invalidateQueries({ queryKey: ['comments', taskId] });
-      
-      // Force refetch of comments
-      setTimeout(() => {
-        refreshComments();
-        
-        // Update comment count to reflect deletion
-        setCommentCount(prevCount => Math.max(0, prevCount - 1));
-      }, 100);
+      // Try to scroll to bottom immediately and again after a delay
+      setTimeout(scrollToBottom, 300);
     }
   };
   
@@ -131,17 +91,6 @@ const TaskFormTabs: React.FC<TaskFormTabsProps> = ({
       </div>
     );
   }
-  
-  // Log rendering info in useEffect to avoid TypeScript error
-  useEffect(() => {
-    if (taskId) {
-      console.log('[TaskFormTabs] Rendering comments section', { 
-        taskId, 
-        hasComments: comments && comments.length > 0,
-        commentsCount: comments?.length
-      });
-    }
-  }, [taskId, comments]);
   
   // Otherwise, show the full tabs interface when editing
   return (
@@ -161,7 +110,7 @@ const TaskFormTabs: React.FC<TaskFormTabsProps> = ({
           value="comments"
           data-testid="comments-tab"
         >
-          Comentários {commentCount > 0 && `(${commentCount})`}
+          Comentários {comments && comments.length > 0 ? `(${comments.length})` : ''}
         </TabsTrigger>
       </TabsList>
       
@@ -184,11 +133,11 @@ const TaskFormTabs: React.FC<TaskFormTabsProps> = ({
               <TaskComments 
                 taskId={taskId} 
                 comments={comments} 
-                onCommentDeleted={handleCommentDeleted}
+                onCommentDeleted={() => refreshComments()}
               />
             ) : (
               <div className="py-4 text-center text-gray-500 italic">
-                {loadingComments ? "Carregando comentários..." : "Sem comentários para esta tarefa"}
+                {loadingComments || isRefetching ? "Carregando comentários..." : "Sem comentários para esta tarefa"}
               </div>
             )}
             
