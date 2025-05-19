@@ -1,14 +1,14 @@
 
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useTaskDataContext } from '@/context/TaskDataProvider';
 import { logError } from '@/utils/logUtils';
 import { Task } from '@/types';
 
-// Import hooks otimizados
+// Import refactored hooks
 import { useTaskFilters } from '@/components/task-history/hooks/useTaskFilters';
 import { useTaskPagination } from '@/components/task-history/hooks/useTaskPagination';
 
-// Import componentes
+// Import refactored components
 import { TaskHistoryStats } from '@/components/task-history/TaskHistoryStats';
 import { TaskSearchBar, TaskFiltersToggle, AdvancedFilters } from '@/components/task-history/TaskFilters';
 import { ViewToggle } from '@/components/task-history/ViewToggle';
@@ -25,7 +25,7 @@ export const TaskHistoryContent: React.FC<TaskHistoryContentProps> = ({ setError
   const { completedTasks } = useTaskDataContext();
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('grid');
   
-  // Inicializa variáveis de estado para filtros
+  // Initialize state variables for filters
   const [searchQuery, setSearchQuery] = useState('');
   const [periodFilter, setPeriodFilter] = useState('all');
   const [scoreFilter, setScoreFilter] = useState('all');
@@ -36,185 +36,145 @@ export const TaskHistoryContent: React.FC<TaskHistoryContentProps> = ({ setError
   const [sortBy, setSortBy] = useState('newest');
   const [showFilters, setShowFilters] = useState(false);
   
-  // Cria array de tarefas validadas usando memo para evitar recálculos
+  // Create validated tasks array using memo to prevent repeated calculations
   const validatedTasks = useMemo(() => {
     if (!completedTasks.length) return [];
     
-    // Cópia defensiva de tarefas com datas validadas
+    // Defensive copy of tasks with validated dates - only calculate once
     return completedTasks.map(task => ({
       ...task,
-      // Garante que completedAt é uma data válida
+      // Ensure completedAt is a valid Date
       completedAt: task.completedAt instanceof Date && !isNaN(task.completedAt.getTime())
         ? task.completedAt
-        : new Date() // Usa data atual como fallback
+        : new Date() // Use current date as fallback
     }));
   }, [completedTasks]);
   
-  // Tenta processar filtros e paginação com tratamento de erros melhorado
-  const {
-    filteredTasks,
-    sortedTasks,
-    // Re-exporta setters para os componentes filhos
-    setSearchQuery: handleSearchChange,
-    setPeriodFilter: handlePeriodChange,
-    setScoreFilter: handleScoreChange,
-    setFeedbackFilter: handleFeedbackChange,
-    setPillarFilter: handlePillarChange,
-    setStartDate: handleStartDateChange,
-    setEndDate: handleEndDateChange,
-    setSortBy: handleSortChange,
-    setShowFilters: handleToggleFilters,
-  } = useTaskFilters(validatedTasks, {
-    searchQuery,
-    periodFilter,
-    scoreFilter,
-    feedbackFilter,
-    pillarFilter,
-    startDate,
-    endDate,
-    sortBy,
-    showFilters
-  });
-
-  // Usa hook de paginação apenas se temos tarefas filtradas
-  const pagination = useMemo(() => {
-    try {
-      if (!sortedTasks.length) {
-        return {
-          currentPage: 1,
-          totalPages: 1,
-          paginatedTasks: [],
-          groupedTasks: [],
-          handlePageChange: () => {},
-          getPageNumbers: () => []
-        };
-      }
-      
-      return useTaskPagination(sortedTasks, periodFilter);
-    } catch (err) {
-      logError('TaskHistory', 'Erro na paginação:', err);
-      setError(`Erro ao processar paginação: ${err instanceof Error ? err.message : String(err)}`);
-      
-      // Valores fallback em caso de erro
-      return {
-        currentPage: 1,
-        totalPages: 1,
-        paginatedTasks: [],
-        groupedTasks: [],
-        handlePageChange: () => {},
-        getPageNumbers: () => []
-      };
-    }
-  }, [sortedTasks, periodFilter, setError]);
+  // Process filters and pagination
+  let filteredTasks: Task[] = [];
+  let sortedTasks: Task[] = [];
+  let groupedTasks = [];
+  let paginatedTasks: Task[] = [];
+  let currentPage = 1;
+  let totalPages = 1;
+  let pageNumbers: (number | string)[] = [];
+  let handlePageChange = (page: number) => {};
   
-  // Desempacotar valores da paginação
-  const { 
-    currentPage, 
-    totalPages, 
-    paginatedTasks, 
-    groupedTasks, 
-    handlePageChange, 
-    getPageNumbers 
-  } = pagination;
-
-  // Handler para gerenciar erros
-  const handleError = useCallback((error: unknown) => {
-    logError('TaskHistory', 'Erro ao processar tarefas:', error);
-    setError(`Erro ao processar o histórico de tarefas: ${error instanceof Error ? error.message : String(error)}`);
-  }, [setError]);
-
-  // Tenta renderizar com proteção contra erros
   try {
-    return (
-      <div className="container p-4 mx-auto">
-        <div className="flex flex-col space-y-4">
-          <h1 className="text-2xl font-bold">Histórico de Tarefas</h1>
+    // Use the filter hook with our state values
+    if (validatedTasks.length > 0) {
+      const filters = useTaskFilters(
+        validatedTasks,
+        {
+          searchQuery,
+          periodFilter,
+          scoreFilter,
+          feedbackFilter,
+          pillarFilter,
+          startDate,
+          endDate,
+          sortBy,
+          showFilters
+        }
+      );
+      
+      // Use useMemo values from the filter hook
+      filteredTasks = filters.filteredTasks;
+      sortedTasks = filters.sortedTasks;
+      
+      // Use the pagination hook with filtered results
+      const pagination = useTaskPagination(sortedTasks, periodFilter);
+      currentPage = pagination.currentPage;
+      totalPages = pagination.totalPages;
+      paginatedTasks = pagination.paginatedTasks;
+      groupedTasks = pagination.groupedTasks;
+      handlePageChange = pagination.handlePageChange;
+      pageNumbers = pagination.getPageNumbers();
+    }
+  } catch (err) {
+    logError('TaskHistory', 'Erro ao processar tarefas:', err);
+    setError(`Erro ao processar o histórico de tarefas: ${err instanceof Error ? err.message : String(err)}`);
+  }
+
+  return (
+    <div className="container p-4 mx-auto">
+      <div className="flex flex-col space-y-4">
+        <h1 className="text-2xl font-bold">Histórico de Tarefas</h1>
+        
+        {/* Display task count even if there's an error */}
+        <div className="text-muted-foreground">
+          {completedTasks.length > 0 ? 
+            `${completedTasks.length} ${completedTasks.length === 1 ? 'tarefa concluída' : 'tarefas concluídas'}` : 
+            'Nenhuma tarefa concluída para exibir'
+          }
+        </div>
+        
+        {/* Pass filtered tasks to TaskHistoryStats */}
+        {sortedTasks.length > 0 && (
+          <TaskHistoryStats filteredTasks={sortedTasks} />
+        )}
+        
+        {/* Search and filter bar */}
+        <div className="flex flex-col md:flex-row justify-between gap-4">
+          <TaskSearchBar 
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            showFilters={showFilters}
+            setShowFilters={setShowFilters}
+          />
           
-          {/* Exibe contagem de tarefas mesmo se houver erro */}
-          <div className="text-muted-foreground">
-            {completedTasks.length > 0 ? 
-              `${completedTasks.length} ${completedTasks.length === 1 ? 'tarefa concluída' : 'tarefas concluídas'}` : 
-              'Nenhuma tarefa concluída para exibir'
-            }
-          </div>
-          
-          {/* Passa tarefas filtradas para TaskHistoryStats */}
-          {sortedTasks.length > 0 && (
-            <TaskHistoryStats filteredTasks={sortedTasks} />
-          )}
-          
-          {/* Barra de busca e filtro */}
-          <div className="flex flex-col md:flex-row justify-between gap-4">
-            <TaskSearchBar 
-              searchQuery={searchQuery}
-              setSearchQuery={handleSearchChange}
+          <div className="flex gap-2">
+            <TaskFiltersToggle 
               showFilters={showFilters}
-              setShowFilters={handleToggleFilters}
+              setShowFilters={setShowFilters}
             />
             
-            <div className="flex gap-2">
-              <TaskFiltersToggle 
-                showFilters={showFilters}
-                setShowFilters={handleToggleFilters}
-              />
-              
-              <ViewToggle 
-                viewMode={viewMode}
-                setViewMode={setViewMode}
-                sortBy={sortBy}
-                setSortBy={handleSortChange}
-              />
-            </div>
+            <ViewToggle 
+              viewMode={viewMode}
+              setViewMode={setViewMode}
+              sortBy={sortBy}
+              setSortBy={setSortBy}
+            />
           </div>
-          
-          {/* Filtros avançados */}
-          {showFilters && (
-            <AdvancedFilters
-              periodFilter={periodFilter}
-              setPeriodFilter={handlePeriodChange}
-              scoreFilter={scoreFilter}
-              setScoreFilter={handleScoreChange}
-              feedbackFilter={feedbackFilter}
-              setFeedbackFilter={handleFeedbackChange}
-              pillarFilter={pillarFilter}
-              setPillarFilter={handlePillarChange}
-              startDate={startDate}
-              setStartDate={handleStartDateChange}
-              endDate={endDate}
-              setEndDate={handleEndDateChange}
-            />
-          )}
+        </div>
+        
+        {/* Advanced filters */}
+        {showFilters && (
+          <AdvancedFilters
+            periodFilter={periodFilter}
+            setPeriodFilter={setPeriodFilter}
+            scoreFilter={scoreFilter}
+            setScoreFilter={setScoreFilter}
+            feedbackFilter={feedbackFilter}
+            setFeedbackFilter={setFeedbackFilter}
+            pillarFilter={pillarFilter}
+            setPillarFilter={setPillarFilter}
+            startDate={startDate}
+            setStartDate={setStartDate}
+            endDate={endDate}
+            setEndDate={setEndDate}
+          />
+        )}
 
-          {/* Mensagem sem resultados */}
-          {(sortedTasks.length === 0 || completedTasks.length === 0) && <NoTasksMessage />}
-          
-          {/* Visualização em lista */}
-          {viewMode === 'list' && paginatedTasks.length > 0 && <TasksTable tasks={paginatedTasks} />}
-          
-          {/* Visualização em grade com agrupamento por linha do tempo */}
-          {viewMode === 'grid' && paginatedTasks.length > 0 && <TaskGroupGrid groups={groupedTasks} />}
-          
-          {/* Paginação */}
-          {sortedTasks.length > 0 && (
-            <TaskPagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              handlePageChange={handlePageChange}
-              pageNumbers={getPageNumbers()}
-            />
-          )}
-        </div>
+        {/* No results message */}
+        {(sortedTasks.length === 0 || completedTasks.length === 0) && <NoTasksMessage />}
+        
+        {/* Task list view */}
+        {viewMode === 'list' && paginatedTasks.length > 0 && <TasksTable tasks={paginatedTasks} />}
+        
+        {/* Grid view with timeline grouping */}
+        {viewMode === 'grid' && paginatedTasks.length > 0 && <TaskGroupGrid groups={groupedTasks} />}
+        
+        {/* Pagination */}
+        {sortedTasks.length > 0 && (
+          <TaskPagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            handlePageChange={handlePageChange}
+            pageNumbers={pageNumbers}
+          />
+        )}
       </div>
-    );
-  } catch (error) {
-    handleError(error);
-    return (
-      <div className="container p-4 mx-auto">
-        <h1 className="text-2xl font-bold mb-4">Histórico de Tarefas</h1>
-        <div className="text-red-500">
-          Erro ao carregar o histórico de tarefas. Por favor, tente novamente.
-        </div>
-      </div>
-    );
-  }
+    </div>
+  );
 };

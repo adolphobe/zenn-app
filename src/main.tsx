@@ -5,20 +5,19 @@ import { createHashRouter, RouterProvider } from 'react-router-dom';
 import App from './App';
 import './index.css';
 import './styles/animations.css';
-import './styles/task-score.css'; 
+import './styles/task-score.css'; // Added task score styling
 import './components/task/task-card.css';
 import { initializeDateTimeSettings } from './utils/dateUtils';
 
-// Inicializa configurações de data antes da renderização do app
+// Initialize date settings before app renders
 initializeDateTimeSettings();
 
-// Configura o HashRouter para evitar duplicação de rotas
+// Simplified HashRouter configuration
 const router = createHashRouter([
   {
-    path: '/',
-    element: <App />,
-    children: [] // App gerencia todas as rotas filhas internamente
-  }
+    path: '*', // Catch all routes and let App handle them
+    element: <App />
+  },
 ]);
 
 ReactDOM.createRoot(document.getElementById('root')!).render(

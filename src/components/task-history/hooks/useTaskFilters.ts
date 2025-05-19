@@ -1,10 +1,11 @@
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { Task } from '@/types';
 import { dateService } from '@/services/dateService';
+import { logDateInfo } from '@/utils/diagnosticLog';
 import { logError } from '@/utils/logUtils';
 
-// Definição de tipo para opções de filtro
+// Type definition for filter options
 interface FilterOptions {
   searchQuery: string;
   periodFilter: string;
@@ -17,14 +18,21 @@ interface FilterOptions {
   showFilters: boolean;
 }
 
-/**
- * Hook otimizado para filtrar tarefas com tratamento apropriado de estado
- */
 export const useTaskFilters = (
   tasks: Task[],
-  initialFilters: FilterOptions
+  initialFilters: FilterOptions = {
+    searchQuery: '',
+    periodFilter: 'all',
+    scoreFilter: 'all',
+    feedbackFilter: 'all',
+    pillarFilter: 'all',
+    startDate: undefined,
+    endDate: undefined,
+    sortBy: 'newest',
+    showFilters: false
+  }
 ) => {
-  // Usa os valores iniciais de filtro das props
+  // Use the initial filter values from props
   const [searchQuery, setSearchQuery] = useState(initialFilters.searchQuery);
   const [periodFilter, setPeriodFilter] = useState(initialFilters.periodFilter);
   const [scoreFilter, setScoreFilter] = useState(initialFilters.scoreFilter);
@@ -34,35 +42,59 @@ export const useTaskFilters = (
   const [endDate, setEndDate] = useState<Date | undefined>(initialFilters.endDate);
   const [sortBy, setSortBy] = useState(initialFilters.sortBy);
   const [showFilters, setShowFilters] = useState(initialFilters.showFilters);
+  const [filterErrors, setFilterErrors] = useState<string[]>([]);
 
-  // Filtra tarefas com base na consulta de busca e filtros - com memoização adequada
+  // For date debugging - MOVED to useEffect to prevent render loops
+  useEffect(() => {
+    if (startDate || endDate) {
+      logDateInfo('useTaskFilters', 'Date filters changed', { startDate, endDate });
+    }
+  }, [startDate, endDate]);
+
+  // Filter tasks based on search query and filters - PROPERLY MEMOIZED
   const filteredTasks = useMemo(() => {
     if (!tasks || tasks.length === 0) return [];
-    
+    const errors: string[] = [];
+
     try {
-      return tasks.filter((task) => {
-        // Aplica filtro de busca - apenas no título para performance
+      const filtered = tasks.filter((task) => {
+        // Validate task has required fields
+        if (!task.title) {
+          errors.push(`Task ${task.id} missing title`);
+          return false;
+        }
+
+        // Apply search filter - FIXED: Only search in title, not notes
         const matchesSearch = !searchQuery || 
           task.title.toLowerCase().includes(searchQuery.toLowerCase());
+
         if (!matchesSearch) return false;
 
-        // Aplica filtro de período com verificação otimizada
+        // Apply period filter with improved error handling
         let matchesPeriod = true;
         if (periodFilter !== 'all') {
-          // Garante que temos uma data válida
-          if (!task.completedAt) return false;
-          
+          // Ensure we have a valid date to work with
+          if (!task.completedAt) {
+            // This should not happen for completed tasks
+            errors.push(`Task ${task.id} is missing completedAt date`);
+            return false;
+          }
+
+          // Make sure completedAt is a valid date
           const completedAt = task.completedAt instanceof Date 
             ? task.completedAt 
             : dateService.parseDate(task.completedAt);
           
-          if (!completedAt) return false;
+          if (!completedAt) {
+            errors.push(`Task ${task.id} has invalid completedAt date: ${task.completedAt}`);
+            return false;
+          }
 
           const today = new Date();
           today.setHours(0, 0, 0, 0);
           
           const weekStart = new Date(today);
-          weekStart.setDate(today.getDate() - today.getDay());
+          weekStart.setDate(today.getDate() - today.getDay()); // Start of week (Sunday)
           
           const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
           
@@ -86,12 +118,15 @@ export const useTaskFilters = (
               break;
           }
         }
+
         if (!matchesPeriod) return false;
 
-        // Aplica filtro de pontuação
+        // Apply score filter - FIXED to handle undefined scores
         let matchesScore = true;
         if (scoreFilter !== 'all') {
+          // Make sure we have a total score
           const totalScore = task.totalScore || 0;
+          
           switch (scoreFilter) {
             case 'high':
               matchesScore = totalScore >= 12;
@@ -104,43 +139,54 @@ export const useTaskFilters = (
               break;
           }
         }
+
         if (!matchesScore) return false;
 
-        // Aplica filtro de feedback
+        // Apply feedback filter
         const matchesFeedback = feedbackFilter === 'all' || task.feedback === feedbackFilter;
         if (!matchesFeedback) return false;
 
-        // Aplica filtro de pilar
+        // Apply pillar filter with error handling
         let matchesPillar = true;
         if (pillarFilter !== 'all') {
+          // Make sure we have the required scores
           const scores = {
             'consequence': task.consequenceScore || 0,
             'pride': task.prideScore || 0,
             'construction': task.constructionScore || 0,
           };
 
+          // Check if the filtered pillar is the dominant one
           const highestScore = Math.max(...Object.values(scores));
           matchesPillar = scores[pillarFilter as keyof typeof scores] === highestScore;
         }
 
         return matchesPillar;
       });
-    } catch (err) {
-      logError('useTaskFilters', 'Erro filtrando tarefas:', err);
-      return []; // Array vazio em caso de erro
-    }
-  }, [
-    tasks, 
-    searchQuery, 
-    periodFilter, 
-    scoreFilter, 
-    feedbackFilter, 
-    pillarFilter, 
-    startDate, 
-    endDate
-  ]);
 
-  // Ordena tarefas filtradas com memoização própria
+      return filtered;
+    } catch (err) {
+      const errorMsg = `Error filtering tasks: ${err instanceof Error ? err.message : String(err)}`;
+      errors.push(errorMsg);
+      logError('useTaskFilters', errorMsg, err);
+      // Return empty array on error
+      return [];
+    } finally {
+      // Only update errors via useEffect to prevent render loop
+      if (errors.length > 0) {
+        setTimeout(() => {
+          setFilterErrors(errors);
+        }, 0);
+      }
+    }
+  }, [tasks, searchQuery, periodFilter, scoreFilter, feedbackFilter, pillarFilter, startDate, endDate]);
+
+  // Clean up errors when dependencies change
+  useEffect(() => {
+    setFilterErrors([]);
+  }, [tasks, searchQuery, periodFilter, scoreFilter, feedbackFilter, pillarFilter, startDate, endDate]);
+
+  // Sort filtered tasks with improved error handling and proper memoization
   const sortedTasks = useMemo(() => {
     if (!filteredTasks.length) return [];
     
@@ -165,25 +211,32 @@ export const useTaskFilters = (
         }
       });
     } catch (err) {
-      logError('useTaskFilters', 'Erro ordenando tarefas:', err);
-      return [...filteredTasks]; // Retorna array não ordenado em caso de erro
+      logError('useTaskFilters', 'Error sorting tasks:', err);
+      return [...filteredTasks]; // Return unsorted array on error
     }
   }, [filteredTasks, sortBy]);
 
   return {
-    // Estado e setters para filtros
-    searchQuery, setSearchQuery,
-    periodFilter, setPeriodFilter,
-    scoreFilter, setScoreFilter,
-    feedbackFilter, setFeedbackFilter,
-    pillarFilter, setPillarFilter,
-    startDate, setStartDate,
-    endDate, setEndDate,
-    sortBy, setSortBy,
-    showFilters, setShowFilters,
-    
-    // Resultados computados
+    searchQuery,
+    setSearchQuery,
+    periodFilter,
+    setPeriodFilter,
+    scoreFilter,
+    setScoreFilter,
+    feedbackFilter,
+    setFeedbackFilter,
+    pillarFilter,
+    setPillarFilter,
+    startDate,
+    setStartDate,
+    endDate,
+    setEndDate,
+    sortBy,
+    setSortBy,
+    showFilters,
+    setShowFilters,
     filteredTasks,
-    sortedTasks
+    sortedTasks,
+    filterErrors
   };
 };

@@ -6,49 +6,74 @@ import { useSidebar } from '@/context/hooks';
 import { Menu } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useEffect, useState, useMemo } from 'react';
-import { logInfo } from '@/utils/logUtils';
+import { toast } from '@/hooks/use-toast';
+import { logWarn, logInfo } from '@/utils/logUtils';
 
 /**
- * PrivateRoute - Protege rotas que requerem autenticação
- * Versão simplificada para evitar re-renderizações desnecessárias
+ * PrivateRoute - Protects routes that require authentication
+ * Improved to handle URL duplication issues
  */
 export const PrivateRoute = () => {
   const { isAuthenticated, isLoading } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const { isOpen: sidebarOpen, open: openSidebar, isMobile } = useSidebar();
   const [authChecked, setAuthChecked] = useState(false);
   
-  // Verificação otimizada para evitar loops de renderização
+  // Check for logout in progress to prevent login/logout loops
   const logoutInProgress = useMemo(() => 
     localStorage.getItem('logout_in_progress') === 'true',
   []);
   
-  // Efetua verificação de autenticação uma única vez
+  // Check for duplicated routes like `/task-history#/task-history`
+  useEffect(() => {
+    const currentPath = location.pathname;
+    const currentHash = location.hash;
+    
+    // Only run this logic if we have a hash that might be causing issues
+    if (currentHash && currentHash.length > 1) {
+      // Detect duplicated path patterns and fix automatically
+      if (currentHash.substring(1) === currentPath) {
+        logWarn('ROUTE', `Detected duplicated path: ${currentPath} in hash ${currentHash}`, { path: currentPath });
+        
+        // Navigate to the correct path without duplication
+        setTimeout(() => {
+          navigate(currentPath, { replace: true });
+        }, 0);
+      }
+    }
+  }, [location, navigate]);
+
+  // Use effect to ensure we've completed at least one auth check
   useEffect(() => {
     if (!isLoading) {
       setAuthChecked(true);
-      logInfo('PrivateRoute', `Autenticação verificada: ${isAuthenticated ? 'autenticado' : 'não autenticado'}`);
     }
   }, [isLoading]);
 
-  // Mostra estado de carregamento enquanto verifica autenticação
+  // Show loading state while checking authentication
   if (isLoading || !authChecked) {
     return <div className="flex items-center justify-center min-h-screen">
       <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
     </div>;
   }
 
-  // Verificação de autenticação simplificada
-  if (!isAuthenticated || logoutInProgress) {
+  // Simplified authentication check
+  const actuallyAuthenticated = isAuthenticated && !logoutInProgress;
+  
+  if (!actuallyAuthenticated) {
+    logInfo(`PrivateRoute`, `User not authenticated, redirecting from ${location.pathname}`);
+    
+    // Return a redirect to login with current location stored for later redirect back
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  // Usuário autenticado, renderiza o layout protegido com sidebar
+  // User is authenticated, render the protected layout with sidebar
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 flex">
       <Sidebar />
       
-      {/* Botão de menu móvel */}
+      {/* Mobile menu toggle button */}
       {isMobile && !sidebarOpen && (
         <button 
           onClick={openSidebar}

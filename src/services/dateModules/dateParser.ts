@@ -3,7 +3,7 @@ import { parseISO, parse, isValid } from 'date-fns';
 import { ISODateString } from '@/types/dates';
 import { logError } from '@/utils/logUtils';
 
-// Cache para datas já processadas - tamanho limitado para eficiência de memória
+// Cache for already parsed dates to avoid redundant processing - limited size for memory efficiency
 const MAX_CACHE_SIZE = 200;
 const dateCache = new Map<string, Date | null>();
 
@@ -13,25 +13,25 @@ const dateCache = new Map<string, Date | null>();
  * @returns Date objeto ou null se inválido
  */
 export function parseDate(date: Date | ISODateString | null | undefined): Date | null {
-  // Fast path: se é null/undefined ou já um Date válido
+  // Fast path: if it's null/undefined or already a valid Date
   if (!date) return null;
   if (date instanceof Date) return isValid(date) ? date : null;
   
-  // Caminho para strings com otimização de cache
+  // String path with cache optimization
   if (typeof date === 'string') {
-    // Verifica o cache primeiro para datas frequentemente usadas
+    // Check cache first for frequently used dates
     if (dateCache.has(date)) {
       return dateCache.get(date) || null;
     }
     
-    // Gerencia o tamanho do cache para evitar vazamentos de memória
+    // Manage cache size to prevent memory leaks
     if (dateCache.size >= MAX_CACHE_SIZE) {
-      // Limpa os 25% mais antigos de entradas quando o cache fica muito grande
+      // Clear oldest 25% of entries when cache gets too big
       const keysToDelete = Array.from(dateCache.keys()).slice(0, MAX_CACHE_SIZE / 4);
       keysToDelete.forEach(key => dateCache.delete(key));
     }
     
-    // Otimização: Tenta conversão direta primeiro para strings ISO (caso mais comum)
+    // Optimization: Try direct conversion first for ISO strings (most common case)
     try {
       if (date.includes('T') || date.includes('Z') || date.match(/^\d{4}-\d{2}-\d{2}/)) {
         const parsedDate = parseISO(date);
@@ -41,10 +41,10 @@ export function parseDate(date: Date | ISODateString | null | undefined): Date |
         }
       }
     } catch (err) {
-      // Continua silenciosamente para o próximo formato
+      // Silently continue to next format
     }
     
-    // Tenta formatos alternativos (DD/MM/YYYY)
+    // Try alternative formats (DD/MM/YYYY)
     if (date.includes('/')) {
       try {
         const parsedDate = parse(date, 'dd/MM/yyyy', new Date());
@@ -53,11 +53,11 @@ export function parseDate(date: Date | ISODateString | null | undefined): Date |
           return parsedDate;
         }
       } catch (err) {
-        // Continua silenciosamente para o próximo formato
+        // Silently continue to next format
       }
     }
     
-    // Tenta formato de timestamp numérico
+    // Try numeric timestamp format
     if (!isNaN(Number(date))) {
       try {
         const timestamp = Number(date);
@@ -67,20 +67,20 @@ export function parseDate(date: Date | ISODateString | null | undefined): Date |
           return parsedDate;
         }
       } catch (err) {
-        // Continua silenciosamente
+        // Silently continue
       }
     }
     
-    // Nenhum formato válido encontrado, cache resultado nulo
+    // No valid format found, cache null result
     dateCache.set(date, null);
   }
   
-  // Se chegamos aqui, não conseguimos obter um Date válido
+  // If we reached here, we couldn't get a valid Date
   return null;
 }
 
 /**
- * Limpa o cache de datas para evitar vazamentos de memória
+ * Cleans the date cache to prevent memory leaks
  */
 export function clearDateCache() {
   dateCache.clear();
