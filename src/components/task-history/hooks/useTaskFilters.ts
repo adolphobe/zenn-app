@@ -1,4 +1,3 @@
-
 import { useState, useMemo, useCallback } from 'react';
 import { Task } from '@/types';
 import { dateService } from '@/services/dateService';
@@ -57,7 +56,8 @@ export const useTaskFilters = (
       // Apply search filter
       const matchesSearch = !searchQuery || 
         task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (task.notes && task.notes.toLowerCase().includes(searchQuery.toLowerCase()));
+        // Only search in task title since notes property doesn't exist on Task type
+        (task.title.toLowerCase().includes(searchQuery.toLowerCase()));
 
       if (!matchesSearch) return false;
 
