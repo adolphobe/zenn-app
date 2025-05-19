@@ -1,5 +1,5 @@
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { Task } from '@/types';
 import { dateService } from '@/services/dateService';
 import { logDateInfo } from '@/utils/diagnosticLog';
@@ -44,23 +44,20 @@ export const useTaskFilters = (
   const [showFilters, setShowFilters] = useState(initialFilters.showFilters);
   const [filterErrors, setFilterErrors] = useState<string[]>([]);
 
-  // For date debugging
-  useMemo(() => {
+  // For date debugging - MOVED to useEffect to prevent render loops
+  useEffect(() => {
     if (startDate || endDate) {
       logDateInfo('useTaskFilters', 'Date filters changed', { startDate, endDate });
     }
   }, [startDate, endDate]);
 
-  // Filter tasks based on search query and filters
+  // Filter tasks based on search query and filters - PROPERLY MEMOIZED
   const filteredTasks = useMemo(() => {
     if (!tasks || tasks.length === 0) return [];
     const errors: string[] = [];
 
-    // Reset previous errors
-    setFilterErrors([]);
-
     try {
-      return tasks.filter((task) => {
+      const filtered = tasks.filter((task) => {
         // Validate task has required fields
         if (!task.title) {
           errors.push(`Task ${task.id} missing title`);
@@ -166,21 +163,30 @@ export const useTaskFilters = (
 
         return matchesPillar;
       });
+
+      return filtered;
     } catch (err) {
       const errorMsg = `Error filtering tasks: ${err instanceof Error ? err.message : String(err)}`;
       errors.push(errorMsg);
       logError('useTaskFilters', errorMsg, err);
-      setFilterErrors(errors);
       // Return empty array on error
       return [];
     } finally {
+      // Only update errors via useEffect to prevent render loop
       if (errors.length > 0) {
-        setFilterErrors(errors);
+        setTimeout(() => {
+          setFilterErrors(errors);
+        }, 0);
       }
     }
   }, [tasks, searchQuery, periodFilter, scoreFilter, feedbackFilter, pillarFilter, startDate, endDate]);
 
-  // Sort filtered tasks with improved error handling
+  // Clean up errors when dependencies change
+  useEffect(() => {
+    setFilterErrors([]);
+  }, [tasks, searchQuery, periodFilter, scoreFilter, feedbackFilter, pillarFilter, startDate, endDate]);
+
+  // Sort filtered tasks with improved error handling and proper memoization
   const sortedTasks = useMemo(() => {
     if (!filteredTasks.length) return [];
     

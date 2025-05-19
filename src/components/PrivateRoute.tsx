@@ -5,10 +5,9 @@ import Sidebar from './Sidebar';
 import { useSidebar } from '@/context/hooks';
 import { Menu } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { toast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
-import { logWarn, logInfo, logError } from '@/utils/logUtils';
+import { logWarn, logInfo } from '@/utils/logUtils';
 
 /**
  * PrivateRoute - Protects routes that require authentication
@@ -20,66 +19,30 @@ export const PrivateRoute = () => {
   const navigate = useNavigate();
   const { isOpen: sidebarOpen, open: openSidebar, isMobile } = useSidebar();
   const [authChecked, setAuthChecked] = useState(false);
-  const [localAuthCheck, setLocalAuthCheck] = useState<boolean | null>(null);
-
+  
   // Check for logout in progress to prevent login/logout loops
-  const logoutInProgress = localStorage.getItem('logout_in_progress') === 'true';
+  const logoutInProgress = useMemo(() => 
+    localStorage.getItem('logout_in_progress') === 'true',
+  []);
   
   // Check for duplicated routes like `/task-history#/task-history`
   useEffect(() => {
     const currentPath = location.pathname;
     const currentHash = location.hash;
-    const currentUrl = window.location.href;
     
-    // Detect duplicated path patterns and fix automatically
-    if (currentUrl.includes(`${currentPath}#${currentPath}`)) {
-      logWarn('ROUTE', `Detected and fixing duplicated path: ${currentUrl}`, { path: currentPath });
-      
-      // Extract the correct path 
-      const correctPath = currentHash.substring(1); // Remove the # character
-      
-      // Use navigate to fix the URL (without adding an entry to history)
-      setTimeout(() => {
-        navigate(correctPath, { replace: true });
-      }, 0);
-    }
-    
-    // Special handling for task-history route (common problem area)
-    if (currentPath === "/task-history" || currentHash === "#/task-history") {
-      logInfo("ROUTE", "Accessing task history page", { path: currentPath, hash: currentHash });
+    // Only run this logic if we have a hash that might be causing issues
+    if (currentHash && currentHash.length > 1) {
+      // Detect duplicated path patterns and fix automatically
+      if (currentHash.substring(1) === currentPath) {
+        logWarn('ROUTE', `Detected duplicated path: ${currentPath} in hash ${currentHash}`, { path: currentPath });
+        
+        // Navigate to the correct path without duplication
+        setTimeout(() => {
+          navigate(currentPath, { replace: true });
+        }, 0);
+      }
     }
   }, [location, navigate]);
-
-  // Additional check for authentication using localStorage directly
-  useEffect(() => {
-    const checkLocalAuth = async () => {
-      try {
-        // Don't check authentication if logout in progress
-        if (logoutInProgress) {
-          setLocalAuthCheck(false);
-          return;
-        }
-        
-        // Check for token in localStorage
-        const hasToken = !!localStorage.getItem('sb-wbvxnapruffchikhrqrs-auth-token');
-        
-        // If no token in localStorage, we're definitely not authenticated
-        if (!hasToken) {
-          setLocalAuthCheck(false);
-          return;
-        }
-        
-        // Double-check with Supabase API
-        const { data } = await supabase.auth.getSession();
-        setLocalAuthCheck(!!data.session);
-      } catch (err) {
-        logError("PrivateRoute", "Erro ao verificar token local:", err);
-        setLocalAuthCheck(false);
-      }
-    };
-
-    checkLocalAuth();
-  }, [logoutInProgress]);
 
   // Use effect to ensure we've completed at least one auth check
   useEffect(() => {
@@ -89,42 +52,23 @@ export const PrivateRoute = () => {
   }, [isLoading]);
 
   // Show loading state while checking authentication
-  if (isLoading || !authChecked || localAuthCheck === null) {
-    logInfo("PrivateRoute", "Ainda carregando estado de autenticação...");
+  if (isLoading || !authChecked) {
     return <div className="flex items-center justify-center min-h-screen">
       <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
     </div>;
   }
 
-  // Use both checks - from context AND from local storage
-  const actuallyAuthenticated = isAuthenticated && !logoutInProgress && localAuthCheck === true;
+  // Simplified authentication check
+  const actuallyAuthenticated = isAuthenticated && !logoutInProgress;
   
   if (!actuallyAuthenticated) {
-    const reason = logoutInProgress ? "logout em andamento" : "não autenticado";
-    logError(`PrivateRoute`, `ERRO DE AUTENTICAÇÃO: Usuário ${reason} em ${location.pathname}`);
-    
-    // Clear any lingering session data if we detect a logout in progress
-    if (logoutInProgress) {
-      localStorage.removeItem('sb-wbvxnapruffchikhrqrs-auth-token');
-      localStorage.removeItem('supabase.auth.token');
-      
-      // Return a redirect to login with current location stored for later redirect back
-      // Add a timestamp to avoid caching issues
-      return <Navigate to={`/login?loggedOut=true&_=${new Date().getTime()}`} state={{ 
-        from: location,
-        loggedOut: true,
-        timestamp: new Date().getTime(),
-        forceClear: true
-      }} replace />;
-    }
+    logInfo(`PrivateRoute`, `User not authenticated, redirecting from ${location.pathname}`);
     
     // Return a redirect to login with current location stored for later redirect back
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
   // User is authenticated, render the protected layout with sidebar
-  logInfo(`PrivateRoute`, `Usuário está autenticado, renderizando conteúdo protegido em ${location.pathname}`);
-  
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 flex">
       <Sidebar />

@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useTaskDataContext } from '@/context/TaskDataProvider';
 import { logError } from '@/utils/logUtils';
 import { Task } from '@/types';
@@ -36,6 +36,20 @@ export const TaskHistoryContent: React.FC<TaskHistoryContentProps> = ({ setError
   const [sortBy, setSortBy] = useState('newest');
   const [showFilters, setShowFilters] = useState(false);
   
+  // Create validated tasks array using memo to prevent repeated calculations
+  const validatedTasks = useMemo(() => {
+    if (!completedTasks.length) return [];
+    
+    // Defensive copy of tasks with validated dates - only calculate once
+    return completedTasks.map(task => ({
+      ...task,
+      // Ensure completedAt is a valid Date
+      completedAt: task.completedAt instanceof Date && !isNaN(task.completedAt.getTime())
+        ? task.completedAt
+        : new Date() // Use current date as fallback
+    }));
+  }, [completedTasks]);
+  
   // Process filters and pagination
   let filteredTasks: Task[] = [];
   let sortedTasks: Task[] = [];
@@ -48,16 +62,7 @@ export const TaskHistoryContent: React.FC<TaskHistoryContentProps> = ({ setError
   
   try {
     // Use the filter hook with our state values
-    if (completedTasks.length > 0) {
-      // Create a defensive copy of tasks with validated dates
-      const validatedTasks = completedTasks.map(task => ({
-        ...task,
-        // Ensure completedAt is a valid Date
-        completedAt: task.completedAt instanceof Date && !isNaN(task.completedAt.getTime())
-          ? task.completedAt
-          : new Date() // Use current date as fallback
-      }));
-      
+    if (validatedTasks.length > 0) {
       const filters = useTaskFilters(
         validatedTasks,
         {
@@ -73,6 +78,7 @@ export const TaskHistoryContent: React.FC<TaskHistoryContentProps> = ({ setError
         }
       );
       
+      // Use useMemo values from the filter hook
       filteredTasks = filters.filteredTasks;
       sortedTasks = filters.sortedTasks;
       

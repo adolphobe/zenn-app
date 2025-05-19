@@ -2,8 +2,7 @@ import React, { createContext, useContext, useMemo, useEffect } from 'react';
 import { useTaskData } from '@/hooks/useTaskData';
 import { Task, TaskFormData } from '@/types';
 import { dateService } from '@/services/dateService';
-import { logDiagnostics, logDateInfo } from '@/utils/diagnosticLog';
-import { logWarn, logError, logInfo } from '@/utils/logUtils';
+import { logInfo } from '@/utils/logUtils';
 
 // Define the context type
 type TaskDataContextType = ReturnType<typeof useTaskData> & {
@@ -22,22 +21,22 @@ export const TaskDataProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   // Use a separate instance to manage completed tasks
   const completedTasksData = useTaskData(true);
   
-  // Track and log task processing errors
+  // Track processing errors
   const [processingErrors, setProcessingErrors] = React.useState<string[]>([]);
   
+  // Log diagnostics about completed tasks - reduce frequency with deps array
   useEffect(() => {
-    // Log processing errors only when we have some
     if (processingErrors.length > 0) {
-      logError('TaskDataProvider', 'Erros ao processar tarefas concluídas:', 
-        processingErrors.join(', ')
-      );
+      console.error('TaskDataProvider: Errors processing completed tasks:', processingErrors.join(', '));
     }
 
-    // Log diagnostics about completed tasks
-    logInfo('TaskDataProvider', `Status das tarefas: ${completedTasksData.tasks.length} tarefas concluídas carregadas`);
-  }, [processingErrors, completedTasksData.tasks]);
+    // Simplified logging to reduce console noise
+    if (completedTasksData.tasks.length > 0) {
+      logInfo('TaskDataProvider', `${completedTasksData.tasks.length} tarefas concluídas carregadas`);
+    }
+  }, [processingErrors.length, completedTasksData.tasks.length]);
   
-  // Process completed tasks to ensure dates are valid Date objects
+  // Process completed tasks to ensure dates are valid Date objects - OPTIMIZED
   const processedCompletedTasks = useMemo(() => {
     const tasks = completedTasksData.tasks || [];
     const errors: string[] = [];
@@ -45,51 +44,46 @@ export const TaskDataProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     if (tasks.length === 0) {
       return [];
     }
-
-    logDiagnostics('TaskDataProvider', `Processing ${tasks.length} completed tasks`);
     
     const processed = tasks.map(task => {
       try {
-        // IMPROVED: Enhanced completed date handling with multiple fallbacks
+        // Only process dates if we need to
         let completedAt: Date | null = null;
         
-        if (task.completedAt) {
-          // Try to parse the completedAt date
-          completedAt = dateService.parseDate(task.completedAt);
-          
-          if (!completedAt) {
-            // If parsing failed, log the error and use current date as fallback
-            logWarn('TaskDataProvider', `Task ${task.id}: Invalid completedAt date, using current date as fallback`, {
-              original: task.completedAt
-            });
-            completedAt = new Date();
-          }
-        } else if (task.completed) {
-          // If task is completed but has no completedAt, provide a fallback
-          logWarn('TaskDataProvider', `Task ${task.id}: Missing completedAt for completed task, using current date`);
+        // Fast path: if it's already a valid Date, reuse it
+        if (task.completedAt instanceof Date && !isNaN(task.completedAt.getTime())) {
+          completedAt = task.completedAt;
+        } 
+        // Parse the date if it's not already a valid Date
+        else if (task.completedAt) {
+          completedAt = dateService.parseDate(task.completedAt) || new Date();
+        } 
+        // Default fallback for completed tasks without dates
+        else if (task.completed) {
           completedAt = new Date();
         }
         
-        // Ensure createdAt is always valid
-        const createdAt = task.createdAt ? dateService.parseDate(task.createdAt) : new Date();
+        // Optimize other date processing too
+        const createdAt = task.createdAt instanceof Date ? 
+          task.createdAt : 
+          (task.createdAt ? dateService.parseDate(task.createdAt) : null) || 
+          new Date();
         
-        // Ensure idealDate is validated but keep original type structure
-        const idealDate = task.idealDate ? dateService.parseDate(task.idealDate) : null;
+        // Ensure idealDate is validated but keep original type structure - only process if needed
+        const idealDate = !task.idealDate ? null :
+          (task.idealDate instanceof Date ? task.idealDate : dateService.parseDate(task.idealDate));
         
-        // Return a new object (immutability) with properly processed dates
+        // Return a new object with properly processed dates
         return {
           ...task,
           completedAt,
           idealDate,
-          createdAt: createdAt || new Date()
+          createdAt
         };
       } catch (error) {
-        // Track specific error
-        const errorMsg = `Error processing task ${task.id}: ${error instanceof Error ? error.message : String(error)}`;
-        errors.push(errorMsg);
-        logError('TaskDataProvider', errorMsg, task);
+        // Track error but return valid object with fallback values
+        errors.push(`Error processing task ${task.id}: ${error instanceof Error ? error.message : String(error)}`);
         
-        // Always return a valid object even if processing fails
         return {
           ...task,
           completedAt: task.completed ? new Date() : null,
@@ -99,16 +93,17 @@ export const TaskDataProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       }
     });
     
-    // Update error state
+    // Update error state only if there are errors - reduce renders
     if (errors.length > 0) {
-      setProcessingErrors(errors);
-    } else {
-      // Clear previous errors if all went well
-      setProcessingErrors([]);
+      // Use setTimeout to avoid render loop from setState during render
+      setTimeout(() => setProcessingErrors(errors), 0);
+    } else if (processingErrors.length > 0) {
+      // Only clear if needed
+      setTimeout(() => setProcessingErrors([]), 0);
     }
     
     return processed;
-  }, [completedTasksData.tasks]);
+  }, [completedTasksData.tasks, processingErrors.length]);
 
   // Create context value with both active and completed tasks
   const contextValue: TaskDataContextType = {
@@ -116,11 +111,6 @@ export const TaskDataProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     completedTasks: processedCompletedTasks,
     completedTasksLoading: completedTasksData.isLoading,
   };
-
-  // Log diagnostics about the context being provided
-  useEffect(() => {
-    logInfo('TaskDataProvider', `Providing ${processedCompletedTasks.length} completed tasks to context`);
-  }, [processedCompletedTasks.length]);
 
   return (
     <TaskDataContext.Provider value={contextValue}>
