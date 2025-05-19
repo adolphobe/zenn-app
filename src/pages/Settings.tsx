@@ -11,6 +11,7 @@ import AvatarSelector from '@/components/settings/AvatarSelector';
 import UserStatsDisplay from '@/components/settings/UserStatsDisplay';
 import AccountInfoSection from '@/components/settings/AccountInfoSection';
 import DeleteAccountModal from '@/components/settings/DeleteAccountModal';
+import PasswordResetSection from '@/components/settings/PasswordResetSection';
 
 // Available avatars - easy to add more later
 const availableAvatars = [
@@ -129,6 +130,9 @@ const Settings = () => {
             </Button>
           </CardFooter>
         </Card>
+        
+        {/* Password Reset Section */}
+        <PasswordResetSection />
         
         {/* Delete Account Section */}
         <div className="flex justify-start pt-0 pb-0">
