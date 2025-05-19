@@ -254,8 +254,16 @@ const Login: React.FC = () => {
         </div>
       </div>
 
-      {/* Right column: Plain gradient background (removing the promotional box) */}
-      <div className="hidden md:block md:w-1/2 relative bg-gradient-to-r from-blue-100 to-blue-200">
+      {/* Right column: Background image */}
+      <div className="hidden md:block md:w-1/2 relative">
+        {/* Background image */}
+        <img 
+          src="https://w0.peakpx.com/wallpaper/116/146/HD-wallpaper-clear-blue-sky-calm-clean-color-gradient-simple-thumbnail.jpg"
+          alt="Blue sky gradient background"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        
+        {/* Overlay with existing effects */}
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-blue-400/20 to-blue-600/30 mix-blend-multiply" />
           <div className="absolute top-[20%] left-[20%] w-32 h-32 rounded-full bg-blue-200/60"></div>
