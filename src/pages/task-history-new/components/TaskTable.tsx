@@ -75,6 +75,9 @@ export const TaskTable: React.FC<TaskTableProps> = ({
     visible: { opacity: 1, x: 0 }
   };
 
+  // Create motion variants for the TableRow
+  const MotionTableRow = motion(TableRow);
+
   return (
     <div className="border rounded-md overflow-hidden shadow-sm">
       <Table>
@@ -109,14 +112,12 @@ export const TaskTable: React.FC<TaskTableProps> = ({
                 const scoreColor = getScoreColor(task.totalScore);
                 
                 return (
-                  <motion.tr
+                  <MotionTableRow
                     key={task.id}
                     className="hover:bg-muted/50 transition-colors"
                     variants={tableRowVariants}
                     initial="hidden"
                     animate="visible"
-                    // Using the 'as' prop instead of 'component'
-                    as={TableRow}
                   >
                     <TableCell 
                       className="font-medium cursor-pointer"
@@ -177,7 +178,7 @@ export const TaskTable: React.FC<TaskTableProps> = ({
                         )}
                       </div>
                     </TableCell>
-                  </motion.tr>
+                  </MotionTableRow>
                 );
               })
             )}
