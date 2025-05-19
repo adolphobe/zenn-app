@@ -1,18 +1,54 @@
 
-import { useState, useMemo } from 'react';
-import { useTaskDataContext } from '@/context/TaskDataProvider';
+import { useState, useCallback } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Task } from '@/types';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/context/auth';
+import { mapToTask } from '@/services/task/taskMapper';
 
-/**
- * Hook to manage completed tasks data for the new task history page
- */
+interface TaskStatsType {
+  count: number;
+  highScoreCount: number;
+  averageScore: number;
+}
+
 export const useCompletedTasksData = () => {
-  const { completedTasks, completedTasksLoading } = useTaskDataContext();
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
+  const { currentUser } = useAuth();
   
-  // Basic stats about completed tasks
-  const stats = useMemo(() => {
-    if (!completedTasks || completedTasks.length === 0) {
+  // Fetch completed tasks for the current user
+  const { 
+    data: tasks = [], 
+    isLoading,
+    refetch
+  } = useQuery({
+    queryKey: ['completedTasks', currentUser?.id],
+    queryFn: async () => {
+      if (!currentUser?.id) return [];
+      
+      const { data, error } = await supabase
+        .from('tasks')
+        .select(`
+          *,
+          comments:task_comments(*)
+        `)
+        .eq('user_id', currentUser.id)
+        .eq('completed', true)
+        .order('completed_at', { ascending: false });
+      
+      if (error) {
+        console.error('Error fetching completed tasks:', error);
+        throw error;
+      }
+      
+      return data.map(mapToTask);
+    },
+    enabled: !!currentUser?.id,
+  });
+  
+  // Calculate stats for completed tasks
+  const calculateStats = useCallback((): TaskStatsType => {
+    if (!tasks || tasks.length === 0) {
       return {
         count: 0,
         highScoreCount: 0,
@@ -20,41 +56,31 @@ export const useCompletedTasksData = () => {
       };
     }
     
-    const tasksWithScores = completedTasks.filter(task => 
-      task.totalScore !== undefined && task.totalScore !== null
-    );
+    // Total task count
+    const count = tasks.length;
     
-    const highScoreCount = tasksWithScores.filter(task => 
-      (task.totalScore || 0) >= 12
-    ).length;
+    // High score tasks (tasks with score >= 12)
+    const highScoreCount = tasks.filter(task => task.totalScore >= 12).length;
     
-    const totalScore = tasksWithScores.reduce((sum, task) => 
-      sum + (task.totalScore || 0), 0
-    );
-    
-    const averageScore = tasksWithScores.length > 0 
-      ? Math.round((totalScore / tasksWithScores.length) * 10) / 10
-      : 0;
+    // Average score of all tasks
+    const totalScoreSum = tasks.reduce((sum, task) => sum + task.totalScore, 0);
+    const averageScore = totalScoreSum / count;
     
     return {
-      count: completedTasks.length,
+      count,
       highScoreCount,
       averageScore
     };
-  }, [completedTasks]);
+  }, [tasks]);
   
-  // Get the selected task
-  const selectedTask = useMemo(() => {
-    if (!selectedTaskId || !completedTasks) return null;
-    return completedTasks.find(task => task.id === selectedTaskId) || null;
-  }, [selectedTaskId, completedTasks]);
+  const stats = calculateStats();
   
   return {
-    tasks: completedTasks || [],
-    isLoading: completedTasksLoading,
+    tasks,
+    isLoading,
     stats,
     selectedTaskId,
     setSelectedTaskId,
-    selectedTask
+    refetch
   };
 };

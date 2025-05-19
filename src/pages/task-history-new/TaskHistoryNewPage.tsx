@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Loader2 } from 'lucide-react';
 import { useCompletedTasksData } from './hooks/useCompletedTasksData';
@@ -13,6 +13,10 @@ import { TaskSearch } from './components/TaskSearch';
 import { ViewToggle } from './components/ViewToggle';
 import { AdvancedFilters } from './components/AdvancedFilters';
 import { TaskPagination } from './components/TaskPagination';
+import TaskModal from './components/TaskModal';
+import RestoreTaskDialog from './components/RestoreTaskDialog';
+import { restoreTask } from './services/taskActions';
+import { Task } from '@/types';
 
 /**
  * New Task History Page component that will gradually incorporate features from the existing one
@@ -23,7 +27,8 @@ const TaskHistoryNewPage = () => {
     isLoading: completedTasksLoading,
     stats,
     selectedTaskId,
-    setSelectedTaskId
+    setSelectedTaskId,
+    refetch
   } = useCompletedTasksData();
   
   // Use the task filters hook with all filtering capabilities
@@ -49,6 +54,31 @@ const TaskHistoryNewPage = () => {
     groupedTasks,
     handlePageChange
   } = useTaskPagination(filteredTasks);
+
+  // State for modals
+  const [taskToView, setTaskToView] = useState<Task | null>(null);
+  const [taskToRestore, setTaskToRestore] = useState<Task | null>(null);
+  
+  // Task selection handler
+  const handleSelectTask = (taskId: string) => {
+    const selectedTask = completedTasks.find(task => task.id === taskId);
+    if (selectedTask) {
+      setTaskToView(selectedTask);
+    }
+  };
+
+  // Task restoration handlers
+  const handleRestoreClick = (taskId: string) => {
+    const taskToRestore = completedTasks.find(task => task.id === taskId);
+    if (taskToRestore) {
+      setTaskToRestore(taskToRestore);
+    }
+  };
+
+  const handleRestoreConfirm = async (taskId: string) => {
+    await restoreTask(taskId);
+    refetch(); // Refresh task list after restoration
+  };
   
   // Loading state
   if (completedTasksLoading) {
@@ -66,7 +96,7 @@ const TaskHistoryNewPage = () => {
   if (!completedTasks || completedTasks.length === 0) {
     return (
       <div className="container p-4 mx-auto">
-        <h1 className="text-2xl font-bold mb-4">Histórico de Tarefas (Novo)</h1>
+        <h1 className="text-2xl font-bold mb-4">Histórico de Tarefas</h1>
         <Alert>
           <AlertTitle>Nenhuma tarefa concluída</AlertTitle>
           <AlertDescription>
@@ -76,11 +106,6 @@ const TaskHistoryNewPage = () => {
       </div>
     );
   }
-
-  // Handle task selection
-  const handleSelectTask = (taskId: string) => {
-    setSelectedTaskId(taskId);
-  };
 
   // Show search results message when filtering
   const isFiltering = searchQuery.trim().length > 0 || 
@@ -95,7 +120,7 @@ const TaskHistoryNewPage = () => {
 
   return (
     <div className="container p-4 mx-auto">
-      <h1 className="text-2xl font-bold mb-6">Histórico de Tarefas (Novo)</h1>
+      <h1 className="text-2xl font-bold mb-6">Histórico de Tarefas</h1>
       
       <div className="flex flex-col md:flex-row justify-between gap-4 mb-4">
         {/* Search bar */}
@@ -153,11 +178,13 @@ const TaskHistoryNewPage = () => {
             <TaskTable 
               tasks={paginatedTasks} 
               onSelectTask={handleSelectTask}
+              onRestoreTask={handleRestoreClick}
             />
           ) : (
             <TaskGrid
               tasks={paginatedTasks}
               onSelectTask={handleSelectTask}
+              onRestoreTask={handleRestoreClick}
             />
           )
         ) : (
@@ -165,6 +192,7 @@ const TaskHistoryNewPage = () => {
             groups={groupedTasks}
             viewMode={viewMode}
             onSelectTask={handleSelectTask}
+            onRestoreTask={handleRestoreClick}
           />
         )}
         
@@ -178,19 +206,20 @@ const TaskHistoryNewPage = () => {
         )}
       </div>
       
-      {/* Add simple task info selection message */}
-      {selectedTaskId && (
-        <div className="mt-4 p-4 bg-muted rounded-md">
-          <p className="text-sm">
-            Tarefa selecionada: <span className="font-medium">{
-              completedTasks.find(task => task.id === selectedTaskId)?.title
-            }</span>
-          </p>
-          <p className="text-xs text-muted-foreground mt-1">
-            Na próxima fase, implementaremos uma visualização detalhada da tarefa.
-          </p>
-        </div>
-      )}
+      {/* Task modals */}
+      <TaskModal
+        task={taskToView}
+        isOpen={!!taskToView}
+        onClose={() => setTaskToView(null)}
+        onRestore={handleRestoreClick}
+      />
+
+      <RestoreTaskDialog
+        task={taskToRestore}
+        isOpen={!!taskToRestore}
+        onClose={() => setTaskToRestore(null)}
+        onConfirm={handleRestoreConfirm}
+      />
     </div>
   );
 };

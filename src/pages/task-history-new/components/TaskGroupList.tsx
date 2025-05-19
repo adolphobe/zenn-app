@@ -15,12 +15,14 @@ interface TaskGroupListProps {
   groups: TaskGroup[];
   viewMode: 'list' | 'grid';
   onSelectTask: (taskId: string) => void;
+  onRestoreTask?: (taskId: string) => void;
 }
 
 export const TaskGroupList: React.FC<TaskGroupListProps> = ({ 
   groups, 
   viewMode,
-  onSelectTask
+  onSelectTask,
+  onRestoreTask
 }) => {
   if (!groups.length) {
     return (
@@ -40,9 +42,17 @@ export const TaskGroupList: React.FC<TaskGroupListProps> = ({
           </div>
           
           {viewMode === 'list' ? (
-            <TaskTable tasks={group.tasks} onSelectTask={onSelectTask} />
+            <TaskTable 
+              tasks={group.tasks} 
+              onSelectTask={onSelectTask}
+              onRestoreTask={onRestoreTask} 
+            />
           ) : (
-            <TaskGrid tasks={group.tasks} onSelectTask={onSelectTask} />
+            <TaskGrid 
+              tasks={group.tasks} 
+              onSelectTask={onSelectTask}
+              onRestoreTask={onRestoreTask}
+            />
           )}
           
           {index < groups.length - 1 && <Separator className="mt-8" />}
