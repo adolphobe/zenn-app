@@ -21,9 +21,9 @@ const PeriodTabs: React.FC<PeriodTabsProps> = ({
         <TabsTrigger value="yesterday">Ontem</TabsTrigger>
         <TabsTrigger value="week">Esta Semana</TabsTrigger>
         <TabsTrigger value="month">Este Mês</TabsTrigger>
-        <TabsTrigger value="custom">Últimos 30 dias</TabsTrigger>
+        {/* <TabsTrigger value="custom">Últimos 30 dias</TabsTrigger> */}
         <TabsTrigger value="custom-range">Personalizado</TabsTrigger>
-        <TabsTrigger value="all-time">Todo o Tempo</TabsTrigger>
+        <TabsTrigger value="all-time">Vitalício</TabsTrigger>
       </TabsList>
     </Tabs>
   );
