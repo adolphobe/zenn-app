@@ -1,66 +1,30 @@
 
-// Optimized logging system with improved throttling and control mechanisms
+// Controle de logging para prevenir excesso de mensagens
 const logThrottles: Record<string, number> = {};
-const LOG_INTERVAL = 3000; // 3 seconds between logs of the same type
-const CATEGORY_BLOCKLIST: string[] = []; // Categories to completely skip
-const MAX_LOGS_PER_CATEGORY = 50; // Maximum logs per category before throttling increases
-const categoryLogCounts: Record<string, number> = {};
-
-// Levels of log for better control
-export enum LogLevel {
-  DEBUG = 0,
-  INFO = 1,
-  WARN = 2,
-  ERROR = 3,
-  CRITICAL = 4
-}
-
-// Global configuration for logging
-const LOG_CONFIG = {
-  minLevel: process.env.NODE_ENV === 'production' ? LogLevel.WARN : LogLevel.DEBUG,
-  enableThrottling: true,
-  disabledCategories: [] as string[]
-};
+const LOG_INTERVAL = 3000; // 3 segundos entre logs do mesmo tipo
 
 /**
- * Improved throttled logging function with better category management
+ * Função que limita a frequência de logs por categoria
+ * Só exibe logs quando realmente necessário
  */
-export const throttledLog = (category: string, message: string, data?: any, level: LogLevel = LogLevel.INFO) => {
-  // Skip completely blocked categories
-  if (CATEGORY_BLOCKLIST.includes(category)) {
-    return false;
-  }
-  
-  // Verify if the category is disabled
-  if (LOG_CONFIG.disabledCategories.includes(category)) {
-    return false;
-  }
-  
-  // Check if the log level is sufficient
-  if (level < LOG_CONFIG.minLevel) {
-    return false;
-  }
-  
-  // Track log counts and increase throttling for noisy categories
-  categoryLogCounts[category] = (categoryLogCounts[category] || 0) + 1;
-  
-  // Dynamic throttling - increase throttle time for very active categories
-  let effectiveInterval = LOG_INTERVAL;
-  if (categoryLogCounts[category] > MAX_LOGS_PER_CATEGORY) {
-    const multiplier = Math.floor(categoryLogCounts[category] / MAX_LOGS_PER_CATEGORY);
-    effectiveInterval = LOG_INTERVAL * (1 + Math.min(5, multiplier)); // Cap at 6x normal interval
+export const throttledLog = (category: string, message: string, data?: any) => {
+  // Em produção, não exibe a maioria dos logs
+  if (process.env.NODE_ENV === 'production') {
+    // Em produção, só exibir logs críticos ou de erro
+    if (!category.includes('ERROR') && !category.includes('CRITICAL')) {
+      return false;
+    }
   }
   
   const now = Date.now();
   const lastLog = logThrottles[category] || 0;
   
-  // If not using throttling or sufficient time has passed since the last log
-  if (!LOG_CONFIG.enableThrottling || now - lastLog > effectiveInterval) {
-    const levelPrefix = LogLevel[level] || 'INFO';
+  // Se passou tempo suficiente desde o último log desta categoria
+  if (now - lastLog > LOG_INTERVAL) {
     if (data !== undefined) {
-      console.log(`[${levelPrefix}][${category}] ${message}`, data);
+      console.log(`[${category}] ${message}`, data);
     } else {
-      console.log(`[${levelPrefix}][${category}] ${message}`);
+      console.log(`[${category}] ${message}`);
     }
     logThrottles[category] = now;
     return true;
@@ -70,74 +34,9 @@ export const throttledLog = (category: string, message: string, data?: any, leve
 };
 
 /**
- * Temporarily mutes logs for a category
+ * Desativa temporariamente todos os logs de uma categoria
  */
 export const muteLogsFor = (category: string, durationMs: number = 30000) => {
   logThrottles[category] = Date.now() + durationMs;
   console.log(`[LOG] Logs da categoria "${category}" silenciados por ${durationMs/1000}s`);
 };
-
-/**
- * Completely disables logs for specific categories
- */
-export const disableCategory = (category: string) => {
-  if (!LOG_CONFIG.disabledCategories.includes(category)) {
-    LOG_CONFIG.disabledCategories.push(category);
-  }
-};
-
-/**
- * Permanently blocks a category from logging (stronger than disable)
- */
-export const blockCategory = (category: string) => {
-  if (!CATEGORY_BLOCKLIST.includes(category)) {
-    CATEGORY_BLOCKLIST.push(category);
-  }
-};
-
-/**
- * Enables logs for specific categories again
- */
-export const enableCategory = (category: string) => {
-  LOG_CONFIG.disabledCategories = LOG_CONFIG.disabledCategories.filter(c => c !== category);
-  
-  // Also remove from blocklist if present
-  const blocklistIndex = CATEGORY_BLOCKLIST.indexOf(category);
-  if (blocklistIndex >= 0) {
-    CATEGORY_BLOCKLIST.splice(blocklistIndex, 1);
-  }
-};
-
-/**
- * Configures the minimum log level
- */
-export const setMinLogLevel = (level: LogLevel) => {
-  LOG_CONFIG.minLevel = level;
-};
-
-/**
- * Resets log counts for a fresh start
- */
-export const resetLogCounts = () => {
-  for (const category in categoryLogCounts) {
-    categoryLogCounts[category] = 0;
-  }
-};
-
-/**
- * Helper functions for different log levels
- */
-export const logDebug = (category: string, message: string, data?: any) => 
-  throttledLog(category, message, data, LogLevel.DEBUG);
-
-export const logInfo = (category: string, message: string, data?: any) => 
-  throttledLog(category, message, data, LogLevel.INFO);
-
-export const logWarn = (category: string, message: string, data?: any) => 
-  throttledLog(category, message, data, LogLevel.WARN);
-
-export const logError = (category: string, message: string, data?: any) => 
-  throttledLog(category, message, data, LogLevel.ERROR);
-
-export const logCritical = (category: string, message: string, data?: any) => 
-  throttledLog(category, message, data, LogLevel.CRITICAL);

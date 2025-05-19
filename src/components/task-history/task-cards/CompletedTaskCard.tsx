@@ -1,5 +1,5 @@
 
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { Task } from '@/types';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -13,8 +13,6 @@ import RestoreTaskConfirmation from '../RestoreTaskConfirmation';
 import CompletedTaskModal from '../completed-task-modal';
 import DateTimeDisplay from '@/components/DateTimeDisplay';
 import { dateService } from '@/services/dateService';
-import { logDateInfo } from '@/utils/diagnosticLog';
-import { logError } from '@/utils/logUtils';
 
 interface CompletedTaskCardProps {
   task: Task;
@@ -25,37 +23,6 @@ export const CompletedTaskCard: React.FC<CompletedTaskCardProps> = ({ task }) =>
   const expanded = isTaskExpanded(task.id);
   const [showRestoreConfirmation, setShowRestoreConfirmation] = useState(false);
   const [showTaskModal, setShowTaskModal] = useState(false);
-  const [dateError, setDateError] = useState<string | null>(null);
-
-  // Validate and format the completion date
-  const completionDate = useMemo(() => {
-    try {
-      // If no completedAt, default to current date for completed tasks
-      if (!task.completedAt && task.completed) {
-        return new Date();
-      }
-      
-      // Parse the completedAt date
-      const parsedDate = task.completedAt instanceof Date ? 
-        task.completedAt : 
-        dateService.parseDate(task.completedAt);
-      
-      // Check if date is valid
-      if (!parsedDate || isNaN(parsedDate.getTime())) {
-        setDateError(`Data inválida para tarefa ${task.id}`);
-        return new Date(); // Fallback to current date
-      }
-      
-      return parsedDate;
-    } catch (error) {
-      const errorMsg = `Erro ao processar data de conclusão: ${
-        error instanceof Error ? error.message : String(error)
-      }`;
-      setDateError(errorMsg);
-      logError('CompletedTaskCard', errorMsg, { taskId: task.id });
-      return new Date(); // Fallback to current date
-    }
-  }, [task.completedAt, task.completed, task.id]);
 
   // Determine dominant pillar based on scores
   const getDominantPillar = () => {
@@ -129,17 +96,7 @@ export const CompletedTaskCard: React.FC<CompletedTaskCardProps> = ({ task }) =>
             <div>
               <h3 className="font-medium text-gray-900 dark:text-gray-100 opacity-70">{task.title}</h3>
               <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                Concluída em {dateError ? (
-                  <span title={dateError} className="text-orange-500">
-                    (data indisponível)
-                  </span>
-                ) : (
-                  <DateTimeDisplay 
-                    date={completionDate} 
-                    showRelative={false} 
-                    fallback="(data não disponível)"
-                  />
-                )}
+                Concluída em <DateTimeDisplay date={task.completedAt} showRelative={false} />
               </p>
             </div>
             <div className="flex gap-2">

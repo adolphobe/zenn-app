@@ -19,7 +19,6 @@ import { useAppContext } from '@/context/AppContext';
 import CompletedTaskModal from './completed-task-modal';
 import RestoreTaskConfirmation from './RestoreTaskConfirmation';
 import DateTimeDisplay from '@/components/DateTimeDisplay';
-import { logDateInfo } from '@/utils/diagnosticLog';
 
 // Table row component
 export const CompletedTaskRow: React.FC<{ task: Task }> = ({ task }) => {
@@ -27,11 +26,6 @@ export const CompletedTaskRow: React.FC<{ task: Task }> = ({ task }) => {
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [showRestoreConfirmation, setShowRestoreConfirmation] = useState(false);
   const { restoreTask } = useAppContext();
-
-  // Log the task's completedAt for diagnosis
-  React.useEffect(() => {
-    logDateInfo('CompletedTaskRow', `Task ${task.id} completedAt in table`, task.completedAt);
-  }, [task.id, task.completedAt]);
 
   // Determine dominant pillar based on scores
   const getDominantPillar = () => {
@@ -77,13 +71,12 @@ export const CompletedTaskRow: React.FC<{ task: Task }> = ({ task }) => {
           <DateTimeDisplay 
             date={task.completedAt} 
             showTimeZone={false} 
-            showRelative={false}
-            fallback="(data não disponível)" 
+            showRelative={false} 
           />
         </TableCell>
         <TableCell>{task.totalScore}/15</TableCell>
         <TableCell className="capitalize">{dominantPillar}</TableCell>
-        <TableCell>{task.feedback ? feedbackLabels[task.feedback as keyof typeof feedbackLabels] || '-' : '-'}</TableCell>
+        <TableCell>{task.feedback ? feedbackLabels[task.feedback] : '-'}</TableCell>
         <TableCell>
           <div className="flex gap-2">
             <Button 
@@ -133,39 +126,26 @@ export const CompletedTaskRow: React.FC<{ task: Task }> = ({ task }) => {
   );
 };
 
-export const TasksTable: React.FC<{ tasks: Task[] }> = ({ tasks }) => {
-  // Verificar se temos tarefas válidas
-  if (!tasks || tasks.length === 0) {
-    return (
-      <Card>
-        <CardContent className="p-4">
-          <p className="text-center text-muted-foreground">Sem tarefas para exibir</p>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  return (
-    <Card>
-      <CardContent className="p-0">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Título</TableHead>
-              <TableHead>Concluído em</TableHead>
-              <TableHead>Pontuação</TableHead>
-              <TableHead>Pilar</TableHead>
-              <TableHead>Feedback</TableHead>
-              <TableHead>Ações</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {tasks.map(task => (
-              <CompletedTaskRow key={task.id} task={task} />
-            ))}
-          </TableBody>
-        </Table>
-      </CardContent>
-    </Card>
-  );
-};
+export const TasksTable: React.FC<{ tasks: Task[] }> = ({ tasks }) => (
+  <Card>
+    <CardContent className="p-0">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Título</TableHead>
+            <TableHead>Concluído em</TableHead>
+            <TableHead>Pontuação</TableHead>
+            <TableHead>Pilar</TableHead>
+            <TableHead>Feedback</TableHead>
+            <TableHead>Ações</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {tasks.map(task => (
+            <CompletedTaskRow key={task.id} task={task} />
+          ))}
+        </TableBody>
+      </Table>
+    </CardContent>
+  </Card>
+);

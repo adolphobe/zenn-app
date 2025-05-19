@@ -2,7 +2,7 @@
 import { toast } from '@/hooks/use-toast';
 import { v4 as uuidv4 } from 'uuid';
 import { AppDispatch } from '../../types';
-import { toggleTaskHidden as toggleTaskHiddenService } from '@/services/task';
+import { toggleTaskHidden as toggleTaskHiddenService } from '@/services/taskService';
 
 // Esta função é simplificada e focada na comunicação com o serviço e o estado local
 export const toggleTaskHidden = async (dispatch: AppDispatch, id: string) => {

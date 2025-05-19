@@ -1,6 +1,6 @@
 
 import { AppDispatch } from '../../types';
-import { fetchTasks } from '@/services/task';
+import { fetchTasks } from '@/services/taskService';
 
 /**
  * Synchronizes tasks from the database to the local state

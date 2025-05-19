@@ -3,15 +3,14 @@ import { createContext, useContext, ReactNode } from 'react';
 import { toast } from '@/hooks/use-toast';
 import { v4 as uuidv4 } from 'uuid';
 import { Task } from '@/types';
-import { Eye, EyeOff, Check, RefreshCcw } from 'lucide-react';
+import { Eye, EyeOff, Check } from 'lucide-react';
 import { ExtendedToastProps } from '@/types/toast';
 
 // Create context for the toast functions
 type TaskToastContextType = {
   showToggleHiddenToast: (task: Task) => void;
-  showCompletionToast: (task: Task) => void;
+  showCompletionToast: (task: Task) => void;  // Renamed function to match usage
   showTaskRestoredToast: (task: Task) => void;
-  showRestoreToast: (taskTitle: string) => void; // Adicionado este método
 };
 
 const TaskToastContext = createContext<TaskToastContextType | null>(null);
@@ -47,25 +46,13 @@ export const TaskToastProvider = ({ children }: { children: ReactNode }) => {
       id: `task-restored-${task.id}-${Date.now()}`,
       title: "Tarefa restaurada",
       description: `"${task.title}" foi restaurada para a lista de tarefas ativas.`,
-      icon: <RefreshCcw size={16} />
-    });
-  };
-
-  // Toast for generic task restoration (string only version)
-  const showRestoreToast = (taskTitle: string) => {
-    toast({
-      id: `task-restored-${Date.now()}`,
-      title: "Tarefa restaurada",
-      description: `"${taskTitle}" foi restaurada para a lista de tarefas ativas.`,
-      icon: <RefreshCcw size={16} />
     });
   };
 
   const value = {
     showToggleHiddenToast,
-    showCompletionToast,
-    showTaskRestoredToast,
-    showRestoreToast
+    showCompletionToast, // Renamed to match usage
+    showTaskRestoredToast
   };
 
   return (

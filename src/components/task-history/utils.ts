@@ -1,23 +1,12 @@
 
 import { Task } from '@/types';
-import { startOfWeek, startOfMonth, differenceInMonths } from 'date-fns';
+import { format, startOfWeek, startOfMonth, differenceInMonths } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { dateService } from '@/services/dateService';
-import { logDateInfo } from '@/utils/diagnosticLog';
 
-// Cached values to prevent recalculations
-const today = dateService.startOfDay(new Date()) || new Date();
-const thisWeekStart = startOfWeek(today, { locale: ptBR });
-const thisMonthStart = startOfMonth(today);
-
-// Timeline grouping function - optimized for performance
+// Timeline grouping function
 export const groupTasksByTimeline = (tasks: Task[], periodFilter: string = 'all') => {
-  // Early exit if no tasks, prevent further processing
-  if (!tasks || tasks.length === 0) {
-    return [];
-  }
-  
-  // If a specific period filter is active (except custom), return all tasks in a single group
+  // If a specific period filter is active (except custom), return all tasks in a single group without timeline labels
   if (periodFilter !== 'all' && periodFilter !== 'custom') {
     return [{
       label: '',  // Empty label means no timeline division header
@@ -25,37 +14,37 @@ export const groupTasksByTimeline = (tasks: Task[], periodFilter: string = 'all'
     }];
   }
   
+  // Use the current date with timezone support
+  const today = dateService.toTimeZone(new Date()) || new Date();
+  today.setHours(0, 0, 0, 0);
+  
+  const thisWeekStart = startOfWeek(today, { locale: ptBR });
+  const thisMonthStart = startOfMonth(today);
+  
   const groups = {
-    today: { label: 'Hoje', tasks: [] as Task[] },
-    yesterday: { label: 'Ontem', tasks: [] as Task[] },
-    thisWeek: { label: 'Esta semana', tasks: [] as Task[] },
-    thisMonth: { label: 'Este mês', tasks: [] as Task[] },
-    lastMonth: { label: 'Mês passado', tasks: [] as Task[] },
-    twoMonthsAgo: { label: 'Dois meses atrás', tasks: [] as Task[] },
-    older: { label: 'Anteriores', tasks: [] as Task[] },
+    today: { label: 'Hoje', tasks: [] },
+    yesterday: { label: 'Ontem', tasks: [] },
+    thisWeek: { label: 'Esta semana', tasks: [] },
+    thisMonth: { label: 'Este mês', tasks: [] },
+    lastMonth: { label: 'Mês passado', tasks: [] },
+    twoMonthsAgo: { label: 'Dois meses atrás', tasks: [] },
+    older: { label: 'Anteriores', tasks: [] },
   };
   
-  const allTasks = [...tasks]; // Defensive copy
-  
-  allTasks.forEach(task => {
+  tasks.forEach(task => {
     // Skip tasks without completedAt
-    if (!task.completedAt) {
-      groups.older.tasks.push(task);  // Place in "older" as fallback
-      return;
-    }
+    if (!task.completedAt) return;
     
     try {
-      // Parse date only once - reuse the result
-      const completedDate = task.completedAt instanceof Date ? 
-        task.completedAt : 
-        dateService.parseDate(task.completedAt);
+      // Garantir que completedAt seja um objeto Date usando dateService
+      // e converta para o timezone configurado
+      const completedDate = dateService.toTimeZone(task.completedAt);
       
       if (!completedDate) {
         groups.older.tasks.push(task);
         return;
       }
       
-      // Group tasks by date - simplified logic with fewer calculations
       if (dateService.isToday(completedDate)) {
         groups.today.tasks.push(task);
       } else if (dateService.isYesterday(completedDate)) {
@@ -76,8 +65,8 @@ export const groupTasksByTimeline = (tasks: Task[], periodFilter: string = 'all'
         }
       }
     } catch (error) {
-      // Fallback to "older" if date processing fails
-      groups.older.tasks.push(task);
+      console.error("Erro ao processar data de conclusão:", error);
+      groups.older.tasks.push(task); // Fallback to "older" if date parsing fails
     }
   });
   
