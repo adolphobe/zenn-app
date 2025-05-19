@@ -70,10 +70,13 @@ export const addComment = async (dispatch: AppDispatch, taskId: string, text: st
     
     // After comments are updated, refresh task data to ensure sync
     try {
-      // This will trigger a refresh of any React Query hooks observing this task
+      // Changed from 'SYNC_TASK_REQUESTED' to 'UPDATE_TASK' action type
       dispatch({
-        type: 'SYNC_TASK_REQUESTED',
-        payload: taskId
+        type: 'UPDATE_TASK',
+        payload: { 
+          id: taskId, 
+          data: {} // Empty data will just trigger a refresh without changing anything
+        }
       });
     } catch (syncError) {
       console.error('[CommentActions] Error syncing task after comment added:', syncError);
@@ -103,11 +106,14 @@ export const deleteComment = async (dispatch: AppDispatch, taskId: string, comme
     // Update local state
     dispatch({ type: 'DELETE_COMMENT', payload: { taskId, commentId } });
     
-    // Sync task data after comment deletion
+    // Sync task data after comment deletion - Fixed to use UPDATE_TASK type
     try {
       dispatch({
-        type: 'SYNC_TASK_REQUESTED',
-        payload: taskId
+        type: 'UPDATE_TASK',
+        payload: { 
+          id: taskId, 
+          data: {} // Empty data will just trigger a refresh without changing anything
+        }
       });
     } catch (syncError) {
       console.error('[CommentActions] Error syncing task after comment deleted:', syncError);

@@ -21,17 +21,24 @@ import {
 interface TaskCommentsProps {
   taskId: string;
   comments: Comment[];
+  onCommentDeleted?: () => void; // Added callback prop
 }
 
-const TaskComments: React.FC<TaskCommentsProps> = ({ taskId, comments }) => {
+const TaskComments: React.FC<TaskCommentsProps> = ({ taskId, comments, onCommentDeleted }) => {
   const { deleteComment } = useAppContext();
   const [commentToDelete, setCommentToDelete] = useState<string | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [localComments, setLocalComments] = useState<Comment[]>(comments);
+  
+  // Update local comments when props change
+  useEffect(() => {
+    setLocalComments(comments);
+  }, [comments]);
   
   // Add more detailed logging for debugging
   useEffect(() => {
-    console.log(`[TaskComments] Rendering ${comments.length} comments for task ${taskId}`);
-    comments.forEach((comment, index) => {
+    console.log(`[TaskComments] Rendering ${localComments.length} comments for task ${taskId}`);
+    localComments.forEach((comment, index) => {
       console.log(`[TaskComments] Comment ${index}:`, {
         id: comment.id,
         text: comment.text,
@@ -39,7 +46,7 @@ const TaskComments: React.FC<TaskCommentsProps> = ({ taskId, comments }) => {
         userId: comment.userId
       });
     });
-  }, [comments, taskId]);
+  }, [localComments, taskId]);
   
   // Add global CSS for scrollbar
   useEffect(() => {
@@ -99,14 +106,14 @@ const TaskComments: React.FC<TaskCommentsProps> = ({ taskId, comments }) => {
   
   // Effect to scroll to bottom whenever comments change
   useEffect(() => {
-    if (scrollContainerRef.current && comments.length > 0) {
+    if (scrollContainerRef.current && localComments.length > 0) {
       // Scroll to bottom of comments div
       scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight;
       console.log('[TaskComments] Scrolled to bottom of comments container');
     }
-  }, [comments]); // Execute when comments change
+  }, [localComments]); // Execute when comments change
   
-  if (!comments || comments.length === 0) {
+  if (!localComments || localComments.length === 0) {
     console.log('[TaskComments] No comments to display');
     return null;
   }
@@ -114,7 +121,28 @@ const TaskComments: React.FC<TaskCommentsProps> = ({ taskId, comments }) => {
   const handleDeleteComment = (commentId: string) => {
     if (deleteComment) {
       console.log(`[TaskComments] Deleting comment ${commentId} for task ${taskId}`);
-      deleteComment(taskId, commentId);
+      
+      // Update local state immediately for instant UI feedback
+      setLocalComments(prev => prev.filter(comment => comment.id !== commentId));
+      
+      // Delete from database and global state
+      deleteComment(taskId, commentId).then(success => {
+        if (success) {
+          // Notify parent component that a comment was deleted
+          if (onCommentDeleted) {
+            console.log('[TaskComments] Calling onCommentDeleted callback');
+            onCommentDeleted();
+          }
+        } else {
+          // If deletion failed in the backend, restore the comment in the UI
+          console.log('[TaskComments] Comment deletion failed, restoring in UI');
+          const deletedComment = comments.find(c => c.id === commentId);
+          if (deletedComment) {
+            setLocalComments(prev => [...prev, deletedComment]);
+          }
+        }
+      });
+      
       setCommentToDelete(null);
     }
   };
@@ -160,7 +188,7 @@ const TaskComments: React.FC<TaskCommentsProps> = ({ taskId, comments }) => {
         onClick={handleContainerClick}
       >
         <div className="space-y-3 p-4">
-          {comments.map(comment => (
+          {localComments.map(comment => (
             <div 
               key={comment.id} 
               className="bg-gray-50 dark:bg-gray-800 p-3 rounded-md relative"

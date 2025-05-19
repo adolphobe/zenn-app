@@ -63,8 +63,8 @@ const TaskFormTabs: React.FC<TaskFormTabsProps> = ({
     }
   }, [activeTab, commentCount]);
   
-  // Handler for when a comment is added - fixing TypeScript error by returning undefined explicitly
-  const handleCommentAdded = (): undefined => {
+  // Handler for when a comment is added - FIX: removed explicit return undefined
+  const handleCommentAdded = () => {
     console.log('[TaskFormTabs] Comment added callback triggered');
     // Update comment count to trigger scrollToBottom effect
     if (task?.comments) {
@@ -76,7 +76,15 @@ const TaskFormTabs: React.FC<TaskFormTabsProps> = ({
     // Try to scroll to bottom immediately and again after a delay
     scrollToBottom();
     setTimeout(scrollToBottom, 300);
-    return undefined;
+  };
+
+  // Handler for comment deletion to update local state
+  const handleCommentDeleted = () => {
+    console.log('[TaskFormTabs] Comment deleted callback triggered');
+    // Update comment count to reflect deletion
+    if (task?.comments && task.comments.length > 0) {
+      setCommentCount(prevCount => Math.max(0, prevCount - 1));
+    }
   };
   
   // If we're creating a new task (not editing), only show the basic fields
@@ -137,7 +145,11 @@ const TaskFormTabs: React.FC<TaskFormTabsProps> = ({
             })}
             
             {task && task.comments && task.comments.length > 0 ? (
-              <TaskComments taskId={taskId} comments={task.comments} />
+              <TaskComments 
+                taskId={taskId} 
+                comments={task.comments} 
+                onCommentDeleted={handleCommentDeleted}
+              />
             ) : (
               <div className="py-4 text-center text-gray-500 italic">
                 Sem comentários para esta tarefa

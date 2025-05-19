@@ -65,12 +65,28 @@ const TaskCommentsContent: React.FC<TaskCommentsContentProps> = ({ task, onComme
       }
     }, 200);
   };
+  
+  // Handler para quando um comentário é removido
+  const handleCommentDeleted = () => {
+    console.log('[TaskCommentsContent] Comment deleted, updating UI');
+    
+    // Decrement local counter to help UI update immediately
+    setLocalCommentsCount(prev => Math.max(0, prev - 1));
+    
+    // Invalidate queries to refresh task data
+    queryClient.invalidateQueries({ queryKey: ['tasks'] });
+    queryClient.invalidateQueries({ queryKey: ['task', task.id] });
+  };
 
   return (
     <div ref={commentsRef}>
       {hasComments ? (
         <div className="space-y-4">
-          <TaskComments taskId={task.id} comments={task.comments} />
+          <TaskComments 
+            taskId={task.id} 
+            comments={task.comments} 
+            onCommentDeleted={handleCommentDeleted}
+          />
           <CommentForm taskId={task.id} onCommentAdded={handleCommentAdded} />
         </div>
       ) : (
