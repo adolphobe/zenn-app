@@ -1,6 +1,5 @@
-
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import Landing from './pages/Landing';
 import { ThemeProvider } from './components/ui/theme-provider';
 import { AuthProvider } from './context/auth';
@@ -45,22 +44,20 @@ function App() {
                 <TaskProviders>
                   <TaskDataProvider>
                     <UserProvider>
-                      <Router>
-                        <Routes>
-                          <Route path="/" element={<Landing />} />
-                          <Route path="/login" element={<Login />} />
-                          <Route path="/reset-password" element={<ResetPassword />} />
-                          <Route path="/app" element={<ActoApp />} />
-                          <Route element={<PrivateRoute />}>
-                            <Route path="/dashboard" element={<Dashboard />} />
-                            <Route path="/dashboard2" element={<Dashboard2 />} />
-                            <Route path="/task-history" element={<TaskHistory />} />
-                            <Route path="/strategic-review" element={<StrategicReview />} />
-                            <Route path="/settings" element={<Settings />} />
-                          </Route>
-                          <Route path="*" element={<NotFound />} />
-                        </Routes>
-                      </Router>
+                      <Routes>
+                        <Route path="/" element={<Landing />} />
+                        <Route path="/login" element={<Login />} />
+                        <Route path="/reset-password" element={<ResetPassword />} />
+                        <Route path="/app" element={<ActoApp />} />
+                        <Route element={<PrivateRoute />}>
+                          <Route path="/dashboard" element={<Dashboard />} />
+                          <Route path="/dashboard2" element={<Dashboard2 />} />
+                          <Route path="/task-history" element={<TaskHistory />} />
+                          <Route path="/strategic-review" element={<StrategicReview />} />
+                          <Route path="/settings" element={<Settings />} />
+                        </Route>
+                        <Route path="*" element={<NotFound />} />
+                      </Routes>
                     </UserProvider>
                   </TaskDataProvider>
                 </TaskProviders>
