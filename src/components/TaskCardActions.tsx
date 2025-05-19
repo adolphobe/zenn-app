@@ -71,7 +71,7 @@ const TaskCardActions: React.FC<TaskCardActionsProps> = ({
         size="sm"
         onClick={onCompleteTask}
         title="Completar"
-        className="bg-white text-gray-700 hover:text-gray-900 border-gray-200 hover:bg-gray-50 hover:border-gray-300 dark:bg-gray-800 dark:text-gray-300 dark:hover:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-750 dark:hover:border-gray-600"
+        className="btn-green"
       >
         <CheckSquare size={16} />
         <span className="ml-1">Completar</span>
