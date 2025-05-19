@@ -1,8 +1,6 @@
 
 import React from 'react';
 import { Task } from '@/types';
-import PillarAnalysisCard from './PillarAnalysisCard';
-import FeedbackAnalysisCard from './FeedbackAnalysisCard';
 import CompletionTimeAnalysisCard from './CompletionTimeAnalysisCard';
 import { motion } from 'framer-motion';
 
@@ -22,17 +20,8 @@ const TaskAnalyticsSection: React.FC<TaskAnalyticsSectionProps> = ({
     visible: { 
       opacity: 1,
       transition: { 
-        staggerChildren: 0.1
+        duration: 0.4
       }
-    }
-  };
-  
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: { 
-      y: 0, 
-      opacity: 1,
-      transition: { duration: 0.4 }
     }
   };
 
@@ -45,17 +34,11 @@ const TaskAnalyticsSection: React.FC<TaskAnalyticsSectionProps> = ({
     >
       <h2 className="text-xl font-bold mb-4">Análise de Tarefas</h2>
       
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <motion.div variants={itemVariants}>
-          <PillarAnalysisCard tasks={tasks} />
-        </motion.div>
-        
-        <motion.div variants={itemVariants}>
-          <FeedbackAnalysisCard tasks={tasks} />
-        </motion.div>
-      </div>
-      
-      <motion.div variants={itemVariants}>
+      <motion.div 
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
         <CompletionTimeAnalysisCard tasks={tasks} />
       </motion.div>
     </motion.div>
