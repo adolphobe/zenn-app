@@ -1,3 +1,4 @@
+
 /* Imports primeiro */
 @import url('./components/task/task-card.css');
 
@@ -201,5 +202,39 @@
   .btn-black:disabled {
     opacity: 0.5 !important;
     cursor: not-allowed !important;
+  }
+  
+  /* Classes de Menu - Tema claro */
+  .menu-item-active {
+    color: #3265de !important;
+    background-color: #edf2ff !important;
+  }
+  
+  .menu-item:hover:not(.menu-item-active) {
+    color: #3265de !important;
+    background-color: #edf2ff !important;
+  }
+  
+  /* Classes de Menu - Tema escuro */
+  .dark .menu-item-active {
+    color: #a9bde8 !important;
+    background-color: #1b2845 !important;
+  }
+  
+  .dark .menu-item:hover:not(.menu-item-active) {
+    color: #a9bde8 !important;
+    background-color: #1b2845 !important;
+  }
+  
+  /* Classes de Filtro - Tema claro */
+  .filter-item-enabled {
+    background-color: #f1f4fe !important;
+    color: #8f77d7 !important;
+  }
+  
+  /* Classes de Filtro - Tema escuro */
+  .dark .filter-item-enabled {
+    background-color: #1d1933 !important;
+    color: #8f77d7 !important;
   }
 }
