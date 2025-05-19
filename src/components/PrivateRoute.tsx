@@ -1,5 +1,5 @@
 
-import { Outlet, useLocation, Navigate } from 'react-router-dom';
+import { Outlet, useLocation, Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/auth';
 import Sidebar from './Sidebar';
 import { useSidebar } from '@/context/hooks';
@@ -12,37 +12,49 @@ import { logWarn, logInfo, logError } from '@/utils/logUtils';
 
 /**
  * PrivateRoute - Protects routes that require authentication
- * Logs and redirects when not authenticated
+ * Improved to handle URL duplication issues
  */
 export const PrivateRoute = () => {
   const { isAuthenticated, isLoading } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const { isOpen: sidebarOpen, open: openSidebar, isMobile } = useSidebar();
   const [authChecked, setAuthChecked] = useState(false);
   const [localAuthCheck, setLocalAuthCheck] = useState<boolean | null>(null);
 
-  // Check if a logout is in progress to prevent login/logout loops
+  // Check for logout in progress to prevent login/logout loops
   const logoutInProgress = localStorage.getItem('logout_in_progress') === 'true';
   
   // Check for duplicated routes like `/task-history#/task-history`
   useEffect(() => {
     const currentPath = location.pathname;
+    const currentHash = location.hash;
     const currentUrl = window.location.href;
     
-    // Detect duplicated path patterns
+    // Detect duplicated path patterns and fix automatically
     if (currentUrl.includes(`${currentPath}#${currentPath}`)) {
-      logWarn('ROUTE', `Detected duplicated path: ${currentUrl}`, { path: currentPath });
+      logWarn('ROUTE', `Detected and fixing duplicated path: ${currentUrl}`, { path: currentPath });
       
-      // We could implement automatic correction here if needed
-      // For now, just log the issue
+      // Extract the correct path 
+      const correctPath = currentHash.substring(1); // Remove the # character
+      
+      // Use navigate to fix the URL (without adding an entry to history)
+      setTimeout(() => {
+        navigate(correctPath, { replace: true });
+      }, 0);
     }
-  }, [location]);
+    
+    // Special handling for task-history route (common problem area)
+    if (currentPath === "/task-history" || currentHash === "#/task-history") {
+      logInfo("ROUTE", "Accessing task history page", { path: currentPath, hash: currentHash });
+    }
+  }, [location, navigate]);
 
   // Additional check for authentication using localStorage directly
   useEffect(() => {
     const checkLocalAuth = async () => {
       try {
-        // Se um logout estiver em andamento, não tente verificar autenticação
+        // Don't check authentication if logout in progress
         if (logoutInProgress) {
           setLocalAuthCheck(false);
           return;
@@ -76,14 +88,6 @@ export const PrivateRoute = () => {
     }
   }, [isLoading]);
 
-  logInfo(`PrivateRoute`, `Verificando autenticação em ${location.pathname}`, { 
-    isAuthenticated, 
-    isLoading, 
-    authChecked, 
-    logoutInProgress, 
-    localAuthCheck 
-  });
-
   // Show loading state while checking authentication
   if (isLoading || !authChecked || localAuthCheck === null) {
     logInfo("PrivateRoute", "Ainda carregando estado de autenticação...");
@@ -92,20 +96,12 @@ export const PrivateRoute = () => {
     </div>;
   }
 
-  // Log auth status and redirect if not authenticated or logout in progress
   // Use both checks - from context AND from local storage
   const actuallyAuthenticated = isAuthenticated && !logoutInProgress && localAuthCheck === true;
   
   if (!actuallyAuthenticated) {
     const reason = logoutInProgress ? "logout em andamento" : "não autenticado";
     logError(`PrivateRoute`, `ERRO DE AUTENTICAÇÃO: Usuário ${reason} em ${location.pathname}`);
-    logError("PrivateRoute", "DETALHES TÉCNICOS: Redirecionando para /login", { 
-      isAuthenticated, 
-      isLoading, 
-      localAuthCheck, 
-      logoutInProgress, 
-      path: location.pathname 
-    });
     
     // Clear any lingering session data if we detect a logout in progress
     if (logoutInProgress) {
