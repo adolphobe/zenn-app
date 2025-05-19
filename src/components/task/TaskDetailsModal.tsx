@@ -66,7 +66,7 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
   if (!task) {
     return (
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="bg-white dark:bg-gray-800 rounded-xl">
+        <DialogContent className="bg-white dark:bg-gray-800 rounded-xl max-w-3xl sm:max-w-lg md:max-w-2xl lg:max-w-3xl">
           <DialogHeader>
             <DialogTitle className="text-xl font-semibold">{title}</DialogTitle>
           </DialogHeader>
@@ -84,20 +84,16 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent 
-        className={`bg-white dark:bg-gray-800 rounded-xl ${
-          isMobile ? 'w-full max-w-lg' : 'w-full max-w-3xl'
-        }`}
+        className="bg-white dark:bg-gray-800 rounded-xl max-w-3xl sm:max-w-lg md:max-w-2xl lg:max-w-3xl p-0"
+        style={{ width: "95vw", maxHeight: isMobile ? "90vh" : "85vh" }}
       >
-        <DialogHeader>
+        <DialogHeader className="p-4 sm:p-6">
           <DialogTitle className="text-xl font-semibold">{title}</DialogTitle>
         </DialogHeader>
         
-        <div 
-          className="flex-grow overflow-hidden" 
-          style={{ maxHeight: isMobile ? '60vh' : '70vh' }}
-        >
-          <AlwaysVisibleScrollArea className="h-full">
-            <div className="p-5 space-y-6">
+        <div className="flex-grow overflow-hidden">
+          <AlwaysVisibleScrollArea className="h-[calc(90vh-12rem)] sm:h-[calc(85vh-14rem)]">
+            <div className="px-4 sm:px-6 py-2 sm:py-4 space-y-6">
               {/* Cabeçalho com informações da tarefa */}
               <TaskDetailsHeader task={task} />
               
@@ -130,7 +126,7 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
           </AlwaysVisibleScrollArea>
         </div>
         
-        <DialogFooter className="flex justify-between">
+        <DialogFooter className="flex items-center justify-between p-4 sm:p-6 border-t">
           {showRestoreButton && onRestore && (
             <Button
               variant="outline"

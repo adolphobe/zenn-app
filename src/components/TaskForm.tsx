@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { Task } from '../types';
 import { TaskFormData } from '../types';
@@ -9,6 +10,7 @@ import { useTabNavigation } from '../context/hooks/useTabNavigation';
 import { useIsMobile } from '../hooks/use-mobile';
 import { useTaskDataContext } from '@/context/TaskDataProvider';
 import { dateService } from '@/services/dateService';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 interface TaskFormProps {
   onClose: () => void;
@@ -69,103 +71,28 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, initialData, taskId, task,
     }
   };
 
-  // Capture mousedown on backdrop to prevent the default click behavior
-  const handleBackdropMouseDown = useCallback((e: React.MouseEvent) => {
-    // Only close if the click is directly on the backdrop element
-    if (e.target === e.currentTarget) {
-      console.log('Backdrop clicked directly, will close modal on mouseup');
-      
-      // Create a function to handle the mouseup event
-      const handleMouseUp = (upEvent: MouseEvent) => {
-        console.log('Mouse up detected, checking if still on backdrop');
-        
-        // Get the element under the mouse on mouseup
-        const elementUnderMouse = document.elementFromPoint(upEvent.clientX, upEvent.clientY);
-        
-        // Check if the mouseup is still on the backdrop
-        if (elementUnderMouse === e.currentTarget) {
-          console.log('Mouse up on backdrop, closing modal');
-          onClose();
-        } else {
-          console.log('Mouse up not on backdrop, modal stays open');
-        }
-        
-        // Remove the listener after handling
-        document.removeEventListener('mouseup', handleMouseUp);
-      };
-      
-      // Add a one-time mouseup listener to the document
-      document.addEventListener('mouseup', handleMouseUp);
-    }
-  }, [onClose]);
-  
-  // Prevent all click events from the modal itself from bubbling up
-  const handleModalClick = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-    console.log('Modal container clicked, preventing propagation');
-  }, []);
-
-  useEffect(() => {
-    // Add a global event handler for the Escape key
-    const handleEscapeKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        console.log('Escape key pressed, closing modal');
-        onClose();
-      }
-    };
-
-    window.addEventListener('keydown', handleEscapeKey);
-    
-    // Cleanup
-    return () => {
-      window.removeEventListener('keydown', handleEscapeKey);
-    };
-  }, [onClose]);
-
   return (
-    <div 
-      className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in" 
-      onMouseDown={handleBackdropMouseDown}
-      data-testid="task-form-backdrop"
-    >
-      <div 
-        className={`bg-white dark:bg-gray-800 rounded-xl shadow-lg ${isMobile ? 'w-full max-w-lg' : 'w-full max-w-3xl'} flex flex-col`}
-        onClick={handleModalClick}
-        onMouseDown={(e) => {
-          e.stopPropagation();
-          console.log('Preventing mousedown propagation from modal container');
+    <Dialog open={true} onOpenChange={() => onClose()}>
+      <DialogContent 
+        className="max-w-3xl sm:max-w-lg md:max-w-2xl lg:max-w-3xl p-0"
+        style={{ 
+          width: "95vw", 
+          maxHeight: isMobile ? "90vh" : "85vh"
         }}
-        data-testid="task-form-modal"
-        style={{ maxHeight: isMobile ? '80vh' : '70vh' }}
       >
-        {/* Header */}
-        <div className="flex justify-between items-center p-5 border-b shrink-0">
-          <h2 className="text-xl font-semibold">{isEditing ? 'Editar Tarefa' : 'Nova Tarefa'}</h2>
-          <button 
-            onClick={(e) => {
-              e.stopPropagation();
-              onClose();
-            }} 
-            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-            aria-label="Close modal"
-          >
-            <X size={20} />
-          </button>
-        </div>
+        <DialogHeader className="p-4 sm:p-6 border-b">
+          <DialogTitle className="text-xl font-semibold">
+            {isEditing ? 'Editar Tarefa' : 'Nova Tarefa'}
+          </DialogTitle>
+        </DialogHeader>
         
-        {/* Scrollable content */}
         <div className="flex-grow overflow-hidden">
-          <AlwaysVisibleScrollArea className="h-full">
+          <AlwaysVisibleScrollArea className="h-[calc(85vh-8rem)] sm:h-[calc(85vh-10rem)]">
             <form 
-              onSubmit={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                handleSubmit(e);
-              }} 
-              className="p-5 space-y-6"
-              onClick={(e) => e.stopPropagation()}
+              onSubmit={handleSubmit} 
+              className="p-4 sm:p-6 space-y-5"
             >
-              <div onClick={(e) => e.stopPropagation()}>
+              <div>
                 <label htmlFor="title" className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
                   Título da Tarefa
                 </label>
@@ -175,7 +102,6 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, initialData, taskId, task,
                   name="title"
                   value={formData.title}
                   onChange={handleChange}
-                  onClick={(e) => e.stopPropagation()}
                   className="w-full p-3 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
                   placeholder="O que precisa ser feito?"
                   required
@@ -198,8 +124,8 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, initialData, taskId, task,
             </form>
           </AlwaysVisibleScrollArea>
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 };
 

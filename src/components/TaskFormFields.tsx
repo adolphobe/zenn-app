@@ -24,88 +24,34 @@ const TaskFormFields: React.FC<TaskFormFieldsProps> = ({
   handleDateChange, 
   setFormData 
 }) => {
-  const totalScore = formData.consequenceScore + formData.prideScore + formData.constructionScore;
+  const totalScore = 
+    (formData.consequenceScore || 0) + 
+    (formData.prideScore || 0) + 
+    (formData.constructionScore || 0);
+  
   const isMobile = useIsMobile();
   
-  // Mobile layout (vertical)
-  if (isMobile) {
-    return (
-      <>
-        <div className="mb-2">
-          <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
-            Avalie o peso da tarefa:
-          </label>
-        </div>
-        
-        <RatingSlider
-          value={formData.consequenceScore}
-          onChange={(value) => setFormData(prev => ({ ...prev, consequenceScore: value }))}
-          color="blue"
-          label="Risco"
-          description={CONSEQUENCE_PHRASES}
-          className="!mt-[12px]" // O "!" força a prioridade em Tailwind
-        />
-
-        <RatingSlider
-          value={formData.prideScore}
-          onChange={(value) => setFormData(prev => ({ ...prev, prideScore: value }))}
-          color="orange"
-          label="Orgulho"
-          description={PRIDE_PHRASES}
-        />
-
-        <RatingSlider
-          value={formData.constructionScore}
-          onChange={(value) => setFormData(prev => ({ ...prev, constructionScore: value }))}
-          color="green"
-          label="Crescimento pessoal"
-          description={CONSTRUCTION_PHRASES}
-        />
-
-        <div>
-          <label htmlFor="idealDate" className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
-            A partir de quando você quer se ver envolvido com isso?
-          </label>
-          <input
-            type="datetime-local"
-            id="idealDate"
-            name="idealDate"
-            value={dateService.formatForDateTimeInput(formData.idealDate)}
-            onChange={handleDateChange}
-            className="w-full p-3 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-          />
-        </div>
-
-        <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg shadow-sm">
-          <TaskScoreDisplay score={totalScore} />
-        </div>
-      </>
-    );
-  }
-  
-  // Desktop layout (horizontal)
   return (
     <div className="space-y-6">
-      {/* Left column with ratings */}
-      <div className="grid grid-cols-2 gap-6">
-        <div className="space-y-6">
-          <div className="mb-2">
-            <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
-              Avalie o peso da tarefa:
-            </label>
-          </div>
-          
+      <div className="mb-2">
+        <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+          Avalie o peso da tarefa:
+        </label>
+      </div>
+      
+      {/* Layout responsivo que se ajusta entre vertical (mobile) e horizontal (desktop) */}
+      <div className={`${isMobile ? 'space-y-5' : 'grid grid-cols-1 lg:grid-cols-2 gap-5'}`}>
+        <div className="space-y-5">
           <RatingSlider
-            value={formData.consequenceScore}
+            value={formData.consequenceScore || 3}
             onChange={(value) => setFormData(prev => ({ ...prev, consequenceScore: value }))}
             color="blue"
             label="Risco"
             description={CONSEQUENCE_PHRASES}
-            className="!mt-[12px]" // O "!" força a prioridade em Tailwind
           />
 
           <RatingSlider
-            value={formData.prideScore}
+            value={formData.prideScore || 3}
             onChange={(value) => setFormData(prev => ({ ...prev, prideScore: value }))}
             color="orange"
             label="Orgulho"
@@ -113,7 +59,7 @@ const TaskFormFields: React.FC<TaskFormFieldsProps> = ({
           />
 
           <RatingSlider
-            value={formData.constructionScore}
+            value={formData.constructionScore || 3}
             onChange={(value) => setFormData(prev => ({ ...prev, constructionScore: value }))}
             color="green"
             label="Crescimento pessoal"
@@ -121,14 +67,11 @@ const TaskFormFields: React.FC<TaskFormFieldsProps> = ({
           />
         </div>
         
-        {/* Right column with score and date */}
-        <div className="space-y-6 mt-[33px]">
-          {/* Score display now comes first */}
-          <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg shadow-sm p-[34px] rounded-[18px]">
+        <div className={`space-y-5 ${isMobile ? 'mt-5' : 'lg:mt-0'}`}>
+          <div className={`p-4 bg-gray-50 dark:bg-gray-900 rounded-lg shadow-sm ${isMobile ? '' : 'lg:mb-8'}`}>
             <TaskScoreDisplay score={totalScore} />
           </div>
           
-          {/* Date input comes second */}
           <div>
             <label htmlFor="idealDate" className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
               A partir de quando você quer se ver envolvido com isso?

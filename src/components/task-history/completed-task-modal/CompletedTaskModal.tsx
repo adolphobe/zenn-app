@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Task } from '@/types';
 import { AlwaysVisibleScrollArea } from '@/components/ui/always-visible-scroll-area';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -26,7 +26,7 @@ const CompletedTaskModal: React.FC<CompletedTaskModalProps> = ({ task, isOpen, o
   // Se não tiver uma tarefa, não renderiza o conteúdo interno
   if (!task) return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-white dark:bg-gray-800 rounded-xl">
+      <DialogContent className="bg-white dark:bg-gray-800 rounded-xl max-w-3xl sm:max-w-lg md:max-w-2xl lg:max-w-3xl">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold">Tarefa Concluída</DialogTitle>
         </DialogHeader>
@@ -61,14 +61,17 @@ const CompletedTaskModal: React.FC<CompletedTaskModalProps> = ({ task, isOpen, o
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className={`bg-white dark:bg-gray-800 rounded-xl ${isMobile ? 'w-full max-w-lg' : 'w-full max-w-3xl'}`}>
-        <DialogHeader>
+      <DialogContent 
+        className="bg-white dark:bg-gray-800 rounded-xl max-w-3xl sm:max-w-lg md:max-w-2xl lg:max-w-3xl p-0"
+        style={{ width: "95vw", maxHeight: isMobile ? "90vh" : "85vh" }}
+      >
+        <DialogHeader className="p-4 sm:p-6">
           <DialogTitle className="text-xl font-semibold">Tarefa Concluída</DialogTitle>
         </DialogHeader>
         
-        <div className="flex-grow overflow-hidden" style={{ maxHeight: isMobile ? '60vh' : '70vh' }}>
-          <AlwaysVisibleScrollArea className="h-full">
-            <div className="p-5 space-y-6">
+        <div className="flex-grow overflow-hidden">
+          <AlwaysVisibleScrollArea className="h-[calc(90vh-12rem)] sm:h-[calc(85vh-14rem)]">
+            <div className="px-4 sm:px-6 py-2 sm:py-4 space-y-6">
               <TaskDetails task={task} />
               
               <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -94,18 +97,15 @@ const CompletedTaskModal: React.FC<CompletedTaskModalProps> = ({ task, isOpen, o
                   </div>
                 </TabsContent>
               </Tabs>
-
-              <div className="mt-6 flex justify-end">
-                <Button
-                  onClick={onClose}
-                  className="px-5 py-2.5 text-sm font-medium"
-                >
-                  Fechar
-                </Button>
-              </div>
             </div>
           </AlwaysVisibleScrollArea>
         </div>
+        
+        <DialogFooter className="p-4 sm:p-6 border-t">
+          <Button onClick={onClose}>
+            Fechar
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

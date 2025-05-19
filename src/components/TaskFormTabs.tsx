@@ -49,33 +49,10 @@ const TaskFormTabs: React.FC<TaskFormTabsProps> = ({
     }
   }, [activeTab, task?.comments?.length]);
   
-  const handleTabValueChange = (value: string) => {
-    console.log('Tab value changed to:', value);
-    setActiveTab(value);
-  };
-  
-  // This function is critical for preventing propagation
-  const handleTabClick = (e: React.MouseEvent, value: string) => {
-    console.log('Tab clicked:', value);
-    
-    // Stop all event propagation
-    e.preventDefault();
-    e.stopPropagation();
-    
-    // Set the active tab
-    setActiveTab(value);
-  };
-  
-  // This ensures clicks within tab content don't bubble up
-  const handleContentClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    console.log('Tab content clicked, preventing propagation');
-  };
-  
   // If we're creating a new task (not editing), only show the basic fields
   if (!isEditing && !taskId) {
     return (
-      <div className="space-y-6" onClick={handleContentClick}>
+      <div className="space-y-6">
         <TaskFormFields 
           formData={formData} 
           handleChange={handleChange} 
@@ -90,43 +67,19 @@ const TaskFormTabs: React.FC<TaskFormTabsProps> = ({
   return (
     <Tabs 
       value={activeTab} 
-      onValueChange={handleTabValueChange}
+      onValueChange={setActiveTab}
       className="w-full"
-      onClick={(e) => {
-        e.stopPropagation();
-        console.log('Tabs container clicked, preventing propagation');
-      }}
     >
-      <TabsList 
-        className="grid w-full grid-cols-2 mb-4"
-        onClick={(e) => {
-          e.stopPropagation();
-          console.log('TabsList clicked, preventing propagation');
-        }}
-        onMouseDown={(e) => {
-          e.stopPropagation();
-          console.log('TabsList mousedown, preventing propagation');
-        }}
-      >
+      <TabsList className="grid w-full grid-cols-2 mb-4">
         <TabsTrigger 
           value="levels"
           data-testid="levels-tab"
-          onClick={(e) => handleTabClick(e, "levels")}
-          onMouseDown={(e) => {
-            e.stopPropagation();
-            console.log('Levels tab mousedown, preventing propagation');
-          }}
         >
           Níveis
         </TabsTrigger>
         <TabsTrigger 
           value="comments"
           data-testid="comments-tab"
-          onClick={(e) => handleTabClick(e, "comments")}
-          onMouseDown={(e) => {
-            e.stopPropagation();
-            console.log('Comments tab mousedown, preventing propagation');
-          }}
         >
           Comentários
         </TabsTrigger>
@@ -135,7 +88,6 @@ const TaskFormTabs: React.FC<TaskFormTabsProps> = ({
       <TabsContent 
         value="levels" 
         className="space-y-6"
-        onClick={handleContentClick}
       >
         <TaskFormFields 
           formData={formData} 
@@ -145,25 +97,15 @@ const TaskFormTabs: React.FC<TaskFormTabsProps> = ({
         />
       </TabsContent>
       
-      <TabsContent 
-        value="comments"
-        onClick={handleContentClick}
-      >
+      <TabsContent value="comments">
         {taskId ? (
-          <div 
-            ref={commentsContainerRef}
-            className="space-y-4"
-            onClick={(e) => {
-              e.stopPropagation();
-              console.log('Comments content div clicked, preventing propagation');
-            }}
-          >
+          <div ref={commentsContainerRef} className="space-y-4">
             {task && task.comments && task.comments.length > 0 && (
               <TaskComments taskId={taskId} comments={task.comments} />
             )}
             <CommentForm 
               taskId={taskId}
-              onCommentAdded={scrollToBottom} // Adicionar callback para rolar após adicionar comentário
+              onCommentAdded={scrollToBottom}
             />
           </div>
         ) : (
