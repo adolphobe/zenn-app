@@ -106,41 +106,73 @@
 @layer components {
   /* Botão Verde */
   .btn-green {
-    @apply !bg-[#009300] !text-white !hover:bg-[#00a600] !transition-colors;
+    background-color: #009300 !important;
+    color: white !important;
+    transition: all 0.2s ease-in-out;
+  }
+
+  .btn-green:hover {
+    background-color: #00a600 !important;
   }
 
   .btn-green:disabled {
-    @apply !opacity-50 !cursor-not-allowed;
+    opacity: 0.5 !important;
+    cursor: not-allowed !important;
   }
 
   /* Botão Vermelho */
   .btn-red {
-    @apply !bg-[#d22a1e] !text-white !hover:bg-[#dd3024] !transition-colors;
+    background-color: #d22a1e !important;
+    color: white !important;
+    transition: all 0.2s ease-in-out;
+  }
+
+  .btn-red:hover {
+    background-color: #dd3024 !important;
   }
 
   .btn-red:disabled {
-    @apply opacity-50 cursor-not-allowed;
+    opacity: 0.5 !important;
+    cursor: not-allowed !important;
   }
 
   /* Botão Azul */
   .btn-blue {
-    @apply bg-[#0b82e0] text-white hover:bg-[#0f86e5] transition-colors;
+    background-color: #0b82e0 !important;
+    color: white !important;
+    transition: all 0.2s ease-in-out;
+  }
+
+  .btn-blue:hover {
+    background-color: #0f86e5 !important;
   }
 
   .btn-blue:disabled {
-    @apply opacity-50 cursor-not-allowed;
+    opacity: 0.5 !important;
+    cursor: not-allowed !important;
   }
 
   /* Botão Preto */
   .btn-black {
-    @apply bg-gray-900 text-white hover:bg-gray-800 transition-colors;
+    background-color: #111827 !important; /* gray-900 */
+    color: white !important;
+    transition: all 0.2s ease-in-out;
+  }
+
+  .btn-black:hover {
+    background-color: #1f2937 !important; /* gray-800 */
   }
 
   .dark .btn-black {
-    @apply bg-gray-800 text-white hover:bg-gray-700;
+    background-color: #1f2937 !important; /* gray-800 */
+  }
+
+  .dark .btn-black:hover {
+    background-color: #374151 !important; /* gray-700 */
   }
 
   .btn-black:disabled {
-    @apply opacity-50 cursor-not-allowed;
+    opacity: 0.5 !important;
+    cursor: not-allowed !important;
   }
 }
