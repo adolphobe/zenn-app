@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from './ui/button';
 import { useAppContext } from '@/context/AppContext';
@@ -56,7 +57,7 @@ const CommentForm: React.FC<CommentFormProps> = ({ taskId, onCommentAdded }) => 
       e.preventDefault(); // Prevent line break
       
       // Check if the comment is not empty
-      if (commentText.trim() && addComment && !isSubmitting) {
+      if (commentText.trim() && !isSubmitting) {
         handleSubmit(e as any);
       }
     }
