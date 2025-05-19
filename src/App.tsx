@@ -62,9 +62,8 @@ function App() {
                         <Route element={<PrivateRoute />}>
                           <Route path="/dashboard" element={<Dashboard />} />
                           <Route path="/dashboard2" element={<Dashboard2 />} />
-                          {/* Corrigindo a rota de histórico de tarefas */}
+                          {/* Manter apenas uma rota para o histórico de tarefas */}
                           <Route path="/task-history" element={<TaskHistory />} />
-                          <Route path="task-history" element={<TaskHistory />} />
                           <Route path="/strategic-review" element={<StrategicReview />} />
                           <Route path="/settings" element={<Settings />} />
                         </Route>

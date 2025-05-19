@@ -8,12 +8,11 @@ import './styles/animations.css';
 import './styles/task-score.css'; // Added task score styling
 import './components/task/task-card.css';
 
-// Configuração corrigida do HashRouter para evitar duplicação de rotas
+// Configuração do HashRouter otimizada
 const router = createHashRouter([
   {
-    path: '/*',
-    element: <App />,
-    // Removendo basename para evitar duplicação de rotas
+    path: '/*', // Este pattern captura todas as rotas na aplicação
+    element: <App />
   },
 ]);
 

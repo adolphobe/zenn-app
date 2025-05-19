@@ -4,7 +4,6 @@ import { useAppContext } from '@/context/AppContext';
 import { useAuth } from '@/context/auth';
 
 // Import refactored hooks
-import { useCompletedTasks } from '@/components/task-history/hooks/useCompletedTasks';
 import { useTaskFilters } from '@/components/task-history/hooks/useTaskFilters';
 import { useTaskPagination } from '@/components/task-history/hooks/useTaskPagination';
 
@@ -27,9 +26,20 @@ const TaskHistory = () => {
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('grid');
   const [error, setError] = useState<string | null>(null);
   
-  // Use the TaskDataContext instead of useCompletedTasks
+  // Use the TaskDataContext for completed tasks
   const { completedTasks, completedTasksLoading } = useTaskDataContext();
   const isLoading = completedTasksLoading || authLoading;
+  
+  // Initialize state variables for filters
+  const [searchQuery, setSearchQuery] = useState('');
+  const [periodFilter, setPeriodFilter] = useState('all');
+  const [scoreFilter, setScoreFilter] = useState('all');
+  const [feedbackFilter, setFeedbackFilter] = useState('all');
+  const [pillarFilter, setPillarFilter] = useState('all');
+  const [startDate, setStartDate] = useState<Date | undefined>(undefined);
+  const [endDate, setEndDate] = useState<Date | undefined>(undefined);
+  const [sortBy, setSortBy] = useState('newest');
+  const [showFilters, setShowFilters] = useState(false);
   
   useEffect(() => {
     console.log('TaskHistory: Montado, verificando autenticação...', { isAuthenticated, authLoading });
@@ -51,67 +61,45 @@ const TaskHistory = () => {
     }
   }, [isAuthenticated, authLoading, completedTasks]);
   
-  // Usar um try/catch para envolver o uso dos hooks de filtro e paginação
-  // para capturar possíveis erros na manipulação de datas
+  // Process filters and pagination
   let filteredTasks = [];
   let sortedTasks = [];
   let groupedTasks = [];
   let paginatedTasks = [];
   let currentPage = 1;
   let totalPages = 1;
-  let searchQuery = '';
-  let periodFilter = 'all';
-  let showFilters = false;
-  let scoreFilter = 'all';
-  let feedbackFilter = 'all';
-  let pillarFilter = 'all';
-  let startDate = null;
-  let endDate = null;
-  let sortBy = 'newest';
-  
-  const setSearchQuery = () => {};
-  const setPeriodFilter = () => {};
-  const setScoreFilter = () => {};
-  const setFeedbackFilter = () => {};
-  const setPillarFilter = () => {};
-  const setStartDate = () => {};
-  const setEndDate = () => {};
-  const setSortBy = () => {};
-  const setShowFilters = () => {};
-  const handlePageChange = () => {};
-  const getPageNumbers = () => [];
+  let pageNumbers: (number | string)[] = [];
+  let handlePageChange = (page: number) => {};
   
   try {
-    // Usar os hooks de filtro e paginação se tivermos tarefas para processar
+    // Use the filter hook with our state values
     if (completedTasks.length > 0) {
-      const filters = useTaskFilters(completedTasks);
-      searchQuery = filters.searchQuery;
-      periodFilter = filters.periodFilter;
-      scoreFilter = filters.scoreFilter;
-      feedbackFilter = filters.feedbackFilter;
-      pillarFilter = filters.pillarFilter;
-      startDate = filters.startDate;
-      endDate = filters.endDate;
-      sortBy = filters.sortBy;
-      showFilters = filters.showFilters;
+      const filters = useTaskFilters(
+        completedTasks,
+        {
+          searchQuery,
+          periodFilter,
+          scoreFilter,
+          feedbackFilter,
+          pillarFilter,
+          startDate,
+          endDate,
+          sortBy,
+          showFilters
+        }
+      );
+      
       filteredTasks = filters.filteredTasks;
       sortedTasks = filters.sortedTasks;
       
-      // Spread operators para copiar métodos
-      ({
-        setSearchQuery, setPeriodFilter, setScoreFilter,
-        setFeedbackFilter, setPillarFilter, setStartDate,
-        setEndDate, setSortBy, setShowFilters
-      } = filters);
-      
-      // Agora usar o hook de paginação com os resultados filtrados
+      // Use the pagination hook with filtered results
       const pagination = useTaskPagination(sortedTasks, periodFilter);
       currentPage = pagination.currentPage;
       totalPages = pagination.totalPages;
       paginatedTasks = pagination.paginatedTasks;
       groupedTasks = pagination.groupedTasks;
       handlePageChange = pagination.handlePageChange;
-      getPageNumbers = pagination.getPageNumbers;
+      pageNumbers = pagination.getPageNumbers();
     }
   } catch (err) {
     console.error('Erro ao processar tarefas no TaskHistory:', err);
@@ -158,7 +146,7 @@ const TaskHistory = () => {
       <div className="flex flex-col space-y-4">
         <h1 className="text-2xl font-bold">Histórico de Tarefas</h1>
         
-        {/* Pass filtered tasks to TaskHistoryStats instead of all completed tasks */}
+        {/* Pass filtered tasks to TaskHistoryStats */}
         {sortedTasks.length > 0 && (
           <TaskHistoryStats filteredTasks={sortedTasks} />
         )}
@@ -220,7 +208,7 @@ const TaskHistory = () => {
             currentPage={currentPage}
             totalPages={totalPages}
             handlePageChange={handlePageChange}
-            pageNumbers={getPageNumbers()}
+            pageNumbers={pageNumbers}
           />
         )}
       </div>
