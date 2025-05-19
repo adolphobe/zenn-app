@@ -19,26 +19,6 @@ export const TaskGrid: React.FC<TaskGridProps> = ({
   onSelectTask, 
   onRestoreTask 
 }) => {
-  // Helper to determine dominant pillar
-  const getDominantPillar = (task: Task) => {
-    const scores = [
-      { name: 'risco', value: task.consequenceScore },
-      { name: 'orgulho', value: task.prideScore },
-      { name: 'crescimento', value: task.constructionScore },
-    ];
-    const max = scores.reduce((prev, current) => 
-      (prev.value > current.value) ? prev : current
-    );
-    return max.name;
-  };
-
-  // Visual styles per pillar
-  const pillarColors: Record<string, string> = {
-    risco: 'bg-orange-100 text-orange-800 border-orange-200',
-    orgulho: 'bg-purple-100 text-purple-800 border-purple-200',
-    crescimento: 'bg-blue-100 text-blue-800 border-blue-200',
-  };
-
   // Visual styles per feedback type
   const feedbackColors: Record<string, string> = {
     transformed: 'bg-[#deffe0] text-[#3d8c40] border-[#a8d9aa]',
@@ -50,14 +30,6 @@ export const TaskGrid: React.FC<TaskGridProps> = ({
     transformed: 'Foi transformador terminar',
     relief: 'Tive alívio ao finalizar',
     obligation: 'Terminei por obrigação'
-  };
-
-  // Determine border color based on task score
-  const getBorderColor = (score: number) => {
-    if (score >= 12) return 'border-l-green-500';
-    if (score >= 9) return 'border-l-blue-500';
-    if (score >= 6) return 'border-l-orange-500';
-    return 'border-l-gray-300';
   };
 
   const containerVariants = {
@@ -95,12 +67,9 @@ export const TaskGrid: React.FC<TaskGridProps> = ({
       animate="visible"
     >
       {tasks.map((task) => {
-        const dominantPillar = getDominantPillar(task);
-        const borderColorClass = getBorderColor(task.totalScore);
-
         return (
           <motion.div key={task.id} variants={itemVariants}>
-            <Card className={`mb-3 border-l-4 ${borderColorClass} hover:bg-muted/10 transition-colors shadow-sm hover:shadow-md`}>
+            <Card className="mb-3 border-l-4 border-l-green-500 hover:bg-muted/10 transition-colors shadow-sm hover:shadow-md">
               <CardContent className="p-4">
                 <div 
                   className="cursor-pointer"
@@ -125,13 +94,6 @@ export const TaskGrid: React.FC<TaskGridProps> = ({
                         {feedbackLabels[task.feedback] || '-'}
                       </Badge>
                     )}
-                    
-                    <Badge
-                      className={pillarColors[dominantPillar] || 'bg-gray-100 text-gray-800'}
-                      variant="outline"
-                    >
-                      {dominantPillar}
-                    </Badge>
                   </div>
                 </div>
                 

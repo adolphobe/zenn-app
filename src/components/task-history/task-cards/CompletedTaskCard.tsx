@@ -59,39 +59,6 @@ export const CompletedTaskCard: React.FC<CompletedTaskCardProps> = ({ task }) =>
     }
   }, [task.completedAt, task.completed, task.id]);
 
-  // Determine dominant pillar based on scores
-  const getDominantPillar = () => {
-    const scores = [
-      { name: 'risco', value: task.consequenceScore },
-      { name: 'orgulho', value: task.prideScore },
-      { name: 'crescimento', value: task.constructionScore },
-    ];
-    const max = scores.reduce((prev, current) => 
-      (prev.value > current.value) ? prev : current
-    );
-    return max.name;
-  };
-
-  // Determine border color based on task score
-  const getBorderColor = () => {
-    if (task.totalScore >= 12) { // Critical
-      return 'border-l-red-300';
-    } else if (task.totalScore >= 9) { // Important
-      return 'border-l-orange-300';
-    } else if (task.totalScore >= 6) { // Moderate
-      return 'border-l-blue-300';
-    } else {
-      return 'border-l-gray-300'; // Default
-    }
-  };
-
-  const dominantPillar = getDominantPillar();
-  const pillarColors = {
-    risco: 'bg-orange-100 text-orange-800 border-orange-200',
-    orgulho: 'bg-purple-100 text-purple-800 border-purple-200',
-    crescimento: 'bg-blue-100 text-blue-800 border-blue-200',
-  };
-
   const feedbackColors = {
     transformed: 'bg-[#deffe0] text-[#3d8c40] border-[#a8d9aa]',
     relief: 'bg-[#e2f2ff] text-[#2970a8] border-[#a3d0f0]',
@@ -133,7 +100,7 @@ export const CompletedTaskCard: React.FC<CompletedTaskCardProps> = ({ task }) =>
   return (
     <>
       <Card 
-        className={`mb-3 border-l-4 ${getBorderColor()}`}
+        className="mb-3 border-l-4 border-l-green-500"
         onClick={() => toggleTaskExpanded(task.id)}
       >
         <CardContent className="pt-4">
@@ -162,12 +129,6 @@ export const CompletedTaskCard: React.FC<CompletedTaskCardProps> = ({ task }) =>
                   {feedbackLabels[task.feedback] || '-'}
                 </Badge>
               )}
-              <Badge
-                className={`${pillarColors[dominantPillar] || 'bg-gray-100 text-gray-800'} hidden`}
-                variant="outline"
-              >
-                {dominantPillar}
-              </Badge>
               <Badge variant="outline" className="bg-gray-100 text-gray-800">
                 {task.totalScore}/15
               </Badge>
