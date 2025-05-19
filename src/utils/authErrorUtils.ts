@@ -32,9 +32,6 @@ interface AuthErrorDetails {
 export const categorizeAuthError = (error: any): AuthErrorDetails => {
   const errorMessage = error?.message || error?.error_description || 'Erro desconhecido';
   
-  console.log("[AuthErrorUtils] Categorizando erro:", errorMessage);
-  console.log("[AuthErrorUtils] DETALHES EM PORTUGUÊS: Analisando o erro de autenticação para fornecer informações mais precisas");
-  
   // Invalid login credentials
   if (errorMessage.includes('Invalid login credentials') || 
       errorMessage.includes('Invalid email or password')) {
@@ -181,8 +178,7 @@ export const logAuthError = (errorDetails: AuthErrorDetails): void => {
       ? console.warn 
       : console.log;
   
-  logFn(`[Auth Error][${type}] ${message}`, originalError);
-  console.log(`[Auth Error] DETALHES EM PORTUGUÊS: Tipo - ${type}, Mensagem - ${message}`);
+  logFn(`[Auth Error][${type}] ${message}`);
 };
 
 /**

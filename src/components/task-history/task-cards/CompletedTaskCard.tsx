@@ -1,236 +1,136 @@
-
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState } from 'react';
 import { Task } from '@/types';
+import { formatDistanceToNow } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
+import { CheckCircle2, Clock4, Edit, ListChecks, MessageSquare, User2 } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { RefreshCw, Eye } from 'lucide-react';
-import { useAppContext } from '@/context/AppContext';
-import { useExpandedTask } from '@/context/hooks';
-import TaskPillarDetails from '@/components/TaskPillarDetails';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { ScrollArea } from "@/components/ui/scroll-area"
 import TaskComments from '@/components/TaskComments';
-import RestoreTaskConfirmation from '../RestoreTaskConfirmation';
-import CompletedTaskModal from '../completed-task-modal';
-import DateTimeDisplay from '@/components/DateTimeDisplay';
-import { dateService } from '@/services/dateService';
-import { logDateInfo } from '@/utils/diagnosticLog';
-import { logError } from '@/utils/logUtils';
-import { useQueryClient } from '@tanstack/react-query';
 
 interface CompletedTaskCardProps {
   task: Task;
+  onEdit?: (task: Task) => void;
 }
 
-export const CompletedTaskCard: React.FC<CompletedTaskCardProps> = ({ task }) => {
-  const { expandedTaskId, toggleTaskExpanded, isTaskExpanded } = useExpandedTask();
-  const expanded = isTaskExpanded(task.id);
-  const [showRestoreConfirmation, setShowRestoreConfirmation] = useState(false);
-  const [showTaskModal, setShowTaskModal] = useState(false);
-  const [dateError, setDateError] = useState<string | null>(null);
-  const queryClient = useQueryClient();
-
-  // Validate and format the completion date
-  const completionDate = useMemo(() => {
-    try {
-      // If no completedAt, default to current date for completed tasks
-      if (!task.completedAt && task.completed) {
-        return new Date();
-      }
-      
-      // Parse the completedAt date
-      const parsedDate = task.completedAt instanceof Date ? 
-        task.completedAt : 
-        dateService.parseDate(task.completedAt);
-      
-      // Check if date is valid
-      if (!parsedDate || isNaN(parsedDate.getTime())) {
-        setDateError(`Data inválida para tarefa ${task.id}`);
-        return new Date(); // Fallback to current date
-      }
-      
-      return parsedDate;
-    } catch (error) {
-      const errorMsg = `Erro ao processar data de conclusão: ${
-        error instanceof Error ? error.message : String(error)
-      }`;
-      setDateError(errorMsg);
-      logError('CompletedTaskCard', errorMsg, { taskId: task.id });
-      return new Date(); // Fallback to current date
-    }
-  }, [task.completedAt, task.completed, task.id]);
-
-  // Determine dominant pillar based on scores
-  const getDominantPillar = () => {
-    const scores = [
-      { name: 'risco', value: task.consequenceScore },
-      { name: 'orgulho', value: task.prideScore },
-      { name: 'crescimento', value: task.constructionScore },
-    ];
-    const max = scores.reduce((prev, current) => 
-      (prev.value > current.value) ? prev : current
-    );
-    return max.name;
-  };
-
-  // Determine border color based on task score
-  const getBorderColor = () => {
-    if (task.totalScore >= 12) { // Critical
-      return 'border-l-red-300';
-    } else if (task.totalScore >= 9) { // Important
-      return 'border-l-orange-300';
-    } else if (task.totalScore >= 6) { // Moderate
-      return 'border-l-blue-300';
-    } else {
-      return 'border-l-gray-300'; // Default
-    }
-  };
-
-  const dominantPillar = getDominantPillar();
-  const pillarColors = {
-    risco: 'bg-orange-100 text-orange-800 border-orange-200',
-    orgulho: 'bg-purple-100 text-purple-800 border-purple-200',
-    crescimento: 'bg-blue-100 text-blue-800 border-blue-200',
-  };
-
-  const feedbackColors = {
-    transformed: 'bg-[#deffe0] text-[#3d8c40] border-[#a8d9aa]',
-    relief: 'bg-[#e2f2ff] text-[#2970a8] border-[#a3d0f0]',
-    obligation: 'bg-[#f1f1f1] text-[#6e6e6e] border-[#d0d0d0]',
-  };
-
-  // Consistent feedback mapping across the application
-  const feedbackLabels = {
-    transformed: 'Foi transformador terminar',
-    relief: 'Tive alívio ao finalizar',
-    obligation: 'Terminei por obrigação'
-  };
-
-  const handleRestore = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setShowRestoreConfirmation(true);
-  };
-
-  const handleView = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setShowTaskModal(true);
-  };
-
-  // Prevent expanded content from collapsing card on click
-  const handleExpandedContentClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-  };
-  
-  // Handle comment deletion in the card
-  const handleCommentDeleted = useCallback(() => {
-    console.log('[CompletedTaskCard] Comment deleted, refreshing task data');
-    
-    // Refresh task data across the application
-    queryClient.invalidateQueries({ queryKey: ['tasks'] });
-    queryClient.invalidateQueries({ queryKey: ['task', task.id] });
-    queryClient.invalidateQueries({ queryKey: ['completedTasks'] });
-  }, [queryClient, task.id]);
+export const CompletedTaskCard: React.FC<CompletedTaskCardProps> = ({
+  task,
+  onEdit,
+}) => {
+  const [open, setOpen] = useState(false);
 
   return (
-    <>
-      <Card 
-        className={`mb-3 border-l-4 ${getBorderColor()}`}
-        onClick={() => toggleTaskExpanded(task.id)}
-      >
-        <CardContent className="pt-4">
-          <div className="flex justify-between items-start">
-            <div>
-              <h3 className="font-medium text-gray-900 dark:text-gray-100 opacity-70">{task.title}</h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                Concluída em {dateError ? (
-                  <span title={dateError} className="text-orange-500">
-                    (data indisponível)
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
+      <div className="p-4">
+        <div className="flex items-center justify-between">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+            {task.title}
+          </h3>
+          <Badge className="bg-green-500 text-white">Concluída</Badge>
+        </div>
+        <p className="mt-2 text-gray-600 dark:text-gray-400">{task.description}</p>
+        <div className="mt-4 flex flex-wrap gap-2">
+          {task.tags && task.tags.map((tag) => (
+            <Badge key={tag} variant="secondary">{tag}</Badge>
+          ))}
+        </div>
+        <div className="mt-4 flex items-center text-gray-500 dark:text-gray-300 text-sm">
+          <User2 className="mr-2 h-4 w-4" />
+          <span>{task.assignee?.name || 'Sem responsável'}</span>
+        </div>
+        <div className="mt-2 flex items-center text-gray-500 dark:text-gray-300 text-sm">
+          <Clock4 className="mr-2 h-4 w-4" />
+          <span>
+            Concluída{' '}
+            {formatDistanceToNow(new Date(task.endDate || ''), {
+              addSuffix: true,
+              locale: ptBR,
+            })}
+          </span>
+        </div>
+      </div>
+      <div className="border-t border-gray-200 dark:border-gray-700 p-4 flex justify-between items-center">
+        <Button variant="ghost" size="sm" onClick={() => onEdit?.(task)}>
+          <Edit className="mr-2 h-4 w-4" />
+          <span>Editar</span>
+        </Button>
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="outline" size="sm">
+              <MessageSquare className="mr-2 h-4 w-4" />
+              <span>Ver detalhes</span>
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>{task.title}</DialogTitle>
+              <DialogDescription>
+                Detalhes completos da tarefa concluída.
+              </DialogDescription>
+            </DialogHeader>
+            <ScrollArea className="h-[400px] w-full pr-4">
+              <div className="grid gap-4 py-4">
+                <div className="flex items-center space-x-2">
+                  <CheckCircle2 className="h-4 w-4 text-green-500" />
+                  <span className="text-sm font-medium">Status:</span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">Concluída</span>
+                </div>
+                <div>
+                  <span className="text-sm font-medium">Descrição:</span>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">{task.description}</p>
+                </div>
+                <div>
+                  <span className="text-sm font-medium">Responsável:</span>
+                  <div className="flex items-center space-x-2">
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src={task.assignee?.avatarUrl || ''} alt={task.assignee?.name || 'Avatar'} />
+                      <AvatarFallback>{task.assignee?.name?.substring(0, 2).toUpperCase() || 'UN'}</AvatarFallback>
+                    </Avatar>
+                    <span className="text-sm text-gray-500 dark:text-gray-400">{task.assignee?.name || 'Sem responsável'}</span>
+                  </div>
+                </div>
+                <div>
+                  <span className="text-sm font-medium">Tags:</span>
+                  <div className="flex flex-wrap gap-2">
+                    {task.tags && task.tags.map((tag) => (
+                      <Badge key={tag} variant="secondary">{tag}</Badge>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <span className="text-sm font-medium">Data de Conclusão:</span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">
+                    {new Date(task.endDate || '').toLocaleDateString(
+                      'pt-BR',
+                      {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric',
+                      }
+                    )}
                   </span>
-                ) : task.idealDate ? (
-                  <DateTimeDisplay 
-                    date={completionDate} 
-                    showRelative={false} 
-                    fallback="(data não disponível)"
-                  />
-                ) : (
-                  <span className="text-gray-400">SEM PRAZO</span>
-                )}
-              </p>
-            </div>
-            <div className="flex gap-2">
-              {task.feedback && (
-                <Badge className={feedbackColors[task.feedback] || 'bg-gray-100 text-gray-800'} variant="outline">
-                  {feedbackLabels[task.feedback] || '-'}
-                </Badge>
-              )}
-              <Badge
-                className={`${pillarColors[dominantPillar] || 'bg-gray-100 text-gray-800'} hidden`}
-                variant="outline"
-              >
-                {dominantPillar}
-              </Badge>
-              <Badge variant="outline" className="bg-gray-100 text-gray-800">
-                {task.totalScore}/15
-              </Badge>
-            </div>
-          </div>
-
-          {expanded && (
-            <div className="mt-4 animate-fade-in" onClick={handleExpandedContentClick}>
-              <TaskPillarDetails task={task} />
-              
-              {/* Display comments if they exist */}
-              {task.comments && task.comments.length > 0 && (
-                <div className="mt-4">
+                </div>
+                <div>
+                  <span className="text-sm font-medium">Comentários:</span>
                   <TaskComments 
                     taskId={task.id} 
-                    comments={task.comments} 
-                    onCommentDeleted={handleCommentDeleted}
+                    comments={task.comments || []} 
                   />
                 </div>
-              )}
-              
-              <div className="mt-4 flex justify-end gap-2">
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="flex items-center gap-1"
-                  onClick={handleView}
-                >
-                  <Eye size={16} />
-                  Visualizar
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="flex items-center gap-1"
-                  onClick={handleRestore}
-                >
-                  <RefreshCw size={16} />
-                  Restaurar
-                </Button>
               </div>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {showTaskModal && (
-        <CompletedTaskModal 
-          task={task} 
-          isOpen={showTaskModal} 
-          onClose={() => setShowTaskModal(false)} 
-        />
-      )}
-
-      {showRestoreConfirmation && (
-        <RestoreTaskConfirmation
-          task={task}
-          isOpen={showRestoreConfirmation}
-          onClose={() => setShowRestoreConfirmation(false)}
-        />
-      )}
-    </>
+            </ScrollArea>
+          </DialogContent>
+        </Dialog>
+      </div>
+    </div>
   );
 };
-
-export default CompletedTaskCard;

@@ -101,62 +101,6 @@ export const logTaskStateChange = (
 };
 
 /**
- * Helper to log dates in consistent format with deduplication
- */
-export const logDateInfo = (category: string, label: string, date: any) => {
-  if (!ENABLE_DIAGNOSTIC_LOGS) return;
-  
-  // Create a string representation for deduplication
-  let dateStr = "Invalid Date";
-  let dateObj: Date | null = null;
-  let isValid = false;
-  
-  try {
-    if (date instanceof Date) {
-      dateObj = date;
-      dateStr = date.toISOString();
-      isValid = !isNaN(date.getTime());
-    } else if (date) {
-      if (typeof date === 'object') {
-        // For objects, just stringify for logging
-        dateStr = JSON.stringify(date);
-      } else {
-        // Try to parse as date
-        dateObj = new Date(date);
-        dateStr = String(date);
-        isValid = dateObj instanceof Date && !isNaN(dateObj.getTime());
-        if (isValid) {
-          dateStr = dateObj.toISOString();
-        }
-      }
-    }
-  } catch (e) {
-    dateStr = `Error parsing: ${date}`;
-  }
-  
-  // Only log problem dates to reduce noise
-  if (!isValid) {
-    throttledLog(
-      `DIAG:DATE:${category}`, 
-      `${label}: ${dateStr}`, 
-      {
-        original: date,
-        isValid: false
-      },
-      LogLevel.WARN // Use WARN for invalid dates
-    );
-  } else {
-    // For valid dates, use DEBUG level
-    throttledLog(
-      `DIAG:DATE:${category}`, 
-      `${label}: ${dateStr}`, 
-      null,
-      LogLevel.DEBUG
-    );
-  }
-};
-
-/**
  * Enable/disable specific diagnostic log categories
  */
 export const disableDateLogs = () => {

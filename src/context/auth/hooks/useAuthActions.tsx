@@ -67,28 +67,27 @@ export function useAuthActions({ setCurrentUser, setSession, setIsLoading }: Aut
   
   // Logout function
   const logout = async (): Promise<void> => {
-    console.log("[AuthProvider] Iniciando processo completo de logout do usuário");
+    console.log("[AuthProvider] Iniciando processo de logout");
     
     try {
       setIsLoading(true);
       
-      // Primeiro marque que um logout está em andamento para evitar redirecionamentos indevidos
+      // Marcar que um logout está em andamento para evitar redirecionamentos indevidos
       localStorage.setItem('logout_in_progress', 'true');
       
-      // Primeiro limpar estados locais 
+      // Limpar estados locais 
       setCurrentUser(null);
       setSession(null);
       
-      // Remover quaisquer dados de autenticação armazenados localmente
+      // Remover dados de autenticação armazenados localmente
       localStorage.removeItem('sb-wbvxnapruffchikhrqrs-auth-token');
       localStorage.removeItem('supabase.auth.token');
       
-      // Chamar signOut do Supabase com escopo explícito para garantir que todos os dispositivos sejam deslogados
+      // Chamar signOut do Supabase
       const { error } = await supabase.auth.signOut({ scope: 'global' });
       
       if (error) {
-        console.error("[AuthProvider] Erro no logout:", error.message);
-        console.error("[AuthProvider] DETALHES EM PORTUGUÊS: Erro ao tentar encerrar a sessão:", error.message);
+        console.error("[AuthProvider] Erro no logout");
         
         const errorDetails = processAuthError(error);
         
@@ -106,8 +105,7 @@ export function useAuthActions({ setCurrentUser, setSession, setIsLoading }: Aut
         });
       }
     } catch (error) {
-      console.error("[AuthProvider] Erro durante logout:", error);
-      console.error("[AuthProvider] DETALHES EM PORTUGUÊS: Ocorreu um erro inesperado ao tentar encerrar a sessão");
+      console.error("[AuthProvider] Erro durante logout");
       
       const errorDetails = processAuthError(error);
     } finally {
@@ -115,9 +113,6 @@ export function useAuthActions({ setCurrentUser, setSession, setIsLoading }: Aut
       setCurrentUser(null);
       setSession(null);
       setIsLoading(false);
-      
-      // Remova a flag de logout quando terminar (isso será feito na rota de login)
-      // localStorage.removeItem('logout_in_progress');
     }
   };
 

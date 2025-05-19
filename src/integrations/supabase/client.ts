@@ -18,28 +18,21 @@ export const supabase = createClient<Database>(
       persistSession: true,
       autoRefreshToken: true,
       detectSessionInUrl: true, // Important for password reset and OAuth flows
-      debug: true, // Enable debug logs to help troubleshoot authentication issues
+      debug: false, // Disable debug logs to reduce console noise
       flowType: 'pkce', // Use PKCE flow for better security
     },
   }
 );
 
-// Helper to check session state with more detailed logging
+// Helper to check session state with minimal logging
 export const checkAndLogSessionStatus = async () => {
   try {
     const { data, error } = await supabase.auth.getSession();
     
     if (error) {
-      console.error("[SupabaseClient] Erro ao verificar sessão:", error);
-      console.error("[SupabaseClient] DETALHES EM PORTUGUÊS: Falha ao verificar estado da sessão");
+      console.error("[SupabaseClient] Erro ao verificar sessão");
       return { isAuthenticated: false, error };
     }
-    
-    console.log("[SupabaseClient] Status da sessão:", data.session ? "Ativa" : "Inativa");
-    console.log("[SupabaseClient] DETALHES EM PORTUGUÊS:", 
-      data.session 
-        ? "Sessão válida encontrada" 
-        : "Nenhuma sessão ativa encontrada");
     
     return { 
       isAuthenticated: !!data.session,
@@ -47,8 +40,7 @@ export const checkAndLogSessionStatus = async () => {
       session: data.session
     };
   } catch (e) {
-    console.error("[SupabaseClient] Erro inesperado ao verificar sessão:", e);
-    console.error("[SupabaseClient] DETALHES EM PORTUGUÊS: Ocorreu um erro inesperado ao verificar o estado de autenticação");
+    console.error("[SupabaseClient] Erro ao verificar sessão");
     return { isAuthenticated: false, error: e };
   }
 };
