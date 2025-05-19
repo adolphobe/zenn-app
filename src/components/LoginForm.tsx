@@ -45,7 +45,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
                   <FormControl>
                     <Input
                       placeholder="E-mail"
-                      className="pl-10 h-12 bg-white border-blue-100 focus:border-blue-300 shadow-sm"
+                      className="pl-10 h-12 bg-white border-blue-100 focus:border-blue-300 shadow-sm text-[#313131]"
                       autoComplete="email"
                       {...field}
                     />
@@ -70,7 +70,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
                     <Input
                       type={showPassword ? "text" : "password"}
                       placeholder="Senha"
-                      className="pl-10 pr-10 h-12 bg-white border-blue-100 focus:border-blue-300 shadow-sm"
+                      className="pl-10 pr-10 h-12 bg-white border-blue-100 focus:border-blue-300 shadow-sm text-[#313131]"
                       autoComplete="current-password"
                       {...field}
                     />
