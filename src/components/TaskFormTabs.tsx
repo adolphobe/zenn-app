@@ -1,5 +1,4 @@
-
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { Task, TaskFormData } from '../types';
 import TaskFormFields from './TaskFormFields';
 import TaskComments from './TaskComments';

@@ -1,11 +1,8 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../context/auth';
 import { Button } from './ui/button';
-import { toast } from '@/hooks/use-toast';
-import { useComments } from '@/hooks/useComments';
 import { AlertCircle } from 'lucide-react';
-import { logComment } from '@/utils/commentLogger';
 
 interface CommentFormProps {
   taskId: string;
@@ -14,99 +11,29 @@ interface CommentFormProps {
 
 const CommentForm: React.FC<CommentFormProps> = ({ taskId, onCommentAdded }) => {
   const [text, setText] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { isAuthenticated, currentUser } = useAuth();
-  const { addComment, isSubmitting } = useComments(taskId);
-  const [authChecked, setAuthChecked] = useState(false);
-  
-  // Log inicial ao montar o componente
-  useEffect(() => {
-    logComment.render('CommentForm', { 
-      taskId, 
-      authState: { isAuthenticated, userId: currentUser?.id } 
-    });
-  }, []);
-  
-  // Verificação detalhada do status de autenticação
-  useEffect(() => {
-    logComment.authCheck(isAuthenticated, currentUser?.id);
-    
-    // Verificar a presença do token no localStorage
-    const hasToken = !!localStorage.getItem('sb-wbvxnapruffchikhrqrs-auth-token');
-    logComment.api.response('authTokenCheck', {
-      hasTokenInLocalStorage: hasToken,
-      tokenValue: hasToken ? '[REDACTED FOR SECURITY]' : 'none'
-    });
-    
-    setAuthChecked(true);
-  }, [isAuthenticated, currentUser, taskId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!text.trim()) {
-      logComment.validation('Tentativa de enviar comentário vazio');
-      
-      toast({
-        title: "Comentário vazio",
-        description: "Por favor, digite um comentário.",
-        variant: "destructive"
-      });
       return;
     }
     
-    if (!isAuthenticated || !currentUser) {
-      logComment.authError('Tentativa de comentar sem estar autenticado');
-      
-      // Verificar detalhes da sessão para diagnóstico
-      const sessionToken = localStorage.getItem('sb-wbvxnapruffchikhrqrs-auth-token');
-      logComment.api.response('sessionCheck', { 
-        sessionExists: sessionToken ? 'yes' : 'no',
-        isAuthenticated, 
-        hasUser: !!currentUser
-      });
-      
-      toast({
-        title: "Não autenticado",
-        description: "Você precisa estar conectado para adicionar comentários.",
-        variant: "destructive"
-      });
-      return;
-    }
+    // Simulate submission (visual only)
+    setIsSubmitting(true);
     
-    logComment.attempt(taskId, text, currentUser.id);
-    
-    // Usando a versão aprimorada da função addComment com mais detalhes de erro
-    addComment(text, {
-      onSuccess: () => {
-        logComment.success(taskId, 'form-success');
-        setText(''); // Limpar o formulário em caso de sucesso
-        
-        if (onCommentAdded) {
-          logComment.info('COMMENT_CALLBACK', 'Chamando callback onCommentAdded');
-          // Garantir que o callback seja chamado após um delay para permitir a atualização dos dados
-          setTimeout(() => {
-            onCommentAdded();
-          }, 100);
-        }
-      },
-      onError: (error) => {
-        logComment.error('Erro na chamada addComment do formulário', error);
-        const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
-        
-        // Toast mais detalhado para erros
-        toast({
-          title: "Erro ao adicionar comentário",
-          description: `Não foi possível adicionar o comentário: ${errorMessage}`,
-          variant: "destructive"
-        });
+    setTimeout(() => {
+      setIsSubmitting(false);
+      setText('');
+      
+      // For UI feedback only
+      if (onCommentAdded) {
+        onCommentAdded();
       }
-    });
+    }, 500);
   };
-
-  if (!authChecked) {
-    logComment.info('COMMENT_RENDER', 'Aguardando verificação de autenticação');
-    return <div className="text-center p-2">Verificando autenticação...</div>;
-  }
 
   return (
     <form onSubmit={handleSubmit} className="mt-2">

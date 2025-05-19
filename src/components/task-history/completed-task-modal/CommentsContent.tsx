@@ -1,9 +1,8 @@
 
-import React, { useRef, useCallback } from 'react';
+import React, { useRef } from 'react';
 import { Task } from '@/types';
 import TaskComments from '@/components/TaskComments';
 import CommentForm from '@/components/CommentForm';
-import { useQueryClient } from '@tanstack/react-query';
 
 interface CommentsContentProps {
   task: Task;
@@ -12,7 +11,6 @@ interface CommentsContentProps {
 
 const CommentsContent: React.FC<CommentsContentProps> = ({ task, onCommentAdded }) => {
   const commentsContainerRef = useRef<HTMLDivElement | null>(null);
-  const queryClient = useQueryClient();
   
   // Verificar se a tarefa existe e tem um ID válido
   if (!task || !task.id) {
@@ -25,29 +23,14 @@ const CommentsContent: React.FC<CommentsContentProps> = ({ task, onCommentAdded 
 
   const hasComments = task.comments && task.comments.length > 0;
   
-  // Handler para quando um comentário é adicionado
-  const handleCommentAdded = useCallback((): void => {
-    console.log('[CommentsContent] Comment added');
-    
-    // Invalidate queries to refresh task data
-    queryClient.invalidateQueries({ queryKey: ['tasks'] });
-    queryClient.invalidateQueries({ queryKey: ['task', task.id] });
-    queryClient.invalidateQueries({ queryKey: ['completedTasks'] });
+  // Handler for visual feedback only
+  const handleCommentAdded = (): void => {
+    console.log('Comment form submitted (visual only)');
     
     if (onCommentAdded) {
       onCommentAdded();
     }
-  }, [queryClient, task.id, onCommentAdded]);
-  
-  // Handler para quando um comentário é excluído
-  const handleCommentDeleted = useCallback((): void => {
-    console.log('[CommentsContent] Comment deleted');
-    
-    // Invalidate queries to refresh task data
-    queryClient.invalidateQueries({ queryKey: ['tasks'] });
-    queryClient.invalidateQueries({ queryKey: ['task', task.id] });
-    queryClient.invalidateQueries({ queryKey: ['completedTasks'] });
-  }, [queryClient, task.id]);
+  };
 
   return (
     <div ref={commentsContainerRef} className="space-y-4">
@@ -55,7 +38,6 @@ const CommentsContent: React.FC<CommentsContentProps> = ({ task, onCommentAdded 
         <TaskComments 
           taskId={task.id} 
           comments={task.comments}
-          onCommentDeleted={handleCommentDeleted} 
         />
       )}
       <CommentForm 
