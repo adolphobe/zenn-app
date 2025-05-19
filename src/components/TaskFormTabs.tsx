@@ -63,8 +63,8 @@ const TaskFormTabs: React.FC<TaskFormTabsProps> = ({
     }
   }, [activeTab, commentCount]);
   
-  // Handler for when a comment is added - fixed to no longer return undefined
-  const handleCommentAdded = () => {
+  // Handler for when a comment is added
+  const handleCommentAdded = (): void => {
     console.log('[TaskFormTabs] Comment added callback triggered');
     // Update comment count to trigger scrollToBottom effect
     if (task?.comments) {
@@ -79,7 +79,7 @@ const TaskFormTabs: React.FC<TaskFormTabsProps> = ({
   };
 
   // Handler for comment deletion to update local state
-  const handleCommentDeleted = () => {
+  const handleCommentDeleted = (): void => {
     console.log('[TaskFormTabs] Comment deleted callback triggered');
     // Update comment count to reflect deletion
     if (task?.comments && task.comments.length > 0) {

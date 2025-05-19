@@ -39,7 +39,7 @@ const TaskCommentsContent: React.FC<TaskCommentsContentProps> = ({ task, onComme
   const hasComments = task.comments && task.comments.length > 0;
   
   // Handler para quando um comentário é adicionado
-  const handleCommentAdded = () => {
+  const handleCommentAdded = (): void => {
     console.log('[TaskCommentsContent] Comment added, calling parent callback');
     
     // Increment local counter to help UI update immediately
@@ -67,7 +67,7 @@ const TaskCommentsContent: React.FC<TaskCommentsContentProps> = ({ task, onComme
   };
   
   // Handler para quando um comentário é removido
-  const handleCommentDeleted = () => {
+  const handleCommentDeleted = (): void => {
     console.log('[TaskCommentsContent] Comment deleted, updating UI');
     
     // Decrement local counter to help UI update immediately

@@ -118,32 +118,38 @@ const TaskComments: React.FC<TaskCommentsProps> = ({ taskId, comments, onComment
     return null;
   }
   
-  const handleDeleteComment = (commentId: string) => {
+  const handleDeleteComment = async (commentId: string) => {
     if (deleteComment) {
       console.log(`[TaskComments] Deleting comment ${commentId} for task ${taskId}`);
       
       // Update local state immediately for instant UI feedback
       setLocalComments(prev => prev.filter(comment => comment.id !== commentId));
       
-      // Delete from database and global state - Make sure we properly handle the Promise
-      if (deleteComment) {
-        deleteComment(taskId, commentId)
-          .then(success => {
-            if (success) {
-              // Notify parent component that a comment was deleted
-              if (onCommentDeleted) {
-                console.log('[TaskComments] Calling onCommentDeleted callback');
-                onCommentDeleted();
-              }
-            } else {
-              // If deletion failed in the backend, restore the comment in the UI
-              console.log('[TaskComments] Comment deletion failed, restoring in UI');
-              const deletedComment = comments.find(c => c.id === commentId);
-              if (deletedComment) {
-                setLocalComments(prev => [...prev, deletedComment]);
-              }
-            }
-          });
+      try {
+        // Delete from database and global state - properly awaiting the promise
+        const success = await deleteComment(taskId, commentId);
+        
+        if (success) {
+          // Notify parent component that a comment was deleted
+          if (onCommentDeleted) {
+            console.log('[TaskComments] Calling onCommentDeleted callback');
+            onCommentDeleted();
+          }
+        } else {
+          // If deletion failed in the backend, restore the comment in the UI
+          console.log('[TaskComments] Comment deletion failed, restoring in UI');
+          const deletedComment = comments.find(c => c.id === commentId);
+          if (deletedComment) {
+            setLocalComments(prev => [...prev, deletedComment]);
+          }
+        }
+      } catch (error) {
+        console.error('[TaskComments] Error deleting comment:', error);
+        // Restore the comment in the UI since deletion failed
+        const deletedComment = comments.find(c => c.id === commentId);
+        if (deletedComment) {
+          setLocalComments(prev => [...prev, deletedComment]);
+        }
       }
       
       setCommentToDelete(null);
