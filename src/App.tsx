@@ -14,6 +14,7 @@ import { Toaster } from './components/ui/toaster';
 import Dashboard from './components/Dashboard';
 import TaskHistory from './pages/TaskHistory';
 import StrategicReview from './pages/StrategicReview';
+import Dashboard2 from './components/Dashboard2';
 import ResetPassword from './pages/ResetPassword';
 import Settings from './pages/Settings';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -25,16 +26,17 @@ import { TooltipProvider } from './components/ui/tooltip';
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 30000,
-      retry: 1,
+      staleTime: 30000, // Consider data fresh for 30 seconds
+      retry: 1, // Retry failed queries once
       refetchOnWindowFocus: true,
     },
   },
 });
 
 function App() {
-  // Initialize date settings
+  // Moved useEffect inside the component where it belongs
   React.useEffect(() => {
+    // Inicializar configurações de data na montagem do aplicativo
     import('./utils/dateUtils').then(({ initializeDateTimeSettings }) => {
       initializeDateTimeSettings();
       console.log('Configurações de data e hora inicializadas');
@@ -59,9 +61,9 @@ function App() {
                         <Route path="/app" element={<ActoApp />} />
                         <Route element={<PrivateRoute />}>
                           <Route path="/dashboard" element={<Dashboard />} />
-                          {/* Removed dashboard2 route */}
+                          <Route path="/dashboard2" element={<Dashboard2 />} />
+                          {/* Manter apenas uma rota para o histórico de tarefas */}
                           <Route path="/task-history" element={<TaskHistory />} />
-                          {/* No longer need duplicate task-history route without leading slash */}
                           <Route path="/strategic-review" element={<StrategicReview />} />
                           <Route path="/settings" element={<Settings />} />
                         </Route>

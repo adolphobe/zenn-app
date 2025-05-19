@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useAppContext } from '@/context/AppContext';
 import { useAuth } from '@/context/auth';
 import { useTaskDataContext } from '@/context/TaskDataProvider';
-import { logInfo } from '@/utils/logUtils';
+import { logInfo, logError } from '@/utils/logUtils';
 import { TaskHistoryContent } from './TaskHistoryContent';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Loader2 } from 'lucide-react';
@@ -16,14 +16,40 @@ const TaskHistoryPage = () => {
   const { completedTasks, completedTasksLoading } = useTaskDataContext();
   const isLoading = completedTasksLoading || authLoading;
   
-  // Log page load only once to reduce console noise
+  // Check for URL duplication and log relevant info at mount
   useEffect(() => {
-    logInfo('TaskHistory', 'Página de histórico de tarefas carregada', {
-      autenticado: isAuthenticated,
-      carregando: isLoading,
-      tarefas: completedTasks.length
+    const currentUrl = window.location.href;
+    logInfo('TaskHistory', 'Componente montado', { 
+      url: currentUrl,
+      isAuthenticated, 
+      authLoading,
+      tasksLoaded: completedTasks.length 
     });
-  }, []);
+    
+    // Verificar se temos uma URL com duplicação do path
+    if (currentUrl.includes('/task-history#/task-history')) {
+      logError('TaskHistory', 'URL com duplicação detectada', currentUrl);
+    }
+    
+    // Validate any tasks with completedAt dates
+    if (completedTasks.length > 0) {
+      completedTasks.forEach(task => {
+        if (task.completedAt) {
+          const isValid = task.completedAt instanceof Date && 
+            !isNaN(task.completedAt.getTime());
+          
+          if (!isValid) {
+            logError('TaskHistory', `Task ${task.id} tem data de conclusão inválida`, task.completedAt);
+          }
+        }
+      });
+    }
+    
+    // Clean up function to help with debugging
+    return () => {
+      logInfo('TaskHistory', 'Componente desmontado');
+    };
+  }, [isAuthenticated, authLoading, completedTasks]);
 
   if (isLoading) {
     return (

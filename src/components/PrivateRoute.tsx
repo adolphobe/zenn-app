@@ -6,11 +6,12 @@ import { useSidebar } from '@/context/hooks';
 import { Menu } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useEffect, useState, useMemo } from 'react';
-import { logInfo } from '@/utils/logUtils';
+import { toast } from '@/hooks/use-toast';
+import { logWarn, logInfo } from '@/utils/logUtils';
 
 /**
  * PrivateRoute - Protects routes that require authentication
- * Fixed to handle navigation properly with hash router
+ * Improved to handle URL duplication issues
  */
 export const PrivateRoute = () => {
   const { isAuthenticated, isLoading } = useAuth();
@@ -24,20 +25,24 @@ export const PrivateRoute = () => {
     localStorage.getItem('logout_in_progress') === 'true',
   []);
   
-  // Ensure current path is clean, without duplications
+  // Check for duplicated routes like `/task-history#/task-history`
   useEffect(() => {
     const currentPath = location.pathname;
+    const currentHash = location.hash;
     
-    // Log navigation without triggering extra renders
-    if (currentPath !== '/dashboard') {
-      logInfo('PrivateRoute', `Navegação detectada para: ${currentPath}`);
+    // Only run this logic if we have a hash that might be causing issues
+    if (currentHash && currentHash.length > 1) {
+      // Detect duplicated path patterns and fix automatically
+      if (currentHash.substring(1) === currentPath) {
+        logWarn('ROUTE', `Detected duplicated path: ${currentPath} in hash ${currentHash}`, { path: currentPath });
+        
+        // Navigate to the correct path without duplication
+        setTimeout(() => {
+          navigate(currentPath, { replace: true });
+        }, 0);
+      }
     }
-    
-    // Private route paths should always start with /
-    if (currentPath && !currentPath.startsWith('/')) {
-      navigate(`/${currentPath}`, { replace: true });
-    }
-  }, [location.pathname, navigate]);
+  }, [location, navigate]);
 
   // Use effect to ensure we've completed at least one auth check
   useEffect(() => {
@@ -57,7 +62,7 @@ export const PrivateRoute = () => {
   const actuallyAuthenticated = isAuthenticated && !logoutInProgress;
   
   if (!actuallyAuthenticated) {
-    logInfo('PrivateRoute', `Usuário não autenticado, redirecionando de ${location.pathname}`);
+    logInfo(`PrivateRoute`, `User not authenticated, redirecting from ${location.pathname}`);
     
     // Return a redirect to login with current location stored for later redirect back
     return <Navigate to="/login" state={{ from: location }} replace />;
