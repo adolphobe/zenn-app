@@ -22,10 +22,10 @@ interface EditTaskModalProps {
 }
 
 const EditTaskModal: React.FC<EditTaskModalProps> = ({ task, isOpen, onClose }) => {
-  // Inicializar form data com a tarefa atual
+  // Initialize form data with current task values
+  // Note: We're removing the 'description' field as it doesn't exist in the Task type
   const [formData, setFormData] = useState<TaskFormData>({
     title: task.title,
-    description: task.description || '',
     consequenceScore: task.consequenceScore,
     prideScore: task.prideScore,
     constructionScore: task.constructionScore,
@@ -37,7 +37,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ task, isOpen, onClose }) 
   const isMobile = useIsMobile();
   const commentsContainerRef = useRef<HTMLDivElement | null>(null);
   
-  // Use our comments hook para gerenciar comentários
+  // Use our comments hook to manage comments
   const { 
     comments, 
     isLoading: loadingComments, 
@@ -45,13 +45,12 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ task, isOpen, onClose }) 
     isRefetching
   } = useComments(task.id);
   
-  console.log('[EditTaskModal] Renderizando para task:', task.id, 'comments:', comments?.length);
+  console.log('[EditTaskModal] Rendering for task:', task.id, 'comments:', comments?.length);
   
-  // Atualizar form data quando a tarefa mudar
+  // Update form data when task changes
   useEffect(() => {
     setFormData({
       title: task.title,
-      description: task.description || '',
       consequenceScore: task.consequenceScore,
       prideScore: task.prideScore,
       constructionScore: task.constructionScore,
@@ -59,7 +58,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ task, isOpen, onClose }) 
     });
   }, [task]);
   
-  // Função para salvar as alterações da tarefa
+  // Function to save task changes
   const handleSaveTask = (e: React.FormEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -74,7 +73,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ task, isOpen, onClose }) 
       return;
     }
     
-    console.log('[EditTaskModal] Salvando tarefa:', task.id, 'formData:', formData);
+    console.log('[EditTaskModal] Saving task:', task.id, 'formData:', formData);
     
     updateTask(task.id, formData);
     toast({
@@ -85,7 +84,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ task, isOpen, onClose }) 
     onClose();
   };
 
-  // Handlers para inputs
+  // Handlers for inputs
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -97,46 +96,46 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ task, isOpen, onClose }) 
       return;
     }
 
-    // Converter string datetime-local para objeto Date
+    // Convert datetime-local string to Date object
     const date = new Date(e.target.value);
     if (!isNaN(date.getTime())) {
       setFormData(prev => ({ ...prev, idealDate: date }));
     } else {
-      console.warn('[EditTaskModal] Data inválida:', e.target.value);
+      console.warn('[EditTaskModal] Invalid date:', e.target.value);
     }
   };
   
-  // Função para rolar para o final da lista de comentários
+  // Function to scroll to bottom of comments list
   const scrollToBottom = useCallback(() => {
     if (commentsContainerRef.current) {
       const scrollElement = commentsContainerRef.current.querySelector('.native-scrollbar');
       if (scrollElement) {
-        console.log('[EditTaskModal] Rolando para o final dos comentários');
+        console.log('[EditTaskModal] Scrolling to bottom of comments');
         scrollElement.scrollTop = scrollElement.scrollHeight;
       } else {
-        console.log('[EditTaskModal] Elemento de rolagem não encontrado');
+        console.log('[EditTaskModal] Scroll element not found');
       }
     } else {
-      console.log('[EditTaskModal] Ref do container de comentários não encontrada');
+      console.log('[EditTaskModal] Comments container ref not found');
     }
   }, []);
   
-  // Rolar para o final quando a aba de comentários é selecionada ou quando os comentários mudam
+  // Scroll to bottom when comments tab is selected or comments change
   useEffect(() => {
     if (activeTab === 'comments' && comments?.length > 0) {
-      // Pequeno atraso para garantir que o DOM foi atualizado
+      // Small delay to ensure DOM has updated
       setTimeout(scrollToBottom, 300);
     }
   }, [activeTab, comments?.length, scrollToBottom]);
   
-  // Handler para quando um comentário é adicionado
+  // Handler for when a comment is added
   const handleCommentAdded = useCallback((): void => {
-    console.log('[EditTaskModal] Comentário adicionado, atualizando...');
+    console.log('[EditTaskModal] Comment added, updating...');
     
-    // Forçar atualização dos comentários
+    // Force comments refresh
     refreshComments();
     
-    // Tentar rolar para o final imediatamente e novamente após um atraso
+    // Try to scroll to bottom immediately and after a delay
     setTimeout(scrollToBottom, 500);
   }, [refreshComments, scrollToBottom]);
 
@@ -158,7 +157,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ task, isOpen, onClose }) 
         <div className="flex-grow overflow-hidden">
           <AlwaysVisibleScrollArea className="h-[calc(85vh-12rem)] sm:h-[calc(85vh-14rem)]">
             <div className="px-4 sm:px-6 py-2 sm:py-4 space-y-6">
-              {/* Input do título da tarefa */}
+              {/* Task title input */}
               <div>
                 <label htmlFor="title" className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
                   Título da Tarefa
@@ -175,7 +174,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ task, isOpen, onClose }) 
                 />
               </div>
               
-              {/* Tabs para níveis e comentários */}
+              {/* Tabs for levels and comments */}
               <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                 <TabsList className="grid w-full grid-cols-2 mb-4">
                   <TabsTrigger value="levels" data-testid="levels-tab">
@@ -186,7 +185,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ task, isOpen, onClose }) 
                   </TabsTrigger>
                 </TabsList>
                 
-                {/* Conteúdo da aba de níveis */}
+                {/* Levels tab content */}
                 <TabsContent value="levels" className="space-y-6">
                   <TaskFormFields 
                     formData={formData} 
@@ -196,7 +195,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ task, isOpen, onClose }) 
                   />
                 </TabsContent>
                 
-                {/* Conteúdo da aba de comentários */}
+                {/* Comments tab content */}
                 <TabsContent value="comments">
                   <div ref={commentsContainerRef} className="space-y-4">
                     {comments && comments.length > 0 ? (
@@ -211,7 +210,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ task, isOpen, onClose }) 
                       </div>
                     )}
                     
-                    {/* Formulário de comentários separado da lógica de salvar a tarefa */}
+                    {/* Comment form component */}
                     <CommentForm 
                       taskId={task.id}
                       onCommentAdded={handleCommentAdded}
