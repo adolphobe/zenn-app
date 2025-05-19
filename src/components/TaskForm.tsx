@@ -293,6 +293,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, initialData, taskId, task,
             </Button>
             <Button
               type="submit"
+               className="btn-green"
             >
               Salvar
             </Button>
