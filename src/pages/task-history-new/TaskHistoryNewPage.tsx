@@ -1,7 +1,6 @@
-
 import React, { useState } from 'react';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
-import { Loader2, BarChart2 } from 'lucide-react';
+import { Loader2, BarChart2, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useCompletedTasksData } from './hooks/useCompletedTasksData';
 import { useTaskFilters } from './hooks/useTaskFilters';
@@ -86,6 +85,20 @@ const TaskHistoryNewPage = () => {
   
   // Get stats for current filtered tasks
   const filteredStats = calculateFilteredStats();
+  
+  // Function to clear all filters
+  const clearAllFilters = () => {
+    setSearchQuery('');
+    setPeriodFilter('all');
+    setScoreFilter('all');
+    setFeedbackFilter('all');
+    setPillarFilter('all');
+    setStartDate(undefined);
+    setEndDate(undefined);
+    // Reset to default sort if needed
+    setSortBy('newest');
+    handleColumnSort('completedAt', 'desc');
+  };
   
   // Check if filters are being applied
   const isFiltering = searchQuery.trim().length > 0 || 
@@ -220,9 +233,17 @@ const TaskHistoryNewPage = () => {
         </motion.div>
       )}
       
-      {/* Display results count when filtering */}
+      {/* Display results count and clear filters link when filtering */}
       {isFiltering && (
-        <p className="text-sm text-muted-foreground mb-4">{resultsMessage}</p>
+        <div className="flex items-center gap-2 mb-4">
+          <p className="text-sm text-muted-foreground">{resultsMessage}</p>
+          <button 
+            onClick={clearAllFilters}
+            className="text-sm text-primary hover:text-primary/80 hover:underline flex items-center gap-1"
+          >
+            Limpar filtro
+          </button>
+        </div>
       )}
       
       {/* Display dynamic task statistics based on filtered tasks */}
