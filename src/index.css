@@ -103,6 +103,15 @@
 }
 
 /* Configurações de Botões */
+
+
+/* SERIA ESSE MODO DE CONFIGURAR SE FOSSE QUERER FAZER BOTAO PRO MODO DARK, ia adicionar class Dark no inicio
+.dark .btn-green {
+  background-color: #00b300 !important;
+}
+*/ 
+
+
 @layer components {
   /* Botão Verde */
   .btn-green {
@@ -121,11 +130,22 @@
   }
 
 
-/* SERIA ESSE MODO DE CONFIGURAR SE FOSSE QUERER FAZER BOTAO PRO MODO DARK, ia adicionar class Dark no inicio
-.dark .btn-green {
-  background-color: #00b300 !important;
-}
-*/ 
+
+  /* Botão Vermelho Lixeira */
+  .btn-red-lixeira {
+  }
+
+  .btn-red-lixeira:hover {
+  color: #ea4040!important;
+  border: 1px solid #ff8b8b!important;
+    
+  }
+
+  .btn-red-lixeira:disabled {
+    opacity: 0.5 !important;
+    cursor: not-allowed !important;
+  }
+
 
   /* Botão Vermelho */
   .btn-red {
