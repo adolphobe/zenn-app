@@ -1,27 +1,27 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Task } from '@/types';
-import { toggleTaskHidden as toggleHiddenService } from '@/services/taskService';
+import { toggleTaskHidden } from '@/services/taskService';
 import { useAuth } from '@/context/auth';
 import { useTaskToasts } from '@/components/task/utils/taskToasts';
 
 export const useTaskVisibilityToggle = (
   tasks: Task[],
-  completed: boolean,
+  completed: boolean = false,
   setTaskOperationLoading: (taskId: string, operation: string, loading: boolean) => void
 ) => {
   const { currentUser } = useAuth();
   const queryClient = useQueryClient();
   const { showToggleHiddenToast } = useTaskToasts();
   
-  // Toggle hidden mutation with improved animation
-  const toggleHiddenMutation = useMutation({
+  // Toggle visibility mutation
+  const toggleVisibilityMutation = useMutation({
     mutationFn: (id: string) => {
-      // Validate task exists
+      // Get current task status
       const task = tasks.find(t => t.id === id);
       if (!task) throw new Error(`Task with id ${id} not found`);
       
-      return toggleHiddenService(id);
+      return toggleTaskHidden(id);
     },
     onMutate: async (id) => {
       // Set loading state
@@ -30,113 +30,41 @@ export const useTaskVisibilityToggle = (
       // Cancel any outgoing refetches
       await queryClient.cancelQueries({ queryKey: ['tasks', currentUser?.id, completed] });
       
-      // Snapshot of the current data
+      // Snapshot the previous value
       const previousTasks = queryClient.getQueryData(['tasks', currentUser?.id, completed]);
       
-      // Get snapshot of the current task
+      // Get the task for optimistic update
       const task = tasks.find(t => t.id === id);
-      if (!task) return { previousTasks };
       
-      // Determine the new state
-      const newHiddenState = !task.hidden;
-      
-      // Optimistically update to the new value with animation marker
-      queryClient.setQueryData(['tasks', currentUser?.id, completed], (old: Task[] | undefined) => {
-        if (!old) return [];
-        
-        return old.map(t => {
-          if (t.id === id) {
-            return { 
-              ...t, 
-              hidden: newHiddenState,
-              // Add animation markers
-              _optimisticUpdateTime: Date.now(),
-              _animationState: newHiddenState ? 'hiding' : 'showing',
-              _pendingVisibilityUpdate: true
-            };
-          }
-          return t;
-        });
-      });
-      
-      // Return context with original tasks for potential rollback
-      return { 
-        previousTasks,
-        newHiddenState,
-        task // Incluir a tarefa para o toast
-      };
-    },
-    onSuccess: (result, id, context) => {
-      // Get current task state before update
-      const task = tasks.find(t => t.id === id);
-      if (!task) return;
-      
-      const wasHidden = task?.hidden;
-      const isNowHidden = result.hidden;
-      
-      // Show toast notification with a tarefa atualizada
-      showToggleHiddenToast({...task, hidden: isNowHidden});
-      
-      // Se a tarefa estava visível e agora está oculta, aplique a lógica de animação
-      if (!wasHidden && isNowHidden) {
-        // Para tarefas sendo ocultadas, adicione um pequeno atraso para permitir
-        // a animação de saída antes de remover da lista
-        setTimeout(() => {
-          // Atualizar o cache após a animação de saída
-          queryClient.setQueryData(['tasks', currentUser?.id, completed], (old: Task[] | undefined) => {
-            if (!old) return [];
-            
-            return old.map(t => {
-              if (t.id === id) {
-                return { 
-                  ...t, 
-                  ...result,
-                  _optimisticUpdateTime: t._optimisticUpdateTime || Date.now(),
-                  _animationState: 'hidden',
-                  _pendingVisibilityUpdate: false
-                };
-              }
-              return t;
-            });
-          });
-          
-          // Invalidar consultas para atualizar os filtros
-          queryClient.invalidateQueries({ 
-            queryKey: ['tasks', currentUser?.id, completed],
-            exact: false
-          });
-        }, 400); // Tempo para animação de saída
-      } else {
-        // Para mostrar uma tarefa oculta, atualize imediatamente
+      if (task) {
+        // Optimistically update to the new value
         queryClient.setQueryData(['tasks', currentUser?.id, completed], (old: Task[] | undefined) => {
           if (!old) return [];
-          
           return old.map(t => {
             if (t.id === id) {
-              return { 
-                ...t, 
-                ...result,
-                _optimisticUpdateTime: t._optimisticUpdateTime || Date.now(),
-                _animationState: 'visible',
-                _pendingVisibilityUpdate: false
-              };
+              return { ...t, hidden: !t.hidden };
             }
             return t;
           });
         });
-        
-        // Invalidar a consulta para atualizar os filtros e mostrar a tarefa
-        queryClient.invalidateQueries({ 
-          queryKey: ['tasks'],
-          exact: false 
-        });
       }
+      
+      return { previousTasks };
     },
-    onError: (error: any, id, context) => {
-      console.error('Error toggling task hidden status:', error);
+    onSuccess: (updatedTask, id) => {
+      const task = tasks.find(t => t.id === id);
+      if (task) {
+        showToggleHiddenToast({ ...task, hidden: !task.hidden });
+      }
+      queryClient.invalidateQueries({ 
+        queryKey: ['tasks'],
+        exact: false
+      });
+    },
+    onError: (error, id, context) => {
+      console.error('Error toggling task visibility:', error);
       
       if (context?.previousTasks) {
-        // Reverter para o estado anterior em caso de erro
         queryClient.setQueryData(['tasks', currentUser?.id, completed], context.previousTasks);
       }
     },
@@ -146,7 +74,7 @@ export const useTaskVisibilityToggle = (
   });
   
   return {
-    toggleTaskHidden: (id: string) => toggleHiddenMutation.mutate(id),
-    toggleHiddenLoading: toggleHiddenMutation.isPending
+    toggleTaskHidden: (id: string) => toggleVisibilityMutation.mutate(id),
+    toggleHiddenLoading: toggleVisibilityMutation.isPending
   };
 };
