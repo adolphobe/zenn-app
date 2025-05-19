@@ -49,17 +49,17 @@ const HeroSection: React.FC<HeroSectionProps> = ({
             />
           </div>
           <div className="relative">
-            <h1 className={`text-4xl md:text-5xl lg:text-6xl font-semibold leading-tight md:leading-tight lg:leading-tight text-gray-900 dark:text-white mb-8 opacity-0 ${loaded ? 'fade-up' : ''}`}>
+            <h1 className={`text-4xl md:text-5xl lg:text-6xl font-semibold leading-tight md:leading-tight lg:leading-tight text-gray-900 dark:text-white mb-8 opacity-0 ${loaded ? 'animate-fade-in' : ''}`} style={{animationDelay: '300ms'}}>
               Listas fazem você lembrar.<br />
               Zenn faz você evoluir.
             </h1>
           </div>
-          <p className={`text-lg md:text-xl text-gray-600 dark:text-gray-300 font-light leading-relaxed mb-10 opacity-0 ${loaded ? 'fade-up fade-up-delay-1' : ''}`}>
+          <p className={`text-lg md:text-xl text-gray-600 dark:text-gray-300 font-light leading-relaxed mb-10 opacity-0 ${loaded ? 'animate-fade-in' : ''}`} style={{animationDelay: '600ms'}}>
             Zenn é um app de execução pessoal.<br />
             Você avalia cada tarefa por três pilares:<br />
             importância real, orgulho pós-execução e crescimento pessoal.
           </p>
-          <div className={`opacity-0 ${loaded ? 'fade-up fade-up-delay-2' : ''} ${showLogin ? 'hidden lg:block' : 'block'}`}>
+          <div className={`opacity-0 ${loaded ? 'animate-fade-in' : ''} ${showLogin ? 'hidden lg:block' : 'block'}`} style={{animationDelay: '900ms'}}>
             <Button 
               onClick={() => navigate('/login')}
               className="group bg-blue-600 hover:bg-blue-700 text-white px-8 py-6 rounded-lg text-lg transition-all duration-300 hover:scale-[1.03] flex items-center gap-2"
@@ -68,14 +68,14 @@ const HeroSection: React.FC<HeroSectionProps> = ({
               <ArrowRight className="transition-transform duration-300 group-hover:translate-x-1" />
             </Button>
           </div>
-          <div className={`mt-32 opacity-0 ${loaded ? 'fade-up fade-up-delay-3' : ''}`}>
+          <div className={`mt-32 opacity-0 ${loaded ? 'animate-fade-in' : ''}`} style={{animationDelay: '1200ms'}}>
             <p className="text-xs text-gray-700 dark:text-gray-500">Aplicativo em Beta, bugs podem acontecer.</p>
           </div>
         </div>
         <div className="lg:col-span-5 relative flex items-center justify-center">
           {showLogin ? (
             <div className="w-full h-full flex items-center justify-center">
-              <div className={`w-full max-w-md bg-white/80 dark:bg-gray-800/80 backdrop-blur-md p-8 rounded-xl ${showLogin ? 'slide-in' : ''}`}>
+              <div className={`w-full max-w-md bg-white/80 dark:bg-gray-800/80 backdrop-blur-md p-8 rounded-xl ${showLogin ? 'animate-fade-in' : ''}`}>
                 <div className="flex justify-between items-center mb-6">
                   <h3 className="text-xl font-semibold text-gray-800 dark:text-white">Faça seu login</h3>
                   <button onClick={() => { setShowLogin(false); }} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">✕</button>

@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { LoaderCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "./skeleton";
+import { useLocation } from "react-router-dom";
 
 interface LoadingOverlayProps {
   show: boolean;
@@ -17,10 +18,20 @@ export function LoadingOverlay({
 }: LoadingOverlayProps) {
   const [visible, setVisible] = useState(show);
   const [fading, setFading] = useState(false);
-
+  const location = useLocation();
+  
+  // Não mostrar o loading na página inicial
+  const isLandingPage = location.pathname === '/';
+  
   useEffect(() => {
     let fadeTimeout: NodeJS.Timeout;
     let hideTimeout: NodeJS.Timeout;
+
+    // Se estiver na página inicial, não mostrar o loading
+    if (isLandingPage) {
+      setVisible(false);
+      return;
+    }
 
     if (show) {
       setVisible(true);
@@ -52,9 +63,10 @@ export function LoadingOverlay({
       clearTimeout(fadeTimeout);
       clearTimeout(hideTimeout);
     };
-  }, [show, delay, visible, onComplete]);
+  }, [show, delay, visible, onComplete, isLandingPage]);
 
-  if (!visible) return null;
+  // Não renderizar nada se estivermos na página inicial ou se não for visível
+  if (!visible || isLandingPage) return null;
 
   return (
     <div 

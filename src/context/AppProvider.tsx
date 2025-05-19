@@ -32,6 +32,7 @@ import {
   syncTasksFromDatabase
 } from './tasks';
 import { LoadingOverlay } from '@/components/ui/loading-overlay';
+import { useLocation } from 'react-router-dom';
 
 // Provider component
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -40,6 +41,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [isSyncing, setIsSyncing] = useState<boolean>(false);
   const [lastSyncTime, setLastSyncTime] = useState<number>(0);
   const [isLoadingPreferences, setIsLoadingPreferences] = useState<boolean>(true);
+  const location = useLocation();
+  
+  // Verificar se estamos na página inicial
+  const isLandingPage = location.pathname === '/';
   
   // Store tasks in DOM for access by non-React components
   useTaskStore(state.tasks);
@@ -270,10 +275,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     toggleViewMode: () => dispatch({ type: 'TOGGLE_VIEW_MODE' })
   };
 
+  // Somente exiba o LoadingOverlay se não estiver na página inicial
+  const showLoadingOverlay = !isLandingPage && (isLoadingPreferences || isLoading);
+
   return (
     <AppContext.Provider value={contextValue}>
       <LoadingOverlay 
-        show={isLoadingPreferences || isLoading} 
+        show={showLoadingOverlay} 
         delay={1500}
       />
       {children}
