@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { Task, TaskFormData } from '@/types';
 import { dateService } from '../dateService';

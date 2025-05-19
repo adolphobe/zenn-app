@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Task } from '@/types';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -19,6 +18,7 @@ interface TaskCardProps {
 }
 
 const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand }) => {
+  
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [titleValue, setTitleValue] = useState(task.title);
   const [editTaskModalOpen, setEditTaskModalOpen] = useState(false);
@@ -45,6 +45,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
   if (viewMode === 'power' && task.is_power_extra && task.totalScore >= 14) {
     cardClass += ' task-power-extra';
   }
+  
   
   // Card expansion handler
   const handleCardClick = (e: React.MouseEvent) => {
@@ -157,7 +158,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
         }}
       >
         <TaskCardHeader 
-          title={renderTitleContent()}
+          title={task.title}
           totalScore={task.totalScore}
           idealDate={task.idealDate}
           isEditing={isEditingTitle}

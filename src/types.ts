@@ -43,6 +43,7 @@ export interface TaskFormData {
   pillar?: string;
   userId?: string;
   hidden?: boolean;
+  is_power_extra?: boolean; // Added this property to fix the type error
 }
 
 export type ViewMode = 'power' | 'chronological' | 'strategic';
