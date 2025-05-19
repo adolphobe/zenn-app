@@ -5,6 +5,7 @@ import { Button } from './ui/button';
 import { toast } from '@/hooks/use-toast';
 import { useComments } from '@/hooks/useComments';
 import { AlertCircle } from 'lucide-react';
+import { logComment } from '@/utils/commentLogger';
 
 interface CommentFormProps {
   taskId: string;
@@ -17,14 +18,25 @@ const CommentForm: React.FC<CommentFormProps> = ({ taskId, onCommentAdded }) => 
   const { addComment, isSubmitting } = useComments(taskId);
   const [authChecked, setAuthChecked] = useState(false);
   
+  // Log inicial ao montar o componente
+  useEffect(() => {
+    logComment.render('CommentForm', { 
+      taskId, 
+      authState: { isAuthenticated, userId: currentUser?.id } 
+    });
+  }, []);
+  
   // Verificação detalhada do status de autenticação
   useEffect(() => {
-    console.log('[CommentForm] Auth status:', { 
-      isAuthenticated, 
-      hasUser: !!currentUser,
-      userId: currentUser?.id,
-      taskId: taskId
+    logComment.authCheck(isAuthenticated, currentUser?.id);
+    
+    // Verificar a presença do token no localStorage
+    const hasToken = !!localStorage.getItem('sb-wbvxnapruffchikhrqrs-auth-token');
+    logComment.api.response('authTokenCheck', {
+      hasTokenInLocalStorage: hasToken,
+      tokenValue: hasToken ? '[REDACTED FOR SECURITY]' : 'none'
     });
+    
     setAuthChecked(true);
   }, [isAuthenticated, currentUser, taskId]);
 
@@ -32,6 +44,8 @@ const CommentForm: React.FC<CommentFormProps> = ({ taskId, onCommentAdded }) => 
     e.preventDefault();
     
     if (!text.trim()) {
+      logComment.validation('Tentativa de enviar comentário vazio');
+      
       toast({
         title: "Comentário vazio",
         description: "Por favor, digite um comentário.",
@@ -41,10 +55,14 @@ const CommentForm: React.FC<CommentFormProps> = ({ taskId, onCommentAdded }) => 
     }
     
     if (!isAuthenticated || !currentUser) {
-      console.error('[CommentForm] User not authenticated:', { 
+      logComment.authError('Tentativa de comentar sem estar autenticado');
+      
+      // Verificar detalhes da sessão para diagnóstico
+      const sessionToken = localStorage.getItem('sb-wbvxnapruffchikhrqrs-auth-token');
+      logComment.api.response('sessionCheck', { 
+        sessionExists: sessionToken ? 'yes' : 'no',
         isAuthenticated, 
-        currentUser,
-        sessionExists: localStorage.getItem('sb-wbvxnapruffchikhrqrs-auth-token') ? 'yes' : 'no'
+        hasUser: !!currentUser
       });
       
       toast({
@@ -55,27 +73,21 @@ const CommentForm: React.FC<CommentFormProps> = ({ taskId, onCommentAdded }) => 
       return;
     }
     
-    console.log('[CommentForm] Submitting comment with detailed data:', { 
-      taskId, 
-      userId: currentUser.id, 
-      text,
-      textLength: text.length,
-      isAuthenticated
-    });
+    logComment.attempt(taskId, text, currentUser.id);
     
     // Usando a versão aprimorada da função addComment com mais detalhes de erro
     addComment(text, {
       onSuccess: () => {
-        console.log('[CommentForm] Comment added successfully');
+        logComment.success(taskId, 'form-success');
         setText(''); // Limpar o formulário em caso de sucesso
         
         if (onCommentAdded) {
-          console.log('[CommentForm] Calling onCommentDeleted callback');
+          logComment.info('COMMENT_CALLBACK', 'Chamando callback onCommentAdded');
           onCommentAdded();
         }
       },
       onError: (error) => {
-        console.error('[CommentForm] Error adding comment:', error);
+        logComment.error('Erro na chamada addComment do formulário', error);
         const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
         
         // Toast mais detalhado para erros
@@ -89,6 +101,7 @@ const CommentForm: React.FC<CommentFormProps> = ({ taskId, onCommentAdded }) => 
   };
 
   if (!authChecked) {
+    logComment.info('COMMENT_RENDER', 'Aguardando verificação de autenticação');
     return <div className="text-center p-2">Verificando autenticação...</div>;
   }
 

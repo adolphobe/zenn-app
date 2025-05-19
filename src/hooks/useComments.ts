@@ -6,6 +6,7 @@ import { toast } from '@/hooks/use-toast';
 import { Comment } from '@/types';
 import { useAuth } from '@/context/auth';
 import { v4 as uuidv4 } from 'uuid';
+import { logComment } from '@/utils/commentLogger';
 
 // Define types for mutation callbacks
 type MutationCallbacks = {
@@ -17,6 +18,17 @@ export const useComments = (taskId: string) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const queryClient = useQueryClient();
   const { currentUser, isAuthenticated } = useAuth();
+  
+  logComment.render('useComments hook', { taskId, userId: currentUser?.id, isAuthenticated });
+  
+  // Registrar informações da sessão atual do Supabase (para debug)
+  supabase.auth.getSession().then(({ data }) => {
+    logComment.authCheck(!!data.session, data.session?.user?.id);
+    logComment.api.response('getSession', { 
+      hasSession: !!data.session, 
+      userId: data.session?.user?.id 
+    });
+  });
 
   // Fetch comments for a specific task
   const { 
@@ -27,11 +39,11 @@ export const useComments = (taskId: string) => {
   } = useQuery({
     queryKey: ['comments', taskId],
     queryFn: async () => {
-      console.log(`[useComments] Fetching comments for task: ${taskId}`);
+      logComment.api.request('fetchComments', { taskId });
       
       // Verificação extra de autenticação
       const sessionCheck = await supabase.auth.getSession();
-      console.log('[useComments] Session check:', { 
+      logComment.api.response('sessionCheck', { 
         hasSession: !!sessionCheck.data.session,
         userId: sessionCheck.data.session?.user?.id || 'none'
       });
@@ -43,12 +55,11 @@ export const useComments = (taskId: string) => {
         .order('created_at', { ascending: true });
 
       if (error) {
-        console.error('[useComments] Error fetching comments:', error);
-        console.error('[useComments] Error details:', JSON.stringify(error));
+        logComment.api.error('fetchComments', error);
         throw error;
       }
       
-      console.log(`[useComments] Fetched ${data?.length || 0} comments`);
+      logComment.api.response('fetchComments', { count: data?.length || 0 });
       
       // Map database comments to our Comment type
       return data.map((comment: any): Comment => ({
@@ -64,12 +75,15 @@ export const useComments = (taskId: string) => {
   // Add comment mutation with proper callback handling
   const { mutate } = useMutation({
     mutationFn: async (text: string) => {
+      logComment.attempt(taskId, text, currentUser?.id);
+      
       if (!isAuthenticated || !currentUser) {
-        console.error('[useComments] User not authenticated');
+        logComment.authError('Usuário não autenticado para adicionar comentário');
         
         // Verificação detalhada de sessão
         const { data: sessionData } = await supabase.auth.getSession();
-        console.error('[useComments] Session check details:', { 
+        logComment.authCheck(!!sessionData.session, sessionData.session?.user?.id);
+        logComment.api.response('getSessionInAddComment', { 
           hasSession: !!sessionData.session,
           sessionUserId: sessionData.session?.user?.id,
           currentUser: currentUser?.id,
@@ -80,21 +94,21 @@ export const useComments = (taskId: string) => {
       }
       
       if (!text.trim()) {
-        console.error('[useComments] Comment text is empty');
+        logComment.validation('Texto do comentário está vazio');
         throw new Error('O texto do comentário não pode estar vazio');
       }
       
       if (!taskId) {
-        console.error('[useComments] Task ID is missing');
+        logComment.validation('ID da tarefa está ausente', { taskId });
         throw new Error('ID da tarefa ausente');
       }
       
-      console.log(`[useComments] Adding comment to task ${taskId} by user ${currentUser.id}`);
-      console.log(`[useComments] Authentication status: ${isAuthenticated ? 'Authenticated' : 'Not authenticated'}`);
+      logComment.api.request('addComment', { taskId, userId: currentUser.id, textLength: text.length });
       setIsSubmitting(true);
       
       try {
         // Primeiro, vamos verificar se a tarefa existe
+        logComment.api.request('checkTaskExists', { taskId });
         const { data: taskCheck, error: taskError } = await supabase
           .from('tasks')
           .select('id')
@@ -102,11 +116,14 @@ export const useComments = (taskId: string) => {
           .single();
           
         if (taskError || !taskCheck) {
-          console.error('[useComments] Task does not exist:', { taskId, error: taskError });
+          logComment.api.error('checkTaskExists', { taskError, taskId });
           throw new Error(`A tarefa (${taskId}) não foi encontrada. Verifique se a tarefa existe.`);
         }
         
+        logComment.api.response('checkTaskExists', { exists: true, taskId });
+        
         // Agora temos certeza que o taskId é válido, vamos adicionar o comentário
+        logComment.api.request('insertComment', { taskId, userId: currentUser.id });
         const { data, error } = await supabase
           .from('task_comments')
           .insert({
@@ -118,8 +135,7 @@ export const useComments = (taskId: string) => {
           .single();
         
         if (error) {
-          console.error('[useComments] Error inserting comment:', error);
-          console.error('[useComments] Error details:', JSON.stringify(error));
+          logComment.api.error('insertComment', error);
           
           // Check for specific error types
           if (error.code === '42501' || error.message?.includes('permission denied')) {
@@ -137,7 +153,8 @@ export const useComments = (taskId: string) => {
           }
         }
 
-        console.log('[useComments] Comment added successfully:', data);
+        logComment.success(taskId, data.id);
+        logComment.api.response('insertComment', data);
         return data;
       } finally {
         setIsSubmitting(false);
@@ -156,7 +173,7 @@ export const useComments = (taskId: string) => {
       queryClient.invalidateQueries({ queryKey: ['task', taskId] });
     },
     onError: (error) => {
-      console.error('[useComments] Error adding comment:', error);
+      logComment.error('Erro em mutação onError', error);
       
       toast({
         id: uuidv4(),
@@ -171,15 +188,15 @@ export const useComments = (taskId: string) => {
 
   // Wrapper function for addComment with proper typing
   const addComment = (text: string, callbacks?: MutationCallbacks) => {
-    console.log('[useComments] addComment called with text:', text);
+    logComment.attempt(taskId, text, currentUser?.id);
     
     mutate(text, {
       onSuccess: () => {
-        console.log('[useComments] Comment added successfully via callback');
+        logComment.success(taskId, 'callback-success');
         if (callbacks?.onSuccess) callbacks.onSuccess();
       },
       onError: (error) => {
-        console.error('[useComments] Error in addComment callback:', error);
+        logComment.error('Erro em addComment callback', error);
         if (callbacks?.onError) callbacks.onError(error);
       }
     });
@@ -188,10 +205,10 @@ export const useComments = (taskId: string) => {
   // Delete comment mutation with proper callback handling
   const { mutate: deleteCommentMutate } = useMutation({
     mutationFn: async (commentId: string) => {
-      console.log(`[useComments] Deleting comment: ${commentId}`);
+      logComment.api.request('deleteComment', { commentId });
       
       if (!isAuthenticated || !currentUser) {
-        console.error('[useComments] User not authenticated when trying to delete');
+        logComment.authError('Usuário não autenticado para excluir comentário');
         throw new Error('Usuário não autenticado. Por favor, faça login novamente.');
       }
       
@@ -201,12 +218,11 @@ export const useComments = (taskId: string) => {
         .eq('id', commentId);
 
       if (error) {
-        console.error('[useComments] Error deleting comment:', error);
-        console.error('[useComments] Error details:', JSON.stringify(error));
+        logComment.api.error('deleteComment', error);
         throw error;
       }
       
-      console.log('[useComments] Comment deleted successfully');
+      logComment.api.response('deleteComment', { success: true, commentId });
       return commentId;
     },
     onSuccess: (commentId) => {
@@ -222,7 +238,7 @@ export const useComments = (taskId: string) => {
       queryClient.invalidateQueries({ queryKey: ['task', taskId] });
     },
     onError: (error) => {
-      console.error('[useComments] Error deleting comment:', error);
+      logComment.error('Erro em deleteComment mutation', error);
       
       toast({
         id: uuidv4(),
@@ -237,15 +253,15 @@ export const useComments = (taskId: string) => {
 
   // Wrapper function for deleteComment with proper typing
   const deleteComment = (commentId: string, callbacks?: MutationCallbacks) => {
-    console.log('[useComments] deleteComment called with:', { commentId });
+    logComment.api.request('deleteComment', { commentId });
     
     deleteCommentMutate(commentId, {
       onSuccess: () => {
-        console.log('[useComments] Comment deleted successfully via callback');
+        logComment.api.response('deleteComment callback', { success: true });
         if (callbacks?.onSuccess) callbacks.onSuccess();
       },
       onError: (error) => {
-        console.error('[useComments] Error in deleteComment callback:', error);
+        logComment.error('Erro em deleteComment callback', error);
         if (callbacks?.onError) callbacks.onError(error);
       }
     });
@@ -253,7 +269,7 @@ export const useComments = (taskId: string) => {
 
   // Função para forçar a atualização dos comentários
   const refreshComments = () => {
-    console.log('[useComments] Forcing comment refresh');
+    logComment.api.request('refreshComments', { taskId });
     return refetch();
   };
 

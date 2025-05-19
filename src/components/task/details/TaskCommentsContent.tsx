@@ -9,6 +9,8 @@ import { useAuth } from '@/context/auth';
 import { AlertTriangle, RefreshCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
+import CommentLogs from '@/components/CommentLogs';
+import { logComment } from '@/utils/commentLogger';
 
 interface TaskCommentsContentProps {
   task: Task;
@@ -20,26 +22,32 @@ const TaskCommentsContent: React.FC<TaskCommentsContentProps> = ({ task, onComme
   const queryClient = useQueryClient();
   const { comments, isLoading, fetchError, refreshComments } = useComments(task?.id || '');
   const { isAuthenticated, currentUser } = useAuth();
+  const [showLogs, setShowLogs] = React.useState(false);
+  
+  // Log inicial do componente
+  useEffect(() => {
+    logComment.render('TaskCommentsContent', {
+      taskId: task?.id,
+      isAuthenticated,
+      hasUser: !!currentUser
+    });
+  }, []);
   
   // Verificação detalhada da autenticação e dados da tarefa
   useEffect(() => {
     if (task?.id) {
-      console.log('[TaskCommentsContent] Task data:', {
+      logComment.info('TASK_DATA', 'Dados da tarefa carregados', {
         id: task?.id,
         hasComments: task?.comments && task.comments.length > 0,
         commentsCount: task?.comments?.length
       });
       
-      console.log('[TaskCommentsContent] Auth state:', { 
-        isAuthenticated, 
-        hasUser: !!currentUser,
-        userId: currentUser?.id 
-      });
+      logComment.authCheck(isAuthenticated, currentUser?.id);
       
       // Verificação adicional da sessão do Supabase
       const checkSession = async () => {
         const { data, error } = await supabase.auth.getSession();
-        console.log('[TaskCommentsContent] Supabase session check:', {
+        logComment.api.response('getSession', {
           hasSession: !!data.session,
           sessionUser: data.session?.user?.id || 'none',
           error: error ? JSON.stringify(error) : 'no error'
@@ -52,7 +60,7 @@ const TaskCommentsContent: React.FC<TaskCommentsContentProps> = ({ task, onComme
   
   // Verificar se a tarefa existe e tem um ID válido
   if (!task || !task.id) {
-    console.warn('[TaskCommentsContent] Task is undefined or has no ID');
+    logComment.validation('Tarefa inválida ou sem ID', { task });
     return (
       <div className="text-center p-6 text-gray-500 dark:text-gray-400">
         <p>Não foi possível carregar os comentários.</p>
@@ -67,7 +75,7 @@ const TaskCommentsContent: React.FC<TaskCommentsContentProps> = ({ task, onComme
   
   // Handler para quando um comentário é adicionado
   const handleCommentAdded = (): void => {
-    console.log('[TaskCommentsContent] Comment added handler called');
+    logComment.info('COMMENT_CALLBACK', 'Comentário adicionado - atualizando dados');
     
     // Invalidate queries to refresh task data
     queryClient.invalidateQueries({ queryKey: ['tasks'] });
@@ -76,6 +84,7 @@ const TaskCommentsContent: React.FC<TaskCommentsContentProps> = ({ task, onComme
     
     // Call parent callback if provided
     if (onCommentAdded) {
+      logComment.info('COMMENT_CALLBACK', 'Chamando callback onCommentAdded do pai');
       onCommentAdded();
     }
     
@@ -85,7 +94,7 @@ const TaskCommentsContent: React.FC<TaskCommentsContentProps> = ({ task, onComme
         const scrollElement = commentsRef.current.querySelector('.native-scrollbar');
         if (scrollElement) {
           scrollElement.scrollTop = scrollElement.scrollHeight;
-          console.log('[TaskCommentsContent] Scrolled to bottom after adding comment');
+          logComment.info('COMMENT_UI', 'Rolagem para o fim após adicionar comentário');
         }
       }
     }, 200);
@@ -93,7 +102,7 @@ const TaskCommentsContent: React.FC<TaskCommentsContentProps> = ({ task, onComme
   
   // Handler para quando um comentário é removido
   const handleCommentDeleted = (): void => {
-    console.log('[TaskCommentsContent] Comment deleted handler called');
+    logComment.info('COMMENT_CALLBACK', 'Comentário removido - atualizando dados');
     
     // Invalidate queries to refresh task data
     queryClient.invalidateQueries({ queryKey: ['tasks'] });
@@ -103,7 +112,7 @@ const TaskCommentsContent: React.FC<TaskCommentsContentProps> = ({ task, onComme
   
   // Handler para forçar atualização de comentários
   const handleRefreshComments = () => {
-    console.log('[TaskCommentsContent] Manual refresh requested');
+    logComment.api.request('refreshComments manual', { taskId: task.id });
     refreshComments();
     
     // Invalidate queries to ensure fresh data
@@ -113,10 +122,12 @@ const TaskCommentsContent: React.FC<TaskCommentsContentProps> = ({ task, onComme
   };
 
   if (isLoading) {
+    logComment.info('COMMENT_UI', 'Carregando comentários...');
     return <div className="text-center p-4">Carregando comentários...</div>;
   }
 
   if (fetchError) {
+    logComment.error('Erro ao carregar comentários', fetchError);
     return (
       <div className="text-center p-4 text-red-500 flex flex-col items-center gap-2">
         <AlertTriangle size={24} />
@@ -141,16 +152,33 @@ const TaskCommentsContent: React.FC<TaskCommentsContentProps> = ({ task, onComme
     <div ref={commentsRef}>
       <div className="flex justify-between items-center mb-2">
         <h3 className="font-medium">Comentários</h3>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={handleRefreshComments}
-          className="flex items-center gap-1 text-xs"
-        >
-          <RefreshCcw size={12} />
-          <span>Atualizar</span>
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setShowLogs(!showLogs)}
+            className="flex items-center gap-1 text-xs"
+          >
+            {showLogs ? "Ocultar Logs" : "Ver Logs"}
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleRefreshComments}
+            className="flex items-center gap-1 text-xs"
+          >
+            <RefreshCcw size={12} />
+            <span>Atualizar</span>
+          </Button>
+        </div>
       </div>
+
+      {/* Visualizador de logs */}
+      {showLogs && (
+        <div className="mb-6">
+          <CommentLogs />
+        </div>
+      )}
 
       {hasComments ? (
         <div className="space-y-4">
