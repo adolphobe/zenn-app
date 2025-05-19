@@ -7,7 +7,7 @@ import { toast } from '@/hooks/use-toast';
 
 interface CommentFormProps {
   taskId: string;
-  onCommentAdded?: () => void; // Nova prop para notificar quando um comentário é adicionado
+  onCommentAdded?: () => void;
 }
 
 const CommentForm: React.FC<CommentFormProps> = ({ taskId, onCommentAdded }) => {
@@ -22,7 +22,7 @@ const CommentForm: React.FC<CommentFormProps> = ({ taskId, onCommentAdded }) => 
       addComment(taskId, commentText);
       setCommentText('');
       
-      // Notificar o componente pai que um comentário foi adicionado
+      // Notify the parent component that a comment was added
       if (onCommentAdded) {
         onCommentAdded();
       }
@@ -39,20 +39,20 @@ const CommentForm: React.FC<CommentFormProps> = ({ taskId, onCommentAdded }) => 
     setCommentText(e.target.value);
   };
   
-  // Função para lidar com o pressionamento de teclas
+  // Handle key press events
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     e.stopPropagation();
     
-    // Verificar se a tecla Enter foi pressionada sem a tecla Shift
+    // Check if Enter was pressed without Shift
     if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault(); // Impedir quebra de linha
+      e.preventDefault(); // Prevent line break
       
-      // Verificar se o comentário não está vazio
+      // Check if the comment is not empty
       if (commentText.trim() && addComment) {
         addComment(taskId, commentText);
         setCommentText('');
         
-        // Notificar o componente pai que um comentário foi adicionado
+        // Notify the parent component that a comment was added
         if (onCommentAdded) {
           onCommentAdded();
         }
@@ -93,7 +93,7 @@ const CommentForm: React.FC<CommentFormProps> = ({ taskId, onCommentAdded }) => 
         <textarea
           value={commentText}
           onChange={handleTextChange}
-          onKeyDown={handleKeyDown} // Adicionar o evento de tecla
+          onKeyDown={handleKeyDown}
           onClick={(e) => {
             e.stopPropagation();
           }}

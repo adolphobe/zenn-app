@@ -1,3 +1,4 @@
+
 import React, { useRef, useEffect } from 'react';
 import { Task, TaskFormData } from '../types';
 import TaskFormFields from './TaskFormFields';
@@ -28,10 +29,10 @@ const TaskFormTabs: React.FC<TaskFormTabsProps> = ({
   task,
   isEditing = false
 }) => {
-  // Referência para o container de comentários no DOM
+  // Reference for the comments container in the DOM
   const commentsContainerRef = useRef<HTMLDivElement | null>(null);
   
-  // Função para rolar para o final da lista de comentários
+  // Function to scroll to the bottom of the comments list
   const scrollToBottom = () => {
     if (commentsContainerRef.current) {
       const scrollElement = commentsContainerRef.current.querySelector('.native-scrollbar');
@@ -41,10 +42,10 @@ const TaskFormTabs: React.FC<TaskFormTabsProps> = ({
     }
   };
   
-  // Efeito para rolar para o final quando a aba de comentários é selecionada
+  // Effect to scroll to the bottom when the comments tab is selected
   useEffect(() => {
     if (activeTab === 'comments' && task?.comments?.length) {
-      // Pequeno delay para garantir que o DOM foi atualizado
+      // Small delay to ensure the DOM has been updated
       setTimeout(scrollToBottom, 100);
     }
   }, [activeTab, task?.comments?.length]);

@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState, useRef } from 'react';
 import { format } from 'date-fns';
 import { Comment } from '@/types';
@@ -27,17 +28,17 @@ const TaskComments: React.FC<TaskCommentsProps> = ({ taskId, comments }) => {
   const [commentToDelete, setCommentToDelete] = useState<string | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   
-  // Injetar CSS global para scrollbar
+  // Add global CSS for scrollbar
   useEffect(() => {
-    // Criar um elemento style
+    // Create a style element
     const style = document.createElement('style');
     const styleId = 'native-scrollbar-styles';
     
-    // Verificar se já existe
+    // Check if it already exists
     if (!document.getElementById(styleId)) {
       style.id = styleId;
       style.innerHTML = `
-        /* Personalização da scrollbar para Chrome, Edge e Safari */
+        /* Customization for scrollbar in Chrome, Edge and Safari */
         .native-scrollbar::-webkit-scrollbar {
           width: 10px;
           height: 10px;
@@ -59,13 +60,13 @@ const TaskComments: React.FC<TaskCommentsProps> = ({ taskId, comments }) => {
           background-color: rgba(156, 163, 175, 0.9);
         }
         
-        /* Personalização da scrollbar para Firefox */
+        /* Customization for scrollbar in Firefox */
         .native-scrollbar {
           scrollbar-width: thin;
           scrollbar-color: rgba(156, 163, 175, 0.7) transparent;
         }
         
-        /* Estilo para tema escuro */
+        /* Style for dark theme */
         .dark .native-scrollbar::-webkit-scrollbar-thumb {
           background-color: rgba(209, 213, 219, 0.5);
         }
@@ -75,20 +76,20 @@ const TaskComments: React.FC<TaskCommentsProps> = ({ taskId, comments }) => {
         }
       `;
       
-      // Adicionar ao head
+      // Add to head
       document.head.appendChild(style);
     }
     
-    // Não é necessário limpar, pois queremos que o estilo permaneça.
+    // No need to clean up, we want the style to remain.
   }, []);
   
-  // Efeito para rolar para o final sempre que os comentários mudarem
+  // Effect to scroll to bottom whenever comments change
   useEffect(() => {
     if (scrollContainerRef.current && comments.length > 0) {
-      // Rolar para o final da div de comentários
+      // Scroll to bottom of comments div
       scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight;
     }
-  }, [comments]); // Executar quando os comentários mudarem
+  }, [comments]); // Execute when comments change
   
   if (!comments || comments.length === 0) {
     return null;
@@ -101,24 +102,29 @@ const TaskComments: React.FC<TaskCommentsProps> = ({ taskId, comments }) => {
     }
   };
   
-  // Impedir a propagação do evento de clique
+  // Prevent click event propagation
   const handleContainerClick = (e: React.MouseEvent) => {
     e.stopPropagation();
   };
   
-  // Função segura para formatar datas
+  // Prevent mousedown in the comment form from bubbling up
+  const handleContainerMouseDown = (e: React.MouseEvent) => {
+    e.stopPropagation();
+  };
+  
+  // Safe function to format dates
   const formatCommentDate = (dateString: string) => {
     try {
-      // Converter a string para um objeto Date
+      // Convert string to Date object
       const parsedDate = safeParseDate(dateString);
       
-      // Se a data for inválida, retornar um texto de fallback
+      // If date is invalid, return fallback text
       if (!parsedDate) {
         console.warn('Invalid comment date encountered:', dateString);
         return 'Data indisponível';
       }
       
-      // Formatar a data válida
+      // Format valid date
       return format(parsedDate, 'dd/MM/yyyy HH:mm');
     } catch (error) {
       console.error('Error formatting comment date:', error, dateString);
@@ -130,7 +136,7 @@ const TaskComments: React.FC<TaskCommentsProps> = ({ taskId, comments }) => {
     <div className="mt-4 cursor-default" onClick={handleContainerClick}>
       <h4 className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">Comentários</h4>
       
-      {/* Div with scrollbar nativa e estilização, now with ref and onClick to avoid propagation */}
+      {/* Div with native scrollbar and styling, now with ref and onClick to avoid propagation */}
       <div 
         ref={scrollContainerRef}
         className="native-scrollbar h-60 overflow-auto rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 cursor-default"
