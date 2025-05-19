@@ -120,6 +120,13 @@
     cursor: not-allowed !important;
   }
 
+
+/* SERIA ESSE MODO DE CONFIGURAR SE FOSSE QUERER FAZER BOTAO PRO MODO DARK, ia adicionar class Dark no inicio
+.dark .btn-green {
+  background-color: #00b300 !important;
+}
+*/ 
+
   /* Botão Vermelho */
   .btn-red {
     background-color: #d22a1e !important;
