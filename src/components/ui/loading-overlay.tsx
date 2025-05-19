@@ -1,0 +1,72 @@
+
+import React, { useEffect, useState } from "react";
+import { LoaderCircle } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Skeleton } from "./skeleton";
+
+interface LoadingOverlayProps {
+  show: boolean;
+  delay?: number;
+  onComplete?: () => void;
+}
+
+export function LoadingOverlay({ 
+  show, 
+  delay = 1500, 
+  onComplete 
+}: LoadingOverlayProps) {
+  const [visible, setVisible] = useState(show);
+  const [fading, setFading] = useState(false);
+
+  useEffect(() => {
+    let fadeTimeout: NodeJS.Timeout;
+    let hideTimeout: NodeJS.Timeout;
+
+    if (show) {
+      setVisible(true);
+      setFading(false);
+    } else if (visible) {
+      // Start fade out animation
+      setFading(true);
+      
+      // After animation completes, actually hide the component
+      hideTimeout = setTimeout(() => {
+        setVisible(false);
+        if (onComplete) onComplete();
+      }, 400); // Match the fadeOut animation duration
+    }
+
+    // If we're showing and have a delay set, auto-hide after delay
+    if (show && delay) {
+      fadeTimeout = setTimeout(() => {
+        setFading(true);
+        
+        hideTimeout = setTimeout(() => {
+          setVisible(false);
+          if (onComplete) onComplete();
+        }, 400); // Match the fadeOut animation duration
+      }, delay);
+    }
+
+    return () => {
+      clearTimeout(fadeTimeout);
+      clearTimeout(hideTimeout);
+    };
+  }, [show, delay, visible, onComplete]);
+
+  if (!visible) return null;
+
+  return (
+    <div 
+      className={cn(
+        "fixed inset-0 bg-white dark:bg-gray-950 z-50 flex flex-col items-center justify-center",
+        fading ? "animate-fade-out" : "animate-fade-in"
+      )}
+    >
+      <div className="flex flex-col items-center space-y-4">
+        <LoaderCircle className="h-12 w-12 text-blue-500 animate-spin" />
+        <Skeleton className="w-24 h-2 bg-blue-200/50 dark:bg-blue-800/30" />
+      </div>
+    </div>
+  );
+}

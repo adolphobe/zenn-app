@@ -1,3 +1,4 @@
+
 import React, { useReducer, useEffect, useCallback, useState } from 'react';
 import { AppContext } from './AppContext';
 import { AppContextType, SortOptionsUpdate } from './types';
@@ -30,6 +31,7 @@ import {
   restoreTask,
   syncTasksFromDatabase
 } from './tasks';
+import { LoadingOverlay } from '@/components/ui/loading-overlay';
 
 // Provider component
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -37,6 +39,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const { currentUser, isAuthenticated, isLoading } = useAuth();
   const [isSyncing, setIsSyncing] = useState<boolean>(false);
   const [lastSyncTime, setLastSyncTime] = useState<number>(0);
+  const [isLoadingPreferences, setIsLoadingPreferences] = useState<boolean>(true);
   
   // Store tasks in DOM for access by non-React components
   useTaskStore(state.tasks);
@@ -99,6 +102,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // Load user preferences when authenticated
   useEffect(() => {
     const loadUserPreferences = async () => {
+      setIsLoadingPreferences(true);
+      
       if (currentUser?.id && isAuthenticated) {
         try {
           console.log("[AppProvider] Carregando preferências do usuário autenticado:", currentUser.id);
@@ -163,10 +168,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
               }
             });
             
-            toast({
-              title: "Preferências carregadas",
-              description: "Suas preferências pessoais foram aplicadas",
-            });
+            // Show toast after loading overlay is gone
+            setTimeout(() => {
+              toast({
+                title: "Preferências carregadas",
+                description: "Suas preferências pessoais foram aplicadas",
+              });
+            }, 2000);
           }
         } catch (error) {
           console.error("[AppProvider] Erro ao carregar preferências:", error);
@@ -177,6 +185,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             console.log("[AppProvider] Usando preferências locais como fallback");
             // We could apply local preferences here if needed
           }
+        } finally {
+          // Add a slight delay to ensure loading state persists for at least the minimum time
+          setTimeout(() => {
+            setIsLoadingPreferences(false);
+          }, 1000);
         }
       } else if (!isLoading && !isAuthenticated) {
         // For non-authenticated users, try to load from localStorage
@@ -185,6 +198,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           // Apply local preferences (similar logic as above)
           console.log("[AppProvider] Aplicando preferências do localStorage para usuário não autenticado");
         }
+        
+        // Add a slight delay to ensure loading state persists for at least the minimum time
+        setTimeout(() => {
+          setIsLoadingPreferences(false);
+        }, 1000);
       }
     };
     
@@ -254,6 +272,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   return (
     <AppContext.Provider value={contextValue}>
+      <LoadingOverlay 
+        show={isLoadingPreferences || isLoading} 
+        delay={1500}
+      />
       {children}
     </AppContext.Provider>
   );
