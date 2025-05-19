@@ -7,6 +7,12 @@ import { Comment } from '@/types';
 import { useAuth } from '@/context/auth';
 import { v4 as uuidv4 } from 'uuid';
 
+// Define types for mutation callbacks
+type MutationCallbacks = {
+  onSuccess?: () => void;
+  onError?: (error: any) => void;
+};
+
 export const useComments = (taskId: string) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const queryClient = useQueryClient();
@@ -45,9 +51,11 @@ export const useComments = (taskId: string) => {
     enabled: !!taskId
   });
 
-  // Add comment mutation
-  const { mutate: addComment } = useMutation({
-    mutationFn: async (text: string) => {
+  // Add comment mutation with proper callback handling
+  const { mutate } = useMutation({
+    mutationFn: async (payload: { text: string; callbacks?: MutationCallbacks }) => {
+      const { text, callbacks } = payload;
+      
       if (!isAuthenticated || !currentUser) {
         console.error('[useComments] User not authenticated');
         throw new Error('User not authenticated');
@@ -58,7 +66,7 @@ export const useComments = (taskId: string) => {
         throw new Error('Comment text cannot be empty');
       }
       
-      console.log(`[useComments] Adding comment to task ${taskId}`);
+      console.log(`[useComments] Adding comment to task ${taskId} by user ${currentUser.id}`);
       setIsSubmitting(true);
       
       try {
@@ -83,7 +91,7 @@ export const useComments = (taskId: string) => {
         setIsSubmitting(false);
       }
     },
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       toast({
         id: uuidv4(),
         title: "Comentário adicionado",
@@ -95,9 +103,14 @@ export const useComments = (taskId: string) => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       queryClient.invalidateQueries({ queryKey: ['task', taskId] });
       
+      // Call the onSuccess callback if provided
+      if (variables.callbacks?.onSuccess) {
+        variables.callbacks.onSuccess();
+      }
+      
       return true;
     },
-    onError: (error) => {
+    onError: (error, variables) => {
       console.error('[useComments] Error adding comment:', error);
       
       toast({
@@ -109,13 +122,26 @@ export const useComments = (taskId: string) => {
         variant: "destructive",
       });
       
+      // Call the onError callback if provided
+      if (variables.callbacks?.onError) {
+        variables.callbacks.onError(error);
+      }
+      
       return false;
     }
   });
 
-  // Delete comment mutation
-  const { mutate: deleteComment } = useMutation({
-    mutationFn: async (commentId: string) => {
+  // Wrapper function for addComment with proper typing
+  const addComment = (text: string, callbacks?: MutationCallbacks) => {
+    console.log('[useComments] addComment called with:', { text, callbacks });
+    return mutate({ text, callbacks });
+  };
+
+  // Delete comment mutation with proper callback handling
+  const { mutate: deleteCommentMutate } = useMutation({
+    mutationFn: async (payload: { commentId: string; callbacks?: MutationCallbacks }) => {
+      const { commentId } = payload;
+      
       console.log(`[useComments] Deleting comment: ${commentId}`);
       
       const { error } = await supabase
@@ -131,7 +157,7 @@ export const useComments = (taskId: string) => {
       console.log('[useComments] Comment deleted successfully');
       return commentId;
     },
-    onSuccess: (commentId) => {
+    onSuccess: (_, variables) => {
       toast({
         id: uuidv4(),
         title: "Comentário excluído",
@@ -143,9 +169,14 @@ export const useComments = (taskId: string) => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       queryClient.invalidateQueries({ queryKey: ['task', taskId] });
       
+      // Call the onSuccess callback if provided
+      if (variables.callbacks?.onSuccess) {
+        variables.callbacks.onSuccess();
+      }
+      
       return true;
     },
-    onError: (error) => {
+    onError: (error, variables) => {
       console.error('[useComments] Error deleting comment:', error);
       
       toast({
@@ -155,9 +186,20 @@ export const useComments = (taskId: string) => {
         variant: "destructive",
       });
       
+      // Call the onError callback if provided
+      if (variables.callbacks?.onError) {
+        variables.callbacks.onError(error);
+      }
+      
       return false;
     }
   });
+
+  // Wrapper function for deleteComment with proper typing
+  const deleteComment = (commentId: string, callbacks?: MutationCallbacks) => {
+    console.log('[useComments] deleteComment called with:', { commentId, callbacks });
+    return deleteCommentMutate({ commentId, callbacks });
+  };
 
   return {
     comments,

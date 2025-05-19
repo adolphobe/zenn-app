@@ -36,14 +36,25 @@ const CommentForm: React.FC<CommentFormProps> = ({ taskId, onCommentAdded }) => 
       return;
     }
     
-    // Corrigindo chamada do método addComment para seguir a convenção do React Query
+    console.log('[CommentForm] Submitting comment:', { 
+      taskId, 
+      userId: currentUser.id, 
+      text 
+    });
+    
+    // Usando a função addComment com os callbacks corretos
     addComment(text, {
       onSuccess: () => {
+        console.log('[CommentForm] Comment added successfully');
         setText(''); // Limpar o formulário em caso de sucesso
         
         if (onCommentAdded) {
+          console.log('[CommentForm] Calling onCommentAdded callback');
           onCommentAdded();
         }
+      },
+      onError: (error) => {
+        console.error('[CommentForm] Error adding comment:', error);
       }
     });
   };

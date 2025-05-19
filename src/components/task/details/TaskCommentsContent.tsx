@@ -5,6 +5,7 @@ import TaskComments from '@/components/TaskComments';
 import CommentForm from '@/components/CommentForm';
 import { useQueryClient } from '@tanstack/react-query';
 import { useComments } from '@/hooks/useComments';
+import { useAuth } from '@/context/auth';
 
 interface TaskCommentsContentProps {
   task: Task;
@@ -15,8 +16,9 @@ const TaskCommentsContent: React.FC<TaskCommentsContentProps> = ({ task, onComme
   const commentsRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
   const { comments } = useComments(task?.id || '');
+  const { isAuthenticated, currentUser } = useAuth();
   
-  // Log task data for debugging
+  // Log task and authentication data for debugging
   useEffect(() => {
     if (task?.id) {
       console.log('[TaskCommentsContent] Task data:', {
@@ -24,11 +26,18 @@ const TaskCommentsContent: React.FC<TaskCommentsContentProps> = ({ task, onComme
         hasComments: task?.comments && task.comments.length > 0,
         commentsCount: task?.comments?.length
       });
+      
+      console.log('[TaskCommentsContent] Auth state:', { 
+        isAuthenticated, 
+        hasUser: !!currentUser,
+        userId: currentUser?.id 
+      });
     }
-  }, [task]);
+  }, [task, isAuthenticated, currentUser]);
   
   // Verificar se a tarefa existe e tem um ID válido
   if (!task || !task.id) {
+    console.warn('[TaskCommentsContent] Task is undefined or has no ID');
     return (
       <div className="text-center p-6 text-gray-500 dark:text-gray-400">
         <p>Não foi possível carregar os comentários.</p>
