@@ -55,10 +55,15 @@ export const RestoreTaskDialog: React.FC<RestoreTaskDialogProps> = ({
             A tarefa será definida para a data: <strong>{restorationDate}</strong>
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel>Cancelar</AlertDialogCancel>
-          <AlertDialogAction onClick={handleConfirm}>Confirmar</AlertDialogAction>
-        </AlertDialogFooter>
+       <AlertDialogFooter>
+        <AlertDialogCancel>Cancelar</AlertDialogCancel>
+        <AlertDialogAction 
+          onClick={handleConfirm}
+          className="btn-green"
+        >
+          Confirmar
+        </AlertDialogAction>
+      </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
   );
