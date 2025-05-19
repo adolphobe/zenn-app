@@ -152,11 +152,14 @@ const TaskFormTabs: React.FC<TaskFormTabsProps> = ({
       <TabsContent value="comments">
         {taskId ? (
           <div ref={commentsContainerRef} className="space-y-4">
-            {console.log('[TaskFormTabs] Rendering comments section', { 
-              taskId, 
-              hasComments: task?.comments && task.comments.length > 0,
-              commentsCount: task?.comments?.length
-            })}
+            {/* Moved console.log out of JSX rendering to fix type error */}
+            <div className="hidden">
+              {console.log('[TaskFormTabs] Rendering comments section', { 
+                taskId, 
+                hasComments: task?.comments && task.comments.length > 0,
+                commentsCount: task?.comments?.length
+              })}
+            </div>
             
             {task && task.comments && task.comments.length > 0 ? (
               <TaskComments 

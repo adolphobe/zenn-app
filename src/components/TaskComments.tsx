@@ -131,21 +131,13 @@ const TaskComments: React.FC<TaskCommentsProps> = ({ taskId, comments, onComment
     
     try {
       // Delete from database and global state
-      const success = await deleteComment(taskId, commentId);
+      await deleteComment(taskId, commentId);
       
-      if (success) {
-        // Notify parent component that a comment was deleted
-        if (onCommentDeleted) {
-          console.log('[TaskComments] Calling onCommentDeleted callback');
-          onCommentDeleted();
-        }
-      } else {
-        // If deletion failed in the backend, restore the comment in the UI
-        console.log('[TaskComments] Comment deletion failed, restoring in UI');
-        const deletedComment = comments.find(c => c.id === commentId);
-        if (deletedComment) {
-          setLocalComments(prev => [...prev, deletedComment]);
-        }
+      // Always call the callback since we're in the try block
+      // This fixes the TypeScript error by not testing void for truthiness
+      if (onCommentDeleted) {
+        console.log('[TaskComments] Calling onCommentDeleted callback');
+        onCommentDeleted();
       }
     } catch (error) {
       console.error('[TaskComments] Error deleting comment:', error);
