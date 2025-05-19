@@ -1,10 +1,20 @@
+
 import { useState, useEffect } from 'react';
 import { Task } from '@/types';
 import { useAuth } from '@/context/auth';
 import { toast } from '@/hooks/use-toast';
 import { 
-  fetchTasks as fetchTasksFromDB
-} from '@/services/task';
+  fetchTasks as fetchTasksFromDB,
+  createTask,
+  updateTask,
+  deleteTask,
+  toggleTaskCompletion,
+  toggleTaskHidden,
+  setTaskFeedback,
+  restoreTask,
+  addComment,
+  deleteComment as deleteCommentService
+} from '@/services/taskService';
 
 /**
  * Hook to manage task fetching and operations with Supabase integration

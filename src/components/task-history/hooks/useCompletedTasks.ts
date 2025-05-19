@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Task } from '@/types';
 import { useAuth } from '@/context/auth';
-import { fetchTasks } from '@/services/task';
+import { fetchTasks } from '@/services/taskService';
 import { toast } from '@/hooks/use-toast';
 import { dateService } from '@/services/dateService';
 import { logDateInfo } from '@/utils/diagnosticLog';

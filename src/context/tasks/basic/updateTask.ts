@@ -3,7 +3,7 @@ import { TaskFormData } from '@/types';
 import { toast } from '@/hooks/use-toast';
 import { v4 as uuidv4 } from 'uuid';
 import { AppDispatch } from '../../types';
-import { updateTask as updateTaskService } from '@/services/task';
+import { updateTask as updateTaskService } from '@/services/taskService';
 
 export const updateTask = async (dispatch: AppDispatch, id: string, data: Partial<TaskFormData>) => {
   try {

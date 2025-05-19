@@ -2,7 +2,7 @@
 import { toast } from '@/hooks/use-toast';
 import { v4 as uuidv4 } from 'uuid';
 import { AppDispatch } from '../../types';
-import { setTaskFeedback as setTaskFeedbackService } from '@/services/task';
+import { setTaskFeedback as setTaskFeedbackService } from '@/services/taskService';
 import { logDiagnostics, logDateInfo } from '@/utils/diagnosticLog';
 
 export const setTaskFeedback = async (

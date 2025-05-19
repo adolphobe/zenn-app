@@ -2,7 +2,7 @@
 import { toast } from '@/hooks/use-toast';
 import { v4 as uuidv4 } from 'uuid';
 import { AppDispatch } from '../../types';
-import { deleteTask as deleteTaskService } from '@/services/task';
+import { deleteTask as deleteTaskService } from '@/services/taskService';
 
 export const deleteTask = async (dispatch: AppDispatch, id: string) => {
   try {

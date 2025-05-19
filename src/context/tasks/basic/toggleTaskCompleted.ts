@@ -2,7 +2,7 @@
 import { toast } from '@/hooks/use-toast';
 import { v4 as uuidv4 } from 'uuid';
 import { AppDispatch } from '../../types';
-import { toggleTaskCompletion as toggleTaskCompletionService } from '@/services/task';
+import { toggleTaskCompletion as toggleTaskCompletionService } from '@/services/taskService';
 import { logTaskStateChange, logDateInfo } from '@/utils/diagnosticLog';
 
 export const toggleTaskCompleted = async (dispatch: AppDispatch, id: string) => {

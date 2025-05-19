@@ -12,10 +12,10 @@ import { initializeDateTimeSettings } from './utils/dateUtils';
 // Initialize date settings before app renders
 initializeDateTimeSettings();
 
-// Simplified HashRouter configuration
+// Improved HashRouter configuration to fix nested routes issues
 const router = createHashRouter([
   {
-    path: '*', // Catch all routes and let App handle them
+    path: '/*', // This pattern captures all routes in the application
     element: <App />
   },
 ]);
