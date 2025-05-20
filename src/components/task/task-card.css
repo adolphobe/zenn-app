@@ -45,7 +45,7 @@
 .task-power-extra {
   @apply border-red-500 shadow-md;
   background-image: linear-gradient(to right, #ffefef, #f0f7ff, #fff5eb);
-  animation: subtle-pulse 4s ease-in-out infinite;
+  animation: subtle-pulse 2s ease-in-out infinite;
   box-shadow: 0 2px 8px rgba(234, 56, 76, 0.25); /* Sombra vermelha suave */
 }
 
@@ -60,15 +60,15 @@
   50% { opacity: 0.3; }
 }
 
-/* Animação de pulse MUITO mais suave */
+/* Animação de pulse um pouco mais perceptível e mais rápida */
 @keyframes subtle-pulse {
   0%, 100% { 
     transform: scale(1);
     box-shadow: 0 2px 8px rgba(234, 56, 76, 0.25);
   }
   50% { 
-    transform: scale(1.005); /* Reduzido de 1.01 para 1.005 para ser bem mais sutil */
-    box-shadow: 0 2px 10px rgba(234, 56, 76, 0.35);
+    transform: scale(1.01); /* Aumentado um pouco de 1.005 para 1.01 */
+    box-shadow: 0 3px 12px rgba(234, 56, 76, 0.4);
   }
 }
 
