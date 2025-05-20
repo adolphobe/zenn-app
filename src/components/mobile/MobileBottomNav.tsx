@@ -21,7 +21,7 @@ type NavigationItem = {
 const MobileBottomNav = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { signOut } = useAuth();
+  const { logout } = useAuth();
   const { 
     state: { viewMode, darkMode, showHiddenTasks, showPillars, showDates, showScores }, 
     setViewMode,
@@ -47,7 +47,7 @@ const MobileBottomNav = () => {
   };
   
   const handleLogout = async () => {
-    await signOut();
+    await logout();
     setMoreDrawerOpen(false);
     navigate('/login');
   };
