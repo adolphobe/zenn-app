@@ -48,6 +48,11 @@ const MobileBottomNav = () => {
     navigate('/mobile/chronological');
   };
   
+  const handleHistoryMode = () => {
+    setFilterDrawerOpen(false); // Close filter drawer when changing modes
+    navigate('/mobile/history');
+  };
+  
   const handleLogout = async () => {
     await logout();
     setMoreDrawerOpen(false);
@@ -92,11 +97,6 @@ const MobileBottomNav = () => {
   // More drawer items
   const moreItems: NavigationItem[] = [
     { 
-      icon: History, 
-      label: 'Histórico', 
-      path: '/task-history-new' 
-    },
-    { 
       icon: Calendar, 
       label: 'Análise Estratégica', 
       path: '/strategic-review' 
@@ -123,14 +123,20 @@ const MobileBottomNav = () => {
     { 
       icon: Power, 
       label: 'Potência', 
-      isActive: viewMode === 'power',
+      isActive: location.pathname === '/mobile/power',
       action: handlePowerMode 
     },
     { 
       icon: Clock, 
       label: 'Cronologia',
-      isActive: viewMode === 'chronological',
+      isActive: location.pathname === '/mobile/chronological',
       action: handleChronologicalMode 
+    },
+    { 
+      icon: History,
+      label: 'Histórico',
+      isActive: location.pathname === '/mobile/history',
+      action: handleHistoryMode
     },
     { 
       icon: Filter, 
@@ -198,7 +204,7 @@ const MobileBottomNav = () => {
             <button
               key={item.label}
               className={cn(
-                "flex flex-col items-center justify-center w-1/4 py-1 text-xs",
+                "flex flex-col items-center justify-center w-1/5 py-1 text-xs",
                 item.isActive ? "text-primary" : "text-muted-foreground"
               )}
               onClick={item.action}

@@ -32,6 +32,7 @@ const LandingPage = lazy(() => import('./pages/Landing'));
 // Mobile pages
 const MobilePowerPage = lazy(() => import('./pages/mobile/MobilePowerPage'));
 const MobileChronologicalPage = lazy(() => import('./pages/mobile/MobileChronologicalPage'));
+const MobileTaskHistoryPage = lazy(() => import('./pages/mobile/MobileTaskHistoryPage'));
 
 // Error and not found pages
 const NotFoundPage = lazy(() => import('./pages/NotFound'));
@@ -79,6 +80,7 @@ function App() {
                         {/* Mobile Routes */}
                         <Route path="/mobile/power" element={<MobilePowerPage />} />
                         <Route path="/mobile/chronological" element={<MobileChronologicalPage />} />
+                        <Route path="/mobile/history" element={<MobileTaskHistoryPage />} />
                       </Route>
                     </Route>
                     
