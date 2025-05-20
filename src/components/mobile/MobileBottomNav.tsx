@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Zap, Clock, Filter, MoreHorizontal, History, Calendar, Moon, Sun, Settings, LogOut } from 'lucide-react';
+import { Zap, CalendarRange, Filter, MoreHorizontal, History, Calendar, Moon, Sun, Settings, LogOut } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAppContext } from '@/context/AppContext';
 import { useAuth } from '@/context/auth';
@@ -191,7 +191,7 @@ const MobileBottomNav = () => {
       action: handlePowerMode 
     },
     { 
-      icon: Clock, 
+      icon: CalendarRange, 
       label: 'Cronologia',
       isActive: location.pathname === '/mobile/chronological',
       action: handleChronologicalMode 
