@@ -103,7 +103,8 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
                     borderTopRightRadius: '0px',
                     borderBottomLeftRadius: '0px',
                     marginTop: '-16px',
-                    marginLeft: '-17px'
+                    marginLeft: '-17px',
+                    fontSize: '10px'
                   }}
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
@@ -111,7 +112,7 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
                   transition={{ duration: 0.2 }}
                   layoutId={`hidden-badge-${title.substring(0, 10)}`}
                 >
-                  OCULTO
+                  OCULTA NO MODO POTÊNCIA
                 </motion.div>
               </TooltipTrigger>
               <TooltipContent className="text-sm max-w-xs leading-relaxed border border-gray-200 bg-white/95 backdrop-blur-sm shadow-md"
