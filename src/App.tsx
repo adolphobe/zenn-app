@@ -10,9 +10,9 @@ import { AppProvider } from './context/AppProvider';
 import { TaskDataProvider } from './context/TaskDataProvider';
 
 // Auth-related pages
-import LoginPage from './pages/auth/LoginPage';
+import LoginPage from './pages/Login';
 import SignupPage from './pages/auth/SignupPage';
-import PasswordResetPage from './pages/auth/PasswordResetPage';
+import PasswordResetPage from './pages/ResetPassword';
 import PasswordResetConfirmPage from './pages/auth/PasswordResetConfirmPage';
 
 // Layouts
@@ -21,18 +21,18 @@ import ActoApp from './pages/ActoApp';
 
 // Main pages
 const Dashboard = lazy(() => import('./components/Dashboard'));
-const Settings = lazy(() => import('./pages/settings/SettingsPage'));
-const TaskHistoryPage = lazy(() => import('./pages/task-history/TaskHistoryPage'));
+const Settings = lazy(() => import('./pages/Settings'));
+const TaskHistoryPage = lazy(() => import('./pages/task-history-new/TaskHistoryNewPage'));
 const TaskHistoryNewPage = lazy(() => import('./pages/task-history-new/TaskHistoryNewPage'));
-const StrategicReviewPage = lazy(() => import('./pages/strategic-review/StrategicReviewPage'));
-const LandingPage = lazy(() => import('./pages/LandingPage'));
+const StrategicReviewPage = lazy(() => import('./pages/StrategicReview'));
+const LandingPage = lazy(() => import('./pages/Landing'));
 
 // Mobile pages
 const MobilePowerPage = lazy(() => import('./pages/mobile/MobilePowerPage'));
 const MobileChronologicalPage = lazy(() => import('./pages/mobile/MobileChronologicalPage'));
 
 // Error and not found pages
-const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
+const NotFoundPage = lazy(() => import('./pages/NotFound'));
 
 // App with all providers and routes
 function App() {

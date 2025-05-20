@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '@/context/AppContext';
 import { useTaskDataContext } from '@/context/TaskDataProvider'; 
@@ -17,6 +18,103 @@ import { AnimatePresence, motion } from 'framer-motion';
 import MobileRedirect from './MobileRedirect';
 
 const Dashboard: React.FC = () => {
+  const { state } = useAppContext();
+  const { viewMode, showHiddenTasks, sortOptions, syncStatus } = state;
+  const { tasks, isLoading: tasksLoading, forceSynchronize, operationsLoading } = useTaskDataContext();
+  const [isTaskFormOpen, setIsTaskFormOpen] = useState(false);
+  const { isTaskExpanded, toggleTaskExpanded } = useExpandedTask();
+  
+  // Estado para mostrar/esconder tarefas vencidas, inicializado do localStorage
+  const [showOverdueTasks, setShowOverdueTasks] = useState(() => {
+    const stored = localStorage.getItem('showOverdueTasks');
+    return stored !== null ? JSON.parse(stored) : true;
+  });
+  
+  // Alternar mostrar/ocultar tarefas vencidas
+  const toggleOverdueTasks = () => {
+    setShowOverdueTasks(prev => !prev);
+  };
+  
+  // Filtragem e ordenação de tarefas
+  const shouldShowHiddenTasks = showHiddenTasks;
+  
+  // Filtrar as tarefas não-completadas e visíveis conforme as configurações
+  const filteredTasks = tasks.filter(task => {
+    const isNotCompleted = !task.completed;
+    const isVisible = shouldShowHiddenTasks || !task.hidden;
+    return isNotCompleted && isVisible;
+  });
+  
+  // Primeiro separar tarefas vencidas de não-vencidas
+  const overdueTasksChronological = filteredTasks.filter(task => 
+    task.idealDate && isTaskOverdue(task.idealDate)
+  );
+    
+  const nonOverdueTasksChronological = filteredTasks.filter(task => 
+    !task.idealDate || !isTaskOverdue(task.idealDate)
+  );
+    
+  // Aplicar ordenação a cada grupo separadamente
+  const sortedOverdueTasks = sortTasks(overdueTasksChronological, 'chronological', sortOptions['chronological']);
+  const sortedNonOverdueTasks = sortTasks(nonOverdueTasksChronological, viewMode, sortOptions[viewMode]);
+  
+  // Animações para os cards de tarefas
+  const taskVariants = {
+    hidden: { 
+      opacity: 0,
+      y: 20,
+      scale: 0.95,
+      transition: { duration: 0.3, ease: "easeInOut" }
+    },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      scale: 1,
+      transition: { duration: 0.3, ease: "easeInOut" }
+    },
+    exit: { 
+      opacity: 0,
+      scale: 0.9,
+      y: -20,
+      transition: { duration: 0.3, ease: "easeInOut" }
+    }
+  };
+  
+  // Descrição dinâmica baseada na direção da ordenação
+  const getDescriptionText = () => {
+    if (viewMode === 'power') {
+      const sortDirection = sortOptions.power.sortDirection;
+      return sortDirection === 'desc' 
+        ? 'As tarefas mais relevantes estão aparecendo primeiro.' 
+        : 'Exibindo as tarefas menos relevantes primeiro.';
+    } else {
+      const sortDirection = sortOptions.chronological.sortDirection;
+      return sortDirection === 'desc' 
+        ? 'Tarefas mais recentes até as mais antigas.' 
+        : 'Exibindo tarefas mais distantes primeiro.';
+    }
+  };
+  
+  // Sincronizar tarefas com o backend
+  const handleSyncTasks = async () => {
+    if (operationsLoading.update) return;
+    
+    try {
+      await forceSynchronize();
+      toast({
+        title: "Sincronização concluída",
+        description: "Suas tarefas foram sincronizadas com sucesso.",
+      });
+    } catch (error) {
+      console.error('Error synchronizing tasks:', error);
+      toast({
+        title: "Erro ao sincronizar",
+        description: "Não foi possível sincronizar suas tarefas. Tente novamente mais tarde.",
+        variant: "destructive",
+      });
+    }
+  };
+  
   // Adicionamos o componente MobileRedirect aqui
   return (
     <>
