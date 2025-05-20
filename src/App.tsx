@@ -1,79 +1,80 @@
 
-import React from 'react';
-import { Routes, Route } from 'react-router-dom';
-import Landing from './pages/Landing';
-import { ThemeProvider } from './components/ui/theme-provider';
+import { lazy, Suspense } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { Toaster } from '@/hooks/use-toast';
+import { LoadingOverlay } from '@/components/ui/loading-overlay';
+
+// Auth providers and pages
 import { AuthProvider } from './context/auth';
-import { UserProvider } from './context/UserContext';
-import ActoApp from './pages/ActoApp';
-import Login from './pages/Login';
-import NotFound from './pages/NotFound';
-import { PrivateRoute } from './components/PrivateRoute';
 import { AppProvider } from './context/AppProvider';
-import { Toaster } from './components/ui/toaster';
-import Dashboard from './components/Dashboard';
-import TaskHistoryNewPage from './pages/task-history-new';
-import StrategicReview from './pages/StrategicReview';
-import ResetPassword from './pages/ResetPassword';
-import Settings from './pages/Settings';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { TaskDataProvider } from './context/TaskDataProvider';
-import TaskProviders from './components/task/TaskProviders';
-import { TooltipProvider } from './components/ui/tooltip';
 
-// Create a client
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 30000,
-      retry: 1,
-      refetchOnWindowFocus: true,
-    },
-  },
-});
+// Auth-related pages
+import LoginPage from './pages/auth/LoginPage';
+import SignupPage from './pages/auth/SignupPage';
+import PasswordResetPage from './pages/auth/PasswordResetPage';
+import PasswordResetConfirmPage from './pages/auth/PasswordResetConfirmPage';
 
+// Layouts
+import { PrivateRoute } from './components/PrivateRoute';
+import ActoApp from './pages/ActoApp';
+
+// Main pages
+const Dashboard = lazy(() => import('./components/Dashboard'));
+const Settings = lazy(() => import('./pages/settings/SettingsPage'));
+const TaskHistoryPage = lazy(() => import('./pages/task-history/TaskHistoryPage'));
+const TaskHistoryNewPage = lazy(() => import('./pages/task-history-new/TaskHistoryNewPage'));
+const StrategicReviewPage = lazy(() => import('./pages/strategic-review/StrategicReviewPage'));
+const LandingPage = lazy(() => import('./pages/LandingPage'));
+
+// Mobile pages
+const MobilePowerPage = lazy(() => import('./pages/mobile/MobilePowerPage'));
+const MobileChronologicalPage = lazy(() => import('./pages/mobile/MobileChronologicalPage'));
+
+// Error and not found pages
+const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
+
+// App with all providers and routes
 function App() {
-  // Initialize date settings
-  React.useEffect(() => {
-    import('./utils/dateUtils').then(({ initializeDateTimeSettings }) => {
-      initializeDateTimeSettings();
-      console.log('Configurações de data e hora inicializadas');
-    });
-  }, []);
-
   return (
-    <div className="App">
-      <QueryClientProvider client={queryClient}>
-        <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
-          <TooltipProvider>
+    <Router>
+      <AuthProvider>
+        <AppProvider>
+          <TaskDataProvider>
             <Toaster />
-            <AuthProvider>
-              <AppProvider>
-                <TaskProviders>
-                  <TaskDataProvider>
-                    <UserProvider>
-                      <Routes>
-                        <Route path="/" element={<Landing />} />
-                        <Route path="/login" element={<Login />} />
-                        <Route path="/reset-password" element={<ResetPassword />} />
-                        <Route path="/app" element={<ActoApp />} />
-                        <Route element={<PrivateRoute />}>
-                          <Route path="/dashboard" element={<Dashboard />} />
-                          <Route path="/task-history-new" element={<TaskHistoryNewPage />} />
-                          <Route path="/strategic-review" element={<StrategicReview />} />
-                          <Route path="/settings" element={<Settings />} />
-                        </Route>
-                        <Route path="*" element={<NotFound />} />
-                      </Routes>
-                    </UserProvider>
-                  </TaskDataProvider>
-                </TaskProviders>
-              </AppProvider>
-            </AuthProvider>
-          </TooltipProvider>
-        </ThemeProvider>
-      </QueryClientProvider>
-    </div>
+            <Suspense fallback={<LoadingOverlay show={true} />}>
+              <Routes>
+                {/* Public Routes */}
+                <Route path="/" element={<LandingPage />} />
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/signup" element={<SignupPage />} />
+                <Route path="/reset-password" element={<PasswordResetPage />} />
+                <Route path="/reset-password/confirm" element={<PasswordResetConfirmPage />} />
+                
+                {/* Protected Routes */}
+                <Route element={<PrivateRoute />}>
+                  <Route element={<ActoApp />}>
+                    {/* Desktop Routes */}
+                    <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="/settings" element={<Settings />} />
+                    <Route path="/task-history" element={<TaskHistoryPage />} />
+                    <Route path="/task-history-new" element={<TaskHistoryNewPage />} />
+                    <Route path="/strategic-review" element={<StrategicReviewPage />} />
+                    
+                    {/* Mobile Routes */}
+                    <Route path="/mobile/power" element={<MobilePowerPage />} />
+                    <Route path="/mobile/chronological" element={<MobileChronologicalPage />} />
+                  </Route>
+                </Route>
+                
+                {/* Default and Not Found Routes */}
+                <Route path="*" element={<NotFoundPage />} />
+              </Routes>
+            </Suspense>
+          </TaskDataProvider>
+        </AppProvider>
+      </AuthProvider>
+    </Router>
   );
 }
 

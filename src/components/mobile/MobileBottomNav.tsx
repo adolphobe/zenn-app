@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+
+import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Power, Clock, Filter, MoreHorizontal, History, Calendar, Moon, Sun, Settings, LogOut } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -38,13 +39,13 @@ const MobileBottomNav = () => {
   const handlePowerMode = () => {
     setViewMode('power');
     setFilterDrawerOpen(false); // Close filter drawer when changing modes
-    navigate('/dashboard');
+    navigate('/mobile/power');
   };
 
   const handleChronologicalMode = () => {
     setViewMode('chronological');
     setFilterDrawerOpen(false); // Close filter drawer when changing modes
-    navigate('/dashboard');
+    navigate('/mobile/chronological');
   };
   
   const handleLogout = async () => {
@@ -149,7 +150,7 @@ const MobileBottomNav = () => {
   const renderDrawerItem = (item: NavigationItem) => (
     <button 
       key={item.label}
-      className="flex items-center gap-2 w-full p-2 hover:bg-muted rounded-md"
+      className="flex items-center gap-1.5 w-full p-1.5 hover:bg-muted rounded-md"
       onClick={() => {
         if (item.action) {
           item.action();
@@ -160,8 +161,8 @@ const MobileBottomNav = () => {
         }
       }}
     >
-      <item.icon size={18} />
-      <span className="text-sm">{item.label}</span>
+      <item.icon size={14} />
+      <span className="text-xs">{item.label}</span>
     </button>
   );
 
@@ -170,8 +171,8 @@ const MobileBottomNav = () => {
       {/* Filter Drawer */}
       <Drawer open={filterDrawerOpen} onOpenChange={setFilterDrawerOpen} direction="bottom">
         <DrawerContent className="max-h-[70vh]">
-          <div className="py-3 px-4">
-            <h3 className="text-lg font-medium mb-3">Filtros</h3>
+          <div className="py-2 px-3">
+            <h3 className="text-sm font-medium mb-2">Filtros</h3>
             <div className="flex flex-col gap-1">
               {filterItems.map(renderDrawerItem)}
             </div>
@@ -182,7 +183,7 @@ const MobileBottomNav = () => {
       {/* More Drawer */}
       <Drawer open={moreDrawerOpen} onOpenChange={setMoreDrawerOpen} direction="bottom">
         <DrawerContent className="max-h-[70vh]">
-          <div className="py-3 px-4">
+          <div className="py-2 px-3">
             <div className="flex flex-col gap-1">
               {moreItems.map(renderDrawerItem)}
             </div>
@@ -215,7 +216,7 @@ const MobileBottomNav = () => {
   );
 };
 
-// Custom icon components with max 18px size
+// Custom icon components with max 14px size (reduzidos de 18px)
 const Eye = (props: any) => (
   <svg 
     xmlns="http://www.w3.org/2000/svg" 
@@ -225,8 +226,8 @@ const Eye = (props: any) => (
     strokeWidth="2" 
     strokeLinecap="round" 
     strokeLinejoin="round"
-    width="18"
-    height="18"
+    width="14"
+    height="14"
     {...props}
   >
     <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
@@ -243,8 +244,8 @@ const EyeOff = (props: any) => (
     strokeWidth="2" 
     strokeLinecap="round" 
     strokeLinejoin="round"
-    width="18"
-    height="18"
+    width="14"
+    height="14"
     {...props}
   >
     <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
@@ -263,8 +264,8 @@ const Badge = (props: any) => (
     strokeWidth="2" 
     strokeLinecap="round" 
     strokeLinejoin="round"
-    width="18"
-    height="18"
+    width="14"
+    height="14"
     {...props}
   >
     <path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z" />
@@ -280,8 +281,8 @@ const Pillar = (props: any) => (
     strokeWidth="2" 
     strokeLinecap="round" 
     strokeLinejoin="round"
-    width="18"
-    height="18"
+    width="14"
+    height="14"
     {...props}
   >
     <rect x="4" y="6" width="16" height="16" rx="2" />
