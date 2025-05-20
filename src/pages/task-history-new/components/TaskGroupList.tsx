@@ -39,24 +39,25 @@ export const TaskGroupList: React.FC<TaskGroupListProps> = ({
   }
 
   return (
-    // Using overflow-hidden on both the container and each group to prevent horizontal scrollbar
-    <div className="space-y-8 overflow-hidden">
+    <div className="space-y-8">
       {groups.map((group, index) => (
-        <div key={index} className="space-y-4 overflow-hidden">
+        <div key={index} className="space-y-4">
           <div className="flex items-center gap-2">
             <h3 className="text-lg font-medium">{group.label}</h3>
             <Badge variant="outline">{group.tasks.length}</Badge>
           </div>
           
           {viewMode === 'list' ? (
-            <TaskTable 
-              tasks={group.tasks} 
-              onSelectTask={onSelectTask}
-              onRestoreTask={onRestoreTask}
-              onSort={onSort}
-              sortField={sortField}
-              sortDirection={sortDirection}
-            />
+            <div className="w-full overflow-x-auto">
+              <TaskTable 
+                tasks={group.tasks} 
+                onSelectTask={onSelectTask}
+                onRestoreTask={onRestoreTask}
+                onSort={onSort}
+                sortField={sortField}
+                sortDirection={sortDirection}
+              />
+            </div>
           ) : (
             <TaskGrid 
               tasks={group.tasks} 

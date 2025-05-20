@@ -13,6 +13,7 @@ import { sortTasks, isTaskOverdue } from '@/utils';
 import { toast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
 import SidebarFilterSection from '@/components/sidebar/SidebarFilterSection';
+import MobileSortDropdown from '@/components/mobile/MobileSortDropdown';
 
 const MobileChronologicalPage: React.FC = () => {
   const { state } = useAppContext();
@@ -127,23 +128,27 @@ const MobileChronologicalPage: React.FC = () => {
     <div className="px-3 py-2 relative">
       {/* Filtros no topo */}
       <div className="flex justify-between items-center mb-4">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={handleSyncTasks}
-          disabled={operationsLoading.update}
-          className={`flex items-center gap-1 ${
-            syncStatus === 'error' ? 'border-red-500 text-red-500 hover:bg-red-50' : ''
-          }`}
-        >
-          {operationsLoading.update ? (
-            <Loader2 size={14} className="animate-spin" />
-          ) : syncStatus === 'error' ? (
-            <RefreshCw size={14} className="text-red-500" />
-          ) : (
-            <RefreshCw size={14} className={syncStatus === 'synced' ? "text-green-500" : ""} />
-          )}
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleSyncTasks}
+            disabled={operationsLoading.update}
+            className={`flex items-center gap-1 ${
+              syncStatus === 'error' ? 'border-red-500 text-red-500 hover:bg-red-50' : ''
+            }`}
+          >
+            {operationsLoading.update ? (
+              <Loader2 size={14} className="animate-spin" />
+            ) : syncStatus === 'error' ? (
+              <RefreshCw size={14} className="text-red-500" />
+            ) : (
+              <RefreshCw size={14} className={syncStatus === 'synced' ? "text-green-500" : ""} />
+            )}
+          </Button>
+          
+          <MobileSortDropdown />
+        </div>
         
         <Button
           variant="outline"

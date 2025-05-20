@@ -1,7 +1,7 @@
 
 import React from 'react';
-import { ArrowUpDown } from 'lucide-react';
-import { useAppContext } from '../context/AppContext';
+import { ArrowUp, ArrowDown } from 'lucide-react';
+import { useAppContext } from '@/context/AppContext';
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -9,20 +9,12 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
   DropdownMenuLabel,
-} from './ui/dropdown-menu';
-import { Button } from './ui/button';
-import { SortDirection } from '../types';
+} from '@/components/ui/dropdown-menu';
+import { Button } from '@/components/ui/button';
+import { SortDirection } from '@/types';
 import { dropdownStyles } from '@/lib/utils';
 
-interface SortDropdownProps {
-  size?: 'default' | 'sm' | 'lg'; // Opcional para tornar o botão mais responsivo
-  minimal?: boolean; // Opcional para mostrar menos texto em telas menores
-}
-
-const SortDropdown: React.FC<SortDropdownProps> = ({
-  size = 'default',
-  minimal = false
-}) => {
+const MobileSortDropdown: React.FC = () => {
   const { state, setSortOptions } = useAppContext();
   const { viewMode, sortOptions } = state;
   
@@ -40,11 +32,15 @@ const SortDropdown: React.FC<SortDropdownProps> = ({
       <DropdownMenuTrigger asChild>
         <Button
           variant="outline"
-          size={size === 'default' ? 'default' : size}
-          className={`flex items-center gap-2 ${minimal ? 'px-3' : 'px-4 py-5'} hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-900/20 dark:hover:text-blue-400`}
+          size="sm"
+          className="flex items-center gap-1.5 px-3 py-1.5"
         >
-          <ArrowUpDown size={16} />
-          {!minimal && <span className="hidden sm:inline">Ordenação</span>}
+          {sortDirection === 'desc' ? (
+            <ArrowDown size={16} className="text-primary" />
+          ) : (
+            <ArrowUp size={16} className="text-primary" />
+          )}
+          <span className="text-xs">Ordenar</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
@@ -89,4 +85,4 @@ const SortDropdown: React.FC<SortDropdownProps> = ({
   );
 };
 
-export default SortDropdown;
+export default MobileSortDropdown;
