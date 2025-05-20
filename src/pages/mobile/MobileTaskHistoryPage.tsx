@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback, useEffect } from 'react';
 import { useTaskDataContext } from '@/context/TaskDataProvider';
 import { Task } from '@/types';
@@ -173,6 +174,7 @@ const MobileTaskHistoryPage = () => {
   };
 
   // Handle confirm restore
+  // Modified to expect a taskId (string) rather than a Task object
   const handleConfirmRestore = async (taskId: string) => {
     await restoreTask(taskId);
     
