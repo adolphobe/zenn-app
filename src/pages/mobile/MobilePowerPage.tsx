@@ -101,7 +101,7 @@ const MobilePowerPage: React.FC = () => {
 
   return (
     <motion.div 
-      className="px-3 py-2 relative"
+      className="py-2 relative"
       initial="initial"
       animate="animate"
       exit="exit"
