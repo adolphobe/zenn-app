@@ -1,10 +1,19 @@
 
 import { supabase } from '@/integrations/supabase/client';
+import { AuthThrottle, withAuthThrottle } from '@/utils/authThrottle';
+import { TokenManager } from '@/utils/tokenManager';
 
-export const login = async (email: string, password: string) => {
+/**
+ * Serviço de login com melhorias de robustez e tratamento de erros
+ */
+export const login = withAuthThrottle(async (email: string, password: string) => {
   try {
     console.log("[LoginService] Tentando login com:", email);
     
+    // Limpar quaisquer flags de operações anteriores
+    TokenManager.clearAllFlags();
+    
+    // Tentativa de login com tratamento de erro específico
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password
@@ -31,7 +40,7 @@ export const login = async (email: string, password: string) => {
       if (error.message.includes('rate limit') || error.message.includes('too many requests')) {
         return {
           success: false,
-          error: "Muitas tentativas de login. Aguarde um momento e tente novamente."
+          error: "Muitas tentativas de login. Aguarde alguns minutos e tente novamente."
         };
       }
       
@@ -51,12 +60,20 @@ export const login = async (email: string, password: string) => {
     }
     
     console.log("[LoginService] Login bem-sucedido para:", data.user?.email);
+    
+    // Marcar login como bem-sucedido
+    TokenManager.setLoginSuccess(true);
+    
     return { success: true, user: data.user, session: data.session };
   } catch (error: any) {
     console.error("[LoginService] Erro inesperado:", error);
+    
+    // Limpar tokens em caso de erro inesperado
+    TokenManager.clearAllFlags();
+    
     return { 
       success: false, 
       error: "Ocorreu um erro ao tentar fazer login. Por favor, tente novamente."
     };
   }
-};
+});

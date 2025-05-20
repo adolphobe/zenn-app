@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/auth';
 import { toast } from '@/hooks/use-toast';
 import { performLogout } from '@/utils/authUtils';
+import { TokenManager } from '@/utils/tokenManager';
 
 interface SidebarUserProfileProps {
   sidebarOpen: boolean;
@@ -21,14 +22,10 @@ const SidebarUserProfile: React.FC<SidebarUserProfileProps> = ({ sidebarOpen }) 
       console.log("[SidebarUserProfile] Iniciando processo de logout");
       
       // Prevent any navigation while logout is in progress
-      const inProgress = localStorage.getItem('logout_in_progress');
-      if (inProgress === 'true') {
+      if (TokenManager.isLogoutInProgress()) {
         console.log("[SidebarUserProfile] Logout já em andamento, ignorando nova solicitação");
         return;
       }
-      
-      // Set logout in progress flag before calling logout
-      localStorage.setItem('logout_in_progress', 'true');
       
       // Centralized logout method
       await performLogout(navigate);
@@ -43,7 +40,7 @@ const SidebarUserProfile: React.FC<SidebarUserProfileProps> = ({ sidebarOpen }) 
       });
       
       // Clear flag in case of error
-      localStorage.removeItem('logout_in_progress');
+      TokenManager.setLogoutInProgress(false);
     }
   };
   

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { toast } from '@/hooks/use-toast';
 import { processAuthError } from '@/utils/authErrorUtils';
@@ -5,6 +6,7 @@ import { login as authLogin, signup as authSignup, sendPasswordResetEmail as aut
 import { supabase } from '@/integrations/supabase/client';
 import { User } from '../../../types/user';
 import { Session } from '@supabase/supabase-js';
+import { TokenManager } from '@/utils/tokenManager';
 
 interface AuthStateProps {
   setCurrentUser: (user: User | null) => void;
@@ -17,6 +19,9 @@ export function useAuthActions({ setCurrentUser, setSession, setIsLoading }: Aut
   const login = async (email: string, password: string): Promise<{ success: boolean, error?: any }> => {
     setIsLoading(true);
     
+    // Limpar todas as flags de autenticação antes de tentar login
+    TokenManager.clearAllFlags();
+    
     try {
       const result = await authLogin(email, password);
       
@@ -26,12 +31,19 @@ export function useAuthActions({ setCurrentUser, setSession, setIsLoading }: Aut
         setSession(result.session);
         const user = await fetchUserProfile(result.user);
         setCurrentUser(user);
+        
+        // Marcar login como bem-sucedido
+        TokenManager.setLoginSuccess(true);
       }
       
       setIsLoading(false);
       return { success: result.success, error: result.error };
     } catch (error) {
       setIsLoading(false);
+      
+      // Em caso de erro, garantir que flags são limpas
+      TokenManager.clearAllFlags();
+      
       return { success: false, error };
     }
   };
@@ -64,31 +76,28 @@ export function useAuthActions({ setCurrentUser, setSession, setIsLoading }: Aut
     }
   };
   
-  // Logout function
+  // Logout function - simplificado para usar o utilitário centralizado
   const logout = async (): Promise<void> => {
     console.log("[AuthProvider] Iniciando processo completo de logout do usuário");
     
     try {
       setIsLoading(true);
       
-      // Set logout in progress flag to prevent loading overlay
-      localStorage.setItem('logout_in_progress', 'true');
+      // Definir flag de logout em andamento
+      TokenManager.setLogoutInProgress(true);
       
-      // First clear local states 
+      // Limpar estados locais
       setCurrentUser(null);
       setSession(null);
       
-      // Remove any locally stored auth data
-      localStorage.removeItem('sb-wbvxnapruffchikhrqrs-auth-token');
-      localStorage.removeItem('supabase.auth.token');
+      // Remover dados de autenticação armazenados localmente
+      TokenManager.clearAllTokens();
       
-      // Call Supabase signOut with explicit scope to ensure all devices are logged out
+      // Chamar signOut do Supabase com escopo explícito para garantir que todos os dispositivos são deslogados
       const { error } = await supabase.auth.signOut({ scope: 'global' });
       
       if (error) {
         console.error("[AuthProvider] Erro no logout:", error.message);
-        console.error("[AuthProvider] DETALHES EM PORTUGUÊS: Erro ao tentar encerrar a sessão:", error.message);
-        
         const errorDetails = processAuthError(error);
         
         toast({
@@ -106,14 +115,17 @@ export function useAuthActions({ setCurrentUser, setSession, setIsLoading }: Aut
       }
     } catch (error) {
       console.error("[AuthProvider] Erro durante logout:", error);
-      console.error("[AuthProvider] DETALHES EM PORTUGUÊS: Ocorreu um erro inesperado ao tentar encerrar a sessão");
-      
       const errorDetails = processAuthError(error);
     } finally {
-      // Always clear user and session states when logging out
+      // Sempre limpar estados de usuário e sessão ao fazer logout
       setCurrentUser(null);
       setSession(null);
       setIsLoading(false);
+      
+      // Garantir que a flag será removida após um tempo
+      setTimeout(() => {
+        TokenManager.setLogoutInProgress(false);
+      }, 1000);
     }
   };
 

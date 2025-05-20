@@ -4,6 +4,7 @@ import { Session } from '@supabase/supabase-js';
 import { User } from '../../../types/user';
 import { supabase } from '@/integrations/supabase/client';
 import { fetchUserProfile, checkAuthSession } from '../authService';
+import { TokenManager } from '@/utils/tokenManager';
 
 export function useAuthState() {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -14,55 +15,63 @@ export function useAuthState() {
   // Set up auth state listener and check for existing session
   useEffect(() => {
     console.log("[AuthProvider] Inicializando estado de autenticação");
-    console.log("[AuthProvider] DETALHES EM PORTUGUÊS: Verificando se existe uma sessão ativa");
     
-    // Check for logout in progress flag and clear it if it exists on page load
-    const logoutInProgress = localStorage.getItem('logout_in_progress');
-    if (logoutInProgress === 'true') {
+    // Verificar e limpar flag de logout em andamento ao inicializar
+    if (TokenManager.isLogoutInProgress()) {
       console.log("[AuthProvider] Detectada flag de logout em andamento ao inicializar, limpando");
-      localStorage.removeItem('logout_in_progress');
-      localStorage.removeItem('sb-wbvxnapruffchikhrqrs-auth-token');
-      localStorage.removeItem('supabase.auth.token');
+      TokenManager.clearAllFlags();
+      TokenManager.clearAllTokens();
     }
     
     let authSubscription: { unsubscribe: () => void } | null = null;
     
-    // Set up auth state change listener FIRST
+    // Configurar o listener de mudanças no estado de autenticação PRIMEIRO
     const setupAuthListener = () => {
       try {
+        // Usar um estado local para controlar o processamento de eventos simultâneos
+        let isProcessingAuthChange = false;
+        
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
           (event, newSession) => {
             console.log("[AuthProvider] Estado de autenticação alterado:", event);
-            console.log("[AuthProvider] DETALHES EM PORTUGUÊS: Evento de autenticação detectado:", 
-              event === 'SIGNED_IN' ? 'Usuário entrou' : 
-              event === 'SIGNED_OUT' ? 'Usuário saiu' : 
-              'Outro evento de autenticação');
             
-            // Update session state
+            // Evitar processamento simultâneo de eventos
+            if (isProcessingAuthChange) {
+              console.log("[AuthProvider] Já processando um evento de autenticação, ignorando novo evento");
+              return;
+            }
+            
+            isProcessingAuthChange = true;
+            
+            // Atualizar estado da sessão
             setSession(newSession);
             
             if (event === 'SIGNED_OUT') {
               console.log("[AuthProvider] Usuário deslogado");
-              console.log("[AuthProvider] DETALHES EM PORTUGUÊS: Usuário encerrou a sessão");
               setCurrentUser(null);
               setIsLoading(false);
+              isProcessingAuthChange = false;
               return;
             }
             
-            // Use setTimeout to prevent potential race conditions
+            // Se houver uma nova sessão, buscar perfil do usuário
             if (newSession?.user) {
               console.log("[AuthProvider] Nova sessão detectada");
-              console.log("[AuthProvider] DETALHES EM PORTUGUÊS: Iniciando nova sessão para o usuário");
               
-              // Use setTimeout to avoid race conditions
+              // Usar setTimeout para evitar condições de corrida
               setTimeout(() => {
                 fetchUserProfile(newSession.user)
                   .then(user => {
                     setCurrentUser(user);
                     setIsLoading(false);
                     setAuthInitialized(true);
+                  })
+                  .finally(() => {
+                    isProcessingAuthChange = false;
                   });
-              }, 0);
+              }, 50);
+            } else {
+              isProcessingAuthChange = false;
             }
           }
         );
@@ -75,7 +84,7 @@ export function useAuthState() {
       }
     };
     
-    // First set up the auth listener
+    // Primeiro configurar o listener de autenticação
     const listenerSetup = setupAuthListener();
     
     if (!listenerSetup) {
@@ -83,7 +92,7 @@ export function useAuthState() {
       setIsLoading(false);
     }
     
-    // THEN check for existing session
+    // DEPOIS verificar se existe uma sessão
     const checkInitialSession = async () => {
       try {
         console.log("[AuthProvider] Verificando sessão inicial...");
@@ -97,30 +106,28 @@ export function useAuthState() {
         }
         
         console.log("[AuthProvider] Verificação inicial da sessão:", isAuthenticated ? "Sessão encontrada" : "Nenhuma sessão");
-        console.log("[AuthProvider] DETALHES EM PORTUGUÊS:", isAuthenticated ? "Encontramos uma sessão ativa" : "Nenhuma sessão ativa encontrada");
         
         if (isAuthenticated && session && user) {
           setSession(session);
           setCurrentUser(user);
         } 
         
-        // Always update loading state regardless of auth status
+        // Sempre atualizar estado de loading independente do status de autenticação
         setIsLoading(false);
         setAuthInitialized(true);
       } catch (error) {
         console.error("[AuthProvider] Erro ao verificar sessão:", error);
-        console.error("[AuthProvider] DETALHES EM PORTUGUÊS: Ocorreu um erro ao verificar se existe uma sessão ativa");
         setIsLoading(false);
         setAuthInitialized(true);
       }
     };
     
-    // Check for initial session after setting up the listener
+    // Verificar sessão inicial após configurar o listener
     setTimeout(() => {
       checkInitialSession();
-    }, 10); // Small delay to ensure listener is registered first
+    }, 50); // Pequeno delay para garantir que o listener é registrado primeiro
     
-    // Clean up subscription on unmount
+    // Limpar inscrição ao desmontar
     return () => {
       console.log("[AuthProvider] Limpando - cancelando inscrição em eventos de autenticação");
       if (authSubscription) {
