@@ -1,3 +1,4 @@
+
 import { Outlet, useLocation, Navigate } from 'react-router-dom';
 import { useAuth } from '@/context/auth';
 import { useSidebar } from '@/context/hooks';
@@ -5,6 +6,7 @@ import { Menu } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useEffect, useState, useMemo } from 'react';
 import { LoadingOverlay } from './ui/loading-overlay';
+import { INITIAL_LOAD_COMPLETE_KEY, INITIAL_LOAD_DELAY, INTERNAL_NAVIGATION_DELAY } from '@/utils/authConstants';
 
 /**
  * PrivateRoute - Protects routes that require authentication
@@ -19,6 +21,11 @@ export const PrivateRoute = () => {
   // Check if the current route is the dashboard
   const isDashboardRoute = location.pathname === '/dashboard';
   
+  // Check if this is the initial load of the application
+  const isInitialLoad = useMemo(() => 
+    localStorage.getItem(INITIAL_LOAD_COMPLETE_KEY) !== 'true',
+  []);
+  
   // Check for logout in progress to prevent login/logout loops
   const logoutInProgress = useMemo(() => 
     localStorage.getItem('logout_in_progress') === 'true',
@@ -31,21 +38,29 @@ export const PrivateRoute = () => {
     }
   }, [isLoading]);
 
-  // Set initial loading state based on route
+  // Set initial loading state based on route and whether this is initial load
   useEffect(() => {
     if (isDashboardRoute && isAuthenticated) {
       setShowLoading(true);
       
+      // Determine appropriate loading time based on whether this is initial load
+      const loadingDelay = isInitialLoad ? INITIAL_LOAD_DELAY : INTERNAL_NAVIGATION_DELAY;
+      
       // Auto-hide loading after content is likely rendered
       const timer = setTimeout(() => {
         setShowLoading(false);
-      }, 1800);
+        
+        // Mark initial load as complete after first dashboard load
+        if (isInitialLoad) {
+          localStorage.setItem(INITIAL_LOAD_COMPLETE_KEY, 'true');
+        }
+      }, loadingDelay);
       
       return () => clearTimeout(timer);
     } else {
       setShowLoading(false);
     }
-  }, [isDashboardRoute, isAuthenticated]);
+  }, [isDashboardRoute, isAuthenticated, isInitialLoad]);
 
   // Show loading overlay while checking authentication
   if (isLoading || !authChecked) {

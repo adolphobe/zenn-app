@@ -4,6 +4,7 @@ import { LoaderCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "./skeleton";
 import { useLocation } from "react-router-dom";
+import { INITIAL_LOAD_COMPLETE_KEY } from "@/utils/authConstants";
 
 interface LoadingOverlayProps {
   show: boolean;
@@ -23,6 +24,7 @@ export function LoadingOverlay({
   // Only show loading on dashboard
   const isDashboard = location.pathname === '/dashboard';
   const isLogoutInProgress = localStorage.getItem('logout_in_progress') === 'true';
+  const isInitialLoad = localStorage.getItem(INITIAL_LOAD_COMPLETE_KEY) !== 'true';
   
   useEffect(() => {
     let fadeTimeout: NodeJS.Timeout;
@@ -56,6 +58,9 @@ export function LoadingOverlay({
 
     // If we're showing and have a delay set, auto-hide after delay
     if (show && isDashboard && delay) {
+      // Para navegações internas, usamos um tempo mais curto
+      const actualDelay = isInitialLoad ? delay : Math.min(delay, 400);
+      
       fadeTimeout = setTimeout(() => {
         setFading(true);
         
@@ -63,14 +68,14 @@ export function LoadingOverlay({
           setVisible(false);
           if (onComplete) onComplete();
         }, 400); // Match the fadeOut animation duration
-      }, delay);
+      }, actualDelay);
     }
 
     return () => {
       clearTimeout(fadeTimeout);
       clearTimeout(hideTimeout);
     };
-  }, [show, delay, visible, onComplete, isDashboard, isLogoutInProgress]);
+  }, [show, delay, visible, onComplete, isDashboard, isLogoutInProgress, isInitialLoad]);
 
   // Don't render if not visible, not on dashboard, or during logout
   if (!visible || !isDashboard || isLogoutInProgress) return null;
@@ -79,7 +84,8 @@ export function LoadingOverlay({
     <div 
       className={cn(
         "fixed inset-0 bg-white z-[9999] flex flex-col items-center justify-center",
-        fading ? "animate-fade-out" : "animate-fade-in"
+        fading ? "animate-fade-out" : "animate-fade-in",
+        isInitialLoad ? "opacity-100" : "bg-white/70 backdrop-blur-sm"
       )}
     >
       <div className="flex flex-col items-center space-y-4">
