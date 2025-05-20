@@ -116,7 +116,7 @@ const MobileStrategicReviewPage = () => {
   const renderFeedbackVisualization = () => {
     if (!feedbackData.withFeedback) {
       return (
-        <div className="text-center">
+        <div className="p-4 text-center">
           <p className="text-muted-foreground">
             Sem dados de feedback para o período selecionado
           </p>
@@ -169,7 +169,7 @@ const MobileStrategicReviewPage = () => {
   };
 
   return (
-    <div className="p-4 pb-20 space-y-6">
+    <div className="pb-20 space-y-6">
       <h1 className="text-xl font-bold mb-4">Análise Estratégica</h1>
       
       {/* Period selector dropdown */}
