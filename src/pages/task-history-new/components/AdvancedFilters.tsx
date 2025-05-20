@@ -8,15 +8,16 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { cn } from '@/lib/utils';
+import { PeriodFilter, ScoreFilter, FeedbackFilter, PillarFilter } from '../hooks/useTaskFilters';
 
 interface AdvancedFiltersProps {
-  periodFilter: string;
+  periodFilter: PeriodFilter;
   setPeriodFilter: (period: string) => void;
-  scoreFilter: string;
+  scoreFilter: ScoreFilter;
   setScoreFilter: (score: string) => void;
-  feedbackFilter: string;
+  feedbackFilter: FeedbackFilter;
   setFeedbackFilter: (feedback: string) => void;
-  pillarFilter: string;
+  pillarFilter: PillarFilter;
   setPillarFilter: (pillar: string) => void;
   startDate: Date | undefined;
   setStartDate: (date: Date | undefined) => void;

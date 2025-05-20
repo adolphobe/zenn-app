@@ -3,11 +3,12 @@ import React from 'react';
 import { LayoutGrid, LayoutList } from 'lucide-react';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { ViewMode, SortBy } from '../hooks/useTaskFilters';
 
 interface ViewToggleProps {
-  viewMode: 'list' | 'grid';
-  setViewMode: (mode: 'list' | 'grid') => void;
-  sortBy: string;
+  viewMode: ViewMode;
+  setViewMode: (mode: ViewMode) => void;
+  sortBy: SortBy;
   setSortBy: (sort: string) => void;
 }
 
@@ -26,13 +27,13 @@ export const ViewToggle: React.FC<ViewToggleProps> = ({
         <SelectContent>
           <SelectItem value="newest">Mais recentes</SelectItem>
           <SelectItem value="oldest">Mais antigas</SelectItem>
-          <SelectItem value="highScore">Maior pontuação</SelectItem>
-          <SelectItem value="lowScore">Menor pontuação</SelectItem>
+          <SelectItem value="highestScore">Maior pontuação</SelectItem>
+          <SelectItem value="lowestScore">Menor pontuação</SelectItem>
           <SelectItem value="alphabetical">Alfabética</SelectItem>
         </SelectContent>
       </Select>
       
-      <ToggleGroup type="single" value={viewMode} onValueChange={(value) => value && setViewMode(value as 'list' | 'grid')}>
+      <ToggleGroup type="single" value={viewMode} onValueChange={(value) => value && setViewMode(value as ViewMode)}>
         <ToggleGroupItem value="grid" aria-label="Ver como grade">
           <LayoutGrid className="h-4 w-4" />
         </ToggleGroupItem>

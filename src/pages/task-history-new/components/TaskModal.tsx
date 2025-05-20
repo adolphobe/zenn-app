@@ -36,7 +36,7 @@ const TaskModal: React.FC<TaskModalProps> = ({ task, isOpen, onClose, onRestore 
       title="Visualizar Tarefa"
       showRestoreButton={true}
       onCommentAdded={handleCommentAdded}
-      isFullScreen={isMobile}
+      isFullScreen={true} // Always use fullscreen for mobile
     />
   );
 };

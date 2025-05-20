@@ -3,14 +3,14 @@ import { useState, useMemo, useCallback } from 'react';
 import { Task } from '@/types';
 import { dateService } from '@/services/dateService';
 
-type ViewMode = 'list' | 'grid';
-type SortBy = 'newest' | 'oldest' | 'highestScore' | 'lowestScore';
-type SortField = 'completedAt' | 'title' | 'totalScore' | 'feedback';
-type SortDirection = 'asc' | 'desc';
-type PeriodFilter = 'all' | 'today' | 'yesterday' | 'week' | 'month' | 'year' | 'custom';
-type ScoreFilter = 'all' | 'high' | 'medium' | 'low';
-type FeedbackFilter = 'all' | 'transformed' | 'relief' | 'obligation';
-type PillarFilter = 'all' | 'physical' | 'emotional' | 'mental' | 'spiritual';
+export type ViewMode = 'list' | 'grid';
+export type SortBy = 'newest' | 'oldest' | 'highestScore' | 'lowestScore' | 'alphabetical';
+export type SortField = 'completedAt' | 'title' | 'totalScore' | 'feedback';
+export type SortDirection = 'asc' | 'desc';
+export type PeriodFilter = 'all' | 'today' | 'yesterday' | 'week' | 'month' | 'year' | 'custom';
+export type ScoreFilter = 'all' | 'high' | 'medium' | 'low';
+export type FeedbackFilter = 'all' | 'transformed' | 'relief' | 'obligation';
+export type PillarFilter = 'all' | 'consequence' | 'pride' | 'construction';
 
 export const useTaskFilters = (initialTasks: Task[]) => {
   // Basic filters
@@ -48,8 +48,8 @@ export const useTaskFilters = (initialTasks: Task[]) => {
     if (searchQuery.trim()) {
       const normalizedQuery = searchQuery.trim().toLowerCase();
       filtered = filtered.filter(task => 
-        task.title.toLowerCase().includes(normalizedQuery) || 
-        (task.description && task.description.toLowerCase().includes(normalizedQuery))
+        task.title.toLowerCase().includes(normalizedQuery)
+        // Note: Task type doesn't have description property, so we need to remove this check
       );
     }
     
@@ -131,15 +131,15 @@ export const useTaskFilters = (initialTasks: Task[]) => {
     // Apply pillar filter
     if (pillarFilter !== 'all') {
       filtered = filtered.filter(task => {
+        // Use the updated property names from the Task type
+        // Instead of physicalScore, emotionalScore, etc. we'll use the ones from the actual Task type
         switch (pillarFilter) {
-          case 'physical':
-            return task.physicalScore > 0;
-          case 'emotional':
-            return task.emotionalScore > 0;
-          case 'mental':
-            return task.mentalScore > 0;
-          case 'spiritual':
-            return task.spiritualScore > 0;
+          case 'consequence':
+            return task.consequenceScore > 0;
+          case 'pride':
+            return task.prideScore > 0;
+          case 'construction':
+            return task.constructionScore > 0;
           default:
             return true;
         }
@@ -196,6 +196,27 @@ export const useTaskFilters = (initialTasks: Task[]) => {
       setSortDirection(direction || 'asc');
     }
   };
+  
+  // Type-safe setters for string-based props passed to components
+  const setSortByTypeSafe = (sort: string) => {
+    setSortBy(sort as SortBy);
+  };
+  
+  const setPeriodFilterTypeSafe = (period: string) => {
+    setPeriodFilter(period as PeriodFilter);
+  };
+  
+  const setScoreFilterTypeSafe = (score: string) => {
+    setScoreFilter(score as ScoreFilter);
+  };
+  
+  const setFeedbackFilterTypeSafe = (feedback: string) => {
+    setFeedbackFilter(feedback as FeedbackFilter);
+  };
+  
+  const setPillarFilterTypeSafe = (pillar: string) => {
+    setPillarFilter(pillar as PillarFilter);
+  };
 
   return {
     searchQuery,
@@ -203,18 +224,18 @@ export const useTaskFilters = (initialTasks: Task[]) => {
     viewMode,
     setViewMode,
     sortBy,
-    setSortBy,
+    setSortBy: setSortByTypeSafe,
     filteredTasks,
     showFilters,
     setShowFilters,
     periodFilter,
-    setPeriodFilter,
+    setPeriodFilter: setPeriodFilterTypeSafe,
     scoreFilter,
-    setScoreFilter,
+    setScoreFilter: setScoreFilterTypeSafe,
     feedbackFilter,
-    setFeedbackFilter,
+    setFeedbackFilter: setFeedbackFilterTypeSafe,
     pillarFilter,
-    setPillarFilter,
+    setPillarFilter: setPillarFilterTypeSafe,
     startDate,
     setStartDate,
     endDate,
