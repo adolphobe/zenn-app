@@ -23,6 +23,31 @@
   @apply bg-acto-light text-acto-light-text border-gray-300;
 }
 
+/* Keeping each text color consistent throughout the card */
+.task-critical,
+.task-critical span.text-inherit,
+.task-critical .text-xs:not(.text-gray-400):not(.text-red-400):not(.text-muted-foreground) {
+  color: var(--acto-critical-text);
+}
+
+.task-important,
+.task-important span.text-inherit,
+.task-important .text-xs:not(.text-gray-400):not(.text-red-400):not(.text-muted-foreground) {
+  color: var(--acto-important-text);
+}
+
+.task-moderate,
+.task-moderate span.text-inherit,
+.task-moderate .text-xs:not(.text-gray-400):not(.text-red-400):not(.text-muted-foreground) {
+  color: var(--acto-moderate-text);
+}
+
+.task-light,
+.task-light span.text-inherit,
+.task-light .text-xs:not(.text-gray-400):not(.text-red-400):not(.text-muted-foreground) {
+  color: var(--acto-light-text);
+}
+
 /* Estilo para o modo de Potência Extra */
 .task-power-extra {
   @apply border-red-500 shadow-md;
@@ -70,4 +95,15 @@
 /* Efeito de hover para cartões não animados */
 .task-card:not([data-pending-update="true"]):hover {
   @apply shadow-md transform scale-[1.01];
+}
+
+/* Media query para ajustes em dispositivos móveis */
+@media (max-width: 640px) {
+  .task-card button {
+    @apply px-2 py-1;
+  }
+  
+  .task-card .flex-wrap {
+    @apply justify-start;
+  }
 }

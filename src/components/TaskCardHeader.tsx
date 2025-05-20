@@ -157,14 +157,14 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
         </div>
       )}
       
-      {/* Data movida para depois dos pilares */}
+      {/* Data movida para depois dos pilares, com padding-top adicionado */}
       {shouldShowDate && (
-        <div className="text-xs flex items-center mt-1 mb-1">
+        <div className="text-xs flex items-center mt-1 mb-1 pt-2">
           {taskIsOverdue && parsedDate && (
             <Bell size={14} className="text-red-400 mr-1" />
           )}
           {parsedDate ? (
-            <span className="text-gray-600">{formatDate(parsedDate, dateDisplayOptions)}</span>
+            <span className="text-inherit">{formatDate(parsedDate, dateDisplayOptions)}</span>
           ) : viewMode === 'chronological' ? (
             <span className="text-gray-400">SEM PRAZO</span>
           ) : null}
