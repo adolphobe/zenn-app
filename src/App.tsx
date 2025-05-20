@@ -26,6 +26,7 @@ const Dashboard = lazy(() => import('./components/Dashboard'));
 const Settings = lazy(() => import('./pages/Settings'));
 const TaskHistoryPage = lazy(() => import('./pages/task-history-new/TaskHistoryNewPage'));
 const TaskHistoryNewPage = lazy(() => import('./pages/task-history-new/TaskHistoryNewPage'));
+const TaskHistoryMobilePage = lazy(() => import('./pages/task-history-mobile'));
 const StrategicReviewPage = lazy(() => import('./pages/StrategicReview'));
 const LandingPage = lazy(() => import('./pages/Landing'));
 
@@ -74,6 +75,7 @@ function App() {
                         <Route path="/settings" element={<Settings />} />
                         <Route path="/task-history" element={<TaskHistoryPage />} />
                         <Route path="/task-history-new" element={<TaskHistoryNewPage />} />
+                        <Route path="/task-history-mobile" element={<TaskHistoryMobilePage />} />
                         <Route path="/strategic-review" element={<StrategicReviewPage />} />
                         
                         {/* Mobile Routes */}
