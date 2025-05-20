@@ -85,7 +85,7 @@ const Settings = () => {
   }
 
   return (
-    <div className="w-full px-4 sm:px-0 md:container md:max-w-3xl md:mx-auto py-4 md:py-8 pb-20">
+    <div className="w-full sm:px-6 md:container md:max-w-3xl md:mx-auto py-4 md:py-8 pb-20">
       <div className="mb-6">
         <h1 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2">Configurações</h1>
         <p className="text-muted-foreground text-sm sm:text-base">Gerencie suas preferências e informações de conta</p>
