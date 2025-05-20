@@ -3,11 +3,12 @@ import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { Task } from '@/types';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw, X } from 'lucide-react';
 import { AlwaysVisibleScrollArea } from '@/components/ui/always-visible-scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useQueryClient } from '@tanstack/react-query';
+import { Drawer, DrawerContent } from '@/components/ui/drawer';
 
 // Importing helper components
 import TaskDetailsHeader from './details/TaskDetailsHeader';
@@ -22,6 +23,7 @@ export interface TaskDetailsModalProps {
   onCommentAdded?: () => void;
   title?: string;
   showRestoreButton?: boolean;
+  isFullScreen?: boolean;
 }
 
 const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
@@ -31,7 +33,8 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
   onRestore,
   onCommentAdded,
   title = "Detalhes da Tarefa",
-  showRestoreButton = false
+  showRestoreButton = false,
+  isFullScreen = false
 }) => {
   // States and refs - IMPORTANT: hooks BEFORE any conditional
   const [activeTab, setActiveTab] = useState('levels');
@@ -113,6 +116,75 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
     );
   }
 
+  // Mobile fullscreen view using Drawer component
+  if (isFullScreen) {
+    return (
+      <Drawer open={isOpen} onOpenChange={onClose} direction="bottom" className="h-[100dvh] p-0 max-w-full">
+        <DrawerContent className="h-[100dvh] max-h-[100dvh] p-0">
+          <div className="flex flex-col h-full">
+            <div className="p-4 border-b flex items-center justify-between sticky top-0 bg-background z-10">
+              <h2 className="text-xl font-semibold">{title}</h2>
+              <Button variant="ghost" size="icon" onClick={onClose}>
+                <X size={20} />
+              </Button>
+            </div>
+            
+            <div className="overflow-auto flex-grow">
+              <div className="p-4 space-y-6">
+                {/* Header with task information */}
+                <TaskDetailsHeader task={task} />
+                
+                {/* Tabs for levels and comments */}
+                <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                  <TabsList className="grid w-full grid-cols-2 mb-4">
+                    <TabsTrigger value="levels">
+                      Níveis
+                    </TabsTrigger>
+                    <TabsTrigger value="comments">
+                      Comentários
+                    </TabsTrigger>
+                  </TabsList>
+                  
+                  {/* Tab contents */}
+                  <TabsContent value="levels" className="space-y-6">
+                    <TaskLevelsContent task={task} isMobile={isMobile} />
+                  </TabsContent>
+                  
+                  <TabsContent value="comments">
+                    <div ref={commentsContainerRef}>
+                      <TaskCommentsContent 
+                        task={task} 
+                        onCommentAdded={handleCommentAdded} 
+                      />
+                    </div>
+                  </TabsContent>
+                </Tabs>
+              </div>
+            </div>
+            
+            <div className="p-4 border-t mt-auto flex justify-between">
+              {showRestoreButton && onRestore && (
+                <Button
+                  variant="outline"
+                  onClick={handleRestore}
+                  className="flex items-center gap-1.5"
+                >
+                  <RefreshCw size={16} />
+                  Restaurar tarefa
+                </Button>
+              )}
+              
+              <Button onClick={onClose} className="ml-auto">
+                Fechar
+              </Button>
+            </div>
+          </div>
+        </DrawerContent>
+      </Drawer>
+    );
+  }
+
+  // Desktop version
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent 

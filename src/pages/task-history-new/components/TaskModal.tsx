@@ -3,6 +3,7 @@ import React from 'react';
 import { Task } from '@/types';
 import TaskDetailsModal from '@/components/task/TaskDetailsModal';
 import { useQueryClient } from '@tanstack/react-query';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface TaskModalProps {
   task: Task | null;
@@ -13,6 +14,7 @@ interface TaskModalProps {
 
 const TaskModal: React.FC<TaskModalProps> = ({ task, isOpen, onClose, onRestore }) => {
   const queryClient = useQueryClient();
+  const isMobile = useIsMobile();
   
   // Handler for comment updates
   const handleCommentAdded = async () => {
@@ -34,6 +36,7 @@ const TaskModal: React.FC<TaskModalProps> = ({ task, isOpen, onClose, onRestore 
       title="Visualizar Tarefa"
       showRestoreButton={true}
       onCommentAdded={handleCommentAdded}
+      isFullScreen={isMobile}
     />
   );
 };

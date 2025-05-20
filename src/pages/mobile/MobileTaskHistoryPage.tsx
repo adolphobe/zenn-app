@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback, useEffect } from 'react';
 import { useTaskDataContext } from '@/context/TaskDataProvider';
 import { Task } from '@/types';
@@ -26,6 +27,8 @@ import { NavigationStore } from '@/utils/navigationStore';
 import RestoreTaskDialog from '../task-history-new/components/RestoreTaskDialog';
 import TaskModal from '../task-history-new/components/TaskModal';
 import { restoreTask } from '../task-history-new/services/taskActions';
+import { useQueryClient } from '@tanstack/react-query';
+import { toast } from '@/hooks/use-toast';
 
 const MobileTaskHistoryPage = () => {
   const { completedTasks, completedTasksLoading } = useTaskDataContext();
@@ -37,6 +40,13 @@ const MobileTaskHistoryPage = () => {
   const [isRestoreDialogOpen, setIsRestoreDialogOpen] = useState(false);
   const [taskToRestore, setTaskToRestore] = useState<Task | null>(null);
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const queryClient = useQueryClient();
+  
+  // Update local tasks state when completedTasks changes
+  useEffect(() => {
+    setTasks(completedTasks);
+  }, [completedTasks]);
   
   // Preload other important pages for faster navigation
   useEffect(() => {
@@ -46,10 +56,6 @@ const MobileTaskHistoryPage = () => {
     
     // Record NavigationStore visit
     NavigationStore.setLastRoute('/mobile/history');
-    
-    return () => {
-      // No cleanup needed
-    };
   }, []);
   
   // Page transition animation
@@ -80,9 +86,9 @@ const MobileTaskHistoryPage = () => {
   
   // Filter tasks based on search query and period
   const filteredTasks = useCallback(() => {
-    if (!completedTasks.length) return [];
+    if (!tasks.length) return [];
     
-    return completedTasks.filter(task => {
+    return tasks.filter(task => {
       // Apply search filter
       const matchesSearch = !searchQuery || 
         task.title.toLowerCase().includes(searchQuery.toLowerCase());
@@ -117,7 +123,7 @@ const MobileTaskHistoryPage = () => {
       
       return true;
     });
-  }, [completedTasks, searchQuery, periodFilter]);
+  }, [tasks, searchQuery, periodFilter]);
   
   // Sort filtered tasks
   const sortedTasks = useCallback(() => {
@@ -172,12 +178,43 @@ const MobileTaskHistoryPage = () => {
     setIsTaskModalOpen(true);
   };
 
-  // Handle confirm restore
+  // Handle confirm restore with optimistic UI update
   const handleConfirmRestore = async (taskId: string) => {
-    await restoreTask(taskId);
-    
-    // Refresh the tasks list - this could be optimistic update
-    // but we'll keep it simple here by letting the data provider handle refetching
+    try {
+      // Optimistic UI update - remove the task from the list
+      const taskToRemove = tasks.find(t => t.id === taskId);
+      
+      // Update local state immediately
+      setTasks(prev => prev.filter(t => t.id !== taskId));
+      setIsRestoreDialogOpen(false);
+      setIsTaskModalOpen(false);
+      
+      // Show success toast
+      toast({
+        title: "Tarefa restaurada",
+        description: "A tarefa foi restaurada com sucesso para sua lista de tarefas.",
+      });
+      
+      // Call API to actually restore the task
+      await restoreTask(taskId);
+      
+      // Refresh data sources
+      await queryClient.invalidateQueries({ queryKey: ['completedTasks'] });
+      await queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      
+    } catch (error) {
+      console.error('Error restoring task:', error);
+      
+      // Revert optimistic update
+      toast({
+        title: "Erro ao restaurar tarefa",
+        description: "Não foi possível restaurar a tarefa. Tente novamente.",
+        variant: "destructive",
+      });
+      
+      // Refresh data to ensure UI is in sync
+      await queryClient.invalidateQueries({ queryKey: ['completedTasks'] });
+    }
   };
   
   // Loading state
@@ -193,7 +230,7 @@ const MobileTaskHistoryPage = () => {
   }
   
   // Empty state
-  if (!completedTasks || completedTasks.length === 0) {
+  if (!tasks || tasks.length === 0) {
     return (
       <div className="p-4">
         <h1 className="text-xl font-bold mb-4">Histórico de Tarefas</h1>

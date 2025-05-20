@@ -1,175 +1,202 @@
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { Task } from '@/types';
-import { startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth, isWithinInterval } from 'date-fns';
+import { dateService } from '@/services/dateService';
 
-/**
- * Hook to manage task filtering and sorting functionality
- */
-export const useTaskFilters = (tasks: Task[]) => {
+type ViewMode = 'list' | 'grid';
+type SortBy = 'newest' | 'oldest' | 'highestScore' | 'lowestScore';
+type SortField = 'completedAt' | 'title' | 'totalScore' | 'feedback';
+type SortDirection = 'asc' | 'desc';
+type PeriodFilter = 'all' | 'today' | 'yesterday' | 'week' | 'month' | 'year' | 'custom';
+type ScoreFilter = 'all' | 'high' | 'medium' | 'low';
+type FeedbackFilter = 'all' | 'transformed' | 'relief' | 'obligation';
+type PillarFilter = 'all' | 'physical' | 'emotional' | 'mental' | 'spiritual';
+
+export const useTaskFilters = (initialTasks: Task[]) => {
+  // Basic filters
   const [searchQuery, setSearchQuery] = useState('');
-  const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
-  const [sortBy, setSortBy] = useState('newest');
-  const [showFilters, setShowFilters] = useState(false);
-  
-  // Column sorting
-  const [sortField, setSortField] = useState<string>('completedAt');
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
-  
+  const [viewMode, setViewMode] = useState<ViewMode>('list');
+  const [sortBy, setSortBy] = useState<SortBy>('newest');
+
   // Advanced filters
-  const [periodFilter, setPeriodFilter] = useState('all');
-  const [scoreFilter, setScoreFilter] = useState('all');
-  const [feedbackFilter, setFeedbackFilter] = useState('all');
-  const [pillarFilter, setPillarFilter] = useState('all');
-  const [startDate, setStartDate] = useState<Date | undefined>(undefined);
-  const [endDate, setEndDate] = useState<Date | undefined>(undefined);
+  const [showFilters, setShowFilters] = useState(false);
+  const [periodFilter, setPeriodFilter] = useState<PeriodFilter>('all');
+  const [scoreFilter, setScoreFilter] = useState<ScoreFilter>('all');
+  const [feedbackFilter, setFeedbackFilter] = useState<FeedbackFilter>('all');
+  const [pillarFilter, setPillarFilter] = useState<PillarFilter>('all');
+  const [startDate, setStartDate] = useState<Date | undefined>();
+  const [endDate, setEndDate] = useState<Date | undefined>();
   
-  // Filter tasks based on search query and advanced filters
+  // Sort column for table
+  const [sortField, setSortField] = useState<SortField>('completedAt');
+  const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
+  
+  // Tasks source
+  const [tasksSource, setTasksSource] = useState<Task[]>(initialTasks);
+
+  // Update tasks source when initialTasks changes
+  const setFilteredTasksSource = useCallback((tasks: Task[]) => {
+    setTasksSource(tasks);
+  }, []);
+
+  // Apply all filters to tasks
   const filteredTasks = useMemo(() => {
-    if (!tasks || !tasks.length) return [];
+    // Start with all tasks
+    let filtered = tasksSource;
     
-    return tasks.filter(task => {
-      // Text search filter
-      const matchesText = !searchQuery.trim() || 
-        task.title.toLowerCase().includes(searchQuery.toLowerCase().trim());
-      if (!matchesText) return false;
+    // Apply search filter if provided
+    if (searchQuery.trim()) {
+      const normalizedQuery = searchQuery.trim().toLowerCase();
+      filtered = filtered.filter(task => 
+        task.title.toLowerCase().includes(normalizedQuery) || 
+        (task.description && task.description.toLowerCase().includes(normalizedQuery))
+      );
+    }
+    
+    // Apply period filter
+    if (periodFilter !== 'all') {
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const yesterday = new Date(today);
+      yesterday.setDate(yesterday.getDate() - 1);
       
-      // Period filter
-      const taskDate = task.completedAt ? new Date(task.completedAt) : null;
-      let matchesPeriod = true;
+      const lastWeek = new Date(today);
+      lastWeek.setDate(lastWeek.getDate() - 7);
       
-      if (taskDate && periodFilter !== 'all') {
-        const now = new Date();
+      const lastMonth = new Date(today);
+      lastMonth.setMonth(lastMonth.getMonth() - 1);
+      
+      const lastYear = new Date(today);
+      lastYear.setFullYear(lastYear.getFullYear() - 1);
+      
+      filtered = filtered.filter(task => {
+        if (!task.completedAt) return false;
         
-        if (periodFilter === 'today') {
-          const todayStart = startOfDay(now);
-          const todayEnd = endOfDay(now);
-          matchesPeriod = isWithinInterval(taskDate, { start: todayStart, end: todayEnd });
-        } 
-        else if (periodFilter === 'week') {
-          const weekStart = startOfWeek(now, { weekStartsOn: 1 });
-          const weekEnd = endOfWeek(now, { weekStartsOn: 1 });
-          matchesPeriod = isWithinInterval(taskDate, { start: weekStart, end: weekEnd });
-        } 
-        else if (periodFilter === 'month') {
-          const monthStart = startOfMonth(now);
-          const monthEnd = endOfMonth(now);
-          matchesPeriod = isWithinInterval(taskDate, { start: monthStart, end: monthEnd });
-        } 
-        else if (periodFilter === 'custom') {
-          if (startDate && endDate) {
-            const customStart = startOfDay(startDate);
-            const customEnd = endOfDay(endDate);
-            matchesPeriod = isWithinInterval(taskDate, { start: customStart, end: customEnd });
-          }
-        }
-      }
-      if (!matchesPeriod) return false;
-      
-      // Score filter
-      const score = task.totalScore || 0;
-      let matchesScore = true;
-      
-      if (scoreFilter !== 'all') {
-        if (scoreFilter === 'high') {
-          matchesScore = score >= 12;
-        } else if (scoreFilter === 'medium') {
-          matchesScore = score >= 8 && score < 12;
-        } else if (scoreFilter === 'low') {
-          matchesScore = score < 8;
-        }
-      }
-      if (!matchesScore) return false;
-      
-      // Feedback filter
-      const feedback = task.feedback;
-      let matchesFeedback = true;
-      
-      if (feedbackFilter !== 'all') {
-        matchesFeedback = feedback === feedbackFilter;
-      }
-      if (!matchesFeedback) return false;
-      
-      // Pillar filter
-      let matchesPillar = true;
-      
-      if (pillarFilter !== 'all') {
-        const maxValue = Math.max(
-          task.consequenceScore || 0,
-          task.prideScore || 0,
-          task.constructionScore || 0
+        const completedDate = task.completedAt instanceof Date ? 
+          task.completedAt : 
+          dateService.parseDate(task.completedAt);
+        
+        if (!completedDate) return false;
+        
+        const taskDateOnly = new Date(
+          completedDate.getFullYear(), 
+          completedDate.getMonth(), 
+          completedDate.getDate()
         );
         
-        if (pillarFilter === 'consequence' && task.consequenceScore !== maxValue) {
-          matchesPillar = false;
-        } else if (pillarFilter === 'pride' && task.prideScore !== maxValue) {
-          matchesPillar = false;
-        } else if (pillarFilter === 'construction' && task.constructionScore !== maxValue) {
-          matchesPillar = false;
+        switch (periodFilter) {
+          case 'today':
+            return taskDateOnly.getTime() === today.getTime();
+          case 'yesterday':
+            return taskDateOnly.getTime() === yesterday.getTime();
+          case 'week':
+            return completedDate >= lastWeek;
+          case 'month':
+            return completedDate >= lastMonth;
+          case 'year':
+            return completedDate >= lastYear;
+          case 'custom':
+            const isAfterStart = !startDate || completedDate >= startDate;
+            const isBeforeEnd = !endDate || completedDate <= endDate;
+            return isAfterStart && isBeforeEnd;
+          default:
+            return true;
         }
-      }
-      
-      return matchesPillar;
-    });
-  }, [
-    tasks, 
-    searchQuery, 
-    periodFilter, 
-    scoreFilter, 
-    feedbackFilter, 
-    pillarFilter, 
-    startDate, 
-    endDate
-  ]);
-  
-  // Function to handle column sorting
-  const handleColumnSort = (field: string, direction: 'asc' | 'desc') => {
-    setSortField(field);
-    setSortDirection(direction);
+      });
+    }
     
-    // Map to predefined sort types for dropdown compatibility
-    if (field === 'completedAt') {
-      setSortBy(direction === 'desc' ? 'newest' : 'oldest');
-    } else if (field === 'totalScore') {
-      setSortBy(direction === 'desc' ? 'highScore' : 'lowScore');
-    } else if (field === 'title') {
-      setSortBy('alphabetical');
+    // Apply score filter
+    if (scoreFilter !== 'all') {
+      filtered = filtered.filter(task => {
+        const score = task.totalScore || 0;
+        
+        switch (scoreFilter) {
+          case 'high':
+            return score >= 12;
+          case 'medium':
+            return score >= 6 && score < 12;
+          case 'low':
+            return score < 6;
+          default:
+            return true;
+        }
+      });
+    }
+    
+    // Apply feedback filter
+    if (feedbackFilter !== 'all') {
+      filtered = filtered.filter(task => task.feedback === feedbackFilter);
+    }
+    
+    // Apply pillar filter
+    if (pillarFilter !== 'all') {
+      filtered = filtered.filter(task => {
+        switch (pillarFilter) {
+          case 'physical':
+            return task.physicalScore > 0;
+          case 'emotional':
+            return task.emotionalScore > 0;
+          case 'mental':
+            return task.mentalScore > 0;
+          case 'spiritual':
+            return task.spiritualScore > 0;
+          default:
+            return true;
+        }
+      });
+    }
+    
+    // Apply sorting
+    const sortedTasks = [...filtered].sort((a, b) => {
+      switch (sortField) {
+        case 'completedAt': {
+          const dateA = a.completedAt instanceof Date ? a.completedAt : new Date(a.completedAt || '');
+          const dateB = b.completedAt instanceof Date ? b.completedAt : new Date(b.completedAt || '');
+          return sortDirection === 'asc' 
+            ? dateA.getTime() - dateB.getTime() 
+            : dateB.getTime() - dateA.getTime();
+        }
+        case 'title': {
+          const titleA = a.title.toLowerCase();
+          const titleB = b.title.toLowerCase();
+          return sortDirection === 'asc'
+            ? titleA.localeCompare(titleB)
+            : titleB.localeCompare(titleA);
+        }
+        case 'totalScore': {
+          const scoreA = a.totalScore || 0;
+          const scoreB = b.totalScore || 0;
+          return sortDirection === 'asc' 
+            ? scoreA - scoreB 
+            : scoreB - scoreA;
+        }
+        case 'feedback': {
+          const feedbackA = a.feedback || '';
+          const feedbackB = b.feedback || '';
+          return sortDirection === 'asc'
+            ? feedbackA.localeCompare(feedbackB)
+            : feedbackB.localeCompare(feedbackA);
+        }
+        default:
+          return 0;
+      }
+    });
+    
+    return sortedTasks;
+  }, [tasksSource, searchQuery, periodFilter, scoreFilter, feedbackFilter, pillarFilter, startDate, endDate, sortField, sortDirection]);
+  
+  // Column sort handler
+  const handleColumnSort = (field: SortField, direction?: SortDirection) => {
+    if (field === sortField && !direction) {
+      // Toggle direction if clicking the same field
+      setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
+    } else {
+      // Set new field and direction (or default to asc)
+      setSortField(field);
+      setSortDirection(direction || 'asc');
     }
   };
-  
-  // Sort filtered tasks
-  const sortedTasks = useMemo(() => {
-    if (!filteredTasks.length) return [];
-    
-    return [...filteredTasks].sort((a, b) => {
-      // Sort based on column sort
-      if (sortField === 'title') {
-        // String comparison for title
-        const comparison = a.title.localeCompare(b.title);
-        return sortDirection === 'asc' ? comparison : -comparison;
-      }
-      else if (sortField === 'totalScore') {
-        // Number comparison for score
-        const aScore = a.totalScore || 0;
-        const bScore = b.totalScore || 0;
-        return sortDirection === 'asc' ? aScore - bScore : bScore - aScore;
-      }
-      else if (sortField === 'feedback') {
-        // String comparison for feedback
-        const aFeedback = a.feedback || '';
-        const bFeedback = b.feedback || '';
-        const comparison = aFeedback.localeCompare(bFeedback);
-        return sortDirection === 'asc' ? comparison : -comparison;
-      }
-      else {
-        // Default to date sorting (completedAt)
-        const aTime = new Date(a.completedAt || 0).getTime();
-        const bTime = new Date(b.completedAt || 0).getTime();
-        return sortDirection === 'asc' ? aTime - bTime : bTime - aTime;
-      }
-    });
-  }, [filteredTasks, sortField, sortDirection]);
-  
+
   return {
     searchQuery,
     setSearchQuery,
@@ -177,16 +204,9 @@ export const useTaskFilters = (tasks: Task[]) => {
     setViewMode,
     sortBy,
     setSortBy,
-    filteredTasks: sortedTasks,
+    filteredTasks,
     showFilters,
     setShowFilters,
-    
-    // Column sorting
-    sortField,
-    sortDirection,
-    handleColumnSort,
-    
-    // Advanced filters
     periodFilter,
     setPeriodFilter,
     scoreFilter,
@@ -198,6 +218,10 @@ export const useTaskFilters = (tasks: Task[]) => {
     startDate,
     setStartDate,
     endDate,
-    setEndDate
+    setEndDate,
+    sortField,
+    sortDirection,
+    handleColumnSort,
+    setFilteredTasksSource
   };
 };

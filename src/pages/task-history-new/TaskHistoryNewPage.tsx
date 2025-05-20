@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Loader2, BarChart2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -19,16 +20,27 @@ import { restoreTask } from './services/taskActions';
 import { Task } from '@/types';
 import TaskAnalyticsSection from './components/TaskAnalyticsSection';
 import { motion } from 'framer-motion';
+import { useQueryClient } from '@tanstack/react-query';
+import { toast } from '@/hooks/use-toast';
 
 /**
  * New Task History Page component with advanced analytics
  */
 const TaskHistoryNewPage = () => {
+  const queryClient = useQueryClient();
   const { 
     tasks: completedTasks, 
     isLoading: completedTasksLoading,
     refetch
   } = useCompletedTasksData();
+  
+  // Local state to manage optimistic updates
+  const [localTasks, setLocalTasks] = useState<Task[]>([]);
+  
+  // Update local state when completed tasks change
+  useEffect(() => {
+    setLocalTasks(completedTasks);
+  }, [completedTasks]);
   
   // Use the task filters hook with all filtering capabilities
   const { 
@@ -43,8 +55,14 @@ const TaskHistoryNewPage = () => {
     pillarFilter, setPillarFilter,
     startDate, setStartDate,
     endDate, setEndDate,
-    sortField, sortDirection, handleColumnSort
-  } = useTaskFilters(completedTasks);
+    sortField, sortDirection, handleColumnSort,
+    setFilteredTasksSource
+  } = useTaskFilters(localTasks);
+  
+  // Update filtered tasks source when local tasks change
+  useEffect(() => {
+    setFilteredTasksSource(localTasks);
+  }, [localTasks, setFilteredTasksSource]);
   
   // Use pagination with task grouping
   const {
@@ -113,7 +131,7 @@ const TaskHistoryNewPage = () => {
     
   // Task selection handler
   const handleSelectTask = (taskId: string) => {
-    const selectedTask = completedTasks.find(task => task.id === taskId);
+    const selectedTask = localTasks.find(task => task.id === taskId);
     if (selectedTask) {
       setTaskToView(selectedTask);
     }
@@ -129,15 +147,44 @@ const TaskHistoryNewPage = () => {
     
     // Se for um ID (string), buscamos a task correspondente
     const taskId = taskOrId;
-    const taskToRestore = completedTasks.find(task => task.id === taskId);
+    const taskToRestore = localTasks.find(task => task.id === taskId);
     if (taskToRestore) {
       setTaskToRestore(taskToRestore);
     }
   };
 
   const handleRestoreConfirm = async (taskId: string) => {
-    await restoreTask(taskId);
-    refetch(); // Refresh task list after restoration
+    try {
+      // Optimistic UI update - remove the task from the local state
+      setLocalTasks(prev => prev.filter(task => task.id !== taskId));
+      setTaskToView(null);
+      setTaskToRestore(null);
+      
+      // Show success toast
+      toast({
+        title: "Tarefa restaurada",
+        description: "A tarefa foi restaurada com sucesso para sua lista de tarefas.",
+      });
+      
+      // Call API to restore the task
+      await restoreTask(taskId);
+      
+      // Refresh relevant queries to ensure data consistency
+      await queryClient.invalidateQueries({ queryKey: ['completedTasks'] });
+      await queryClient.invalidateQueries({ queryKey: ['tasks'] }); 
+      
+    } catch (error) {
+      console.error('Error restoring task:', error);
+      
+      // Revert optimistic update on error
+      await refetch();
+      
+      toast({
+        title: "Erro ao restaurar tarefa",
+        description: "Não foi possível restaurar a tarefa. Tente novamente.",
+        variant: "destructive",
+      });
+    }
   };
   
   // Toggle analytics section
@@ -158,7 +205,7 @@ const TaskHistoryNewPage = () => {
   }
 
   // Empty state
-  if (!completedTasks || completedTasks.length === 0) {
+  if (!localTasks || localTasks.length === 0) {
     return (
       <div className="container p-4 mx-auto">
         <h1 className="text-2xl font-bold mb-4">Histórico de Tarefas</h1>
@@ -194,7 +241,7 @@ const TaskHistoryNewPage = () => {
       
       {/* Analytics section */}
       <TaskAnalyticsSection 
-        tasks={completedTasks} 
+        tasks={localTasks} 
         isVisible={showAnalytics} 
       />
       
