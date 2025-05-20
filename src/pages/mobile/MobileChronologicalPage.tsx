@@ -101,7 +101,7 @@ const MobileChronologicalPage: React.FC = () => {
   }
 
   return (
-    <div className="px-3 py-2 relative">
+    <div className="py-2 relative">
       {/* Cabeçalho com ordenação e botão de adicionar */}
       <div className="flex justify-between items-center mb-4">
         <MobileSortDropdown />
