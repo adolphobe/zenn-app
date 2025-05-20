@@ -232,7 +232,7 @@ const MobileTaskHistoryPage = () => {
   // Empty state
   if (!tasks || tasks.length === 0) {
     return (
-      <div className=" ">
+      <div className="p-4">
         <h1 className="text-xl font-bold mb-4">Histórico de Tarefas</h1>
         <div className="bg-muted rounded-lg p-6 text-center">
           <p className="mb-2 text-muted-foreground">Nenhuma tarefa concluída ainda</p>
@@ -272,7 +272,7 @@ const MobileTaskHistoryPage = () => {
   
   return (
     <motion.div 
-      className="p-4 pb-20 max-w-full"
+      className="pb-20 max-w-full"
       initial="initial"
       animate="animate"
       exit="exit"
