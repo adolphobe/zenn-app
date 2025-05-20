@@ -148,7 +148,7 @@ const TaskComments: React.FC<TaskCommentsProps> = ({ taskId, comments: initialCo
   
   return (
     <div className="mt-4 cursor-default" onClick={handleContainerClick}>
-      <h4 className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">Comentários</h4>
+      {/* <h4 className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">Comentários</h4> */}
       
       {/* Div with native scrollbar and styling */}
       <div 
