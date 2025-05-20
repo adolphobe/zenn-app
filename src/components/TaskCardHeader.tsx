@@ -8,6 +8,7 @@ import { useAppContext } from '@/context/AppContext';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { motion, AnimatePresence } from 'framer-motion';
 import { dateService } from '@/services/dateService';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface TaskCardHeaderProps {
   title: string;
@@ -46,6 +47,7 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
   constructionScore = 0
 }) => {
   const { state: { showPillars, showDates, viewMode, showScores } } = useAppContext();
+  const isMobile = useIsMobile();
   
   // Define tooltip message based on view mode and score
   const getTooltipMessage = () => {
@@ -85,6 +87,14 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
   // In chronological mode, only show score if showScores is true
   const shouldShowScore = viewMode !== 'chronological' || showScores;
   
+  // Handle hidden badge click to prevent expanding the card on mobile
+  const handleHiddenBadgeClick = (e: React.MouseEvent) => {
+    if (isMobile) {
+      e.stopPropagation();
+      // The tooltip will show due to the TooltipTrigger
+    }
+  };
+  
   return (
     <div className={`${isHidden && showHiddenTasks ? 'pt-[15px]' : ''} relative`}>
       {/* Hidden label with improved reactivity */}
@@ -111,6 +121,8 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
                   exit={{ opacity: 0, scale: 0.8 }}
                   transition={{ duration: 0.2 }}
                   layoutId={`hidden-badge-${title.substring(0, 10)}`}
+                  onClick={handleHiddenBadgeClick}
+                  data-hidden-badge="true"
                 >
                   OCULTA NO MODO POTÊNCIA
                 </motion.div>

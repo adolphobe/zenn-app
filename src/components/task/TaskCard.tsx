@@ -10,6 +10,7 @@ import { useAppContext } from '@/context/AppContext';
 import { useTaskDataContext } from '@/context/TaskDataProvider';
 import { useTaskToasts } from './utils/taskToasts';
 import useTaskAnimations from '@/hooks/useTaskAnimations';
+import { useIsMobile } from '@/hooks/use-mobile';
 import './task-card.css'; // Importamos o arquivo CSS
 
 interface TaskCardProps {
@@ -31,6 +32,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
   const { toggleTaskHidden, updateTask } = useTaskDataContext();
   const { showToggleHiddenToast } = useTaskToasts();
   const { animationClass, isPendingVisibilityUpdate, animationState } = useTaskAnimations(task);
+  const isMobile = useIsMobile();
   
   // Update titleValue when task changes
   useEffect(() => {
@@ -51,6 +53,16 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
   // Card expansion handler
   const handleCardClick = (e: React.MouseEvent) => {
     if (isEditingTitle) return;
+    
+    // Check if the click is on the hidden badge - don't expand on mobile
+    const clickedElement = e.target as HTMLElement;
+    const isHiddenBadgeClick = clickedElement.closest('div[data-hidden-badge="true"]') !== null;
+    
+    if (isMobile && isHiddenBadgeClick) {
+      // Don't toggle expanded state on mobile when clicking the hidden badge
+      return;
+    }
+    
     onToggleExpand(task.id);
   };
 
