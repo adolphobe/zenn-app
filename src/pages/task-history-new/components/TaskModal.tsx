@@ -8,7 +8,7 @@ interface TaskModalProps {
   task: Task | null;
   isOpen: boolean;
   onClose: () => void;
-  onRestore: (taskId: string) => void;
+  onRestore: (task: Task) => void;
 }
 
 const TaskModal: React.FC<TaskModalProps> = ({ task, isOpen, onClose, onRestore }) => {

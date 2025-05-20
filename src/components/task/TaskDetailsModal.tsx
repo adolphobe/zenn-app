@@ -18,7 +18,7 @@ export interface TaskDetailsModalProps {
   task: Task | null;
   isOpen: boolean;
   onClose: () => void;
-  onRestore?: (taskId: string) => void;
+  onRestore?: (task: Task) => void;
   onCommentAdded?: () => void;
   title?: string;
   showRestoreButton?: boolean;
@@ -88,8 +88,8 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
   
   // Handler for restore task
   const handleRestore = () => {
-    if (onRestore && task?.id) {
-      onRestore(task.id);
+    if (onRestore && task) {
+      onRestore(task);
       onClose();
     }
   };
