@@ -101,7 +101,8 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
                     borderTopLeftRadius: '10px', 
                     borderBottomRightRadius: '9px',
                     borderTopRightRadius: '0px',
-                    borderBottomLeftRadius: '0px'
+                    borderBottomLeftRadius: '0px',
+                    paddingBottom: '8px'
                   }}
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
