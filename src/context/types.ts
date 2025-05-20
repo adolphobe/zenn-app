@@ -1,3 +1,4 @@
+
 import { Task, DateDisplayOptions, ViewMode, SortOption, TaskFormData as BaseTaskFormData } from '../types';
 import { Dispatch } from 'react';
 
@@ -24,6 +25,7 @@ export interface AppState {
   viewModeSettings: {
     power: ViewModeSettings;
     chronological: ViewModeSettings;
+    strategic: ViewModeSettings;
   };
   // These remain as global settings (backward compatibility)
   showHiddenTasks: boolean;

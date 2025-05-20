@@ -1,9 +1,23 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import { User, UserPreferences } from '@/types/user';
-import { AppState } from '@/context/types';
+import { User } from '@/types/user';
+import { AppState, ViewModeSettings } from '@/context/types';
 import { debounce } from 'lodash';
 import { Json } from '@/integrations/supabase/types';
+import { SortOption, DateDisplayOptions, ViewMode } from '@/types';
+
+// Define UserPreferences interface (previously imported from @/types/user)
+export interface UserPreferences {
+  darkMode: boolean;
+  activeViewMode: ViewMode;
+  sidebarOpen: boolean;
+  viewModeSettings: {
+    power: ViewModeSettings & { sortOptions: SortOption };
+    chronological: ViewModeSettings & { sortOptions: SortOption };
+    strategic: ViewModeSettings & { sortOptions?: SortOption };
+  };
+  dateDisplayOptions: DateDisplayOptions;
+}
 
 // Function to extract preferences from app state
 export const extractPreferencesFromState = (state: AppState): UserPreferences => {
@@ -25,6 +39,12 @@ export const extractPreferencesFromState = (state: AppState): UserPreferences =>
         showDates: state.viewModeSettings.chronological.showDates,
         showScores: state.viewModeSettings.chronological.showScores,
         sortOptions: state.sortOptions.chronological,
+      },
+      strategic: {
+        showHiddenTasks: state.viewModeSettings.strategic.showHiddenTasks,
+        showPillars: state.viewModeSettings.strategic.showPillars,
+        showDates: state.viewModeSettings.strategic.showDates,
+        showScores: state.viewModeSettings.strategic.showScores,
       }
     },
     dateDisplayOptions: state.dateDisplayOptions
