@@ -1,55 +1,294 @@
 
-import React from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
-import { HomeIcon, List, BarChartBig, History } from 'lucide-react';
+import React, { useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { Power, Clock, Filter, MoreHorizontal, History, Calendar, Moon, Sun, Settings, LogOut } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useAppContext } from '@/context/AppContext';
+import { useAuth } from '@/context/auth';
+import { 
+  Drawer,
+  DrawerContent,
+  DrawerTrigger,
+} from '@/components/ui/drawer';
 
-const MobileBottomNav: React.FC = () => {
+type NavigationItem = {
+  icon: React.ElementType;
+  label: string;
+  action?: () => void;
+  path?: string;
+};
+
+const MobileBottomNav = () => {
+  const navigate = useNavigate();
   const location = useLocation();
+  const { logout } = useAuth();
+  const { 
+    state: { viewMode, darkMode, showHiddenTasks, showPillars, showDates, showScores }, 
+    setViewMode,
+    toggleDarkMode,
+    toggleShowHiddenTasks,
+    toggleShowPillars,
+    toggleShowDates,
+    toggleShowScores
+  } = useAppContext();
   
-  const linkItems = [
-    {
-      title: 'Potência',
-      path: '/mobile/power',
-      icon: <HomeIcon className="w-5 h-5" />
+  const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
+  const [moreDrawerOpen, setMoreDrawerOpen] = useState(false);
+
+  // Navigation handlers
+  const handlePowerMode = () => {
+    setViewMode('power');
+    setFilterDrawerOpen(false); // Close filter drawer when changing modes
+    navigate('/mobile/power');
+  };
+
+  const handleChronologicalMode = () => {
+    setViewMode('chronological');
+    setFilterDrawerOpen(false); // Close filter drawer when changing modes
+    navigate('/mobile/chronological');
+  };
+  
+  const handleLogout = async () => {
+    await logout();
+    setMoreDrawerOpen(false);
+    navigate('/login');
+  };
+  
+  // Filter drawer items (depend on view mode)
+  const filterItems = viewMode === 'power' ? [
+    { 
+      icon: showHiddenTasks ? Eye : EyeOff, 
+      label: showHiddenTasks ? 'Esconder tarefas ocultas' : 'Mostrar tarefas ocultas',
+      action: toggleShowHiddenTasks 
     },
-    {
-      title: 'Lista',
-      path: '/mobile/chronological',
-      icon: <List className="w-5 h-5" />
+    { 
+      icon: Pillar, 
+      label: showPillars ? 'Esconder pilares' : 'Mostrar pilares',
+      action: toggleShowPillars 
     },
-    {
-      title: 'Histórico',
-      path: '/task-history-mobile',
-      icon: <History className="w-5 h-5" />
+    { 
+      icon: Calendar, 
+      label: showDates ? 'Esconder datas' : 'Mostrar datas',
+      action: toggleShowDates 
     },
-    {
-      title: 'Insights',
-      path: '/strategic-review',
-      icon: <BarChartBig className="w-5 h-5" />
+    { 
+      icon: Badge, 
+      label: showScores ? 'Esconder pontuação' : 'Mostrar pontuação',
+      action: toggleShowScores 
+    }
+  ] : [
+    { 
+      icon: showHiddenTasks ? Eye : EyeOff, 
+      label: showHiddenTasks ? 'Esconder tarefas ocultas' : 'Mostrar tarefas ocultas',
+      action: toggleShowHiddenTasks 
+    },
+    { 
+      icon: Pillar, 
+      label: showPillars ? 'Esconder pilares' : 'Mostrar pilares',
+      action: toggleShowPillars 
     }
   ];
   
+  // More drawer items
+  const moreItems: NavigationItem[] = [
+    { 
+      icon: History, 
+      label: 'Histórico', 
+      path: '/task-history-new' 
+    },
+    { 
+      icon: Calendar, 
+      label: 'Análise Estratégica', 
+      path: '/strategic-review' 
+    },
+    { 
+      icon: darkMode ? Sun : Moon, 
+      label: darkMode ? 'Modo Claro' : 'Modo Escuro',
+      action: toggleDarkMode 
+    },
+    { 
+      icon: Settings, 
+      label: 'Configurações', 
+      path: '/settings' 
+    },
+    { 
+      icon: LogOut, 
+      label: 'Sair',
+      action: handleLogout 
+    }
+  ];
+
+  // Main navigation items
+  const mainNavItems = [
+    { 
+      icon: Power, 
+      label: 'Potência', 
+      isActive: viewMode === 'power',
+      action: handlePowerMode 
+    },
+    { 
+      icon: Clock, 
+      label: 'Cronologia',
+      isActive: viewMode === 'chronological',
+      action: handleChronologicalMode 
+    },
+    { 
+      icon: Filter, 
+      label: 'Filtros',
+      isActive: filterDrawerOpen,
+      action: () => setFilterDrawerOpen(!filterDrawerOpen)
+    },
+    { 
+      icon: MoreHorizontal, 
+      label: 'Mais',
+      isActive: moreDrawerOpen,
+      action: () => setMoreDrawerOpen(!moreDrawerOpen)
+    }
+  ];
+
+  // Drawer menu item renderer
+  const renderDrawerItem = (item: NavigationItem) => (
+    <button 
+      key={item.label}
+      className="flex items-center gap-1.5 w-full p-1.5 hover:bg-muted rounded-md"
+      onClick={() => {
+        if (item.action) {
+          item.action();
+        } else if (item.path) {
+          navigate(item.path);
+          setFilterDrawerOpen(false);
+          setMoreDrawerOpen(false);
+        }
+      }}
+    >
+      <item.icon size={14} />
+      <span className="text-xs">{item.label}</span>
+    </button>
+  );
+
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-gray-200 dark:border-gray-800 flex justify-around">
-      {linkItems.map(item => (
-        <NavLink
-          key={item.path}
-          to={item.path}
-          className={({ isActive }) => cn(
-            "flex flex-col items-center justify-center py-3 flex-1 text-xs text-center",
-            isActive 
-              ? "text-primary font-medium" 
-              : "text-muted-foreground"
-          )}
-          end
-        >
-          <div className="mb-1">{item.icon}</div>
-          <span>{item.title}</span>
-        </NavLink>
-      ))}
-    </nav>
+    <>
+      {/* Filter Drawer */}
+      <Drawer open={filterDrawerOpen} onOpenChange={setFilterDrawerOpen} direction="bottom">
+        <DrawerContent className="max-h-[70vh]">
+          <div className="py-2 px-3">
+            <h3 className="text-sm font-medium mb-2">Filtros</h3>
+            <div className="flex flex-col gap-1">
+              {filterItems.map(renderDrawerItem)}
+            </div>
+          </div>
+        </DrawerContent>
+      </Drawer>
+
+      {/* More Drawer */}
+      <Drawer open={moreDrawerOpen} onOpenChange={setMoreDrawerOpen} direction="bottom">
+        <DrawerContent className="max-h-[70vh]">
+          <div className="py-2 px-3">
+            <div className="flex flex-col gap-1">
+              {moreItems.map(renderDrawerItem)}
+            </div>
+          </div>
+        </DrawerContent>
+      </Drawer>
+
+      {/* Bottom Navigation Bar */}
+      <div className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border md:hidden">
+        <div className="flex justify-around px-1 py-2">
+          {mainNavItems.map((item) => (
+            <button
+              key={item.label}
+              className={cn(
+                "flex flex-col items-center justify-center w-1/4 py-1 text-xs",
+                item.isActive ? "text-primary" : "text-muted-foreground"
+              )}
+              onClick={item.action}
+            >
+              <item.icon size={20} className="mb-1" /> {/* Keep icon size at 20 for main nav */}
+              <span className="text-[10px]">{item.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+      
+      {/* Add padding at the bottom on mobile to compensate for the navigation */}
+      <div className="h-16 md:hidden" />
+    </>
   );
 };
+
+// Custom icon components with max 14px size (reduzidos de 18px)
+const Eye = (props: any) => (
+  <svg 
+    xmlns="http://www.w3.org/2000/svg" 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round"
+    width="14"
+    height="14"
+    {...props}
+  >
+    <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
+    <circle cx="12" cy="12" r="3" />
+  </svg>
+);
+
+const EyeOff = (props: any) => (
+  <svg 
+    xmlns="http://www.w3.org/2000/svg" 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round"
+    width="14"
+    height="14"
+    {...props}
+  >
+    <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
+    <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68" />
+    <path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61" />
+    <line x1="2" x2="22" y1="2" y2="22" />
+  </svg>
+);
+
+const Badge = (props: any) => (
+  <svg 
+    xmlns="http://www.w3.org/2000/svg" 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round"
+    width="14"
+    height="14"
+    {...props}
+  >
+    <path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z" />
+  </svg>
+);
+
+const Pillar = (props: any) => (
+  <svg 
+    xmlns="http://www.w3.org/2000/svg" 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round"
+    width="14"
+    height="14"
+    {...props}
+  >
+    <rect x="4" y="6" width="16" height="16" rx="2" />
+    <path d="M8 6V4c0-1.1.9-2 2-2h4c1.1 0 2 .9 2 2v2" />
+    <line x1="8" y1="12" x2="16" y2="12" />
+  </svg>
+);
 
 export default MobileBottomNav;
