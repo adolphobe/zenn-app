@@ -150,7 +150,7 @@ const MobileBottomNav = () => {
   const renderDrawerItem = (item: NavigationItem) => (
     <button 
       key={item.label}
-      className="flex items-center gap-3 w-full p-3 hover:bg-muted rounded-md"
+      className="flex items-center gap-2 w-full p-2 hover:bg-muted rounded-md"
       onClick={() => {
         if (item.action) {
           item.action();
@@ -161,8 +161,8 @@ const MobileBottomNav = () => {
         }
       }}
     >
-      <item.icon size={18} /> {/* Reduced icon size from 20 to 18 */}
-      <span>{item.label}</span>
+      <item.icon size={16} /> {/* Reduced icon size from 18 to 16 */}
+      <span className="text-sm">{item.label}</span>
     </button>
   );
 
@@ -171,9 +171,9 @@ const MobileBottomNav = () => {
       {/* Filter Drawer */}
       <Drawer open={filterDrawerOpen} onOpenChange={setFilterDrawerOpen} direction="bottom">
         <DrawerContent className="max-h-[70vh]">
-          <div className="py-4 px-4">
-            <h3 className="text-lg font-medium mb-4">Filtros</h3>
-            <div className="flex flex-col gap-2">
+          <div className="py-3 px-4">
+            <h3 className="text-lg font-medium mb-3">Filtros</h3>
+            <div className="flex flex-col gap-1">
               {filterItems.map(renderDrawerItem)}
             </div>
           </div>
@@ -183,9 +183,8 @@ const MobileBottomNav = () => {
       {/* More Drawer */}
       <Drawer open={moreDrawerOpen} onOpenChange={setMoreDrawerOpen} direction="bottom">
         <DrawerContent className="max-h-[70vh]">
-          <div className="py-4 px-4">
-            <h3 className="text-lg font-medium mb-4">Mais opções</h3>
-            <div className="flex flex-col gap-2">
+          <div className="py-3 px-4">
+            <div className="flex flex-col gap-1">
               {moreItems.map(renderDrawerItem)}
             </div>
           </div>
@@ -204,7 +203,7 @@ const MobileBottomNav = () => {
               )}
               onClick={item.action}
             >
-              <item.icon size={20} className="mb-1" /> {/* Reduced icon size from 22 to 20 */}
+              <item.icon size={20} className="mb-1" /> {/* Keep icon size at 20 for main nav */}
               <span className="text-[10px]">{item.label}</span>
             </button>
           ))}
