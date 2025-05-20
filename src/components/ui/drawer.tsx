@@ -30,15 +30,14 @@ const Drawer = ({
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/30" onClick={handleBackdropClick}>
+    <div className={cn("fixed inset-0 z-[100] bg-black/30", className)} onClick={handleBackdropClick}>
       <div 
         className={cn(
-          "fixed bg-background p-4 shadow-lg transition-all duration-300 ease-in-out",
+          "fixed bg-background p-4 shadow-lg transition-all duration-300 ease-in-out z-[101]",
           direction === "bottom" && "bottom-0 left-0 right-0 rounded-t-xl",
           direction === "top" && "top-0 left-0 right-0 rounded-b-xl",
           direction === "left" && "top-0 bottom-0 left-0 rounded-r-xl",
-          direction === "right" && "top-0 bottom-0 right-0 rounded-l-xl",
-          className
+          direction === "right" && "top-0 bottom-0 right-0 rounded-l-xl"
         )}
         onClick={handleContentClick}
       >

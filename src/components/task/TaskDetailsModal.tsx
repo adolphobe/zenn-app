@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useQueryClient } from '@tanstack/react-query';
 import { Drawer, DrawerContent } from '@/components/ui/drawer';
+import { cn } from '@/lib/utils';
 
 // Importing helper components
 import TaskDetailsHeader from './details/TaskDetailsHeader';
@@ -24,6 +25,7 @@ export interface TaskDetailsModalProps {
   title?: string;
   showRestoreButton?: boolean;
   isFullScreen?: boolean;
+  className?: string;
 }
 
 const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
@@ -34,7 +36,8 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
   onCommentAdded,
   title = "Detalhes da Tarefa",
   showRestoreButton = false,
-  isFullScreen = false
+  isFullScreen = false,
+  className
 }) => {
   // States and refs - IMPORTANT: hooks BEFORE any conditional
   const [activeTab, setActiveTab] = useState('levels');
@@ -119,7 +122,12 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
   // Mobile fullscreen view using Drawer component
   if (isFullScreen) {
     return (
-      <Drawer open={isOpen} onOpenChange={onClose} direction="bottom" className="h-[100dvh] p-0 max-w-full">
+      <Drawer 
+        open={isOpen} 
+        onOpenChange={onClose} 
+        direction="bottom" 
+        className={cn("h-[100dvh] p-0 max-w-full z-[100]", className)}
+      >
         <DrawerContent className="h-[100dvh] max-h-[100dvh] p-0">
           <div className="flex flex-col h-full">
             <div className="p-4 border-b flex items-center justify-between sticky top-0 bg-background z-10">
@@ -188,7 +196,7 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent 
-        className="bg-white dark:bg-gray-800 rounded-xl max-w-3xl sm:max-w-lg md:max-w-2xl lg:max-w-3xl p-0"
+        className={cn("bg-white dark:bg-gray-800 rounded-xl max-w-3xl sm:max-w-lg md:max-w-2xl lg:max-w-3xl p-0", className)}
         style={{ width: "95vw", maxHeight: isMobile ? "90vh" : "85vh" }}
       >
         <DialogHeader className="p-4 sm:p-6">
