@@ -166,7 +166,7 @@ const MobileChronologicalPage: React.FC = () => {
             className="mb-4 overflow-hidden"
           >
             <div className="border rounded-md p-3 bg-background/80 backdrop-blur-sm">
-              <SidebarFilterSection sidebarOpen={true} />
+              <SidebarFilterSection sidebarOpen={true} isMobile={true} />
             </div>
           </motion.div>
         )}
@@ -256,8 +256,8 @@ const MobileChronologicalPage: React.FC = () => {
         )}
       </div>
       
-      {/* Botão flutuante de adicionar tarefa */}
-      <div className="fixed right-4 top-4 z-50">
+      {/* Botão flutuante de adicionar tarefa - MOVED TO BOTTOM */}
+      <div className="fixed right-4 bottom-20 z-50">
         {isTaskFormOpen ? (
           <TaskForm onClose={() => setIsTaskFormOpen(false)} />
         ) : (
