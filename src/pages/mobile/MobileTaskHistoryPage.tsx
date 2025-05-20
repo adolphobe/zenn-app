@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useTaskDataContext } from '@/context/TaskDataProvider';
 import { Task } from '@/types';
-import { ChevronLeft, ChevronRight, Filter, Clock, ArrowUp, ArrowDown, Search } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Filter, Clock, ArrowUp, ArrowDown, Search, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -23,6 +23,9 @@ import {
 import { ptBR } from 'date-fns/locale';
 import { motion, AnimatePresence } from 'framer-motion';
 import { NavigationStore } from '@/utils/navigationStore';
+import RestoreTaskDialog from '../task-history-new/components/RestoreTaskDialog';
+import TaskModal from '../task-history-new/components/TaskModal';
+import { restoreTask } from '../task-history-new/services/taskActions';
 
 const MobileTaskHistoryPage = () => {
   const { completedTasks, completedTasksLoading } = useTaskDataContext();
@@ -31,6 +34,9 @@ const MobileTaskHistoryPage = () => {
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [isRestoreDialogOpen, setIsRestoreDialogOpen] = useState(false);
+  const [taskToRestore, setTaskToRestore] = useState<Task | null>(null);
+  const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   
   // Preload other important pages for faster navigation
   useEffect(() => {
@@ -152,6 +158,26 @@ const MobileTaskHistoryPage = () => {
     if (!date) return '';
     const dateObj = date instanceof Date ? date : new Date(date);
     return format(dateObj, "dd MMM, yyyy", { locale: ptBR });
+  };
+
+  // Handle restore task
+  const handleRestoreTask = (task: Task) => {
+    setTaskToRestore(task);
+    setIsRestoreDialogOpen(true);
+  };
+
+  // Handle task click
+  const handleTaskClick = (task: Task) => {
+    setSelectedTask(task);
+    setIsTaskModalOpen(true);
+  };
+
+  // Handle confirm restore
+  const handleConfirmRestore = async (taskId: string) => {
+    await restoreTask(taskId);
+    
+    // Refresh the tasks list - this could be optimistic update
+    // but we'll keep it simple here by letting the data provider handle refetching
   };
   
   // Loading state
@@ -331,7 +357,7 @@ const MobileTaskHistoryPage = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.2 }}
             className="rounded-lg shadow-sm border p-3 relative border-l-4 border-l-green-500"
-            onClick={() => setSelectedTask(task)}
+            onClick={() => handleTaskClick(task)}
           >
             <h3 className="font-medium mb-2">{task.title}</h3>
             
@@ -378,99 +404,21 @@ const MobileTaskHistoryPage = () => {
         </div>
       )}
       
-      {/* Task detail sheet */}
-      <Sheet open={!!selectedTask} onOpenChange={(isOpen) => !isOpen && setSelectedTask(null)}>
-        <SheetContent side="bottom" className="h-[90%] sm:max-w-full p-0">
-          {selectedTask && (
-            <div className="flex flex-col h-full">
-              <div className="p-4 border-b">
-                <h2 className="text-xl font-semibold">{selectedTask.title}</h2>
-                <p className="text-sm flex items-center mt-1 text-muted-foreground">
-                  <Clock className="h-4 w-4 mr-1.5" />
-                  Concluída em {formatDate(selectedTask.completedAt)}
-                </p>
-              </div>
-              
-              <div className="overflow-auto p-4 space-y-6">
-                {/* Feedback badge if present */}
-                {selectedTask.feedback && (
-                  <div className="mb-4">
-                    <h3 className="text-sm font-medium mb-2">Feedback após conclusão</h3>
-                    <Badge variant="outline" className={`px-3 py-1.5 text-base ${getFeedbackColorClass(selectedTask.feedback)}`}>
-                      {getFeedbackLabel(selectedTask.feedback)}
-                    </Badge>
-                  </div>
-                )}
-                
-                {/* Score levels with colored cards */}
-                <div>
-                  <h3 className="text-sm font-medium mb-3">Níveis</h3>
-                  <div className="grid grid-cols-3 gap-3">
-                    <div className="bg-red-50 border border-red-200 p-3 rounded-lg shadow-sm">
-                      <p className="text-xs text-red-700 font-medium mb-1">Risco</p>
-                      <div className="flex items-end">
-                        <span className="text-xl font-bold text-red-700">{selectedTask.consequenceScore || 0}</span>
-                        <span className="text-xs text-red-500 mb-1 ml-1">/5</span>
-                      </div>
-                    </div>
-                    
-                    <div className="bg-blue-50 border border-blue-200 p-3 rounded-lg shadow-sm">
-                      <p className="text-xs text-blue-700 font-medium mb-1">Orgulho</p>
-                      <div className="flex items-end">
-                        <span className="text-xl font-bold text-blue-700">{selectedTask.prideScore || 0}</span>
-                        <span className="text-xs text-blue-500 mb-1 ml-1">/5</span>
-                      </div>
-                    </div>
-                    
-                    <div className="bg-green-50 border border-green-200 p-3 rounded-lg shadow-sm">
-                      <p className="text-xs text-green-700 font-medium mb-1">Crescimento</p>
-                      <div className="flex items-end">
-                        <span className="text-xl font-bold text-green-700">{selectedTask.constructionScore || 0}</span>
-                        <span className="text-xs text-green-500 mb-1 ml-1">/5</span>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  {/* Total score */}
-                  <div className="mt-4 p-3 bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-lg shadow-sm">
-                    <p className="text-xs text-purple-700 font-medium mb-1">Pontuação Total</p>
-                    <div className="flex items-end">
-                      <span className="text-xl font-bold text-purple-700">
-                        {(selectedTask.consequenceScore || 0) + (selectedTask.prideScore || 0) + (selectedTask.constructionScore || 0)}
-                      </span>
-                      <span className="text-xs text-purple-500 mb-1 ml-1">/15</span>
-                    </div>
-                  </div>
-                </div>
-                
-                {/* Date completed */}
-                <div>
-                  <h3 className="text-sm font-medium mb-2">Informações Adicionais</h3>
-                  {selectedTask.idealDate && (
-                    <div className="flex items-center mb-2 p-2 bg-gray-50 rounded-md border border-gray-200">
-                      <span className="text-sm font-medium text-gray-700 mr-2">Data da tarefa:</span>
-                      <span className="text-sm text-gray-600">{formatDate(selectedTask.idealDate)}</span>
-                    </div>
-                  )}
-                </div>
-                
-                {/* Restore task button */}
-                <Button 
-                  className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    // Aqui você adicionaria a lógica para restaurar a tarefa
-                    // Por exemplo: restoreTask(selectedTask.id);
-                    setSelectedTask(null);
-                  }}
-                >
-                  Restaurar tarefa
-                </Button>
-              </div>
-            </div>
-          )}
-        </SheetContent>
-      </Sheet>
+      {/* Task Modal */}
+      <TaskModal
+        task={selectedTask}
+        isOpen={isTaskModalOpen}
+        onClose={() => setIsTaskModalOpen(false)}
+        onRestore={handleRestoreTask}
+      />
+
+      {/* Restore Task Dialog */}
+      <RestoreTaskDialog
+        task={taskToRestore}
+        isOpen={isRestoreDialogOpen}
+        onClose={() => setIsRestoreDialogOpen(false)}
+        onConfirm={handleConfirmRestore}
+      />
     </motion.div>
   );
 };
