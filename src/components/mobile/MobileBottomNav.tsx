@@ -52,12 +52,20 @@ const MobileBottomNav = () => {
     setFilterDrawerOpen(false); // Close filter drawer when changing modes
     navigate('/mobile/history');
   };
+
+  const handleStrategicReview = () => {
+    setMoreDrawerOpen(false);
+    navigate('/mobile/strategic-review');
+  };
   
   const handleLogout = async () => {
     await logout();
     setMoreDrawerOpen(false);
     navigate('/login');
   };
+  
+  // Check if current route is Power or Chronological page
+  const isPowerOrChronologicalPage = location.pathname === '/mobile/power' || location.pathname === '/mobile/chronological';
   
   // Filter drawer items (depend on view mode)
   const filterItems = viewMode === 'power' ? [
@@ -99,7 +107,7 @@ const MobileBottomNav = () => {
     { 
       icon: Calendar, 
       label: 'Análise Estratégica', 
-      path: '/strategic-review' 
+      path: '/mobile/strategic-review' 
     },
     { 
       icon: darkMode ? Sun : Moon, 
@@ -118,7 +126,7 @@ const MobileBottomNav = () => {
     }
   ];
 
-  // Main navigation items
+  // Main navigation items - conditionally show Filter based on page
   const mainNavItems = [
     { 
       icon: Power, 
@@ -138,12 +146,12 @@ const MobileBottomNav = () => {
       isActive: location.pathname === '/mobile/history',
       action: handleHistoryMode
     },
-    { 
+    ...(isPowerOrChronologicalPage ? [{ 
       icon: Filter, 
       label: 'Filtros',
       isActive: filterDrawerOpen,
       action: () => setFilterDrawerOpen(!filterDrawerOpen)
-    },
+    }] : []),
     { 
       icon: MoreHorizontal, 
       label: 'Mais',

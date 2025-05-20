@@ -1,4 +1,3 @@
-
 import { lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from '@/hooks/use-toast';
@@ -33,6 +32,7 @@ const LandingPage = lazy(() => import('./pages/Landing'));
 const MobilePowerPage = lazy(() => import('./pages/mobile/MobilePowerPage'));
 const MobileChronologicalPage = lazy(() => import('./pages/mobile/MobileChronologicalPage'));
 const MobileTaskHistoryPage = lazy(() => import('./pages/mobile/MobileTaskHistoryPage'));
+import MobileStrategicReviewPage from './pages/mobile/MobileStrategicReviewPage';
 
 // Error and not found pages
 const NotFoundPage = lazy(() => import('./pages/NotFound'));
@@ -81,6 +81,7 @@ function App() {
                         <Route path="/mobile/power" element={<MobilePowerPage />} />
                         <Route path="/mobile/chronological" element={<MobileChronologicalPage />} />
                         <Route path="/mobile/history" element={<MobileTaskHistoryPage />} />
+                        <Route path="/mobile/strategic-review" element={<MobileStrategicReviewPage />} />
                       </Route>
                     </Route>
                     
