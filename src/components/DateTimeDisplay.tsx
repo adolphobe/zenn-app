@@ -36,7 +36,7 @@ const DateTimeDisplay: React.FC<DateTimeDisplayProps> = ({
   // Se não há data, exibe o fallback
   if (!date) {
     console.debug('DateTimeDisplay: Sem data, exibindo fallback', fallback);
-    return <span className={`text-inherit ${className}`}>{fallback}</span>;
+    return <span className={className}>{fallback}</span>;
   }
   
   // Tenta formatar a data
@@ -50,7 +50,7 @@ const DateTimeDisplay: React.FC<DateTimeDisplayProps> = ({
         date, 
         fallback 
       });
-      return <span className={`text-inherit ${className}`}>{fallback}</span>;
+      return <span className={className}>{fallback}</span>;
     }
     
     let formattedDate: string;
@@ -71,27 +71,27 @@ const DateTimeDisplay: React.FC<DateTimeDisplayProps> = ({
     // Se não conseguiu formatar, exibe o fallback
     if (!formattedDate) {
       console.debug('DateTimeDisplay: Falha na formatação, exibindo fallback');
-      return <span className={`text-inherit ${className}`}>{fallback}</span>;
+      return <span className={className}>{fallback}</span>;
     }
     
     // Garantir que temos um ISO string válido para o atributo dateTime
     const isoString = dateService.toISOString(validDate);
     if (!isoString) {
       console.debug('DateTimeDisplay: Falha ao gerar ISO string, usando span simples');
-      return <span className={`text-inherit ${className}`}>{formattedDate}</span>;
+      return <span className={className}>{formattedDate}</span>;
     }
     
     return (
       <time 
         dateTime={isoString} 
-        className={`text-inherit ${className}`}
+        className={className}
       >
         {formattedDate}
       </time>
     );
   } catch (error) {
     console.error('Erro ao renderizar data:', error, { date });
-    return <span className={`text-inherit ${className}`}>{fallback}</span>;
+    return <span className={className}>{fallback}</span>;
   }
 };
 

@@ -31,9 +31,9 @@ const TaskCardActions: React.FC<TaskCardActionsProps> = ({
   const buttonStyles = "bg-white text-gray-700 hover:text-gray-900 border-gray-200 hover:bg-gray-50 hover:border-gray-300 dark:bg-gray-800 dark:text-gray-300 dark:hover:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-750 dark:hover:border-gray-600";
   
   return (
-    <div className="flex flex-wrap justify-between gap-y-2 mt-4">
-      {/* Left side actions: Edit, Hide, Delete - with flex-wrap to improve mobile layout */}
-      <div className="flex flex-wrap gap-2">
+    <div className="flex justify-between space-x-2 mt-4">
+      {/* Left side actions: Edit, Hide, Delete */}
+      <div className="flex space-x-2">
         <Button
           variant="outline"
           size="sm"
@@ -42,7 +42,7 @@ const TaskCardActions: React.FC<TaskCardActionsProps> = ({
           className={buttonStyles}
         >
           <Edit2 size={16} />
-          <span className="ml-1 hidden xs:inline">Editar</span>
+          <span className="ml-1">Editar</span>
         </Button>
         
         {viewMode === 'power' && (
@@ -56,7 +56,7 @@ const TaskCardActions: React.FC<TaskCardActionsProps> = ({
             data-hidden={isHidden ? "true" : "false"}
           >
             {isHidden ? <Eye size={16} className="text-green-600" /> : <EyeOff size={16} />}
-            <span className="ml-1 hidden xs:inline">{isHidden ? "Mostrar" : "Ocultar"}</span>
+            <span className="ml-1">{isHidden ? "Mostrar" : "Ocultar"}</span>
           </Button>
         )}
         
@@ -71,7 +71,6 @@ const TaskCardActions: React.FC<TaskCardActionsProps> = ({
           `}
         >
           <Trash2 size={16} />
-          <span className="ml-1 hidden xs:inline">Excluir</span>
         </Button>
 
         {/* Botão Potência Extra - apenas visível no modo potência e para tarefas com pontuação alta */}
@@ -90,7 +89,7 @@ const TaskCardActions: React.FC<TaskCardActionsProps> = ({
             data-power-extra={isPowerExtra ? "true" : "false"}
           >
             <Zap size={16} className={isPowerExtra ? "text-red-600" : ""} />
-            <span className="ml-1 hidden xs:inline">{isPowerExtra ? "Desativar" : "Potência Extra"}</span>
+            <span className="ml-1">{isPowerExtra ? "Desativar" : "Potência Extra"}</span>
           </Button>
         )}
       </div>
@@ -104,7 +103,7 @@ const TaskCardActions: React.FC<TaskCardActionsProps> = ({
         className="btn-green"
       >
         <CheckSquare size={16} />
-        <span className="ml-1 hidden xs:inline">Completar</span>
+        <span className="ml-1">Completar</span>
       </Button>
     </div>
   );
