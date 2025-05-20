@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useTaskDataContext } from '@/context/TaskDataProvider';
 import { Task } from '@/types';
 import { ChevronLeft, ChevronRight, Filter, Clock, ArrowUp, ArrowDown, Search } from 'lucide-react';
@@ -21,7 +21,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ptBR } from 'date-fns/locale';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { NavigationStore } from '@/utils/navigationStore';
 
 const MobileTaskHistoryPage = () => {
   const { completedTasks, completedTasksLoading } = useTaskDataContext();
@@ -30,6 +31,43 @@ const MobileTaskHistoryPage = () => {
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  
+  // Preload other important pages for faster navigation
+  useEffect(() => {
+    // Preload the dashboard views
+    const preloadPower = import('./MobilePowerPage').catch(() => {});
+    const preloadChronological = import('./MobileChronologicalPage').catch(() => {});
+    
+    // Record NavigationStore visit
+    NavigationStore.setLastRoute('/mobile/history');
+    
+    return () => {
+      // No cleanup needed
+    };
+  }, []);
+  
+  // Page transition animation
+  const pageVariants = {
+    initial: {
+      opacity: 0,
+    },
+    animate: {
+      opacity: 1,
+      transition: {
+        duration: 0.3,
+        ease: "easeInOut",
+        when: "beforeChildren",
+        staggerChildren: 0.1
+      }
+    },
+    exit: {
+      opacity: 0,
+      transition: {
+        duration: 0.2,
+        ease: "easeInOut"
+      }
+    }
+  };
   
   // Items per page
   const itemsPerPage = 10;
@@ -170,7 +208,13 @@ const MobileTaskHistoryPage = () => {
   };
   
   return (
-    <div className="p-4 pb-20 max-w-full">
+    <motion.div 
+      className="p-4 pb-20 max-w-full"
+      initial="initial"
+      animate="animate"
+      exit="exit"
+      variants={pageVariants}
+    >
       <h1 className="text-xl font-bold mb-4">Histórico de Tarefas</h1>
       
       {/* Search and filters */}
@@ -427,7 +471,7 @@ const MobileTaskHistoryPage = () => {
           )}
         </SheetContent>
       </Sheet>
-    </div>
+    </motion.div>
   );
 };
 

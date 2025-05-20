@@ -39,10 +39,10 @@ export const TaskGroupList: React.FC<TaskGroupListProps> = ({
   }
 
   return (
-    // Added overflow-x-hidden to prevent horizontal scrollbar
-    <div className="space-y-8 overflow-x-hidden">
+    // Using overflow-hidden on both the container and each group to prevent horizontal scrollbar
+    <div className="space-y-8 overflow-hidden">
       {groups.map((group, index) => (
-        <div key={index} className="space-y-4">
+        <div key={index} className="space-y-4 overflow-hidden">
           <div className="flex items-center gap-2">
             <h3 className="text-lg font-medium">{group.label}</h3>
             <Badge variant="outline">{group.tasks.length}</Badge>

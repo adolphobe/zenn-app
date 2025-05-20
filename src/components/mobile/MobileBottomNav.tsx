@@ -5,6 +5,7 @@ import { Power, Clock, Filter, MoreHorizontal, History, Calendar, Moon, Sun, Set
 import { cn } from '@/lib/utils';
 import { useAppContext } from '@/context/AppContext';
 import { useAuth } from '@/context/auth';
+import { NavigationStore } from '@/utils/navigationStore';
 import { 
   Drawer,
   DrawerContent,
@@ -35,27 +36,83 @@ const MobileBottomNav = () => {
   const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
   const [moreDrawerOpen, setMoreDrawerOpen] = useState(false);
 
-  // Navigation handlers
+  // Enhanced navigation handlers with NavigationStore
   const handlePowerMode = () => {
+    const currentPath = '/mobile/power';
+    
+    // Skip navigation if already on the same route
+    if (NavigationStore.isRepeatNavigation(currentPath)) {
+      setFilterDrawerOpen(false);
+      return;
+    }
+    
     setViewMode('power');
     setFilterDrawerOpen(false); // Close filter drawer when changing modes
-    navigate('/mobile/power');
+    
+    // Track navigation
+    NavigationStore.setNavigationType('internal');
+    NavigationStore.setLastRoute(currentPath);
+    NavigationStore.addRecentRoute(currentPath);
+    
+    navigate(currentPath);
   };
 
   const handleChronologicalMode = () => {
+    const currentPath = '/mobile/chronological';
+    
+    // Skip navigation if already on the same route
+    if (NavigationStore.isRepeatNavigation(currentPath)) {
+      setFilterDrawerOpen(false);
+      return;
+    }
+    
     setViewMode('chronological');
     setFilterDrawerOpen(false); // Close filter drawer when changing modes
-    navigate('/mobile/chronological');
+    
+    // Track navigation
+    NavigationStore.setNavigationType('internal');
+    NavigationStore.setLastRoute(currentPath);
+    NavigationStore.addRecentRoute(currentPath);
+    
+    navigate(currentPath);
   };
   
   const handleHistoryMode = () => {
+    const currentPath = '/mobile/history';
+    
+    // Skip navigation if already on the same route
+    if (NavigationStore.isRepeatNavigation(currentPath)) {
+      setFilterDrawerOpen(false);
+      return;
+    }
+    
     setFilterDrawerOpen(false); // Close filter drawer when changing modes
-    navigate('/mobile/history');
+    
+    // Track navigation
+    NavigationStore.setNavigationType('external');
+    NavigationStore.setLastRoute(currentPath);
+    NavigationStore.addRecentRoute(currentPath);
+    
+    navigate(currentPath);
   };
 
   const handleStrategicReview = () => {
+    const currentPath = '/mobile/strategic-review';
+    
+    // Skip navigation if already on the same route
+    if (NavigationStore.isRepeatNavigation(currentPath)) {
+      setMoreDrawerOpen(false);
+      return;
+    }
+    
     setMoreDrawerOpen(false);
-    navigate('/mobile/strategic-review');
+    
+    // Track navigation
+    NavigationStore.setNavigationType('external');
+    NavigationStore.setLastRoute(currentPath);
+    NavigationStore.addRecentRoute(currentPath);
+    
+    navigate(currentPath);
   };
   
   const handleLogout = async () => {
@@ -169,6 +226,17 @@ const MobileBottomNav = () => {
         if (item.action) {
           item.action();
         } else if (item.path) {
+          // Use NavigationStore for path navigation
+          if (NavigationStore.isRepeatNavigation(item.path)) {
+            setFilterDrawerOpen(false);
+            setMoreDrawerOpen(false);
+            return;
+          }
+          
+          NavigationStore.setNavigationType('external');
+          NavigationStore.setLastRoute(item.path);
+          NavigationStore.addRecentRoute(item.path);
+          
           navigate(item.path);
           setFilterDrawerOpen(false);
           setMoreDrawerOpen(false);

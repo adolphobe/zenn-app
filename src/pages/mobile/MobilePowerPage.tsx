@@ -12,6 +12,7 @@ import TaskForm from '@/components/TaskForm';
 import { sortTasks } from '@/utils';
 import { toast } from '@/hooks/use-toast';
 import SidebarFilterSection from '@/components/sidebar/SidebarFilterSection';
+import { NavigationStore } from '@/utils/navigationStore';
 
 const MobilePowerPage: React.FC = () => {
   const { state } = useAppContext();
@@ -20,6 +21,20 @@ const MobilePowerPage: React.FC = () => {
   const [isTaskFormOpen, setIsTaskFormOpen] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const { isTaskExpanded, toggleTaskExpanded } = useExpandedTask();
+  
+  // Preload components for faster navigation
+  useEffect(() => {
+    // Preload the history and strategic review pages
+    const preloadHistory = import('../mobile/MobileTaskHistoryPage').catch(() => {});
+    const preloadStrategic = import('../mobile/MobileStrategicReviewPage').catch(() => {});
+    
+    // Record dashboard visit for optimizing return navigation
+    NavigationStore.recordDashboardVisit();
+    
+    return () => {
+      // Cleanup if needed
+    };
+  }, []);
   
   // Filtragem e ordenação de tarefas - similar ao Desktop
   const shouldShowHiddenTasks = showHiddenTasks;
@@ -31,10 +46,10 @@ const MobilePowerPage: React.FC = () => {
     return isNotCompleted && isVisible;
   });
   
-  // Ordenar as tarefas conforme o modo de visualização (neste caso, modo Potência)
+  // Ordenar as tarefas conforme o modo de visualização
   const sortedTasks = sortTasks(filteredTasks, 'power', sortOptions['power']);
   
-  // Animações para os cards de tarefas
+  // Animações para os cards de tarefas - enhanced with smoother transitions
   const taskVariants = {
     hidden: { 
       opacity: 0,
@@ -53,6 +68,29 @@ const MobilePowerPage: React.FC = () => {
       scale: 0.9,
       y: -20,
       transition: { duration: 0.3, ease: "easeInOut" }
+    }
+  };
+  
+  // Page transition variants
+  const pageVariants = {
+    initial: {
+      opacity: 0,
+    },
+    animate: {
+      opacity: 1,
+      transition: {
+        duration: 0.3,
+        ease: "easeInOut",
+        when: "beforeChildren",
+        staggerChildren: 0.1
+      }
+    },
+    exit: {
+      opacity: 0,
+      transition: {
+        duration: 0.2,
+        ease: "easeInOut"
+      }
     }
   };
   
@@ -85,7 +123,13 @@ const MobilePowerPage: React.FC = () => {
   }
 
   return (
-    <div className="px-3 py-2 relative">
+    <motion.div 
+      className="px-3 py-2 relative"
+      initial="initial"
+      animate="animate"
+      exit="exit"
+      variants={pageVariants}
+    >
       {/* Filtros no topo */}
       <div className="flex justify-between items-center mb-4">
         <Button
@@ -166,7 +210,7 @@ const MobilePowerPage: React.FC = () => {
         )}
       </div>
       
-      {/* Botão flutuante de adicionar tarefa - MOVED TO BOTTOM */}
+      {/* Botão flutuante de adicionar tarefa */}
       <div className="fixed right-4 bottom-20 z-50">
         {isTaskFormOpen ? (
           <TaskForm onClose={() => setIsTaskFormOpen(false)} />
@@ -180,7 +224,7 @@ const MobilePowerPage: React.FC = () => {
           </Button>
         )}
       </div>
-    </div>
+    </motion.div>
   );
 };
 
