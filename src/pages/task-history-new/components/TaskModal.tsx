@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Task } from '@/types';
 import TaskDetailsModal from '@/components/task/TaskDetailsModal';
 import { useQueryClient } from '@tanstack/react-query';
@@ -15,6 +15,31 @@ interface TaskModalProps {
 const TaskModal: React.FC<TaskModalProps> = ({ task, isOpen, onClose, onRestore }) => {
   const queryClient = useQueryClient();
   const isMobile = useIsMobile();
+  
+  // Prevent background scrolling when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      // Save the current scroll position
+      const scrollY = window.scrollY;
+      
+      // Apply fixed positioning to body with current scroll offset
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = '100%';
+      document.body.style.overflowY = 'hidden';
+      
+      return () => {
+        // Restore scrolling when component unmounts or modal closes
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.width = '';
+        document.body.style.overflowY = '';
+        
+        // Restore scroll position
+        window.scrollTo(0, scrollY);
+      };
+    }
+  }, [isOpen]);
   
   // Handler for comment updates
   const handleCommentAdded = async () => {
@@ -37,7 +62,7 @@ const TaskModal: React.FC<TaskModalProps> = ({ task, isOpen, onClose, onRestore 
       showRestoreButton={true}
       onCommentAdded={handleCommentAdded}
       isFullScreen={true}
-      className="z-[100]" // Aumentando o z-index para ficar acima do menu mobile
+      className="z-[100]" // Higher z-index to stay above mobile menu
     />
   );
 };

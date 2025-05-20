@@ -27,6 +27,31 @@ const Drawer = ({
     e.stopPropagation();
   };
 
+  // Effect to manage body scrolling
+  React.useEffect(() => {
+    if (open) {
+      // Save the current scroll position
+      const scrollY = window.scrollY;
+      
+      // Lock the body in place
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = '100%';
+      document.body.style.overflowY = 'hidden';
+      
+      return () => {
+        // Restore body to normal when drawer closes
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.width = '';
+        document.body.style.overflowY = '';
+        
+        // Return to the previous scroll position
+        window.scrollTo(0, scrollY);
+      };
+    }
+  }, [open]);
+
   if (!open) return null;
 
   return (
