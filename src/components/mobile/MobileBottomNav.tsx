@@ -192,7 +192,7 @@ const MobileBottomNav = () => {
     },
     { 
       icon: ListOrdered, 
-      label: 'Cronologia',
+      label: 'Cronológico',
       isActive: location.pathname === '/mobile/chronological',
       action: handleChronologicalMode 
     },
