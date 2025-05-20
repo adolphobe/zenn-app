@@ -25,7 +25,7 @@ interface TaskCardHeaderProps {
   consequenceScore?: number;
   prideScore?: number;
   constructionScore?: number;
-  isPowerExtra?: boolean; // Added this prop
+  isPowerExtra?: boolean;
 }
 
 const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
@@ -137,18 +137,6 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
         </div>
         
         <div className="flex items-center">
-          {shouldShowDate && (
-            <div className="text-xs text-right ml-3 flex items-center">
-              {taskIsOverdue && parsedDate && (
-                <Bell size={14} className="text-red-400 mr-1" />
-              )}
-              {parsedDate ? (
-                formatDate(parsedDate, dateDisplayOptions)
-              ) : viewMode === 'chronological' ? (
-                <span className="text-gray-400">SEM PRAZO</span>
-              ) : null}
-            </div>
-          )}
           {shouldShowScore && (
             <div className="flex items-center justify-center bg-white bg-opacity-40 rounded-full px-3 py-1.5 font-semibold ml-2">
               <span className="text-[16px]">{totalScore}</span>
@@ -158,8 +146,22 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
         </div>
       </div>
       
+      {/* Data movida para antes dos pilares */}
+      {shouldShowDate && (
+        <div className="text-xs flex items-center mt-1 mb-1">
+          {taskIsOverdue && parsedDate && (
+            <Bell size={14} className="text-red-400 mr-1" />
+          )}
+          {parsedDate ? (
+            <span className="text-gray-600">{formatDate(parsedDate, dateDisplayOptions)}</span>
+          ) : viewMode === 'chronological' ? (
+            <span className="text-gray-400">SEM PRAZO</span>
+          ) : null}
+        </div>
+      )}
+      
       {showPillars && (
-        <div className="mt-2 text-xs flex flex-wrap gap-2">
+        <div className="mt-1 text-xs flex flex-wrap gap-2">
           <span>Risco: {consequenceScore}</span>
           <span>|</span>
           <span>Orgulho: {prideScore}</span>

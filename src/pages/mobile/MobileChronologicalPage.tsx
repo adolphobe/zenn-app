@@ -133,42 +133,42 @@ const MobileChronologicalPage: React.FC = () => {
     <div className="px-3 py-2">
       {/* Cabeçalho */}
       <div className="mb-5">
-        <div className="flex justify-between items-center">
-          <h1 className="text-xl font-bold">Modo Cronológico</h1>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleSyncTasks}
-              disabled={operationsLoading.update}
-              className={`flex items-center gap-1 ${
-                syncStatus === 'error' ? 'border-red-500 text-red-500 hover:bg-red-50' : ''
-              }`}
-            >
-              {operationsLoading.update ? (
-                <Loader2 size={14} className="animate-spin" />
-              ) : syncStatus === 'error' ? (
-                <RefreshCw size={14} className="text-red-500" />
-              ) : (
-                <RefreshCw size={14} className={syncStatus === 'synced' ? "text-green-500" : ""} />
-              )}
-            </Button>
-            
-            {isTaskFormOpen ? (
-              <TaskForm onClose={() => setIsTaskFormOpen(false)} />
-            ) : (
-              <button
-                onClick={() => setIsTaskFormOpen(true)}
-                className="rounded-full p-2 bg-blue-600 text-white hover:bg-blue-700 transition-colors"
-              >
-                <Plus size={18} />
-              </button>
-            )}
-          </div>
-        </div>
+        <h1 className="text-xl font-bold">Modo Cronológico</h1>
         <p className="text-xs text-muted-foreground mt-1">
           {getDescriptionText()}
         </p>
+        
+        {/* Botão de adicionar tarefa logo após o título e legenda */}
+        <div className="mt-3 flex justify-between items-center">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleSyncTasks}
+            disabled={operationsLoading.update}
+            className={`flex items-center gap-1 ${
+              syncStatus === 'error' ? 'border-red-500 text-red-500 hover:bg-red-50' : ''
+            }`}
+          >
+            {operationsLoading.update ? (
+              <Loader2 size={14} className="animate-spin" />
+            ) : syncStatus === 'error' ? (
+              <RefreshCw size={14} className="text-red-500" />
+            ) : (
+              <RefreshCw size={14} className={syncStatus === 'synced' ? "text-green-500" : ""} />
+            )}
+          </Button>
+          
+          {isTaskFormOpen ? (
+            <TaskForm onClose={() => setIsTaskFormOpen(false)} />
+          ) : (
+            <button
+              onClick={() => setIsTaskFormOpen(true)}
+              className="rounded-full p-2 bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+            >
+              <Plus size={18} />
+            </button>
+          )}
+        </div>
       </div>
       
       {/* Tarefas vencidas */}
