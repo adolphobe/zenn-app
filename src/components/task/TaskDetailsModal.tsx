@@ -138,7 +138,7 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
             </div>
             
             <div className="overflow-auto flex-grow">
-              <div className="p-4 space-y-6">
+              <div className="space-y-6">
                 {/* Header with task information */}
                 <TaskDetailsHeader task={task} />
                 
