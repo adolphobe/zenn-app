@@ -14,6 +14,7 @@ import { useComments } from '@/hooks/useComments';
 import { useTabNavigation } from '@/context/hooks/useTabNavigation';
 import { toast } from '@/hooks/use-toast';
 import { v4 as uuidv4 } from 'uuid';
+import { Sheet, SheetContent } from '@/components/ui/sheet';
 
 interface EditTaskModalProps {
   task: Task;
@@ -139,13 +140,112 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ task, isOpen, onClose }) 
     setTimeout(scrollToBottom, 500);
   }, [refreshComments, scrollToBottom]);
 
+  // Render the mobile version using Sheet
+  if (isMobile) {
+    return (
+      <Sheet open={isOpen} onOpenChange={onClose}>
+        <SheetContent side="bottom" className="h-[100dvh] p-0 max-w-full">
+          <div className="flex flex-col h-full">
+            <div className="p-4 border-b">
+              <h2 className="text-xl font-semibold">Editar Tarefa</h2>
+            </div>
+            
+            <div className="flex-1 overflow-auto">
+              <div className="px-4 py-4 space-y-6">
+                {/* Task title input */}
+                <div>
+                  <label htmlFor="title" className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+                    Título da Tarefa
+                  </label>
+                  <input
+                    type="text"
+                    id="title"
+                    name="title"
+                    value={formData.title}
+                    onChange={handleChange}
+                    className="w-full p-3 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                    placeholder="O que precisa ser feito?"
+                    required
+                  />
+                </div>
+                
+                {/* Tabs for levels and comments */}
+                <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                  <TabsList className="grid w-full grid-cols-2 mb-4">
+                    <TabsTrigger value="levels" data-testid="levels-tab">
+                      Níveis
+                    </TabsTrigger>
+                    <TabsTrigger value="comments" data-testid="comments-tab">
+                      Comentários {comments && comments.length > 0 ? `(${comments.length})` : ''}
+                    </TabsTrigger>
+                  </TabsList>
+                  
+                  {/* Levels tab content */}
+                  <TabsContent value="levels" className="space-y-6">
+                    <TaskFormFields 
+                      formData={formData} 
+                      handleChange={handleChange} 
+                      handleDateChange={handleDateChange} 
+                      setFormData={setFormData} 
+                    />
+                  </TabsContent>
+                  
+                  {/* Comments tab content */}
+                  <TabsContent value="comments">
+                    <div ref={commentsContainerRef} className="space-y-4">
+                      {comments && comments.length > 0 ? (
+                        <TaskComments 
+                          taskId={task.id} 
+                          comments={comments}
+                          onCommentDeleted={() => refreshComments()}
+                        />
+                      ) : (
+                        <div className="py-4 text-center text-gray-500 italic">
+                          {loadingComments || isRefetching ? "Carregando comentários..." : "Sem comentários para esta tarefa"}
+                        </div>
+                      )}
+                      
+                      {/* Comment form component */}
+                      <CommentForm 
+                        taskId={task.id}
+                        onCommentAdded={handleCommentAdded}
+                      />
+                    </div>
+                  </TabsContent>
+                </Tabs>
+              </div>
+            </div>
+            
+            <div className="p-4 border-t mt-auto flex justify-between">
+              <Button
+                type="button"
+                onClick={onClose}
+                variant="outline"
+              >
+                Cancelar
+              </Button>
+              <Button
+                type="button"
+                onClick={handleSaveTask}
+                className="btn-green"
+              >
+                Salvar
+              </Button>
+            </div>
+          </div>
+        </SheetContent>
+      </Sheet>
+    );
+  }
+
+  // Desktop version
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent 
         className="max-w-3xl sm:max-w-lg md:max-w-2xl lg:max-w-3xl p-0"
         style={{ 
           width: "95vw", 
-          maxHeight: isMobile ? "90vh" : "85vh"
+          maxHeight: "85vh"
         }}
       >
         <DialogHeader className="p-4 sm:p-6 border-b">

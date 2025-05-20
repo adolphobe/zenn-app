@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback } from 'react';
 import { useTaskDataContext } from '@/context/TaskDataProvider';
 import { Task } from '@/types';
@@ -140,6 +141,16 @@ const MobileTaskHistoryPage = () => {
       </div>
     );
   }
+  
+  // Get task priority color class based on scores
+  const getTaskCardColorClass = (task: Task) => {
+    const totalScore = (task.consequenceScore || 0) + (task.prideScore || 0) + (task.constructionScore || 0);
+    
+    if (totalScore >= 12) return "border-l-red-500 bg-red-50";
+    if (totalScore >= 9) return "border-l-orange-500 bg-orange-50";
+    if (totalScore >= 6) return "border-l-blue-500 bg-blue-50";
+    return "border-l-gray-400 bg-gray-50";
+  };
   
   // Get pillar color
   const getPillarColor = (pillar: string) => {
@@ -294,30 +305,34 @@ const MobileTaskHistoryPage = () => {
       
       {/* Task list */}
       <div className="space-y-3">
-        {paginatedTasks().map((task) => (
-          <motion.div
-            key={task.id}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.2 }}
-            className="bg-card rounded-lg shadow-sm border p-3 relative border-l-4 border-l-green-500"
-            onClick={() => setSelectedTask(task)}
-          >
-            <h3 className="font-medium mb-2">{task.title}</h3>
-            
-            {task.feedback && (
-              <div className="mb-2">
-                <Badge variant="outline" className={`${getFeedbackColorClass(task.feedback)}`}>
-                  {getFeedbackLabel(task.feedback)}
-                </Badge>
+        {paginatedTasks().map((task) => {
+          const cardColorClass = getTaskCardColorClass(task);
+          return (
+            <motion.div
+              key={task.id}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.2 }}
+              className={`rounded-lg shadow-sm border p-3 relative border-l-4 ${cardColorClass}`}
+              onClick={() => setSelectedTask(task)}
+            >
+              <h3 className="font-medium mb-2">{task.title}</h3>
+              
+              {task.feedback && (
+                <div className="mb-2">
+                  <Badge variant="outline" className={`${getFeedbackColorClass(task.feedback)}`}>
+                    {getFeedbackLabel(task.feedback)}
+                  </Badge>
+                </div>
+              )}
+              
+              <div className="text-xs text-muted-foreground mt-2">
+                <Clock className="h-3.5 w-3.5 inline-block mr-1" />
+                {formatDate(task.completedAt)}
               </div>
-            )}
-            
-            <div className="text-xs text-muted-foreground">
-              {formatDate(task.completedAt)}
-            </div>
-          </motion.div>
-        ))}
+            </motion.div>
+          );
+        })}
       </div>
       
       {/* Pagination controls */}
@@ -349,49 +364,83 @@ const MobileTaskHistoryPage = () => {
       
       {/* Task detail sheet */}
       <Sheet open={!!selectedTask} onOpenChange={(isOpen) => !isOpen && setSelectedTask(null)}>
-        <SheetContent side="bottom" className="h-[90%] sm:max-w-full">
+        <SheetContent side="bottom" className="h-[90%] sm:max-w-full p-0">
           {selectedTask && (
-            <div className="space-y-6 h-full overflow-y-auto pb-12">
-              <SheetHeader>
-                <SheetTitle>{selectedTask.title}</SheetTitle>
-              </SheetHeader>
+            <div className="flex flex-col h-full">
+              <div className="p-4 border-b">
+                <h2 className="text-xl font-semibold">{selectedTask.title}</h2>
+                <p className="text-sm flex items-center mt-1 text-muted-foreground">
+                  <Clock className="h-4 w-4 mr-1.5" />
+                  Concluída em {formatDate(selectedTask.completedAt)}
+                </p>
+              </div>
               
-              <div className="space-y-4">
-                <div className="flex items-center gap-2 text-sm">
-                  <Clock className="h-4 w-4 text-muted-foreground" />
-                  <span>Concluída em {formatDate(selectedTask.completedAt)}</span>
-                </div>
-                
-                <div className="grid grid-cols-3 gap-3">
-                  <div className="bg-muted p-3 rounded-lg">
-                    <p className="text-xs text-muted-foreground mb-1">Risco</p>
-                    <p className="text-lg font-medium">{selectedTask.consequenceScore || 0}</p>
-                  </div>
-                  
-                  <div className="bg-muted p-3 rounded-lg">
-                    <p className="text-xs text-muted-foreground mb-1">Orgulho</p>
-                    <p className="text-lg font-medium">{selectedTask.prideScore || 0}</p>
-                  </div>
-                  
-                  <div className="bg-muted p-3 rounded-lg">
-                    <p className="text-xs text-muted-foreground mb-1">Crescimento</p>
-                    <p className="text-lg font-medium">{selectedTask.constructionScore || 0}</p>
-                  </div>
-                </div>
-                
+              <div className="overflow-auto p-4 space-y-6">
+                {/* Feedback badge if present */}
                 {selectedTask.feedback && (
-                  <div className="bg-muted p-4 rounded-lg">
-                    <p className="text-sm text-muted-foreground mb-1">Feedback após conclusão</p>
-                    <p className="font-medium">
+                  <div className="mb-4">
+                    <h3 className="text-sm font-medium mb-2">Feedback após conclusão</h3>
+                    <Badge variant="outline" className={`px-3 py-1.5 text-base ${getFeedbackColorClass(selectedTask.feedback)}`}>
                       {getFeedbackLabel(selectedTask.feedback)}
-                    </p>
+                    </Badge>
                   </div>
                 )}
                 
+                {/* Score levels with colored cards */}
+                <div>
+                  <h3 className="text-sm font-medium mb-3">Níveis</h3>
+                  <div className="grid grid-cols-3 gap-3">
+                    <div className="bg-red-50 border border-red-200 p-3 rounded-lg shadow-sm">
+                      <p className="text-xs text-red-700 font-medium mb-1">Risco</p>
+                      <div className="flex items-end">
+                        <span className="text-xl font-bold text-red-700">{selectedTask.consequenceScore || 0}</span>
+                        <span className="text-xs text-red-500 mb-1 ml-1">/5</span>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-blue-50 border border-blue-200 p-3 rounded-lg shadow-sm">
+                      <p className="text-xs text-blue-700 font-medium mb-1">Orgulho</p>
+                      <div className="flex items-end">
+                        <span className="text-xl font-bold text-blue-700">{selectedTask.prideScore || 0}</span>
+                        <span className="text-xs text-blue-500 mb-1 ml-1">/5</span>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-green-50 border border-green-200 p-3 rounded-lg shadow-sm">
+                      <p className="text-xs text-green-700 font-medium mb-1">Crescimento</p>
+                      <div className="flex items-end">
+                        <span className="text-xl font-bold text-green-700">{selectedTask.constructionScore || 0}</span>
+                        <span className="text-xs text-green-500 mb-1 ml-1">/5</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Total score */}
+                  <div className="mt-4 p-3 bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-lg shadow-sm">
+                    <p className="text-xs text-purple-700 font-medium mb-1">Pontuação Total</p>
+                    <div className="flex items-end">
+                      <span className="text-xl font-bold text-purple-700">
+                        {(selectedTask.consequenceScore || 0) + (selectedTask.prideScore || 0) + (selectedTask.constructionScore || 0)}
+                      </span>
+                      <span className="text-xs text-purple-500 mb-1 ml-1">/15</span>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Date completed */}
+                <div>
+                  <h3 className="text-sm font-medium mb-2">Informações Adicionais</h3>
+                  {selectedTask.idealDate && (
+                    <div className="flex items-center mb-2 p-2 bg-gray-50 rounded-md border border-gray-200">
+                      <span className="text-sm font-medium text-gray-700 mr-2">Data da tarefa:</span>
+                      <span className="text-sm text-gray-600">{formatDate(selectedTask.idealDate)}</span>
+                    </div>
+                  )}
+                </div>
+                
                 {/* Restore task button */}
                 <Button 
-                  variant="outline" 
-                  className="w-full"
+                  className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white"
                   onClick={(e) => {
                     e.stopPropagation();
                     // Aqui você adicionaria a lógica para restaurar a tarefa

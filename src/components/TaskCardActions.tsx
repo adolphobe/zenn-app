@@ -100,7 +100,7 @@ const TaskCardActions: React.FC<TaskCardActionsProps> = ({
         className="btn-green mt-0"
       >
         <CheckSquare size={16} />
-        <span className="ml-1">Completar</span>
+        <span className="ml-1 sm:inline-block">Completar</span>
       </Button>
     </div>
   );
