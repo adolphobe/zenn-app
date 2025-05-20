@@ -139,11 +139,6 @@ const MobileBottomNav = () => {
       icon: Calendar, 
       label: showDates ? 'Esconder datas' : 'Mostrar datas',
       action: toggleShowDates 
-    },
-    { 
-      icon: Badge, 
-      label: showScores ? 'Esconder pontuação' : 'Mostrar pontuação',
-      action: toggleShowScores 
     }
   ] : [
     { 
@@ -217,36 +212,35 @@ const MobileBottomNav = () => {
   ];
 
   // Drawer menu item renderer
- // Drawer menu item renderer
-const renderDrawerItem = (item: NavigationItem) => (
-  <button 
-    key={item.label}
-    className="flex items-center gap-2 w-full p-2 hover:bg-muted rounded-md"
-    onClick={() => {
-      if (item.action) {
-        item.action();
-      } else if (item.path) {
-        // Use NavigationStore for path navigation
-        if (NavigationStore.isRepeatNavigation(item.path)) {
+  const renderDrawerItem = (item: NavigationItem) => (
+    <button 
+      key={item.label}
+      className="flex items-center gap-2 w-full p-2 hover:bg-muted rounded-md"
+      onClick={() => {
+        if (item.action) {
+          item.action();
+        } else if (item.path) {
+          // Use NavigationStore for path navigation
+          if (NavigationStore.isRepeatNavigation(item.path)) {
+            setFilterDrawerOpen(false);
+            setMoreDrawerOpen(false);
+            return;
+          }
+          
+          NavigationStore.setNavigationType('external');
+          NavigationStore.setLastRoute(item.path);
+          NavigationStore.addRecentRoute(item.path);
+          
+          navigate(item.path);
           setFilterDrawerOpen(false);
           setMoreDrawerOpen(false);
-          return;
         }
-        
-        NavigationStore.setNavigationType('external');
-        NavigationStore.setLastRoute(item.path);
-        NavigationStore.addRecentRoute(item.path);
-        
-        navigate(item.path);
-        setFilterDrawerOpen(false);
-        setMoreDrawerOpen(false);
-      }
-    }}
-  >
-    <item.icon size={18} />
-    <span className="text-sm">{item.label}</span>
-  </button>
-);
+      }}
+    >
+      <item.icon size={18} />
+      <span className="text-sm">{item.label}</span>
+    </button>
+  );
 
   return (
     <>
