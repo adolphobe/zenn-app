@@ -16,19 +16,19 @@ const AvatarSelector: React.FC<AvatarSelectorProps> = ({
   onSelect,
 }) => {
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-4">
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-7 gap-2 sm:gap-4">
       {avatars.map((avatar, index) => (
         <div 
           key={index} 
           className={cn(
-            "cursor-pointer relative flex flex-col items-center rounded-md p-2 transition-all",
+            "cursor-pointer relative flex flex-col items-center rounded-md p-1.5 sm:p-2 transition-all",
             selectedAvatar === avatar 
               ? "bg-primary/10 ring-2 ring-primary" 
               : "hover:bg-muted"
           )}
           onClick={() => onSelect(avatar)}
         >
-          <Avatar className="w-16 h-16 border-2 border-white shadow-sm">
+          <Avatar className="w-14 h-14 sm:w-16 sm:h-16 border-2 border-white shadow-sm">
             <AvatarImage src={avatar} alt={`Avatar option ${index + 1}`} />
             <AvatarFallback className="bg-blue-100 text-blue-800">
               <User size={24} />

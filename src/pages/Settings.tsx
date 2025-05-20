@@ -85,13 +85,13 @@ const Settings = () => {
   }
 
   return (
-    <div className="container py-8 max-w-3xl mx-auto pb-0">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Configurações</h1>
-        <p className="text-muted-foreground">Gerencie suas preferências e informações de conta</p>
+    <div className="w-full px-4 sm:px-6 md:container md:max-w-3xl md:mx-auto py-4 md:py-8 pb-20">
+      <div className="mb-6">
+        <h1 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2">Configurações</h1>
+        <p className="text-muted-foreground text-sm sm:text-base">Gerencie suas preferências e informações de conta</p>
       </div>
       
-      <div className="space-y-8">
+      <div className="space-y-6">
         {/* Account Information */}
         <AccountInfoSection user={currentUser} />
         
@@ -100,7 +100,7 @@ const Settings = () => {
         
         {/* Avatar Selection */}
         <Card>
-          <CardHeader>
+          <CardHeader className="pb-2 sm:pb-4">
             <CardTitle>Escolha seu avatar</CardTitle>
             <CardDescription>
               Selecione uma imagem para seu perfil
@@ -115,13 +115,13 @@ const Settings = () => {
                 onSelect={handleAvatarSelect}
               />
             ) : (
-              <div className="flex justify-center py-8">
+              <div className="flex justify-center py-4 sm:py-8">
                 <div className="w-6 h-6 border-2 border-t-primary border-r-transparent border-b-transparent border-l-transparent rounded-full animate-spin"></div>
               </div>
             )}
           </CardContent>
           
-          <CardFooter className="flex justify-end">
+          <CardFooter className="flex justify-end pt-2 sm:pt-4">
             <Button 
               onClick={handleSave} 
               disabled={isSaving || selectedAvatar === currentUser.profileImage}
@@ -135,7 +135,7 @@ const Settings = () => {
         <PasswordResetSection />
         
         {/* Delete Account Section */}
-        <div className="flex justify-start pt-0 pb-0">
+        <div className="flex justify-start pt-0 pb-12">
           <Button 
             variant="outline" 
             size="sm" 

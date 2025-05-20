@@ -87,7 +87,7 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({ isOpen, onClose
   
   return (
     <Dialog open={isOpen} onOpenChange={handleCancel}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md max-w-[90%] p-4 sm:p-6">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-red-500">
             <AlertTriangle className="h-5 w-5" />
@@ -108,7 +108,7 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({ isOpen, onClose
         </DialogHeader>
 
         {step === 2 && (
-          <div className="py-4">
+          <div className="py-2 sm:py-4">
             <Input
               value={confirmText}
               onChange={(e) => {
@@ -124,11 +124,11 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({ isOpen, onClose
           </div>
         )}
 
-        <DialogFooter className="sm:justify-between">
+        <DialogFooter className="flex flex-col-reverse sm:flex-row sm:justify-between gap-2">
           <Button
             variant="destructive"
             onClick={handleCancel}
-            className="hover:bg-red-600"
+            className="hover:bg-red-600 w-full sm:w-auto"
           >
             Cancelar
           </Button>
@@ -136,7 +136,7 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({ isOpen, onClose
             onClick={handleNext}
             variant="outline"
             disabled={isDeleting}
-            className="border-gray-200 hover:bg-transparent"
+            className="border-gray-200 hover:bg-transparent w-full sm:w-auto"
           >
             {step === 1 ? "Avançar" : isDeleting ? "Excluindo..." : "Confirmar exclusão"}
           </Button>

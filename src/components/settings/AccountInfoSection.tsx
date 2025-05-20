@@ -12,14 +12,14 @@ interface AccountInfoSectionProps {
 const AccountInfoSection: React.FC<AccountInfoSectionProps> = ({ user }) => {
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="pb-2 sm:pb-4">
         <CardTitle>Informações da conta</CardTitle>
         <CardDescription>
           Detalhes da sua conta
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="space-y-2">
+      <CardContent className="space-y-3 sm:space-y-4">
+        <div className="space-y-1.5 sm:space-y-2">
           <Label htmlFor="name">Nome</Label>
           <Input
             id="name"
@@ -28,7 +28,7 @@ const AccountInfoSection: React.FC<AccountInfoSectionProps> = ({ user }) => {
             className="bg-muted/50"
           />
         </div>
-        <div className="space-y-2">
+        <div className="space-y-1.5 sm:space-y-2">
           <Label htmlFor="email">E-mail</Label>
           <Input
             id="email"
@@ -37,7 +37,7 @@ const AccountInfoSection: React.FC<AccountInfoSectionProps> = ({ user }) => {
             className="bg-muted/50"
           />
         </div>
-        <div className="space-y-2">
+        <div className="space-y-1.5 sm:space-y-2">
           <Label htmlFor="created">Conta criada em</Label>
           <Input
             id="created"
