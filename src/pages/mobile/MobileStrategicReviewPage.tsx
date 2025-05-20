@@ -11,7 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { motion } from 'framer-motion';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, HelpCircle, Info } from 'lucide-react';
 import { 
   DropdownMenu,
   DropdownMenuTrigger,
@@ -19,6 +19,7 @@ import {
   DropdownMenuItem
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 const MobileStrategicReviewPage = () => {
   const { completedTasks, completedTasksLoading } = useTaskDataContext();
@@ -220,8 +221,26 @@ const MobileStrategicReviewPage = () => {
               <p className="text-xl font-medium">{taskStats?.totalFilteredTasks || 0}</p>
             </div>
             
-            <div className="bg-muted p-3 rounded-lg text-center">
-              <p className="text-xs text-muted-foreground mb-1">Score Médio</p>
+            <div className="bg-muted p-3 rounded-lg text-center relative">
+              <div className="flex items-center justify-center">
+                <p className="text-xs text-muted-foreground mb-1">Score Médio</p>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-5 w-5 ml-1 p-0">
+                        <Info className="h-3.5 w-3.5 text-muted-foreground" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="text-xs max-w-[200px]">
+                        Este valor é calculado como a média de pontuação total de todas as tarefas 
+                        concluídas no período selecionado. A pontuação total de cada tarefa é 
+                        a soma das suas três notas: importância, orgulho e evolução.
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
               <p className="text-xl font-medium">
                 {filteredTasks.length > 0 ? 
                   (filteredTasks.reduce((sum, task) => sum + (task.totalScore || 0), 0) / filteredTasks.length).toFixed(1) : 
@@ -244,8 +263,13 @@ const MobileStrategicReviewPage = () => {
       
       {/* Pillar analysis card */}
       <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-base">Foco das Suas Tarefas</CardTitle>
+        <CardHeader className="pb-2 flex flex-row items-start justify-between">
+          <div className="space-y-1">
+            <CardTitle className="text-base">Foco das Suas Tarefas</CardTitle>
+            <p className="text-xs text-muted-foreground">
+              Toque nas barras abaixo para ver análises detalhadas de cada tipo de foco.
+            </p>
+          </div>
         </CardHeader>
         <CardContent>
           {filteredTasks.length > 0 ? (
@@ -269,6 +293,19 @@ const MobileStrategicReviewPage = () => {
           )}
         </CardContent>
       </Card>
+
+      {/* Average calculation explanation */}
+      <div className="text-xs text-muted-foreground px-1">
+        <p className="font-medium mb-1">Como as médias são calculadas:</p>
+        <p>
+          Cada barra representa a média das notas que você deu em cada pilar ao criar suas tarefas:
+        </p>
+        <ul className="list-disc pl-4 mt-1 space-y-1">
+          <li className="text-blue-600">Era importante: média das notas de urgência/importância</li>
+          <li className="text-orange-600">Deu orgulho: média das notas de satisfação pessoal</li>
+          <li className="text-green-600">Gerou evolução: média das notas de crescimento</li>
+        </ul>
+      </div>
     </div>
   );
 };

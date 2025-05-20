@@ -32,7 +32,7 @@ const LandingPage = lazy(() => import('./pages/Landing'));
 const MobilePowerPage = lazy(() => import('./pages/mobile/MobilePowerPage'));
 const MobileChronologicalPage = lazy(() => import('./pages/mobile/MobileChronologicalPage'));
 const MobileTaskHistoryPage = lazy(() => import('./pages/mobile/MobileTaskHistoryPage'));
-import MobileStrategicReviewPage from './pages/mobile/MobileStrategicReviewPage';
+const MobileStrategicReviewPage = lazy(() => import('./pages/mobile/MobileStrategicReviewPage'));
 
 // Error and not found pages
 const NotFoundPage = lazy(() => import('./pages/NotFound'));
