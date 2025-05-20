@@ -185,7 +185,7 @@ const MobileBottomNav = () => {
       {/* Filter Drawer */}
       <Drawer open={filterDrawerOpen} onOpenChange={setFilterDrawerOpen} direction="bottom">
         <DrawerContent className="max-h-[70vh]">
-          <div className="py-2 px-3">
+          <div className="py-2 px-3 mb-[60px]">
             <h3 className="text-sm font-medium mb-2">Filtros</h3>
             <div className="flex flex-col gap-1">
               {filterItems.map(renderDrawerItem)}
@@ -197,7 +197,7 @@ const MobileBottomNav = () => {
       {/* More Drawer */}
       <Drawer open={moreDrawerOpen} onOpenChange={setMoreDrawerOpen} direction="bottom">
         <DrawerContent className="max-h-[70vh]">
-          <div className="py-2 px-3">
+          <div className="py-2 px-3 mb-[60px]">
             <div className="flex flex-col gap-1">
               {moreItems.map(renderDrawerItem)}
             </div>
