@@ -217,35 +217,36 @@ const MobileBottomNav = () => {
   ];
 
   // Drawer menu item renderer
-  const renderDrawerItem = (item: NavigationItem) => (
-    <button 
-      key={item.label}
-      className="flex items-center gap-1.5 w-full p-1.5 hover:bg-muted rounded-md"
-      onClick={() => {
-        if (item.action) {
-          item.action();
-        } else if (item.path) {
-          // Use NavigationStore for path navigation
-          if (NavigationStore.isRepeatNavigation(item.path)) {
-            setFilterDrawerOpen(false);
-            setMoreDrawerOpen(false);
-            return;
-          }
-          
-          NavigationStore.setNavigationType('external');
-          NavigationStore.setLastRoute(item.path);
-          NavigationStore.addRecentRoute(item.path);
-          
-          navigate(item.path);
+ // Drawer menu item renderer
+const renderDrawerItem = (item: NavigationItem) => (
+  <button 
+    key={item.label}
+    className="flex items-center gap-2 w-full p-2 hover:bg-muted rounded-md"
+    onClick={() => {
+      if (item.action) {
+        item.action();
+      } else if (item.path) {
+        // Use NavigationStore for path navigation
+        if (NavigationStore.isRepeatNavigation(item.path)) {
           setFilterDrawerOpen(false);
           setMoreDrawerOpen(false);
+          return;
         }
-      }}
-    >
-      <item.icon size={14} />
-      <span className="text-xs">{item.label}</span>
-    </button>
-  );
+        
+        NavigationStore.setNavigationType('external');
+        NavigationStore.setLastRoute(item.path);
+        NavigationStore.addRecentRoute(item.path);
+        
+        navigate(item.path);
+        setFilterDrawerOpen(false);
+        setMoreDrawerOpen(false);
+      }
+    }}
+  >
+    <item.icon size={18} />
+    <span className="text-sm">{item.label}</span>
+  </button>
+);
 
   return (
     <>
