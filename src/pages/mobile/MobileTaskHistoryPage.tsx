@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback } from 'react';
 import { useTaskDataContext } from '@/context/TaskDataProvider';
 import { Task } from '@/types';
@@ -160,13 +159,27 @@ const MobileTaskHistoryPage = () => {
   const getFeedbackLabel = (feedback: string | null) => {
     switch (feedback) {
       case 'transformed':
-        return 'Transformação';
+        return 'Foi transformador terminar';
       case 'relief':
-        return 'Alívio';
+        return 'Tive alívio ao finalizar';
       case 'obligation':
-        return 'Obrigação';
+        return 'Terminei por obrigação';
       default:
         return 'Sem feedback';
+    }
+  };
+  
+  // Get feedback color class
+  const getFeedbackColorClass = (feedback: string | null) => {
+    switch (feedback) {
+      case 'transformed':
+        return 'text-[#3d8c40] bg-[#deffe0] border-[#a8d9aa]';
+      case 'relief':
+        return 'text-[#2970a8] bg-[#e2f2ff] border-[#a3d0f0]';
+      case 'obligation':
+        return 'text-[#6e6e6e] bg-[#f1f1f1] border-[#d0d0d0]';
+      default:
+        return 'text-muted-foreground';
     }
   };
   
@@ -287,41 +300,21 @@ const MobileTaskHistoryPage = () => {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.2 }}
-            className="bg-card rounded-lg shadow-sm border p-3 relative"
+            className="bg-card rounded-lg shadow-sm border p-3 relative border-l-4 border-l-green-500"
             onClick={() => setSelectedTask(task)}
           >
-            <div className="flex items-center gap-2 mb-1">
-              <h3 className="font-medium flex-grow">{task.title}</h3>
-              <span className="text-xs text-muted-foreground">
-                {formatDate(task.completedAt)}
-              </span>
-            </div>
+            <h3 className="font-medium mb-2">{task.title}</h3>
             
-            <div className="flex items-center gap-2">
-              {task.pillar && (
-                <div className={`w-2 h-2 rounded-full ${getPillarColor(task.pillar)}`} />
-              )}
-              <span className="text-xs text-muted-foreground capitalize">
-                {task.pillar || 'Sem pilar'}
-              </span>
-              
-              {task.feedback && (
-                <>
-                  <div className="text-muted-foreground mx-1">•</div>
-                  <span className="text-xs text-muted-foreground">
-                    {getFeedbackLabel(task.feedback)}
-                  </span>
-                </>
-              )}
-              
-              {task.totalScore !== undefined && (
-                <>
-                  <div className="text-muted-foreground mx-1">•</div>
-                  <span className="text-xs text-muted-foreground">
-                    {task.totalScore} pontos
-                  </span>
-                </>
-              )}
+            {task.feedback && (
+              <div className="mb-2">
+                <Badge variant="outline" className={`${getFeedbackColorClass(task.feedback)}`}>
+                  {getFeedbackLabel(task.feedback)}
+                </Badge>
+              </div>
+            )}
+            
+            <div className="text-xs text-muted-foreground">
+              {formatDate(task.completedAt)}
             </div>
           </motion.div>
         ))}
