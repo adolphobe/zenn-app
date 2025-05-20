@@ -11,7 +11,7 @@ import { TaskDataProvider } from './context/TaskDataProvider';
 
 // Auth-related pages
 import LoginPage from './pages/Login';
-import SignupPage from './pages/auth/SignupPage';
+import SignupPage from './pages/Signup';
 import PasswordResetPage from './pages/ResetPassword';
 import PasswordResetConfirmPage from './pages/auth/PasswordResetConfirmPage';
 
