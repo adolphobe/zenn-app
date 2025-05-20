@@ -23,7 +23,9 @@ const MobileSortDropdown: React.FC = () => {
   
   const handleSortDirectionChange = (direction: SortDirection) => {
     setSortOptions({
-      sortDirection: direction
+      [viewMode]: {
+        sortDirection: direction
+      }
     });
   };
   
