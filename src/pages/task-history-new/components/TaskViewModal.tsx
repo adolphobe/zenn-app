@@ -8,7 +8,7 @@ interface TaskViewModalProps {
   task: Task | null;
   isOpen: boolean;
   onClose: () => void;
-  onRestore: (taskId: string) => void;
+  onRestore: (task: Task) => void;
 }
 
 const TaskViewModal: React.FC<TaskViewModalProps> = ({ 
@@ -30,12 +30,19 @@ const TaskViewModal: React.FC<TaskViewModalProps> = ({
     }
   };
 
+  // Handler for restore - adaptando para passar o objeto task completo
+  const handleRestoreTask = () => {
+    if (task) {
+      onRestore(task);
+    }
+  };
+
   return (
     <TaskDetailsModal
       task={task}
       isOpen={isOpen}
       onClose={onClose}
-      onRestore={onRestore}
+      onRestore={handleRestoreTask}
       title="Detalhes da Tarefa"
       showRestoreButton={true}
       onCommentAdded={handleCommentAdded}
