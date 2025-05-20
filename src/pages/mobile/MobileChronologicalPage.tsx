@@ -161,12 +161,14 @@ const MobileChronologicalPage: React.FC = () => {
           {isTaskFormOpen ? (
             <TaskForm onClose={() => setIsTaskFormOpen(false)} />
           ) : (
-            <button
+            <Button
               onClick={() => setIsTaskFormOpen(true)}
-              className="rounded-full p-2 bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+              className="bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+              size="sm"
             >
-              <Plus size={18} />
-            </button>
+              <Plus size={16} className="mr-1" />
+              Adicionar Tarefa
+            </Button>
           )}
         </div>
       </div>

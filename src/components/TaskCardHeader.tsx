@@ -146,7 +146,18 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
         </div>
       </div>
       
-      {/* Data movida para antes dos pilares */}
+      {/* Moved pillars to appear first, before the date */}
+      {showPillars && (
+        <div className="mt-1 text-xs flex flex-wrap gap-2">
+          <span>Risco: {consequenceScore}</span>
+          <span>|</span>
+          <span>Orgulho: {prideScore}</span>
+          <span>|</span>
+          <span>Crescimento: {constructionScore}</span>
+        </div>
+      )}
+      
+      {/* Data movida para depois dos pilares */}
       {shouldShowDate && (
         <div className="text-xs flex items-center mt-1 mb-1">
           {taskIsOverdue && parsedDate && (
@@ -157,16 +168,6 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
           ) : viewMode === 'chronological' ? (
             <span className="text-gray-400">SEM PRAZO</span>
           ) : null}
-        </div>
-      )}
-      
-      {showPillars && (
-        <div className="mt-1 text-xs flex flex-wrap gap-2">
-          <span>Risco: {consequenceScore}</span>
-          <span>|</span>
-          <span>Orgulho: {prideScore}</span>
-          <span>|</span>
-          <span>Crescimento: {constructionScore}</span>
         </div>
       )}
     </div>

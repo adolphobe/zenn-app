@@ -4,7 +4,6 @@ import { Outlet } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import MobileBottomNav from '../components/mobile/MobileBottomNav';
 import { useSidebar } from '@/context/hooks';
-import { Menu } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -15,17 +14,6 @@ const ActoApp: React.FC = () => {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 flex">
       {/* Desktop sidebar */}
       {!isMobile && <Sidebar />}
-      
-      {/* Mobile menu toggle button - only show when sidebar is closed */}
-      {isMobile && !sidebarOpen && (
-        <button 
-          onClick={openSidebar}
-          className="fixed bottom-20 right-4 z-40 p-2 rounded-md bg-gray-500/50 text-white shadow-md hover:bg-gray-600/70 transition-colors"
-          aria-label="Abrir menu"
-        >
-          <Menu size={24} />
-        </button>
-      )}
       
       <main 
         className={cn(
