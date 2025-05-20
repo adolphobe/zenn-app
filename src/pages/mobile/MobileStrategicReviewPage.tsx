@@ -1,19 +1,24 @@
 
 import React, { useState } from 'react';
 import { useTaskDataContext } from '@/context/TaskDataProvider';
-import PeriodTabs from '@/components/strategic-review/PeriodTabs';
 import { useStrategicReviewState } from '@/components/strategic-review/hooks/useStrategicReviewState';
 import { useInsightsAnalysis } from '@/components/strategic-review/hooks/useInsightsAnalysis';
 import { useFeedbackAnalysis } from '@/components/strategic-review/hooks/useFeedbackAnalysis';
 import PillarInsight from '@/components/strategic-review/components/PillarInsight';
-import PillarChart from '@/components/strategic-review/components/PillarChart';
 import DateRangePicker from '@/components/strategic-review/DateRangePicker';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { BarChart, PieChart, Pie, Bar, Cell, ResponsiveContainer, XAxis, YAxis, Tooltip } from 'recharts';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { motion } from 'framer-motion';
+import { ChevronDown } from 'lucide-react';
+import { 
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem
+} from '@/components/ui/dropdown-menu';
+import { Button } from '@/components/ui/button';
 
 const MobileStrategicReviewPage = () => {
   const { completedTasks, completedTasksLoading } = useTaskDataContext();
@@ -34,6 +39,16 @@ const MobileStrategicReviewPage = () => {
 
   const pillarsData = useInsightsAnalysis(filteredTasks);
   const feedbackData = useFeedbackAnalysis(filteredTasks);
+  
+  // Period options
+  const periodOptions = [
+    { label: 'Hoje', value: 'today' },
+    { label: 'Ontem', value: 'yesterday' },
+    { label: 'Esta Semana', value: 'week' },
+    { label: 'Este Mês', value: 'month' },
+    { label: 'Personalizado', value: 'custom-range' },
+    { label: 'Vitalício', value: 'all-time' },
+  ];
   
   // Loading states
   if (completedTasksLoading) {
@@ -66,6 +81,73 @@ const MobileStrategicReviewPage = () => {
     return format(dateObj, "dd MMM, yyyy", { locale: ptBR });
   };
 
+  // Render pillar visualization
+  const renderPillarsVisualization = () => {
+    return (
+      <div className="space-y-3 mt-4">
+        {pillarsData.averages.map((pillar) => (
+          <div 
+            key={pillar.id} 
+            className="flex flex-col space-y-1.5"
+            onClick={() => setFocusedPillar(pillar.id)}
+          >
+            <div className="flex justify-between items-center">
+              <span className="text-sm font-medium">{pillar.name}</span>
+              <span className="text-sm font-medium">{pillar.value.toFixed(1)}</span>
+            </div>
+            <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
+              <div 
+                className="h-full rounded-full" 
+                style={{ 
+                  width: `${Math.min(pillar.value * 20, 100)}%`,
+                  backgroundColor: pillar.color 
+                }} 
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  // Render feedback visualization
+  const renderFeedbackVisualization = () => {
+    if (!feedbackData.withFeedback) {
+      return (
+        <div className="p-4 text-center">
+          <p className="text-muted-foreground">
+            Sem dados de feedback para o período selecionado
+          </p>
+        </div>
+      );
+    }
+    
+    return (
+      <div className="space-y-4">
+        <div className="flex flex-col space-y-2">
+          {feedbackData.distribution.map((item) => (
+            <div key={item.id} className="flex items-center space-x-2">
+              <div 
+                className="w-4 h-4 rounded-full" 
+                style={{ backgroundColor: item.color }} 
+              />
+              <div className="flex-1 flex justify-between">
+                <span className="text-sm">{item.name}</span>
+                <span className="text-sm font-medium">{item.percent}%</span>
+              </div>
+            </div>
+          ))}
+        </div>
+        
+        <div className="p-3 bg-muted rounded-lg">
+          <p className="text-sm whitespace-pre-line">
+            {feedbackData.insight}
+          </p>
+        </div>
+      </div>
+    );
+  };
+
   // Render focused insight
   const renderFocusedInsight = () => {
     if (!focusedPillar) return null;
@@ -88,9 +170,27 @@ const MobileStrategicReviewPage = () => {
     <div className="p-4 pb-20 space-y-6">
       <h1 className="text-xl font-bold mb-4">Análise Estratégica</h1>
       
-      {/* Period selector */}
+      {/* Period selector dropdown */}
       <div className="mb-6">
-        <PeriodTabs period={period} onPeriodChange={handlePeriodChange} />
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" className="w-full justify-between">
+              <span>Período: {periodOptions.find(p => p.value === period)?.label}</span>
+              <ChevronDown className="h-4 w-4 ml-2" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="center" className="w-56">
+            {periodOptions.map((option) => (
+              <DropdownMenuItem 
+                key={option.value} 
+                onClick={() => handlePeriodChange(option.value)}
+                className={period === option.value ? "bg-muted font-medium" : ""}
+              >
+                {option.label}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
         
         {showCustomDatePicker && (
           <div className="mt-4">
@@ -138,43 +238,7 @@ const MobileStrategicReviewPage = () => {
           <CardTitle className="text-base">Impacto Emocional</CardTitle>
         </CardHeader>
         <CardContent>
-          {feedbackData.withFeedback ? (
-            <div className="space-y-4">
-              <div className="h-[200px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={feedbackData.distribution}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={60}
-                      outerRadius={80}
-                      paddingAngle={2}
-                      dataKey="value"
-                      label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                    >
-                      {feedbackData.distribution.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-              
-              <div className="p-3 bg-muted rounded-lg">
-                <p className="text-sm whitespace-pre-line">
-                  {feedbackData.insight}
-                </p>
-              </div>
-            </div>
-          ) : (
-            <div className="p-4 text-center">
-              <p className="text-muted-foreground">
-                Sem dados de feedback para o período selecionado
-              </p>
-            </div>
-          )}
+          {renderFeedbackVisualization()}
         </CardContent>
       </Card>
       
@@ -186,13 +250,7 @@ const MobileStrategicReviewPage = () => {
         <CardContent>
           {filteredTasks.length > 0 ? (
             <div className="space-y-4">
-              <div className="h-[200px]">
-                <PillarChart 
-                  data={pillarsData.averages} 
-                  onPillarHover={setFocusedPillar} 
-                  height={200}
-                />
-              </div>
+              {renderPillarsVisualization()}
               
               {renderFocusedInsight()}
               
