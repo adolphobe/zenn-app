@@ -1,7 +1,6 @@
-
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Power, Clock, Filter, MoreHorizontal, History, Calendar, Moon, Sun, Settings, LogOut } from 'lucide-react';
+import { Zap, Clock, Filter, MoreHorizontal, History, Calendar, Moon, Sun, Settings, LogOut } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAppContext } from '@/context/AppContext';
 import { useAuth } from '@/context/auth';
@@ -186,7 +185,7 @@ const MobileBottomNav = () => {
   // Main navigation items - conditionally show Filter based on page
   const mainNavItems = [
     { 
-      icon: Power, 
+      icon: Zap, 
       label: 'Potência', 
       isActive: location.pathname === '/mobile/power',
       action: handlePowerMode 
