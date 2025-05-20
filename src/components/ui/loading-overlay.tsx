@@ -26,6 +26,18 @@ export function LoadingOverlay({
   const isLogoutInProgress = localStorage.getItem('logout_in_progress') === 'true';
   const isInitialLoad = localStorage.getItem(INITIAL_LOAD_COMPLETE_KEY) !== 'true';
   
+  // Check if this is a recent navigation back to dashboard
+  const lastDashboardVisit = localStorage.getItem('last_dashboard_visit');
+  const now = Date.now();
+  const recentDashboardVisit = lastDashboardVisit && (now - parseInt(lastDashboardVisit)) < 30000; // 30 seconds
+  
+  useEffect(() => {
+    // Track dashboard visits to prevent unnecessary loading on quick returns
+    if (isDashboard) {
+      localStorage.setItem('last_dashboard_visit', Date.now().toString());
+    }
+  }, [isDashboard]);
+  
   useEffect(() => {
     let fadeTimeout: NodeJS.Timeout;
     let hideTimeout: NodeJS.Timeout;
@@ -36,13 +48,19 @@ export function LoadingOverlay({
       return;
     }
 
+    // Don't show loading on dashboard if it was recently visited
+    if (isDashboard && recentDashboardVisit) {
+      setVisible(false);
+      return;
+    }
+
     // Only show on dashboard
     if (!isDashboard) {
       setVisible(false);
       return;
     }
 
-    if (show && isDashboard) {
+    if (show && isDashboard && !recentDashboardVisit) {
       setVisible(true);
       setFading(false);
     } else if (visible) {
@@ -57,8 +75,8 @@ export function LoadingOverlay({
     }
 
     // If we're showing and have a delay set, auto-hide after delay
-    if (show && isDashboard && delay) {
-      // Para navegações internas, usamos um tempo mais curto
+    if (show && isDashboard && delay && !recentDashboardVisit) {
+      // Use a shorter delay for internal navigations
       const actualDelay = isInitialLoad ? delay : Math.min(delay, 400);
       
       fadeTimeout = setTimeout(() => {
@@ -75,17 +93,17 @@ export function LoadingOverlay({
       clearTimeout(fadeTimeout);
       clearTimeout(hideTimeout);
     };
-  }, [show, delay, visible, onComplete, isDashboard, isLogoutInProgress, isInitialLoad]);
+  }, [show, delay, visible, onComplete, isDashboard, isLogoutInProgress, isInitialLoad, recentDashboardVisit]);
 
   // Don't render if not visible, not on dashboard, or during logout
-  if (!visible || !isDashboard || isLogoutInProgress) return null;
+  if (!visible || !isDashboard || isLogoutInProgress || (isDashboard && recentDashboardVisit)) return null;
 
   return (
     <div 
       className={cn(
         "fixed inset-0 bg-white z-[9999] flex flex-col items-center justify-center",
         fading ? "animate-fade-out" : "animate-fade-in",
-        isInitialLoad ? "opacity-100" : "bg-white/70 backdrop-blur-sm"
+        isInitialLoad ? "opacity-100" : "bg-white/50 backdrop-blur-sm"
       )}
     >
       <div className="flex flex-col items-center space-y-4">

@@ -1,5 +1,6 @@
 
 import React, { useEffect, useRef, useCallback } from 'react';
+import { motion } from 'framer-motion';
 import { useAuth } from '@/context/auth';
 import { Tabs, TabsContent } from '@/components/ui/tabs';
 import { useTaskPillars } from '@/context/hooks';
@@ -10,6 +11,7 @@ import { useStrategicReviewState } from '@/components/strategic-review/hooks/use
 import { useToast } from '@/hooks/use-toast';
 import { useTaskDataContext } from '@/context/TaskDataProvider';
 import { logDiagnostics } from '@/utils/diagnosticLog';
+import { NavigationStore } from '@/utils/navigationStore';
 
 // Main Strategic Review Page Component
 const StrategicReview: React.FC = () => {
@@ -20,6 +22,12 @@ const StrategicReview: React.FC = () => {
   
   // Use the task pillars hook to ensure all tasks have pillars assigned
   const { assignMissingPillars } = useTaskPillars();
+  
+  // Record this page visit for navigation optimization
+  useEffect(() => {
+    NavigationStore.addRecentRoute('/strategic-review');
+    NavigationStore.setNavigationType('external');
+  }, []);
   
   // Log for diagnosis
   useEffect(() => {
@@ -89,7 +97,13 @@ const StrategicReview: React.FC = () => {
   }, [assignMissingPillars, addToast, completedTasksLoading, completedTasks]);
   
   return (
-    <div className="w-full">
+    <motion.div 
+      className="w-full"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.3 }}
+    >
       <div className="mb-6">
         <h1 className="text-3xl font-bold tracking-tight">Insights das suas tarefas</h1>
         <p className="text-muted-foreground">
@@ -130,14 +144,20 @@ const StrategicReview: React.FC = () => {
         )}
         
         {/* Analysis Content */}
-        <TabsContent value={period} className="space-y-6">
-          <AnalysisContent 
-            tasks={filteredTasks} 
-            isLoading={completedTasksLoading} 
-          />
-        </TabsContent>
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.4 }}
+        >
+          <TabsContent value={period} className="space-y-6">
+            <AnalysisContent 
+              tasks={filteredTasks} 
+              isLoading={completedTasksLoading} 
+            />
+          </TabsContent>
+        </motion.div>
       </Tabs>
-    </div>
+    </motion.div>
   );
 };
 

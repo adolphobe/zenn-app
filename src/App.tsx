@@ -1,4 +1,5 @@
-import { lazy, Suspense } from 'react';
+
+import { lazy, Suspense, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from '@/hooks/use-toast';
 import { LoadingOverlay } from '@/components/ui/loading-overlay';
@@ -20,7 +21,7 @@ import PasswordResetConfirmPage from './pages/auth/PasswordResetConfirmPage';
 import { PrivateRoute } from './components/PrivateRoute';
 import ActoApp from './pages/ActoApp';
 
-// Main pages
+// Main pages with preloading
 const Dashboard = lazy(() => import('./components/Dashboard'));
 const Settings = lazy(() => import('./pages/Settings'));
 const TaskHistoryPage = lazy(() => import('./pages/task-history-new/TaskHistoryNewPage'));
@@ -37,11 +38,18 @@ const MobileStrategicReviewPage = lazy(() => import('./pages/mobile/MobileStrate
 // Error and not found pages
 const NotFoundPage = lazy(() => import('./pages/NotFound'));
 
+// Preload function to trigger component loading in the background
+const preloadComponents = () => {
+  // Start loading components in the background
+  import('./pages/task-history-new/TaskHistoryNewPage');
+  import('./pages/StrategicReview');
+};
+
 // Create a client
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 1000 * 60, // 1 minute
+      staleTime: 1000 * 60 * 5, // 5 minutes - increased from 1 minute
       retry: 1,
       refetchOnWindowFocus: false,
     },
@@ -50,6 +58,16 @@ const queryClient = new QueryClient({
 
 // App with all providers and routes
 function App() {
+  // Preload important components on app init
+  useEffect(() => {
+    // Start preloading components after a short delay
+    const timer = setTimeout(() => {
+      preloadComponents();
+    }, 2000);
+    
+    return () => clearTimeout(timer);
+  }, []);
+  
   return (
     <QueryClientProvider client={queryClient}>
       <Router>

@@ -23,5 +23,7 @@ export const AUTH_DEBOUNCE_DELAY = 300;
 
 // Tempos de carregamento (em ms)
 export const INITIAL_LOAD_DELAY = 1800;
-export const INTERNAL_NAVIGATION_DELAY = 400;
+export const INTERNAL_NAVIGATION_DELAY = 0;  // Reduced to zero for internal navigation
 
+// Navegação
+export const RECENT_NAVIGATION_THRESHOLD = 30000; // 30 seconds

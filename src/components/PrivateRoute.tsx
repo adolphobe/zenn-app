@@ -1,4 +1,3 @@
-
 import { Outlet, useLocation, Navigate } from 'react-router-dom';
 import { useAuth } from '@/context/auth';
 import { useSidebar } from '@/context/hooks';

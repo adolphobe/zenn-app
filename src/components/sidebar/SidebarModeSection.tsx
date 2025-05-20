@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { Clock, History, Power, Calendar } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -21,8 +21,23 @@ const SidebarModeSection: React.FC<SidebarModeSectionProps> = ({ sidebarOpen }) 
   const isOnTaskHistory = location.pathname.includes('task-history');
   const isAlreadyOnDashboard = location.pathname === '/dashboard';
   
+  // Preload components on mount to make navigation faster
+  useEffect(() => {
+    // Preload the history and strategic review pages when sidebar loads
+    const preloadStrategicReview = import('../pages/StrategicReview').catch(() => {});
+    const preloadTaskHistory = import('../pages/task-history-new/TaskHistoryNewPage').catch(() => {});
+    
+    // These will run in the background and cache the components
+    return () => {
+      // Cleanup if needed
+    };
+  }, []);
+  
   // Handler for mode switching
   const handleModeClick = (mode: string) => {
+    // Track that we're performing an internal navigation
+    localStorage.setItem('navigation_type', 'internal');
+    
     // Só navegue para o dashboard se não estivermos já lá
     if (!isAlreadyOnDashboard) {
       navigate('/dashboard');
@@ -30,6 +45,15 @@ const SidebarModeSection: React.FC<SidebarModeSectionProps> = ({ sidebarOpen }) 
     
     // Explicitly set the view mode to ensure it works correctly
     setViewMode(mode as any);
+  };
+
+  // Handler for external page navigation
+  const handleExternalNavigation = (path: string) => {
+    // Track that we're performing an external navigation
+    localStorage.setItem('navigation_type', 'external');
+    
+    // Navigate to external page
+    navigate(path);
   };
 
   // Determine if a mode is active
@@ -66,6 +90,8 @@ const SidebarModeSection: React.FC<SidebarModeSectionProps> = ({ sidebarOpen }) 
           icon={History}
           label="Histórico"
           path="/task-history-new"
+          isActive={isOnTaskHistory}
+          onClick={() => handleExternalNavigation('/task-history-new')}
         />
         
         {/* Análise Estratégica */}
@@ -73,6 +99,8 @@ const SidebarModeSection: React.FC<SidebarModeSectionProps> = ({ sidebarOpen }) 
           icon={Calendar}
           label="Análise Estratégica"
           path="/strategic-review"
+          isActive={isOnStrategicReview}
+          onClick={() => handleExternalNavigation('/strategic-review')}
         />
       </div>
     </SidebarSection>
