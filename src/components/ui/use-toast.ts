@@ -1,6 +1,6 @@
 
 import * as React from "react"
-import { ToastContext } from "@/hooks/use-toast-context"
+import { ToastContext } from "@/hooks/use-toast"
 import { v4 as uuidv4 } from "uuid"
 import { ExtendedToastProps, ToastProps, ToastActionElement } from "@/types/toast"
 
@@ -11,8 +11,8 @@ function useToast() {
     const toasts: any[] = [];
     
     const addToast = (toast: ExtendedToastProps) => {
-      // This is just a stub to prevent errors when useToast is imported directly
       console.log('Toast created in stub:', toast);
+      return toast.id || uuidv4();
     };
     
     const removeToast = (id: string) => {
@@ -36,11 +36,11 @@ function useToast() {
 
 function toast(props: ExtendedToastProps) {
   const { addToast } = useToast();
-  // Ensure there is an ID by generating one if not provided
   addToast({
     ...props,
     id: props.id || uuidv4()
   });
+  return props.id || uuidv4();
 }
 
 export {

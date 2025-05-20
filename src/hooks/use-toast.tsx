@@ -77,24 +77,26 @@ export function Toaster() {
   }), [toasts, addToast, removeToast, updateToast])
 
   return (
-    <ToastContext.Provider value={contextValue}>
-      {toasts.map(function ({ id, title, description, action, icon, ...props }) {
-        return (
-          <Toast key={id} {...props}>
-            <div className="grid gap-1">
-              {icon && <span className="inline-flex mr-2">{icon}</span>}
-              {title && <ToastTitle>{title}</ToastTitle>}
-              {description && (
-                <ToastDescription>{description}</ToastDescription>
-              )}
-            </div>
-            {action}
-            <ToastClose />
-          </Toast>
-        )
-      })}
-      <ToastViewport />
-    </ToastContext.Provider>
+    <ToastProvider>
+      <ToastContext.Provider value={contextValue}>
+        {toasts.map(function ({ id, title, description, action, icon, ...props }) {
+          return (
+            <Toast key={id} {...props}>
+              <div className="grid gap-1">
+                {icon && <span className="inline-flex mr-2">{icon}</span>}
+                {title && <ToastTitle>{title}</ToastTitle>}
+                {description && (
+                  <ToastDescription>{description}</ToastDescription>
+                )}
+              </div>
+              {action}
+              <ToastClose />
+            </Toast>
+          )
+        })}
+        <ToastViewport />
+      </ToastContext.Provider>
+    </ToastProvider>
   )
 }
 
