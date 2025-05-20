@@ -1,3 +1,4 @@
+
 import { Outlet, useLocation, Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/auth';
 import Sidebar from './Sidebar';
@@ -6,6 +7,7 @@ import { Menu } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useEffect, useState, useMemo } from 'react';
 import { LoadingOverlay } from './ui/loading-overlay';
+import MobileNavBar from '@/components/mobile/MobileNavBar';
 
 /**
  * PrivateRoute - Protects routes that require authentication
@@ -94,13 +96,18 @@ export const PrivateRoute = () => {
             sidebarOpen 
               ? isMobile ? "ml-0" : "md:ml-64" 
               : isMobile ? "ml-0" : "md:ml-20",
-            "flex justify-center"
+            "flex justify-center",
+            // Add padding bottom on mobile for the nav bar
+            isMobile ? "pb-16" : ""
           )}
         >
           <div className="w-full max-w-6xl"> 
             <Outlet />
           </div>
         </main>
+
+        {/* Mobile Navigation Bar */}
+        <MobileNavBar />
       </div>
     </>
   );
