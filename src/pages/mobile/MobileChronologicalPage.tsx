@@ -5,22 +5,18 @@ import { useTaskDataContext } from '@/context/TaskDataProvider';
 import { useExpandedTask } from '@/context/hooks';
 import { motion, AnimatePresence } from 'framer-motion';
 import TaskCard from '@/components/TaskCard';
-import { Plus, Loader2, RefreshCw, Bell, ChevronUp, ChevronDown, Filter } from 'lucide-react';
+import { Plus, Loader2, Bell, ChevronUp, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import TaskForm from '@/components/TaskForm';
 import { sortTasks, isTaskOverdue } from '@/utils';
-import { toast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
-import SidebarFilterSection from '@/components/sidebar/SidebarFilterSection';
 import MobileSortDropdown from '@/components/mobile/MobileSortDropdown';
 
 const MobileChronologicalPage: React.FC = () => {
   const { state } = useAppContext();
-  const { viewMode, showHiddenTasks, sortOptions, syncStatus } = state;
-  const { tasks, isLoading: tasksLoading, forceSynchronize, operationsLoading } = useTaskDataContext();
+  const { viewMode, showHiddenTasks, sortOptions } = state;
+  const { tasks, isLoading: tasksLoading } = useTaskDataContext();
   const [isTaskFormOpen, setIsTaskFormOpen] = useState(false);
-  const [showFilters, setShowFilters] = useState(false);
   const { isTaskExpanded, toggleTaskExpanded } = useExpandedTask();
   
   // Estado para mostrar/esconder tarefas vencidas, inicializado do localStorage
@@ -96,26 +92,6 @@ const MobileChronologicalPage: React.FC = () => {
     setShowOverdueTasks(prev => !prev);
   };
   
-  // Sincronizar tarefas com o backend
-  const handleSyncTasks = async () => {
-    if (operationsLoading.update) return;
-    
-    try {
-      await forceSynchronize();
-      toast({
-        title: "Sincronização concluída",
-        description: "Suas tarefas foram sincronizadas com sucesso.",
-      });
-    } catch (error) {
-      console.error('Error synchronizing tasks:', error);
-      toast({
-        title: "Erro ao sincronizar",
-        description: "Não foi possível sincronizar suas tarefas. Tente novamente mais tarde.",
-        variant: "destructive",
-      });
-    }
-  };
-  
   if (tasksLoading) {
     return (
       <div className="flex justify-center items-center h-[70vh]">
@@ -126,56 +102,18 @@ const MobileChronologicalPage: React.FC = () => {
 
   return (
     <div className="px-3 py-2 relative">
-      {/* Filtros no topo */}
+      {/* Cabeçalho com ordenação e botão de adicionar */}
       <div className="flex justify-between items-center mb-4">
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleSyncTasks}
-            disabled={operationsLoading.update}
-            className={`flex items-center gap-1 ${
-              syncStatus === 'error' ? 'border-red-500 text-red-500 hover:bg-red-50' : ''
-            }`}
-          >
-            {operationsLoading.update ? (
-              <Loader2 size={14} className="animate-spin" />
-            ) : syncStatus === 'error' ? (
-              <RefreshCw size={14} className="text-red-500" />
-            ) : (
-              <RefreshCw size={14} className={syncStatus === 'synced' ? "text-green-500" : ""} />
-            )}
-          </Button>
-          
-          <MobileSortDropdown />
-        </div>
+        <MobileSortDropdown />
         
         <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setShowFilters(!showFilters)}
-          className={`flex items-center gap-1 ${showFilters ? 'bg-muted' : ''}`}
+          onClick={() => setIsTaskFormOpen(true)}
+          className="bg-blue-600 text-white hover:bg-blue-700 transition-colors rounded-full h-10 w-10 shadow-md flex items-center justify-center"
+          size="icon"
         >
-          <Filter size={16} />
-          Filtros
+          <Plus size={20} />
         </Button>
       </div>
-      
-      {/* Área de filtros expansível */}
-      <AnimatePresence>
-        {showFilters && (
-          <motion.div 
-            initial={{ opacity: 0, height: 0 }} 
-            animate={{ opacity: 1, height: 'auto' }} 
-            exit={{ opacity: 0, height: 0 }}
-            className="mb-4 overflow-hidden"
-          >
-            <div className="border rounded-md p-3 bg-background/80 backdrop-blur-sm">
-              <SidebarFilterSection sidebarOpen={true} />
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
       
       {/* Tarefas vencidas */}
       {sortedOverdueTasks.length > 0 && (
@@ -261,20 +199,10 @@ const MobileChronologicalPage: React.FC = () => {
         )}
       </div>
       
-      {/* Botão flutuante de adicionar tarefa */}
-      <div className="fixed right-4 top-4 z-50">
-        {isTaskFormOpen ? (
-          <TaskForm onClose={() => setIsTaskFormOpen(false)} />
-        ) : (
-          <Button
-            onClick={() => setIsTaskFormOpen(true)}
-            className="bg-blue-600 text-white hover:bg-blue-700 transition-colors rounded-full h-12 w-12 shadow-md flex items-center justify-center"
-            size="icon"
-          >
-            <Plus size={24} />
-          </Button>
-        )}
-      </div>
+      {/* Task Form Modal */}
+      {isTaskFormOpen && (
+        <TaskForm onClose={() => setIsTaskFormOpen(false)} />
+      )}
     </div>
   );
 };
