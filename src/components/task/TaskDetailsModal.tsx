@@ -130,7 +130,7 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
       >
         <DrawerContent className="h-[100dvh] max-h-[100dvh] p-0">
           <div className="flex flex-col h-full">
-            <div className="border-b flex items-center justify-between sticky top-0 bg-background z-10 py-3 px-4 pt-[50px]">
+            <div className="border-b flex items-center justify-between sticky top-0 bg-background z-10 py-3 px-4 pt-[30px]">
               <h2 className="text-xl font-semibold">{title}</h2>
               <Button variant="ghost" size="icon" onClick={onClose}>
                 <X size={20} />
