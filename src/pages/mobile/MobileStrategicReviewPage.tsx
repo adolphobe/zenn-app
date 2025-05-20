@@ -116,7 +116,7 @@ const MobileStrategicReviewPage = () => {
   const renderFeedbackVisualization = () => {
     if (!feedbackData.withFeedback) {
       return (
-        <div className="p-4 text-center">
+        <div className="text-center">
           <p className="text-muted-foreground">
             Sem dados de feedback para o período selecionado
           </p>
