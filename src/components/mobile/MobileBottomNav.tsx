@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Power, Clock, Filter, MoreHorizontal, History, Calendar, Moon, Sun, Settings, LogOut } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -38,11 +38,13 @@ const MobileBottomNav = () => {
   // Navigation handlers
   const handlePowerMode = () => {
     setViewMode('power');
+    setFilterDrawerOpen(false); // Close filter drawer when changing modes
     navigate('/dashboard');
   };
 
   const handleChronologicalMode = () => {
     setViewMode('chronological');
+    setFilterDrawerOpen(false); // Close filter drawer when changing modes
     navigate('/dashboard');
   };
   
@@ -159,7 +161,7 @@ const MobileBottomNav = () => {
         }
       }}
     >
-      <item.icon size={20} />
+      <item.icon size={18} /> {/* Reduced icon size from 20 to 18 */}
       <span>{item.label}</span>
     </button>
   );
@@ -202,7 +204,7 @@ const MobileBottomNav = () => {
               )}
               onClick={item.action}
             >
-              <item.icon size={22} className="mb-1" />
+              <item.icon size={20} className="mb-1" /> {/* Reduced icon size from 22 to 20 */}
               <span className="text-[10px]">{item.label}</span>
             </button>
           ))}
