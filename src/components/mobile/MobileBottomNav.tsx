@@ -1,10 +1,12 @@
+
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Zap, ListOrdered, Filter, MoreHorizontal, History, Calendar, Moon, Sun, Settings, LogOut } from 'lucide-react';
+import { Zap, ListOrdered, Filter, History, Calendar, Moon, Sun, Settings, LogOut } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAppContext } from '@/context/AppContext';
 import { useAuth } from '@/context/auth';
 import { NavigationStore } from '@/utils/navigationStore';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { 
   Drawer,
   DrawerContent,
@@ -21,7 +23,7 @@ type NavigationItem = {
 const MobileBottomNav = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { logout } = useAuth();
+  const { logout, currentUser } = useAuth();
   const { 
     state: { viewMode, darkMode, showHiddenTasks, showPillars, showDates, showScores }, 
     setViewMode,
@@ -203,8 +205,19 @@ const MobileBottomNav = () => {
       isActive: filterDrawerOpen,
       action: () => setFilterDrawerOpen(!filterDrawerOpen)
     }] : []),
+    // Replace the MoreHorizontal icon with a user Avatar
     { 
-      icon: MoreHorizontal, 
+      customRender: () => (
+        <div className="flex flex-col items-center justify-center">
+          <Avatar className="h-6 w-6 mb-1">
+            <AvatarImage src={currentUser?.profileImage} />
+            <AvatarFallback className="text-[10px] bg-primary/10">
+              {currentUser?.name?.substring(0, 2) || 'U'}
+            </AvatarFallback>
+          </Avatar>
+          <span className="text-[10px]">Mais</span>
+        </div>
+      ),
       label: 'Mais',
       isActive: moreDrawerOpen,
       action: () => setMoreDrawerOpen(!moreDrawerOpen)
@@ -270,7 +283,7 @@ const MobileBottomNav = () => {
       {/* Bottom Navigation Bar */}
       <div className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border md:hidden">
         <div className="flex justify-around px-1 py-2">
-          {mainNavItems.map((item) => (
+          {mainNavItems.map((item, index) => (
             <button
               key={item.label}
               className={cn(
@@ -279,8 +292,14 @@ const MobileBottomNav = () => {
               )}
               onClick={item.action}
             >
-              <item.icon size={20} className="mb-1" /> {/* Keep icon size at 20 for main nav */}
-              <span className="text-[10px]">{item.label}</span>
+              {item.customRender ? (
+                item.customRender()
+              ) : (
+                <>
+                  <item.icon size={20} className="mb-1" />
+                  <span className="text-[10px]">{item.label}</span>
+                </>
+              )}
             </button>
           ))}
         </div>
