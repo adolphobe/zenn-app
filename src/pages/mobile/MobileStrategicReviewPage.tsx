@@ -20,6 +20,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { PeriodType } from '@/components/strategic-review/types';
 
 const MobileStrategicReviewPage = () => {
   const { completedTasks, completedTasksLoading } = useTaskDataContext();
@@ -43,12 +44,12 @@ const MobileStrategicReviewPage = () => {
   
   // Period options
   const periodOptions = [
-    { label: 'Hoje', value: 'today' },
-    { label: 'Ontem', value: 'yesterday' },
-    { label: 'Esta Semana', value: 'week' },
-    { label: 'Este Mês', value: 'month' },
-    { label: 'Personalizado', value: 'custom-range' },
-    { label: 'Vitalício', value: 'all-time' },
+    { label: 'Hoje', value: 'today' as PeriodType },
+    { label: 'Ontem', value: 'yesterday' as PeriodType },
+    { label: 'Esta Semana', value: 'week' as PeriodType },
+    { label: 'Este Mês', value: 'month' as PeriodType },
+    { label: 'Personalizado', value: 'custom-range' as PeriodType },
+    { label: 'Vitalício', value: 'all-time' as PeriodType },
   ];
   
   // Loading states
