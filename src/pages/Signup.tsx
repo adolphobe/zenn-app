@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { SignupForm } from '@/components/SignupForm';
+import SignupForm from '@/components/SignupForm';
 
 const SignupPage: React.FC = () => {
   return (
@@ -21,7 +21,7 @@ const SignupPage: React.FC = () => {
           </p>
         </div>
         
-        <SignupForm />
+        <SignupForm onCancel={() => window.location.href = '/login'} />
         
         <div className="mt-6 text-center">
           <span className="text-sm text-gray-600 dark:text-gray-400">
