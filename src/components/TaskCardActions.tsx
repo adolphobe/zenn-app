@@ -42,7 +42,6 @@ const TaskCardActions: React.FC<TaskCardActionsProps> = ({
           className={buttonStyles}
         >
           <Edit2 size={16} />
-          <span className="ml-1 hidden sm:inline">Editar</span>
         </Button>
         
         {viewMode === 'power' && (
@@ -56,7 +55,6 @@ const TaskCardActions: React.FC<TaskCardActionsProps> = ({
             data-hidden={isHidden ? "true" : "false"}
           >
             {isHidden ? <Eye size={16} className="text-green-600" /> : <EyeOff size={16} />}
-            <span className="ml-1 hidden sm:inline">{isHidden ? "Mostrar" : "Ocultar"}</span>
           </Button>
         )}
         
@@ -89,7 +87,6 @@ const TaskCardActions: React.FC<TaskCardActionsProps> = ({
             data-power-extra={isPowerExtra ? "true" : "false"}
           >
             <Zap size={16} className={isPowerExtra ? "text-red-600" : ""} />
-            <span className="ml-1 hidden sm:inline">{isPowerExtra ? "Desativar" : "P.Extra"}</span>
           </Button>
         )}
       </div>
