@@ -159,7 +159,7 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
       
       {/* Data movida para depois dos pilares, com padding-top adicionado */}
       {shouldShowDate && (
-        <div className="text-xs flex items-center mt-1 mb-1 pt-2">
+        <div className="text-xs flex items-center mt-1 mb-1 pt-2 text-inherit">
           {taskIsOverdue && parsedDate && (
             <Bell size={14} className="text-red-400 mr-1" />
           )}

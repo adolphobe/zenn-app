@@ -42,7 +42,7 @@ const TaskCardActions: React.FC<TaskCardActionsProps> = ({
           className={buttonStyles}
         >
           <Edit2 size={16} />
-          <span className="ml-1 sm:inline">Editar</span>
+          <span className="ml-1 hidden xs:inline">Editar</span>
         </Button>
         
         {viewMode === 'power' && (
@@ -56,7 +56,7 @@ const TaskCardActions: React.FC<TaskCardActionsProps> = ({
             data-hidden={isHidden ? "true" : "false"}
           >
             {isHidden ? <Eye size={16} className="text-green-600" /> : <EyeOff size={16} />}
-            <span className="ml-1">{isHidden ? "Mostrar" : "Ocultar"}</span>
+            <span className="ml-1 hidden xs:inline">{isHidden ? "Mostrar" : "Ocultar"}</span>
           </Button>
         )}
         
@@ -71,6 +71,7 @@ const TaskCardActions: React.FC<TaskCardActionsProps> = ({
           `}
         >
           <Trash2 size={16} />
+          <span className="ml-1 hidden xs:inline">Excluir</span>
         </Button>
 
         {/* Botão Potência Extra - apenas visível no modo potência e para tarefas com pontuação alta */}
@@ -89,7 +90,7 @@ const TaskCardActions: React.FC<TaskCardActionsProps> = ({
             data-power-extra={isPowerExtra ? "true" : "false"}
           >
             <Zap size={16} className={isPowerExtra ? "text-red-600" : ""} />
-            <span className="ml-1 hidden sm:inline">{isPowerExtra ? "Desativar" : "Potência Extra"}</span>
+            <span className="ml-1 hidden xs:inline">{isPowerExtra ? "Desativar" : "Potência Extra"}</span>
           </Button>
         )}
       </div>
@@ -103,7 +104,7 @@ const TaskCardActions: React.FC<TaskCardActionsProps> = ({
         className="btn-green"
       >
         <CheckSquare size={16} />
-        <span className="ml-1">Completar</span>
+        <span className="ml-1 hidden xs:inline">Completar</span>
       </Button>
     </div>
   );
