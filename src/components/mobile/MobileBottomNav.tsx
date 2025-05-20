@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Power, Clock, Filter, MoreHorizontal, History, Calendar, Moon, Sun, Settings, LogOut } from 'lucide-react';
@@ -161,7 +160,7 @@ const MobileBottomNav = () => {
         }
       }}
     >
-      <item.icon size={16} /> {/* Reduced icon size from 18 to 16 */}
+      <item.icon size={18} />
       <span className="text-sm">{item.label}</span>
     </button>
   );
@@ -216,7 +215,7 @@ const MobileBottomNav = () => {
   );
 };
 
-// Custom icon components
+// Custom icon components with max 18px size
 const Eye = (props: any) => (
   <svg 
     xmlns="http://www.w3.org/2000/svg" 
@@ -226,6 +225,8 @@ const Eye = (props: any) => (
     strokeWidth="2" 
     strokeLinecap="round" 
     strokeLinejoin="round"
+    width="18"
+    height="18"
     {...props}
   >
     <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
@@ -242,6 +243,8 @@ const EyeOff = (props: any) => (
     strokeWidth="2" 
     strokeLinecap="round" 
     strokeLinejoin="round"
+    width="18"
+    height="18"
     {...props}
   >
     <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
@@ -260,6 +263,8 @@ const Badge = (props: any) => (
     strokeWidth="2" 
     strokeLinecap="round" 
     strokeLinejoin="round"
+    width="18"
+    height="18"
     {...props}
   >
     <path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z" />
@@ -275,6 +280,8 @@ const Pillar = (props: any) => (
     strokeWidth="2" 
     strokeLinecap="round" 
     strokeLinejoin="round"
+    width="18"
+    height="18"
     {...props}
   >
     <rect x="4" y="6" width="16" height="16" rx="2" />
