@@ -38,12 +38,6 @@ export const initialState: AppState = {
       showPillars: true,
       showDates: true,
       showScores: true,
-    },
-    strategic: {
-      showHiddenTasks: false,
-      showPillars: true,
-      showDates: true,
-      showScores: true,
     }
   },
   // New sync status field

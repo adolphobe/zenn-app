@@ -5,7 +5,6 @@ import Sidebar from '../components/Sidebar';
 import { useSidebar } from '@/context/hooks';
 import { Menu } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import MobileNavBar from '@/components/mobile/MobileNavBar';
 
 const ActoApp: React.FC = () => {
   const { isOpen: sidebarOpen, open: openSidebar, isMobile } = useSidebar();
@@ -31,18 +30,13 @@ const ActoApp: React.FC = () => {
           sidebarOpen 
             ? isMobile ? "ml-0" : "md:ml-64" 
             : isMobile ? "ml-0" : "md:ml-20",
-          "flex justify-center",
-          // Add padding bottom on mobile for the nav bar
-          isMobile ? "pb-16" : ""
+          "flex justify-center"
         )}
       >
         <div className="w-full max-w-6xl"> 
           <Outlet />
         </div>
       </main>
-      
-      {/* Mobile Navigation Bar */}
-      <MobileNavBar />
     </div>
   );
 };
