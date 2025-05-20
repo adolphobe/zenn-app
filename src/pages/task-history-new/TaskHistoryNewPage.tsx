@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
-import { Loader2, BarChart2, X } from 'lucide-react';
+import { Loader2, BarChart2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useCompletedTasksData } from './hooks/useCompletedTasksData';
 import { useTaskFilters } from './hooks/useTaskFilters';
@@ -119,8 +119,16 @@ const TaskHistoryNewPage = () => {
     }
   };
 
-  // Task restoration handlers
-  const handleRestoreClick = (taskId: string) => {
+  // Task restoration handlers - modificado para aceitar tanto um Task quanto um taskId
+  const handleRestoreClick = (taskOrId: Task | string) => {
+    // Se for um objeto Task, usamos ele diretamente
+    if (typeof taskOrId === 'object') {
+      setTaskToRestore(taskOrId);
+      return;
+    }
+    
+    // Se for um ID (string), buscamos a task correspondente
+    const taskId = taskOrId;
     const taskToRestore = completedTasks.find(task => task.id === taskId);
     if (taskToRestore) {
       setTaskToRestore(taskToRestore);
