@@ -45,7 +45,7 @@
 .task-power-extra {
   @apply border-red-500 shadow-md;
   background-image: linear-gradient(to right, #ffefef, #f0f7ff, #fff5eb);
-  animation: subtle-pulse 1s ease-in-out infinite;
+  animation: subtle-pulse 0.7s ease-in-out infinite;
   box-shadow: 0 2px 8px rgba(234, 56, 76, 0.25); /* Sombra vermelha suave */
 }
 
@@ -67,7 +67,7 @@
     box-shadow: 0 2px 8px rgba(234, 56, 76, 0.25);
   }
   50% { 
-    transform: scale(1.02); /* Aumentado para 1.02 */
+    transform: scale(1.03); /* Aumentado para 1.03 */
     box-shadow: 0 4px 14px rgba(234, 56, 76, 0.45);
   }
 }

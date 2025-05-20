@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback } from 'react';
 import { useTaskDataContext } from '@/context/TaskDataProvider';
 import { Task } from '@/types';
@@ -142,27 +141,17 @@ const MobileTaskHistoryPage = () => {
     );
   }
   
-  // Get task priority color class based on scores
-  const getTaskCardColorClass = (task: Task) => {
-    const totalScore = (task.consequenceScore || 0) + (task.prideScore || 0) + (task.constructionScore || 0);
-    
-    if (totalScore >= 12) return "border-l-red-500 bg-red-50";
-    if (totalScore >= 9) return "border-l-orange-500 bg-orange-50";
-    if (totalScore >= 6) return "border-l-blue-500 bg-blue-50";
-    return "border-l-gray-400 bg-gray-50";
-  };
-  
-  // Get pillar color
-  const getPillarColor = (pillar: string) => {
-    switch (pillar) {
-      case 'consequence':
-        return 'bg-red-500';
-      case 'pride':
-        return 'bg-blue-500';
-      case 'construction':
-        return 'bg-green-500';
+  // Get feedback color class
+  const getFeedbackColorClass = (feedback: string | null) => {
+    switch (feedback) {
+      case 'transformed':
+        return 'text-[#3d8c40] bg-[#deffe0] border-[#a8d9aa]';
+      case 'relief':
+        return 'text-[#2970a8] bg-[#e2f2ff] border-[#a3d0f0]';
+      case 'obligation':
+        return 'text-[#6e6e6e] bg-[#f1f1f1] border-[#d0d0d0]';
       default:
-        return 'bg-gray-500';
+        return 'text-muted-foreground';
     }
   };
   
@@ -177,20 +166,6 @@ const MobileTaskHistoryPage = () => {
         return 'Terminei por obrigação';
       default:
         return 'Sem feedback';
-    }
-  };
-  
-  // Get feedback color class
-  const getFeedbackColorClass = (feedback: string | null) => {
-    switch (feedback) {
-      case 'transformed':
-        return 'text-[#3d8c40] bg-[#deffe0] border-[#a8d9aa]';
-      case 'relief':
-        return 'text-[#2970a8] bg-[#e2f2ff] border-[#a3d0f0]';
-      case 'obligation':
-        return 'text-[#6e6e6e] bg-[#f1f1f1] border-[#d0d0d0]';
-      default:
-        return 'text-muted-foreground';
     }
   };
   
@@ -305,34 +280,31 @@ const MobileTaskHistoryPage = () => {
       
       {/* Task list */}
       <div className="space-y-3">
-        {paginatedTasks().map((task) => {
-          const cardColorClass = getTaskCardColorClass(task);
-          return (
-            <motion.div
-              key={task.id}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.2 }}
-              className={`rounded-lg shadow-sm border p-3 relative border-l-4 ${cardColorClass}`}
-              onClick={() => setSelectedTask(task)}
-            >
-              <h3 className="font-medium mb-2">{task.title}</h3>
-              
-              {task.feedback && (
-                <div className="mb-2">
-                  <Badge variant="outline" className={`${getFeedbackColorClass(task.feedback)}`}>
-                    {getFeedbackLabel(task.feedback)}
-                  </Badge>
-                </div>
-              )}
-              
-              <div className="text-xs text-muted-foreground mt-2">
-                <Clock className="h-3.5 w-3.5 inline-block mr-1" />
-                {formatDate(task.completedAt)}
+        {paginatedTasks().map((task) => (
+          <motion.div
+            key={task.id}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2 }}
+            className="rounded-lg shadow-sm border p-3 relative border-l-4 border-l-green-500"
+            onClick={() => setSelectedTask(task)}
+          >
+            <h3 className="font-medium mb-2">{task.title}</h3>
+            
+            {task.feedback && (
+              <div className="mb-2">
+                <Badge variant="outline" className={`${getFeedbackColorClass(task.feedback)}`}>
+                  {getFeedbackLabel(task.feedback)}
+                </Badge>
               </div>
-            </motion.div>
-          );
-        })}
+            )}
+            
+            <div className="text-xs text-muted-foreground mt-2">
+              <Clock className="h-3.5 w-3.5 inline-block mr-1" />
+              {formatDate(task.completedAt)}
+            </div>
+          </motion.div>
+        ))}
       </div>
       
       {/* Pagination controls */}

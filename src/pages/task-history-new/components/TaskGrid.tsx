@@ -85,7 +85,7 @@ export const TaskGrid: React.FC<TaskGridProps> = ({
         
         return (
           <motion.div key={task.id} variants={itemVariants}>
-            <Card className="mb-3 border-l-4 border-l-green-500 hover:bg-muted/10 transition-colors shadow-sm hover:shadow-md bg-transparent">
+            <Card className="mb-3 border-l-4 border-l-green-500 hover:bg-muted/10 transition-colors shadow-sm hover:shadow-md">
               <CardContent className="p-4">
                 <div 
                   className="cursor-pointer"

@@ -166,8 +166,8 @@ const MobilePowerPage: React.FC = () => {
         )}
       </div>
       
-      {/* Botão flutuante de adicionar tarefa */}
-      <div className="fixed right-4 top-4 z-50">
+      {/* Botão flutuante de adicionar tarefa - MOVED TO BOTTOM */}
+      <div className="fixed right-4 bottom-20 z-50">
         {isTaskFormOpen ? (
           <TaskForm onClose={() => setIsTaskFormOpen(false)} />
         ) : (
