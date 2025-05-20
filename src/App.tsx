@@ -9,6 +9,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './context/auth';
 import { AppProvider } from './context/AppProvider';
 import { TaskDataProvider } from './context/TaskDataProvider';
+import TaskProviders from './components/task/TaskProviders';
 
 // Auth-related pages
 import LoginPage from './pages/Login';
@@ -53,38 +54,40 @@ function App() {
       <Router>
         <AuthProvider>
           <AppProvider>
-            <TaskDataProvider>
-              <Toaster />
-              <Suspense fallback={<LoadingOverlay show={true} />}>
-                <Routes>
-                  {/* Public Routes */}
-                  <Route path="/" element={<LandingPage />} />
-                  <Route path="/login" element={<LoginPage />} />
-                  <Route path="/signup" element={<SignupPage />} />
-                  <Route path="/reset-password" element={<PasswordResetPage />} />
-                  <Route path="/reset-password/confirm" element={<PasswordResetConfirmPage />} />
-                  
-                  {/* Protected Routes */}
-                  <Route element={<PrivateRoute />}>
-                    <Route element={<ActoApp />}>
-                      {/* Desktop Routes */}
-                      <Route path="/dashboard" element={<Dashboard />} />
-                      <Route path="/settings" element={<Settings />} />
-                      <Route path="/task-history" element={<TaskHistoryPage />} />
-                      <Route path="/task-history-new" element={<TaskHistoryNewPage />} />
-                      <Route path="/strategic-review" element={<StrategicReviewPage />} />
-                      
-                      {/* Mobile Routes */}
-                      <Route path="/mobile/power" element={<MobilePowerPage />} />
-                      <Route path="/mobile/chronological" element={<MobileChronologicalPage />} />
+            <TaskProviders>
+              <TaskDataProvider>
+                <Toaster />
+                <Suspense fallback={<LoadingOverlay show={true} />}>
+                  <Routes>
+                    {/* Public Routes */}
+                    <Route path="/" element={<LandingPage />} />
+                    <Route path="/login" element={<LoginPage />} />
+                    <Route path="/signup" element={<SignupPage />} />
+                    <Route path="/reset-password" element={<PasswordResetPage />} />
+                    <Route path="/reset-password/confirm" element={<PasswordResetConfirmPage />} />
+                    
+                    {/* Protected Routes */}
+                    <Route element={<PrivateRoute />}>
+                      <Route element={<ActoApp />}>
+                        {/* Desktop Routes */}
+                        <Route path="/dashboard" element={<Dashboard />} />
+                        <Route path="/settings" element={<Settings />} />
+                        <Route path="/task-history" element={<TaskHistoryPage />} />
+                        <Route path="/task-history-new" element={<TaskHistoryNewPage />} />
+                        <Route path="/strategic-review" element={<StrategicReviewPage />} />
+                        
+                        {/* Mobile Routes */}
+                        <Route path="/mobile/power" element={<MobilePowerPage />} />
+                        <Route path="/mobile/chronological" element={<MobileChronologicalPage />} />
+                      </Route>
                     </Route>
-                  </Route>
-                  
-                  {/* Default and Not Found Routes */}
-                  <Route path="*" element={<NotFoundPage />} />
-                </Routes>
-              </Suspense>
-            </TaskDataProvider>
+                    
+                    {/* Default and Not Found Routes */}
+                    <Route path="*" element={<NotFoundPage />} />
+                  </Routes>
+                </Suspense>
+              </TaskDataProvider>
+            </TaskProviders>
           </AppProvider>
         </AuthProvider>
       </Router>
