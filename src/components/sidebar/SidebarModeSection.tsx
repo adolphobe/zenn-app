@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 import SidebarSection from './SidebarSection';
 import { useAppContext } from '@/context/AppContext';
 import SidebarNavItem from './SidebarNavItem';
+import { NavigationStore } from '@/utils/navigationStore';
 
 interface SidebarModeSectionProps {
   sidebarOpen: boolean;
@@ -24,8 +25,9 @@ const SidebarModeSection: React.FC<SidebarModeSectionProps> = ({ sidebarOpen }) 
   // Preload components on mount to make navigation faster
   useEffect(() => {
     // Preload the history and strategic review pages when sidebar loads
-    const preloadStrategicReview = import('../pages/StrategicReview').catch(() => {});
-    const preloadTaskHistory = import('../pages/task-history-new/TaskHistoryNewPage').catch(() => {});
+    // Fix the import paths to use absolute imports with @/ prefix
+    const preloadStrategicReview = import('@/pages/StrategicReview').catch(() => {});
+    const preloadTaskHistory = import('@/pages/task-history-new/TaskHistoryNewPage').catch(() => {});
     
     // These will run in the background and cache the components
     return () => {
@@ -36,7 +38,7 @@ const SidebarModeSection: React.FC<SidebarModeSectionProps> = ({ sidebarOpen }) 
   // Handler for mode switching
   const handleModeClick = (mode: string) => {
     // Track that we're performing an internal navigation
-    localStorage.setItem('navigation_type', 'internal');
+    NavigationStore.setNavigationType('internal');
     
     // Só navegue para o dashboard se não estivermos já lá
     if (!isAlreadyOnDashboard) {
@@ -50,7 +52,10 @@ const SidebarModeSection: React.FC<SidebarModeSectionProps> = ({ sidebarOpen }) 
   // Handler for external page navigation
   const handleExternalNavigation = (path: string) => {
     // Track that we're performing an external navigation
-    localStorage.setItem('navigation_type', 'external');
+    NavigationStore.setNavigationType('external');
+    
+    // Track this route for recent views
+    NavigationStore.addRecentRoute(path);
     
     // Navigate to external page
     navigate(path);
