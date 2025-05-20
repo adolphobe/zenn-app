@@ -122,7 +122,7 @@ const CommentForm: React.FC<CommentFormProps> = ({ taskId, onCommentAdded }) => 
         <div className="flex justify-between">
           <div className="text-xs text-gray-500">
             {isAuthenticated ? (
-              <span>Comentando como: {currentUser?.email || 'Usuário autenticado'}</span>
+      {/*<span>Comentando como: {currentUser?.email || 'Usuário autenticado'}</span>*/}
             ) : (
               <a href="/#/login" className="text-blue-500 hover:underline">Faça login para comentar</a>
             )}
