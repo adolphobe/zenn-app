@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Task } from '@/types';
 import { format } from 'date-fns';
@@ -84,7 +85,7 @@ export const TaskGrid: React.FC<TaskGridProps> = ({
         
         return (
           <motion.div key={task.id} variants={itemVariants}>
-            <Card className="mb-3 border-l-4 border-l-green-500 hover:bg-muted/10 transition-colors shadow-sm hover:shadow-md bg-white">
+            <Card className="mb-3 border-l-4 border-l-green-500 hover:bg-muted/10 transition-colors shadow-sm hover:shadow-md bg-transparent">
               <CardContent className="p-4">
                 <div 
                   className="cursor-pointer"

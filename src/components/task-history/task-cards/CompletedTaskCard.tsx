@@ -110,7 +110,7 @@ export const CompletedTaskCard: React.FC<CompletedTaskCardProps> = ({ task }) =>
   return (
     <>
       <Card 
-        className="mb-3 border-l-4 border-l-green-500"
+        className="mb-3 border-l-4 border-l-green-500 bg-transparent hover:bg-gray-50/30 dark:hover:bg-gray-800/20 transition-colors"
         onClick={() => toggleTaskExpanded(task.id)}
       >
         <CardContent className="pt-4">

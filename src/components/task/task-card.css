@@ -45,14 +45,14 @@
 .task-power-extra {
   @apply border-red-500 shadow-md;
   background-image: linear-gradient(to right, #ffefef, #f0f7ff, #fff5eb);
-  animation: subtle-pulse 1.5s ease-in-out infinite;
+  animation: subtle-pulse 1s ease-in-out infinite;
   box-shadow: 0 2px 8px rgba(234, 56, 76, 0.25); /* Sombra vermelha suave */
 }
 
 /* Indicador de ponto piscando para Potência Extra */
 .power-extra-indicator {
   @apply w-2 h-2 rounded-full bg-red-500 mr-2 inline-block;
-  animation: blink 1.5s ease-in-out infinite;
+  animation: blink 1s ease-in-out infinite;
 }
 
 @keyframes blink {
@@ -60,15 +60,15 @@
   50% { opacity: 0.3; }
 }
 
-/* Animação de pulse um pouco mais perceptível e mais rápida */
+/* Animação de pulse mais perceptível e mais rápida */
 @keyframes subtle-pulse {
   0%, 100% { 
     transform: scale(1);
     box-shadow: 0 2px 8px rgba(234, 56, 76, 0.25);
   }
   50% { 
-    transform: scale(1.015); /* Aumentado um pouco mais para 1.015 */
-    box-shadow: 0 3px 12px rgba(234, 56, 76, 0.4);
+    transform: scale(1.02); /* Aumentado para 1.02 */
+    box-shadow: 0 4px 14px rgba(234, 56, 76, 0.45);
   }
 }
 
