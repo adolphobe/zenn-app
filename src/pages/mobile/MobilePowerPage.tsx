@@ -127,7 +127,7 @@ const MobilePowerPage: React.FC = () => {
             className="mb-4 overflow-hidden"
           >
             <div className="border rounded-md p-3 bg-background/80 backdrop-blur-sm">
-              <SidebarFilterSection sidebarOpen={true} isMobile={true} />
+              <SidebarFilterSection sidebarOpen={true} />
             </div>
           </motion.div>
         )}
