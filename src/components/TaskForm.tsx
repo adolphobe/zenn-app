@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { useQueryClient } from '@tanstack/react-query';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from '@/components/ui/sheet';
 
 // Import our components
 import TaskFormFields from './TaskFormFields';
@@ -124,8 +125,120 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, initialData, taskId, task,
     // Try to scroll to bottom immediately and again after a delay
     setTimeout(scrollToBottom, 300);
   }, [refreshComments, scrollToBottom]);
+
+  // Render appropriate form container based on mobile vs desktop
+  if (isMobile) {
+    // Mobile: Full-screen Sheet component for mobile
+    const sheetContent = (
+      <form onSubmit={handleSubmit} className="h-full flex flex-col">
+        <SheetHeader className="px-4 py-3 border-b">
+          <SheetTitle className="text-lg font-semibold">
+            {isEditing ? 'Editar Tarefa' : 'Nova Tarefa'}
+          </SheetTitle>
+        </SheetHeader>
+
+        <div className="flex-1 overflow-y-auto p-4">
+          {/* Task title input */}
+          <div className="mb-4">
+            <label htmlFor="title" className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+              Título da Tarefa
+            </label>
+            <input
+              type="text"
+              id="title"
+              name="title"
+              value={formData.title}
+              onChange={handleChange}
+              className="w-full p-3 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+              placeholder="O que precisa ser feito?"
+              required
+            />
+          </div>
+          
+          {/* Show either simple form for new tasks or tabs for editing */}
+          {!isEditing && !taskId ? (
+            <TaskFormFields 
+              formData={formData} 
+              handleChange={handleChange} 
+              handleDateChange={handleDateChange} 
+              setFormData={setFormData} 
+            />
+          ) : (
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <TabsList className="grid w-full grid-cols-2 mb-4">
+                <TabsTrigger value="levels" data-testid="levels-tab">
+                  Níveis
+                </TabsTrigger>
+                <TabsTrigger value="comments" data-testid="comments-tab">
+                  Comentários {comments && comments.length > 0 ? `(${comments.length})` : ''}
+                </TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="levels" className="space-y-6">
+                <TaskFormFields 
+                  formData={formData} 
+                  handleChange={handleChange} 
+                  handleDateChange={handleDateChange} 
+                  setFormData={setFormData} 
+                />
+              </TabsContent>
+              
+              <TabsContent value="comments">
+                {taskId ? (
+                  <div ref={commentsContainerRef} className="space-y-4">
+                    {comments && comments.length > 0 ? (
+                      <TaskComments 
+                        taskId={taskId} 
+                        comments={comments}
+                        onCommentDeleted={() => refreshComments()}
+                      />
+                    ) : (
+                      <div className="py-4 text-center text-gray-500 italic">
+                        {loadingComments || isRefetching ? "Carregando comentários..." : "Sem comentários para esta tarefa"}
+                      </div>
+                    )}
+                    
+                    <CommentForm 
+                      taskId={taskId}
+                      onCommentAdded={handleCommentAdded}
+                    />
+                  </div>
+                ) : (
+                  <div className="text-gray-500 italic">Salve a tarefa primeiro para adicionar comentários</div>
+                )}
+              </TabsContent>
+            </Tabs>
+          )}
+        </div>
+
+        <div className="px-4 py-4 mt-auto border-t flex justify-between">
+          <Button
+            type="button"
+            onClick={onClose}
+            variant="outline"
+          >
+            Cancelar
+          </Button>
+          <Button
+            type="submit"
+            className="btn-green"
+          >
+            {isEditing ? 'Salvar' : 'Adicionar tarefa'}
+          </Button>
+        </div>
+      </form>
+    );
+
+    return (
+      <Sheet open={true} onOpenChange={() => onClose()}>
+        <SheetContent side="bottom" className="h-[100dvh] p-0 sm:max-w-full">
+          {sheetContent}
+        </SheetContent>
+      </Sheet>
+    );
+  }
   
-  // Simplified content when creating a new task
+  // Simplified content when creating a new task on desktop
   if (!isEditing && !taskId) {
     return (
       <Dialog open={true} onOpenChange={() => onClose()}>
@@ -133,7 +246,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, initialData, taskId, task,
           className="max-w-3xl sm:max-w-lg md:max-w-2xl lg:max-w-3xl p-0"
           style={{ 
             width: "95vw", 
-            maxHeight: isMobile ? "90vh" : "85vh"
+            maxHeight: "85vh"
           }}
         >
           <DialogHeader className="p-4 sm:p-6 border-b">
@@ -195,7 +308,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, initialData, taskId, task,
     );
   }
 
-  // Full version for editing an existing task
+  // Full version for editing an existing task on desktop
   return (
     <Dialog open={true} onOpenChange={() => onClose()}>
       <DialogContent 
