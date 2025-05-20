@@ -130,7 +130,7 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
       >
         <DrawerContent className="h-[100dvh] max-h-[100dvh] p-0">
           <div className="flex flex-col h-full">
-            <div className="border-b flex items-center justify-between sticky top-0 bg-background z-10">
+            <div className="border-b flex items-center justify-between sticky top-0 bg-background z-10 py-3 px-4">
               <h2 className="text-xl font-semibold">{title}</h2>
               <Button variant="ghost" size="icon" onClick={onClose}>
                 <X size={20} />
@@ -138,7 +138,7 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
             </div>
             
             <div className="overflow-auto flex-grow">
-              <div className="space-y-6">
+              <div className="space-y-6 pt-3">
                 {/* Header with task information */}
                 <TaskDetailsHeader task={task} />
                 
