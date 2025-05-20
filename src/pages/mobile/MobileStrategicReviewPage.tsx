@@ -16,7 +16,7 @@ import { ptBR } from 'date-fns/locale';
 import { motion } from 'framer-motion';
 
 const MobileStrategicReviewPage = () => {
-  const { allTasks, tasksLoading } = useTaskDataContext();
+  const { completedTasks, completedTasksLoading } = useTaskDataContext();
   const [focusedPillar, setFocusedPillar] = useState<string | null>(null);
   
   const {
@@ -30,13 +30,13 @@ const MobileStrategicReviewPage = () => {
     setCustomStartDate,
     setCustomEndDate,
     handlePeriodChange
-  } = useStrategicReviewState(allTasks);
+  } = useStrategicReviewState(completedTasks);
 
   const pillarsData = useInsightsAnalysis(filteredTasks);
   const feedbackData = useFeedbackAnalysis(filteredTasks);
   
   // Loading states
-  if (tasksLoading) {
+  if (completedTasksLoading) {
     return (
       <div className="p-4">
         <Alert className="mb-4">
@@ -47,7 +47,7 @@ const MobileStrategicReviewPage = () => {
   }
   
   // If no tasks at all
-  if (allTasks.length === 0) {
+  if (completedTasks.length === 0) {
     return (
       <div className="p-4">
         <Alert>
@@ -95,10 +95,10 @@ const MobileStrategicReviewPage = () => {
         {showCustomDatePicker && (
           <div className="mt-4">
             <DateRangePicker 
-              startDate={customStartDate}
-              endDate={customEndDate}
-              onStartDateChange={setCustomStartDate}
-              onEndDateChange={setCustomEndDate}
+              customStartDate={customStartDate}
+              customEndDate={customEndDate}
+              setCustomStartDate={setCustomStartDate}
+              setCustomEndDate={setCustomEndDate}
             />
           </div>
         )}
