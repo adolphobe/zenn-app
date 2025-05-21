@@ -1,3 +1,4 @@
+
 import { Outlet, useLocation, Navigate } from 'react-router-dom';
 import { useAuth } from '@/context/auth';
 import { useSidebar } from '@/context/hooks';
@@ -6,6 +7,7 @@ import { cn } from '@/lib/utils';
 import { useEffect, useState, useMemo } from 'react';
 import { LoadingOverlay } from './ui/loading-overlay';
 import { INITIAL_LOAD_COMPLETE_KEY, INITIAL_LOAD_DELAY, INTERNAL_NAVIGATION_DELAY } from '@/utils/authConstants';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 /**
  * PrivateRoute - Protects routes that require authentication
@@ -16,6 +18,7 @@ export const PrivateRoute = () => {
   const { isOpen: sidebarOpen, open: openSidebar, isMobile } = useSidebar();
   const [authChecked, setAuthChecked] = useState(false);
   const [showLoading, setShowLoading] = useState(true);
+  const mobileCheck = useIsMobile();
   
   // Check if the current route is the dashboard
   const isDashboardRoute = location.pathname === '/dashboard';
@@ -36,6 +39,19 @@ export const PrivateRoute = () => {
       setAuthChecked(true);
     }
   }, [isLoading]);
+
+  // Mobile redirect for dashboard route
+  useEffect(() => {
+    if (authChecked && !isLoading && isDashboardRoute && mobileCheck) {
+      // Get the user's preferred view mode from localStorage if available
+      const appState = localStorage.getItem('app_state');
+      const viewMode = appState ? JSON.parse(appState).viewMode : 'power';
+      
+      // Redirect immediately to the appropriate mobile route
+      const mobileRoute = viewMode === 'chronological' ? '/mobile/chronological' : '/mobile/power';
+      window.location.replace(mobileRoute);
+    }
+  }, [authChecked, isLoading, isDashboardRoute, mobileCheck]);
 
   // Set initial loading state based on route and whether this is initial load
   useEffect(() => {

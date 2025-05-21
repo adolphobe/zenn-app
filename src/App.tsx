@@ -20,6 +20,7 @@ import PasswordResetConfirmPage from './pages/auth/PasswordResetConfirmPage';
 // Layouts
 import { PrivateRoute } from './components/PrivateRoute';
 import ActoApp from './pages/ActoApp';
+import MobileRedirect from './components/MobileRedirect';
 
 // Main pages with preloading
 const Dashboard = lazy(() => import('./components/Dashboard'));
@@ -89,7 +90,12 @@ function App() {
                     <Route element={<PrivateRoute />}>
                       <Route element={<ActoApp />}>
                         {/* Desktop Routes */}
-                        <Route path="/dashboard" element={<Dashboard />} />
+                        <Route path="/dashboard" element={
+                          <>
+                            <MobileRedirect />
+                            <Dashboard />
+                          </>
+                        } />
                         <Route path="/settings" element={<Settings />} />
                         <Route path="/task-history" element={<TaskHistoryPage />} />
                         <Route path="/task-history-new" element={<TaskHistoryNewPage />} />
