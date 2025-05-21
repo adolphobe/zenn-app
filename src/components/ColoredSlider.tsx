@@ -128,10 +128,10 @@ const ColoredSlider: React.FC<ColoredSliderProps> = ({
       <div className="relative h-4 mb-2">
         <div className="absolute top-1/2 transform -translate-y-1/2 w-full h-1 bg-gray-100 rounded-full"></div>
         
-        {/* Custom Track - Gradient */}
+        {/* Custom Track - Gradient - Always show at least 5% width */}
         <div 
           className={`absolute top-1/2 transform -translate-y-1/2 h-4 rounded-full bg-gradient-to-r from-${gradientFrom} to-${gradientTo}`}
-          style={{ width: value === 1 ? '5%' : `${(value - 1) * 25}%` }}
+          style={{ width: `${Math.max(5, (value - 1) * 25)}%` }}
         ></div>
         
         {/* Markers */}
