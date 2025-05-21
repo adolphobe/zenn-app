@@ -6,7 +6,7 @@ import { useToast } from '@/hooks/use-toast';
 export const usePullToRefresh = () => {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const { forceSynchronize } = useTaskDataContext();
-  const { toast } = useToast();
+  const { addToast } = useToast();
   
   const handleRefresh = useCallback(async () => {
     if (isRefreshing) return Promise.resolve();
@@ -17,7 +17,7 @@ export const usePullToRefresh = () => {
       await forceSynchronize();
       
       // Show success toast
-      toast({
+      addToast({
         title: "Atualizado",
         description: "Suas tarefas foram sincronizadas com sucesso.",
         variant: "default",
@@ -26,7 +26,7 @@ export const usePullToRefresh = () => {
       return Promise.resolve();
     } catch (error) {
       // Show error toast
-      toast({
+      addToast({
         title: "Erro ao sincronizar",
         description: "Não foi possível sincronizar suas tarefas. Tente novamente.",
         variant: "destructive",
@@ -36,7 +36,7 @@ export const usePullToRefresh = () => {
     } finally {
       setIsRefreshing(false);
     }
-  }, [forceSynchronize, isRefreshing, toast]);
+  }, [forceSynchronize, isRefreshing, addToast]);
   
   return {
     isRefreshing,
