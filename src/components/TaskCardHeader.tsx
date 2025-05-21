@@ -58,6 +58,11 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
     viewMode === 'chronological' && isOverdue ? 'text-[#ea384c]' : ''
   }`;
   
+  // Definir classe para o texto "SEM DATA" de acordo com o modo
+  const noDateClassName = viewMode === 'chronological' 
+    ? 'text-gray-500 dark:text-gray-400' 
+    : 'task-text-secondary'; // No modo potência, usa a classe que herda a cor do card
+  
   return (
     <div>
       {/* Title */}
@@ -114,14 +119,14 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
       </div>
 
       {/* Data Ideal (se existir) ou "SEM DATA" */}
-      <div className="mt-2 flex items-center task-text-secondary text-sm">
+      <div className="mt-2 flex items-center text-sm">
         {idealDate ? (
-          <>
+          <span className="task-text-secondary">
             {isOverdue && <Bell size={14} className="mr-1 text-[#ea384c]" />}
             {formattedDate}
-          </>
+          </span>
         ) : (
-          <span className="text-gray-500 dark:text-gray-400">SEM DATA</span>
+          <span className={noDateClassName}>SEM DATA</span>
         )}
       </div>
     </div>
