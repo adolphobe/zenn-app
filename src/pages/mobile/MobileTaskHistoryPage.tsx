@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback, useEffect } from 'react';
 import { useTaskDataContext } from '@/context/TaskDataProvider';
 import { Task } from '@/types';
@@ -29,6 +28,7 @@ import TaskModal from '../task-history-new/components/TaskModal';
 import { restoreTask } from '../task-history-new/services/taskActions';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from '@/hooks/use-toast';
+import { dateService } from '@/services/dateService';
 
 const MobileTaskHistoryPage = () => {
   const { completedTasks, completedTasksLoading } = useTaskDataContext();
@@ -163,7 +163,7 @@ const MobileTaskHistoryPage = () => {
   const formatDate = (date: Date | string | null) => {
     if (!date) return '';
     const dateObj = date instanceof Date ? date : new Date(date);
-    return format(dateObj, "dd MMM, yyyy", { locale: ptBR });
+    return format(dateObj, "dd MMM, yyyy 'às' HH:mm", { locale: ptBR });
   };
 
   // Handle restore task
