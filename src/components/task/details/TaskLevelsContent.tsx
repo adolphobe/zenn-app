@@ -97,7 +97,7 @@ const TaskLevelsContent: React.FC<TaskLevelsContentProps> = ({ task, isMobile = 
       </div>
       
       <div className="space-y-6">
-        <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg shadow-sm mt-[23px] mb-[20px]">
+        <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg shadow-sm mt-[3px] mb-[30px]">
           <div className="text-center">
             <span className={`text-3xl font-bold ${scoreColorClass}`}>{task.totalScore || 0}/15</span>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{scoreLabel}</p>
