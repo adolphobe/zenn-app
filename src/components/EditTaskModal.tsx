@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Task, TaskFormData } from '@/types';
 import { AlwaysVisibleScrollArea } from '@/components/ui/always-visible-scroll-area';
@@ -6,9 +7,9 @@ import { useTaskDataContext } from '@/context/TaskDataProvider';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import TaskFormFields from '../TaskFormFields';
-import TaskComments from '../TaskComments';
-import CommentForm from '../CommentForm';
+import TaskFormFields from './TaskFormFields';
+import TaskComments from './TaskComments';
+import CommentForm from './CommentForm';
 import { useComments } from '@/hooks/useComments';
 import { useTabNavigation } from '@/context/hooks/useTabNavigation';
 import { toast } from '@/hooks/use-toast';
