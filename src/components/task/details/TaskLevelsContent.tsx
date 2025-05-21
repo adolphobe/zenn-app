@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { Task } from '@/types';
-import { CONSEQUENCE_PHRASES, PRIDE_PHRASES, CONSTRUCTION_PHRASES } from '@/constants';
 import RatingSliderReadOnly from '@/components/ui/rating-slider-readonly';
 
 interface TaskLevelsContentProps {
@@ -38,6 +37,33 @@ const TaskLevelsContent: React.FC<TaskLevelsContentProps> = ({ task, isMobile = 
     }
   };
 
+  // Frases explicativas para Risco (Consequência)
+  const riskExplanations = [
+    "Zero risco - posso ignorar",
+    "Risco baixo - não urgente",
+    "Risco médio - requer atenção",
+    "Risco alto - precisa de ação",
+    "Risco extremo - consequências graves"
+  ];
+  
+  // Frases explicativas para Orgulho
+  const prideExplanations = [
+    "Sem valor para mim",
+    "Apenas evita problemas",
+    "Dá alguma satisfação",
+    "Importante para mim",
+    "Me deixará muito orgulhoso"
+  ];
+  
+  // Frases explicativas para Crescimento pessoal
+  const growthExplanations = [
+    "Não me desenvolve",
+    "Pouca aprendizagem",
+    "Desenvolve algumas habilidades",
+    "Expande meus limites",
+    "Transforma meu potencial"
+  ];
+
   const scoreColorClass = getScoreColorClass(task.totalScore || 0);
   const scoreLabel = getScoreLabel(task.totalScore || 0);
   
@@ -47,21 +73,21 @@ const TaskLevelsContent: React.FC<TaskLevelsContentProps> = ({ task, isMobile = 
         value={task.consequenceScore}
         color="blue"
         label="Risco"
-        description={CONSEQUENCE_PHRASES}
+        description={riskExplanations}
       />
       
       <RatingSliderReadOnly
         value={task.prideScore}
         color="orange"
         label="Orgulho"
-        description={PRIDE_PHRASES}
+        description={prideExplanations}
       />
       
       <RatingSliderReadOnly
         value={task.constructionScore}
         color="green"
         label="Crescimento pessoal"
-        description={CONSTRUCTION_PHRASES}
+        description={growthExplanations}
       />
       
       <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg shadow-sm mt-6">
@@ -78,21 +104,21 @@ const TaskLevelsContent: React.FC<TaskLevelsContentProps> = ({ task, isMobile = 
           value={task.consequenceScore}
           color="blue"
           label="Risco"
-          description={CONSEQUENCE_PHRASES}
+          description={riskExplanations}
         />
         
         <RatingSliderReadOnly
           value={task.prideScore}
           color="orange"
           label="Orgulho"
-          description={PRIDE_PHRASES}
+          description={prideExplanations}
         />
         
         <RatingSliderReadOnly
           value={task.constructionScore}
           color="green"
           label="Crescimento pessoal"
-          description={CONSTRUCTION_PHRASES}
+          description={growthExplanations}
         />
       </div>
       

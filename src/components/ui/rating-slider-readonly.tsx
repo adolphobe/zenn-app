@@ -1,123 +1,66 @@
 
 import React from 'react';
-import { cn } from "@/lib/utils";
-import { Slider } from "@/components/ui/slider";
 
 interface RatingSliderReadOnlyProps {
-  value?: number | null;
-  maxValue?: number;
-  color?: 'blue' | 'orange' | 'green';
+  value: number;
+  color: string;
   label: string;
-  description?: string[] | null;
-  className?: string;
+  description: string[];
 }
 
-const RatingSliderReadOnly: React.FC<RatingSliderReadOnlyProps> = ({
-  value,
-  maxValue = 5,
-  color = 'blue',
-  label,
-  description = [],
-  className
+const RatingSliderReadOnly: React.FC<RatingSliderReadOnlyProps> = ({ 
+  value = 3, 
+  color, 
+  label, 
+  description 
 }) => {
-  // Ensure value is within valid range (1 to maxValue)
-  const safeValue = React.useMemo(() => {
-    const parsedValue = Number(value);
-    if (isNaN(parsedValue) || parsedValue < 1) return 1;
-    return Math.min(parsedValue, maxValue);
-  }, [value, maxValue]);
-  
-  // Define color themes for different rating types
-  const colorStyles = {
-    blue: {
-      bg: 'bg-blue-50 dark:bg-blue-950/30',
-      track: 'bg-blue-200 dark:bg-blue-800',
-      fill: 'bg-blue-500',
-      text: 'text-blue-700 dark:text-blue-300',
-      border: 'border-blue-200 dark:border-blue-800',
-      activeBorder: 'border-blue-500',
-      hover: 'hover:bg-blue-100 dark:hover:bg-blue-900/40',
-      gradient: 'from-blue-300 to-blue-500 dark:from-blue-700 dark:to-blue-500'
-    },
-    orange: {
-      bg: 'bg-orange-50 dark:bg-orange-950/30',
-      track: 'bg-orange-200 dark:bg-orange-800',
-      fill: 'bg-orange-500',
-      text: 'text-orange-700 dark:text-orange-300',
-      border: 'border-orange-200 dark:border-orange-800',
-      activeBorder: 'border-orange-500',
-      hover: 'hover:bg-orange-100 dark:hover:bg-orange-900/40',
-      gradient: 'from-orange-300 to-orange-500 dark:from-orange-700 dark:to-orange-500'
-    },
-    green: {
-      bg: 'bg-emerald-50 dark:bg-emerald-950/30',
-      track: 'bg-emerald-200 dark:bg-emerald-800',
-      fill: 'bg-emerald-500',
-      text: 'text-emerald-700 dark:text-emerald-300',
-      border: 'border-emerald-200 dark:border-emerald-800',
-      activeBorder: 'border-emerald-500',
-      hover: 'hover:bg-emerald-100 dark:hover:bg-emerald-900/40',
-      gradient: 'from-emerald-300 to-emerald-500 dark:from-emerald-700 dark:to-emerald-500'
-    }
+  // Map colors to Tailwind color classes
+  const colorMap: Record<string, { base: string, gradientFrom: string, gradientTo: string }> = {
+    blue: { base: 'blue', gradientFrom: 'blue-400', gradientTo: 'blue-600' },
+    orange: { base: 'orange', gradientFrom: 'orange-300', gradientTo: 'orange-500' },
+    green: { base: 'green', gradientFrom: 'green-400', gradientTo: 'green-600' },
+    red: { base: 'red', gradientFrom: 'red-400', gradientTo: 'red-600' },
   };
 
-  const styles = colorStyles[color];
+  const colorObj = colorMap[color] || colorMap.blue;
   
-  // Get description text safely
-  const safeDescriptions = Array.isArray(description) ? description : [];
-  const descriptionText = safeDescriptions[safeValue - 1] || '';
-  
+  const getExplanation = () => {
+    if (!description || description.length === 0) return '';
+    return description[Math.min(Math.max(0, value - 1), description.length - 1)];
+  };
+
   return (
-    <div className={cn("rounded-lg p-5 mb-6 transition-all", styles.bg, className)}>
+    <div className={`flex flex-col w-full px-4 py-3 bg-${colorObj.base}-50 dark:bg-${colorObj.base}-900/20 rounded-xl`}>
       <div className="flex justify-between items-center mb-3">
-        <h3 className={cn("font-medium text-sm", styles.text)}>{label}</h3>
-        <span className={cn("font-semibold text-sm", styles.text)}>
-          {safeValue}/{maxValue}
-        </span>
+        <h2 className={`text-base font-medium text-${colorObj.base}-600 dark:text-${colorObj.base}-400`}>{label}</h2>
+        <span className={`text-sm font-medium text-${colorObj.base}-600 dark:text-${colorObj.base}-400`}>{value}/5</span>
       </div>
       
-      <div className="relative mb-4 px-3 py-1">
-        {/* Read-only slider */}
-        <Slider
-          value={[safeValue]}
-          min={1}
-          max={maxValue}
-          step={1}
-          disabled={true}
-          classNames={{
-            track: cn(styles.track),
-            range: cn(
-              "bg-gradient-to-r", 
-              styles.gradient,
-              safeValue === 1 ? "opacity-0" : "opacity-100"
-            ),
-            thumb: cn(styles.fill, "cursor-default")
-          }}
-        />
+      {/* Custom Track - Empty */}
+      <div className="relative h-4 mb-2">
+        <div className="absolute top-1/2 transform -translate-y-1/2 w-full h-1 bg-gray-100 dark:bg-gray-700 rounded-full"></div>
         
-        {/* Custom step indicators */}
-        <div className="absolute top-0 left-0 w-full flex justify-between px-3 pointer-events-none">
-          {Array.from({ length: maxValue }, (_, i) => i + 1).map((step) => (
-            <div
-              key={step}
-              className={cn(
-                "w-6 h-6 rounded-full border-2 transition-all duration-200",
-                "transform translate-y-[-4px]", 
-                step <= safeValue
-                  ? cn("bg-white dark:bg-gray-900", styles.activeBorder)
-                  : cn("bg-white dark:bg-gray-900", styles.border)
-              )}
-            />
+        {/* Custom Track - Gradient */}
+        <div 
+          className={`absolute top-1/2 transform -translate-y-1/2 h-4 rounded-full bg-gradient-to-r from-${colorObj.gradientFrom} to-${colorObj.gradientTo}`}
+          style={{ width: value === 1 ? '5%' : `${(value - 1) * 25}%` }}
+        ></div>
+        
+        {/* Markers */}
+        <div className="absolute mt-5 w-full flex justify-between px-1">
+          {[1, 2, 3, 4, 5].map((mark) => (
+            <div 
+              key={mark} 
+              className={`h-1.5 w-1.5 rounded-full ${mark <= value ? `bg-${colorObj.base}-500` : 'bg-gray-200 dark:bg-gray-600'}`}
+            ></div>
           ))}
         </div>
       </div>
       
-      {/* Description text */}
-      {descriptionText && (
-        <p className={cn("text-sm mt-3 text-[14px]", styles.text)}>
-          {descriptionText}
-        </p>
-      )}
+      {/* Explanatory text */}
+      <p className={`text-sm text-${colorObj.base}-600 dark:text-${colorObj.base}-400 mt-4 min-h-6`}>
+        {getExplanation()}
+      </p>
     </div>
   );
 };
