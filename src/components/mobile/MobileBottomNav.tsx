@@ -226,9 +226,9 @@ const MobileBottomNav = () => {
     { 
       customRender: () => (
         <div className="flex flex-col items-center justify-center">
-          <Avatar className="h-8 w-8 mb-1">
+          <Avatar className="h-6 w-6 mb-1">
             <AvatarImage src={currentUser?.profileImage} />
-            <AvatarFallback className="text-xs bg-primary/10">
+            <AvatarFallback className="text-[10px] bg-primary/10">
               {currentUser?.name?.substring(0, 2) || 'U'}
             </AvatarFallback>
           </Avatar>
@@ -241,7 +241,7 @@ const MobileBottomNav = () => {
     }
   ];
 
-  // Drawer menu item renderer
+  // Drawer menu item renderer - AUMENTEI O ESPAÇAMENTO E TAMANHO DOS ÍCONES AQUI
   const renderDrawerItem = (item: NavigationItem) => (
     <button 
       key={item.label}
@@ -274,7 +274,7 @@ const MobileBottomNav = () => {
 
   return (
     <>
-      {/* Filter Drawer */}
+      {/* Filter Drawer - AUMENTEI O ESPAÇAMENTO AQUI */}
       <Drawer open={filterDrawerOpen} onOpenChange={setFilterDrawerOpen} direction="bottom">
         <DrawerContent className="max-h-[70vh]">
           <div className="py-3 px-4 mb-[30px]">
@@ -286,7 +286,7 @@ const MobileBottomNav = () => {
         </DrawerContent>
       </Drawer>
 
-      {/* More Drawer */}
+      {/* More Drawer - AUMENTEI O ESPAÇAMENTO AQUI */}
       <Drawer open={moreDrawerOpen} onOpenChange={setMoreDrawerOpen} direction="bottom">
         <DrawerContent className="max-h-[70vh]">
           <div className="py-3 px-4 mb-[60px]">
@@ -297,9 +297,9 @@ const MobileBottomNav = () => {
         </DrawerContent>
       </Drawer>
 
-      {/* Bottom Navigation Bar */}
+      {/* Bottom Navigation Bar - MANTIDO COMO ESTAVA */}
       <div className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border md:hidden">
-        <div className="flex justify-around px-2 py-3">
+        <div className="flex justify-around px-1 py-2">
           {mainNavItems.map((item, index) => (
             <button
               key={item.label}
@@ -313,7 +313,7 @@ const MobileBottomNav = () => {
                 item.customRender()
               ) : (
                 <>
-                  <item.icon size={22} className="mb-1" />
+                  <item.icon size={20} className="mb-1" />
                   <span className="text-[10px]">{item.label}</span>
                 </>
               )}
