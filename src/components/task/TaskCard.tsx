@@ -155,6 +155,11 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
     return task.title;
   };
 
+  // Convert idealDate to string format if it's a Date object
+  const idealDateString = task.idealDate ? 
+    (typeof task.idealDate === 'string' ? task.idealDate : task.idealDate.toISOString()) 
+    : null;
+
   return (
     <>
       <motion.div
@@ -180,7 +185,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
         <TaskCardHeader 
           title={task.title}
           totalScore={task.totalScore}
-          idealDate={task.idealDate}
+          idealDate={idealDateString}
           isEditing={isEditingTitle}
           titleValue={titleValue}
           dateDisplayOptions={dateDisplayOptions}
