@@ -403,4 +403,4 @@ const Pillar = (props: any) => (
   </svg>
 );
 
-export default MobileBottomNa
+export default MobileBottomNav;
