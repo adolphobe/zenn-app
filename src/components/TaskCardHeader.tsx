@@ -1,9 +1,10 @@
 
 import React from 'react';
 import { format } from 'date-fns';
-import { Eye, CalendarDays } from 'lucide-react';
+import { Bell, Eye } from 'lucide-react';
 import { Badge } from './ui/badge';
 import { DateDisplayOptions } from '@/types/dates';
+import { isTaskOverdue } from '@/utils';
 
 interface TaskCardHeaderProps {
   title: string;
@@ -47,6 +48,9 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
   const formatString = dateDisplayOptions.dateFormat || 'dd/MM/yyyy';
   const formattedDate = idealDate ? format(new Date(idealDate), formatString) : null;
   
+  // Verificar se a data está vencida
+  const isOverdue = idealDate ? isTaskOverdue(idealDate) : false;
+  
   return (
     <div>
       {/* Title */}
@@ -87,17 +91,17 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
       <div className="flex flex-wrap gap-2 items-center mt-2">
         {consequenceScore !== undefined && (
           <Badge variant="outline" className="bg-opacity-80 text-xs task-text-secondary">
-            Cons: {consequenceScore}
+            Risco: {consequenceScore}
           </Badge>
         )}
         {prideScore !== undefined && (
           <Badge variant="outline" className="bg-opacity-80 text-xs task-text-secondary">
-            Org: {prideScore}
+            Orgulho: {prideScore}
           </Badge>
         )}
         {constructionScore !== undefined && (
           <Badge variant="outline" className="bg-opacity-80 text-xs task-text-secondary">
-            Constr: {constructionScore}
+            Crescimento Pessoal: {constructionScore}
           </Badge>
         )}
       </div>
@@ -105,7 +109,9 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
       {/* Data Ideal (se existir) */}
       {idealDate && (
         <div className="mt-2 flex items-center task-text-secondary text-sm">
-          <CalendarDays size={14} className="mr-1" /> 
+          {isOverdue ? (
+            <Bell size={14} className="mr-1 text-[#ea384c]" /> 
+          ) : null}
           {formattedDate}
         </div>
       )}
