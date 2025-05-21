@@ -24,6 +24,31 @@ const CompletedTaskModal: React.FC<CompletedTaskModalProps> = ({ task, isOpen, o
   const isMobile = useIsMobile();
   const commentsContainerRef = useRef<HTMLDivElement | null>(null);
   
+  // Effect to prevent background scrolling
+  useEffect(() => {
+    if (isOpen && isMobile) {
+      // Save the current scroll position
+      const scrollY = window.scrollY;
+      
+      // Apply fixed positioning to body with current scroll offset
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = '100%';
+      document.body.style.overflowY = 'hidden';
+      
+      return () => {
+        // Restore scrolling when component unmounts or modal closes
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.width = '';
+        document.body.style.overflowY = '';
+        
+        // Restore scroll position
+        window.scrollTo(0, scrollY);
+      };
+    }
+  }, [isOpen, isMobile]);
+  
   // Se não tiver uma tarefa, não renderiza o conteúdo interno
   if (!task) return (
     <Dialog open={isOpen} onOpenChange={onClose}>

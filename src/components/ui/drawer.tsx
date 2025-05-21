@@ -30,23 +30,23 @@ const Drawer = ({
   // Effect to manage body scrolling
   React.useEffect(() => {
     if (open) {
-      // Save the current scroll position
+      // Salve a posição atual de rolagem
       const scrollY = window.scrollY;
       
-      // Lock the body in place
+      // Bloqueie o scroll do body completamente
       document.body.style.position = 'fixed';
       document.body.style.top = `-${scrollY}px`;
       document.body.style.width = '100%';
       document.body.style.overflowY = 'hidden';
       
       return () => {
-        // Restore body to normal when drawer closes
+        // Restaure quando o drawer fechar
         document.body.style.position = '';
         document.body.style.top = '';
         document.body.style.width = '';
         document.body.style.overflowY = '';
         
-        // Return to the previous scroll position
+        // Restaure a posição de rolagem
         window.scrollTo(0, scrollY);
       };
     }
