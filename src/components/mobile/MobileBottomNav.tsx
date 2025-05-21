@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Zap, ListOrdered, Filter, History, Calendar, Moon, Sun, Settings, LogOut } from 'lucide-react';
@@ -197,7 +196,7 @@ const MobileBottomNav = () => {
     }
   ];
 
-  // Main navigation items - conditionally show Filter based on page
+  // Modified: Always include Filter in mainNavItems but conditionally set disabled state
   const mainNavItems = [
     { 
       icon: Zap, 
@@ -217,12 +216,17 @@ const MobileBottomNav = () => {
       isActive: location.pathname === '/mobile/history',
       action: handleHistoryMode
     },
-    ...(isPowerOrChronologicalPage ? [{ 
+    { 
       icon: Filter, 
       label: 'Filtros',
       isActive: filterDrawerOpen,
-      action: () => setFilterDrawerOpen(!filterDrawerOpen)
-    }] : []),
+      isDisabled: !isPowerOrChronologicalPage,
+      action: () => {
+        if (isPowerOrChronologicalPage) {
+          setFilterDrawerOpen(!filterDrawerOpen);
+        }
+      }
+    },
     // Replace the MoreHorizontal icon with a user Avatar
     { 
       customRender: () => (
@@ -242,7 +246,7 @@ const MobileBottomNav = () => {
     }
   ];
 
-  // Drawer menu item renderer - AUMENTEI O ESPAÇAMENTO E TAMANHO DOS ÍCONES AQUI
+  // Drawer menu item renderer
   const renderDrawerItem = (item: NavigationItem) => (
     <button 
       key={item.label}
@@ -275,7 +279,7 @@ const MobileBottomNav = () => {
 
   return (
     <>
-      {/* Filter Drawer - AUMENTEI O ESPAÇAMENTO AQUI */}
+      {/* Filter Drawer */}
       <Drawer open={filterDrawerOpen} onOpenChange={setFilterDrawerOpen} direction="bottom">
         <DrawerContent className="max-h-[70vh]">
           <div className="py-3 px-4 mb-[30px]">
@@ -287,7 +291,7 @@ const MobileBottomNav = () => {
         </DrawerContent>
       </Drawer>
 
-      {/* More Drawer - AUMENTEI O ESPAÇAMENTO AQUI */}
+      {/* More Drawer */}
       <Drawer open={moreDrawerOpen} onOpenChange={setMoreDrawerOpen} direction="bottom">
         <DrawerContent className="max-h-[70vh]">
           <div className="py-3 px-4 mb-[0px]">
@@ -298,7 +302,7 @@ const MobileBottomNav = () => {
         </DrawerContent>
       </Drawer>
 
-      {/* Bottom Navigation Bar with enhanced active state styling */}
+      {/* Bottom Navigation Bar with enhanced active state styling and disabled state for Filter */}
       <div className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border md:hidden">
         <div className="flex justify-around px-1 py-2">
           {mainNavItems.map((item, index) => (
@@ -308,9 +312,12 @@ const MobileBottomNav = () => {
                 "flex flex-col items-center justify-center w-1/5 py-1 text-xs",
                 item.isActive 
                   ? "text-primary" 
-                  : "text-muted-foreground"
+                  : item.isDisabled
+                    ? "text-gray-300 dark:text-gray-600 cursor-not-allowed"
+                    : "text-muted-foreground"
               )}
               onClick={item.action}
+              disabled={item.isDisabled}
             >
               {item.customRender ? (
                 item.customRender()
@@ -320,7 +327,9 @@ const MobileBottomNav = () => {
                     "flex items-center justify-center mb-1 rounded-md w-8 h-8 transition-colors",
                     item.isActive 
                       ? "bg-primary/10 text-primary" 
-                      : "text-muted-foreground"
+                      : item.isDisabled
+                        ? "text-gray-300 dark:text-gray-600"
+                        : "text-muted-foreground"
                   )}>
                     <item.icon size={20} />
                   </div>
@@ -328,7 +337,9 @@ const MobileBottomNav = () => {
                     "text-[10px]",
                     item.isActive 
                       ? "font-medium text-primary" 
-                      : "text-muted-foreground"
+                      : item.isDisabled
+                        ? "text-gray-300 dark:text-gray-600"
+                        : "text-muted-foreground"
                   )}>
                     {item.label}
                   </span>
@@ -345,7 +356,7 @@ const MobileBottomNav = () => {
   );
 };
 
-// Custom icon components com tamanho aumentado para 16px (eram 14px)
+// Custom icon components
 const Eye = (props: any) => (
   <svg 
     xmlns="http://www.w3.org/2000/svg" 
