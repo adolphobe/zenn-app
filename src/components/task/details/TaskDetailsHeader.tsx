@@ -37,40 +37,38 @@ const TaskDetailsHeader: React.FC<TaskDetailsHeaderProps> = ({ task }) => {
     };
     
     return (
-      <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg mt-4">
-        <h3 className="font-medium mb-2 text-gray-700 dark:text-gray-300">Feedback</h3>
-        <div className="text-gray-600 dark:text-gray-300 px-2 py-1">
-          <span className={`font-medium ${feedbackStyles[task.feedback as keyof typeof feedbackStyles] || ''}`}>
-            {feedbackLabels[task.feedback as keyof typeof feedbackLabels] || 'Feedback não disponível'}
-          </span>
-        </div>
+      <div className="mt-2">
+        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Feedback:</span>
+        <span className={`ml-2 text-sm ${feedbackStyles[task.feedback as keyof typeof feedbackStyles] || ''}`}>
+          {feedbackLabels[task.feedback as keyof typeof feedbackLabels] || 'Feedback não disponível'}
+        </span>
       </div>
     );
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3">
       {/* Task Title */}
       <div>
-        <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+        <div className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
           Título da Tarefa
-        </label>
-        <div className="w-full p-3 border rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
+        </div>
+        <div className="text-gray-800 dark:text-gray-200">
           {task.title}
         </div>
       </div>
       
       {/* Task Dates */}
-      <div className="flex flex-col space-y-2 mt-4">
-        <div className="flex flex-col sm:flex-row sm:justify-between">
-          <div className="mb-2">
+      <div className="flex flex-col mt-2 space-y-1">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:space-y-0 space-y-1">
+          <div>
             <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Concluída em:</span>
             <span className="ml-2 text-sm text-gray-600 dark:text-gray-400">
               {formatDate(task.completedAt)}
             </span>
           </div>
           {task.idealDate && (
-            <div className="mb-2">
+            <div>
               <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Data da tarefa:</span>
               <span className="ml-2 text-sm text-gray-600 dark:text-gray-400">
                 {formatDate(task.idealDate)}
