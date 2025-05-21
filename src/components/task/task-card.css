@@ -40,11 +40,24 @@
 
 /* Garantindo que o modo cronológico não tenha estilos de cores especiais */
 .task-card[data-view-mode="chronological"] {
-  @apply bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 border-gray-200 dark:border-gray-700;
+  @apply bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 border-gray-200 dark:border-gray-700 !important;
 }
 
 .task-card[data-view-mode="chronological"] .task-text-secondary {
-  @apply text-gray-600 dark:text-gray-400;
+  @apply text-gray-600 dark:text-gray-400 !important;
+}
+
+/* Desabilitando estilos de potência extra no modo cronológico */
+.task-card[data-view-mode="chronological"].task-power-extra {
+  background-image: none !important;
+  animation: none !important;
+  box-shadow: none !important;
+  @apply border-gray-200 dark:border-gray-700 !important;
+}
+
+/* Ocultando indicador de potência extra no modo cronológico */
+.task-card[data-view-mode="chronological"] .power-extra-indicator {
+  display: none !important;
 }
 
 /* Estilo para o modo de Potência Extra */
@@ -53,14 +66,6 @@
   background-image: linear-gradient(to right, #ffefef, #f0f7ff, #fff5eb);
   animation: subtle-pulse 0.7s ease-in-out infinite;
   box-shadow: 0 2px 8px rgba(234, 56, 76, 0.25); /* Sombra vermelha suave */
-}
-
-/* Garantindo que mesmo no modo Potência Extra, o modo cronológico mantém seu estilo */
-.task-card[data-view-mode="chronological"].task-power-extra {
-  background-image: none;
-  animation: none;
-  box-shadow: none;
-  @apply bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 border-gray-200 dark:border-gray-700;
 }
 
 /* Indicador de ponto piscando para Potência Extra */

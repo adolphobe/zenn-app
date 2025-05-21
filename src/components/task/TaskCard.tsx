@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Task } from '@/types';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -42,7 +41,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
   // Determinar classes de estilo com base no modo e status da tarefa
   let cardClass = "";
   
-  // Aplicar estilos diferentes baseados no viewMode
+  // Garantir que o viewMode seja respeitado e não seja substituído
   if (viewMode === 'power') {
     // No modo potência, usamos as classes de prioridade
     cardClass = getTaskPriorityClass(task.totalScore);
@@ -52,7 +51,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
       cardClass += ' task-power-extra';
     }
   } else {
-    // No modo cronológico, usamos o estilo padrão sem cores por prioridade
+    // No modo cronológico, forçamos sempre o estilo padrão sem cores por prioridade
     cardClass = 'bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 border-gray-200 dark:border-gray-700';
   }
   
