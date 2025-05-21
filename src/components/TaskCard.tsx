@@ -1,14 +1,5 @@
 
-// This file acts as a wrapper to maintain compatibility with existing code
-import { Task, ViewMode } from '@/types';
+// Este arquivo agora atua como um wrapper para manter a compatibilidade com o código existente
 import TaskCardNew from './task/TaskCardNew';
 
-interface TaskCardProps {
-  task: Task;
-  isExpanded: boolean;
-  onToggleExpand: (taskId: string) => void;
-  viewMode?: ViewMode; 
-}
-
-// Re-export TaskCardNew as default
 export default TaskCardNew;

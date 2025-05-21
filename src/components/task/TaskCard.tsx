@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Task } from '@/types';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -17,7 +16,7 @@ interface TaskCardProps {
   task: Task;
   isExpanded: boolean;
   onToggleExpand: (taskId: string) => void;
-  viewMode?: 'power' | 'chronological'; // Explicitly limiting to these two modes
+  viewMode?: 'power' | 'chronological'; // Made optional to maintain backward compatibility
 }
 
 const TaskCard: React.FC<TaskCardProps> = ({ 
@@ -42,18 +41,9 @@ const TaskCard: React.FC<TaskCardProps> = ({
   
   // Use the view mode from props if provided, otherwise fall back to the context value
   // This ensures that we can override the view mode when used in the chronological page
+  // Only use 'power' or 'chronological' (handle 'strategic' at the component level)
   const viewMode = propViewMode || 
     (contextViewMode === 'strategic' ? 'power' : contextViewMode);
-  
-  // Improved logging for debugging the display issues
-  console.log(`TaskCard rendering for task ${task.id} with:`, { 
-    title: task.title, 
-    totalScore: task.totalScore,
-    viewMode,
-    hidden: task.hidden, 
-    showHiddenTasks,
-    wasFiltered: task.hidden && !showHiddenTasks
-  });
   
   // Update titleValue when task changes
   useEffect(() => {
@@ -66,9 +56,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
   // Garantir que o viewMode seja respeitado e não seja substituído
   if (viewMode === 'power') {
     // No modo potência, usamos as classes de prioridade
-    const priorityClass = getTaskPriorityClass(task.totalScore);
-    console.log(`Task ${task.id} priority class: ${priorityClass} based on score ${task.totalScore}`);
-    cardClass = priorityClass;
+    cardClass = getTaskPriorityClass(task.totalScore);
     
     // Aplicar estilo "Potência Extra" se estiver ativado e no modo potência
     if (task.is_power_extra && task.totalScore >= 14) {

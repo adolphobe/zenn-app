@@ -71,7 +71,7 @@ const TaskLevelsContent: React.FC<TaskLevelsContentProps> = ({ task, isMobile = 
     <div className="space-y-6">
       <RatingSliderReadOnly
         value={task.consequenceScore}
-        color="red"
+        color="blue"
         label="Risco"
         description={riskExplanations}
       />
@@ -102,7 +102,7 @@ const TaskLevelsContent: React.FC<TaskLevelsContentProps> = ({ task, isMobile = 
       <div className="space-y-6">
         <RatingSliderReadOnly
           value={task.consequenceScore}
-          color="red"
+          color="blue"
           label="Risco"
           description={riskExplanations}
         />

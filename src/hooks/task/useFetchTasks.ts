@@ -1,4 +1,3 @@
-
 import { useState, useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Task } from '@/types';
@@ -20,10 +19,8 @@ export const useFetchTasks = (completed: boolean = false) => {
     
     try {
       setSyncStatus('syncing');
-      console.log('Fetching tasks for user:', currentUser.id, 'completed:', completed);
       const tasks = await fetchTasks(currentUser.id, completed);
       setSyncStatus('synced');
-      console.log('Fetched tasks count:', tasks.length);
       return tasks;
     } catch (error) {
       console.error('Error fetching tasks:', error);
@@ -32,7 +29,7 @@ export const useFetchTasks = (completed: boolean = false) => {
     }
   }, [currentUser?.id, isAuthenticated, completed]);
   
-  const { data, isLoading, error, refetch } = useQuery({
+  const { data, isLoading, error } = useQuery({
     queryKey: ['tasks', { completed }],
     queryFn: fetchTasksData,
     enabled: !!currentUser?.id && isAuthenticated,
@@ -71,7 +68,6 @@ export const useFetchTasks = (completed: boolean = false) => {
     isLoading,
     error,
     forceSynchronize,
-    syncStatus,
-    refetch
+    syncStatus
   };
 };

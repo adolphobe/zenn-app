@@ -42,10 +42,7 @@ const RatingSliderReadOnly: React.FC<RatingSliderReadOnlyProps> = ({
   const explanationClass = `text-sm text-${colorObj.base}-600 dark:text-${colorObj.base}-400 mt-4 min-h-6`;
 
   return (
-    <div 
-      className={containerClass}
-      style={{ pointerEvents: 'none' }} // Add this to make component non-interactive
-    >
+    <div className={containerClass}>
       <div className="flex justify-between items-center mb-3">
         <h2 className={`text-base font-medium ${headerTextClass}`}>{label}</h2>
         <span className={`text-sm font-medium ${headerTextClass}`}>{value}/5</span>
@@ -60,7 +57,7 @@ const RatingSliderReadOnly: React.FC<RatingSliderReadOnlyProps> = ({
           className={`absolute top-1/2 transform -translate-y-1/2 h-4 rounded-full`}
           style={{ 
             width: `${Math.max(5, (value - 1) * 25)}%`,
-            background: `linear-gradient(to right, #${color === 'green' ? '68d391' : color === 'orange' ? 'fdb874' : color === 'red' ? 'fc8181' : '60a5fa'}, #${color === 'green' ? '38a169' : color === 'orange' ? 'ed8936' : color === 'red' ? 'e53e3e' : '3182ce'})`
+            background: `linear-gradient(to right, #${color === 'green' ? '68d391' : color === 'orange' ? 'fdb874' : color === 'blue' ? '60a5fa' : 'fc8181'}, #${color === 'green' ? '38a169' : color === 'orange' ? 'ed8936' : color === 'blue' ? '3182ce' : 'e53e3e'})`
           }}
         ></div>
         

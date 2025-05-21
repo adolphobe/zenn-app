@@ -65,9 +65,9 @@ const TaskFormFields: React.FC<TaskFormFieldsProps> = ({
       <div className={`${isMobile ? 'space-y-5' : 'grid grid-cols-1 lg:grid-cols-2 gap-5'}`}>
         <div className="space-y-5">
           <ColoredSlider
-            color="red"
-            gradientFrom="red-400"
-            gradientTo="red-600"
+            color="blue"
+            gradientFrom="blue-400"
+            gradientTo="blue-600"
             value={formData.consequenceScore || 3}
             onChange={(value) => setFormData(prev => ({ ...prev, consequenceScore: value }))}
             label="Risco"

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '@/context/AppContext';
 import { useTaskDataContext } from '@/context/TaskDataProvider'; 
@@ -10,11 +11,11 @@ import { sortTasks, isTaskOverdue } from '@/utils';
 import { Plus, Bell, ChevronDown, ChevronUp, Loader2, RefreshCw } from 'lucide-react';
 import { useExpandedTask } from '@/context/hooks';
 import { Badge } from './ui/badge';
+import { Alert, AlertTitle, AlertDescription } from './ui/alert';
 import { Button } from './ui/button';
 import { toast } from '@/hooks/use-toast';
 import { AnimatePresence, motion } from 'framer-motion';
 import MobileRedirect from './MobileRedirect';
-import { ViewMode } from '@/types';
 
 const Dashboard: React.FC = () => {
   const { state } = useAppContext();
@@ -29,53 +30,20 @@ const Dashboard: React.FC = () => {
     return stored !== null ? JSON.parse(stored) : true;
   });
   
-  // Save showOverdueTasks to localStorage when it changes
-  useEffect(() => {
-    localStorage.setItem('showOverdueTasks', JSON.stringify(showOverdueTasks));
-  }, [showOverdueTasks]);
-  
   // Alternar mostrar/ocultar tarefas vencidas
   const toggleOverdueTasks = () => {
     setShowOverdueTasks(prev => !prev);
   };
   
-  // Improved console log to debug filter settings
-  console.log('Dashboard render with settings:', { 
-    viewMode, 
-    showHiddenTasks, 
-    sortOptions: sortOptions[viewMode],
-    taskCount: tasks?.length || 0,
-  });
-  
-  // Log all tasks for debugging
-  console.log('All tasks before filtering:', tasks.map(t => ({
-    id: t.id, 
-    title: t.title,
-    score: t.totalScore,
-    hidden: t.hidden,
-    completed: t.completed
-  })));
+  // Filtragem e ordenação de tarefas
+  const shouldShowHiddenTasks = showHiddenTasks;
   
   // Filtrar as tarefas não-completadas e visíveis conforme as configurações
   const filteredTasks = tasks.filter(task => {
-    // More detailed logging for filtering decisions
     const isNotCompleted = !task.completed;
-    const isVisible = showHiddenTasks || !task.hidden;
-    const keepTask = isNotCompleted && isVisible;
-    
-    console.log(`Filtering task ${task.id} (${task.title}):`, { 
-      score: task.totalScore,
-      completed: task.completed, 
-      hidden: task.hidden,
-      showHiddenTasks,
-      keepTask,
-      reason: !keepTask ? (task.completed ? 'completed' : 'hidden') : 'displayed'
-    });
-    
-    return keepTask;
+    const isVisible = shouldShowHiddenTasks || !task.hidden;
+    return isNotCompleted && isVisible;
   });
-  
-  console.log('Filtered tasks count:', filteredTasks.length);
   
   // Primeiro separar tarefas vencidas de não-vencidas
   const overdueTasksChronological = filteredTasks.filter(task => 
@@ -85,9 +53,6 @@ const Dashboard: React.FC = () => {
   const nonOverdueTasksChronological = filteredTasks.filter(task => 
     !task.idealDate || !isTaskOverdue(task.idealDate)
   );
-  
-  console.log('Overdue tasks:', overdueTasksChronological.length);
-  console.log('Non-overdue tasks:', nonOverdueTasksChronological.length);
     
   // Aplicar ordenação a cada grupo separadamente
   const sortedOverdueTasks = sortTasks(overdueTasksChronological, 'chronological', sortOptions['chronological']);
@@ -149,12 +114,6 @@ const Dashboard: React.FC = () => {
       });
     }
   };
-  
-  // Fix TypeScript typing for viewMode
-  const typedViewMode: ViewMode = viewMode as ViewMode;
-  
-  // Explicitly log the view mode for debugging
-  console.log('Current viewMode in Dashboard:', viewMode);
   
   // Adicionamos o componente MobileRedirect aqui
   return (
@@ -253,7 +212,6 @@ const Dashboard: React.FC = () => {
                               task={task} 
                               isExpanded={isTaskExpanded(task.id)} 
                               onToggleExpand={toggleTaskExpanded} 
-                              viewMode={typedViewMode}
                             />
                           </motion.div>
                         ))}
@@ -279,27 +237,19 @@ const Dashboard: React.FC = () => {
                   <TaskCard 
                     task={task} 
                     isExpanded={isTaskExpanded(task.id)} 
-                    onToggleExpand={toggleTaskExpanded}
-                    viewMode={typedViewMode}
+                    onToggleExpand={toggleTaskExpanded} 
                   />
                 </motion.div>
               ))}
             </AnimatePresence>
 
-            {filteredTasks.length === 0 && !tasksLoading && (
+            {filteredTasks.length === 0 && (
               <div className="text-center py-12 border border-dashed rounded-lg bg-muted/30 border-border">
                 <p className="text-muted-foreground">
-                  {showHiddenTasks 
+                  {shouldShowHiddenTasks 
                     ? 'Nenhuma tarefa encontrada. Adicione sua primeira tarefa!' 
                     : 'Nenhuma tarefa visível. Você pode habilitar tarefas ocultas nas configurações.'}
                 </p>
-              </div>
-            )}
-            
-            {tasksLoading && (
-              <div className="text-center py-12">
-                <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-blue-500" />
-                <p className="text-muted-foreground">Carregando tarefas...</p>
               </div>
             )}
           </div>

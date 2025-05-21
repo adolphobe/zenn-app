@@ -1,81 +1,110 @@
 
-/* Card styles for different priority levels */
+/* Estilos para os cartões de tarefas com base no nível de prioridade */
 .task-card {
-  @apply flex flex-col gap-2 p-4 relative rounded-lg border shadow transition-all;
+  @apply relative border rounded-lg p-4 shadow-sm transition-all duration-300;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
 }
 
-/* Priority classes for task cards based on score */
+/* Estilos de cores para o modo Potência baseado na pontuação total */
 .task-critical {
-  @apply bg-red-50 text-red-900 border-red-300 dark:bg-red-950 dark:text-red-100 dark:border-red-800;
+  @apply bg-acto-critical text-acto-critical-text border-red-300;
+}
+
+/* Fix for the circular dependency - instead of applying text-gray-X,
+   we directly style these elements in the context of task-critical */
+.task-critical .task-text-secondary {
+  @apply text-acto-critical-text;
 }
 
 .task-important {
-  @apply bg-purple-50 text-purple-900 border-purple-300 dark:bg-purple-950 dark:text-purple-100 dark:border-purple-800;
+  @apply bg-acto-important text-acto-important-text border-orange-300;
+}
+
+/* Using the same pattern for the other priority levels */
+.task-important .task-text-secondary {
+  @apply text-acto-important-text;
 }
 
 .task-moderate {
-  @apply bg-amber-50 text-amber-900 border-amber-300 dark:bg-amber-950 dark:text-amber-100 dark:border-amber-800;
+  @apply bg-acto-moderate text-acto-moderate-text border-blue-300;
+}
+
+.task-moderate .task-text-secondary {
+  @apply text-acto-moderate-text;
 }
 
 .task-light {
-  @apply bg-blue-50 text-blue-900 border-blue-200 dark:bg-blue-950 dark:text-blue-100 dark:border-blue-900;
+  @apply bg-acto-light text-acto-light-text border-gray-300;
 }
 
-/* Potência Extra animation */
-@keyframes pulseGlow {
-  0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
-  70% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+/* Garantindo que o modo cronológico não tenha estilos de cores especiais */
+.task-card[data-view-mode="chronological"] {
+  @apply bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 border-gray-200 dark:border-gray-700 !important;
 }
 
+.task-card[data-view-mode="chronological"] .task-text-secondary {
+  @apply text-gray-600 dark:text-gray-400 !important;
+}
+
+/* Desabilitando estilos de potência extra no modo cronológico */
+.task-card[data-view-mode="chronological"].task-power-extra {
+  background-image: none !important;
+  animation: none !important;
+  box-shadow: none !important;
+  @apply border-gray-200 dark:border-gray-700 !important;
+}
+
+/* Ocultando indicador de potência extra no modo cronológico */
+.task-card[data-view-mode="chronological"] .power-extra-indicator {
+  display: none !important;
+}
+
+/* Estilo para o modo de Potência Extra */
 .task-power-extra {
-  @apply border-red-500;
-  animation: pulseGlow 2s infinite;
+  @apply border-red-500 shadow-md;
+  background-image: linear-gradient(to right, #ffefef, #f0f7ff, #fff5eb);
+  animation: subtle-pulse 0.7s ease-in-out infinite;
+  box-shadow: 0 2px 8px rgba(234, 56, 76, 0.25); /* Sombra vermelha suave */
 }
 
-/* Styling for Power Extra indicator in titles */
+/* Indicador de ponto piscando para Potência Extra */
 .power-extra-indicator {
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  background-color: #ef4444; /* red-500 */
-  border-radius: 50%;
-  margin-right: 8px;
-  animation: pulseGlow 2s infinite;
+  @apply w-2 h-2 rounded-full bg-red-500 mr-2 inline-block;
+  animation: blink 1s ease-in-out infinite;
 }
 
-/* Text styles based on card type */
-.task-text-secondary {
-  @apply text-gray-600 dark:text-gray-400;
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
 }
 
-/* "Oculta" badge animation */
-.task-hidden-badge {
-  @apply bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300 text-xs py-0.5 px-1.5 ml-2 rounded-md flex items-center;
+/* Animação de pulse mais perceptível e mais rápida */
+@keyframes subtle-pulse {
+  0%, 100% { 
+    transform: scale(1);
+    box-shadow: 0 2px 8px rgba(234, 56, 76, 0.25);
+  }
+  50% { 
+    transform: scale(1.03); /* Aumentado para 1.03 */
+    box-shadow: 0 4px 14px rgba(234, 56, 76, 0.45);
+  }
 }
 
-/* Task disappearing and appearing animations */
-.task-hiding {
-  opacity: 0.5;
-  transform: translateY(-10px) scale(0.95);
-  transition: all 0.3s ease-in-out;
+/* Animações para mostrar/ocultar tarefas */
+.task-card[data-animation-state="hiding"] {
+  animation: fadeOut 0.4s ease-in-out forwards;
 }
 
-.task-showing {
-  opacity: 1;
-  transform: translateY(0) scale(1);
-  transition: all 0.3s ease-in-out;
+.task-card[data-animation-state="showing"] {
+  animation: fadeIn 0.4s ease-in-out forwards;
 }
 
-.task-hidden {
-  display: none;
+.task-card[data-pending-update="true"] {
+  pointer-events: none;
 }
 
-/* Custom delete button styles */
-.btn-red-lixeira {
-  @apply hover:bg-red-50 hover:text-red-600 hover:border-red-300 transition-colors;
-}
-
-.btn-green {
-  @apply bg-green-50 text-green-600 border-green-200 hover:bg-green-100 hover:border-green-300 transition-colors;
+/* Efeito de hover para cartões não animados */
+.task-card:not([data-pending-update="true"]):hover {
+  @apply shadow-md transform scale-[1.01];
 }

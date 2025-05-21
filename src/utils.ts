@@ -11,22 +11,10 @@ export const formatDate = (
 };
 
 export const getTaskPriorityClass = (score: number): string => {
-  // Add more debug logging
-  console.log(`Calculating priority class for score: ${score}`);
-  let priorityClass = '';
-  
-  if (score >= 14) {
-    priorityClass = 'task-critical';
-  } else if (score >= 11) {
-    priorityClass = 'task-important';
-  } else if (score >= 8) {
-    priorityClass = 'task-moderate';
-  } else {
-    priorityClass = 'task-light';
-  }
-  
-  console.log(`Priority class chosen: ${priorityClass}`);
-  return priorityClass;
+  if (score >= 14) return 'task-critical';
+  if (score >= 11) return 'task-important';
+  if (score >= 8) return 'task-moderate';
+  return 'task-light';
 };
 
 // Exporta funções do dateService para compatibilidade
