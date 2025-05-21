@@ -10,6 +10,7 @@ import TaskForm from '@/components/TaskForm';
 import { sortTasks } from '@/utils';
 import { NavigationStore } from '@/utils/navigationStore';
 import MobileSortDropdown from '@/components/mobile/MobileSortDropdown';
+import PullToRefresh from '@/components/mobile/PullToRefresh';
 
 // Preload the chronological page component - this is static and won't change
 const preloadChronological = () => import('./MobileChronologicalPage');
@@ -97,64 +98,66 @@ const MobilePowerPage: React.FC = () => {
   }
 
   return (
-    <motion.div 
-      className="py-2 relative"
-      initial="initial"
-      animate="animate"
-      exit="exit"
-      variants={pageVariants}
-    >
-      {/* Cabeçalho com ordenação e botão de adicionar */}
-      <div className="flex justify-between items-center mb-4">
-        <MobileSortDropdown />
+    <PullToRefresh>
+      <motion.div 
+        className="py-2 relative"
+        initial="initial"
+        animate="animate"
+        exit="exit"
+        variants={pageVariants}
+      >
+        {/* Cabeçalho com ordenação e botão de adicionar */}
+        <div className="flex justify-between items-center mb-4">
+          <MobileSortDropdown />
+          
+          <Button
+            onClick={() => setIsTaskFormOpen(true)}
+            className="bg-blue-600 text-white hover:bg-blue-700 transition-colors rounded-full h-10 w-10 shadow-md flex items-center justify-center"
+            size="icon"
+          >
+            <Plus size={20} />
+          </Button>
+        </div>
         
-        <Button
-          onClick={() => setIsTaskFormOpen(true)}
-          className="bg-blue-600 text-white hover:bg-blue-700 transition-colors rounded-full h-10 w-10 shadow-md flex items-center justify-center"
-          size="icon"
-        >
-          <Plus size={20} />
-        </Button>
-      </div>
-      
-      {/* Lista de tarefas */}
-      <div className="grid grid-cols-1 gap-3">
-        <AnimatePresence initial={false} mode="popLayout">
-          {sortedTasks.map(task => (
-            <motion.div
-              key={`task-${task.id}-${task.hidden ? 1 : 0}-${task._optimisticUpdateTime || 0}`}
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-              variants={taskVariants}
-              layout
-              layoutId={`task-container-${task.id}`}
-            >
-              <TaskCard 
-                task={task} 
-                isExpanded={isTaskExpanded(task.id)} 
-                onToggleExpand={toggleTaskExpanded} 
-              />
-            </motion.div>
-          ))}
-        </AnimatePresence>
+        {/* Lista de tarefas */}
+        <div className="grid grid-cols-1 gap-3">
+          <AnimatePresence initial={false} mode="popLayout">
+            {sortedTasks.map(task => (
+              <motion.div
+                key={`task-${task.id}-${task.hidden ? 1 : 0}-${task._optimisticUpdateTime || 0}`}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+                variants={taskVariants}
+                layout
+                layoutId={`task-container-${task.id}`}
+              >
+                <TaskCard 
+                  task={task} 
+                  isExpanded={isTaskExpanded(task.id)} 
+                  onToggleExpand={toggleTaskExpanded} 
+                />
+              </motion.div>
+            ))}
+          </AnimatePresence>
 
-        {filteredTasks.length === 0 && (
-          <div className="text-center py-8 border border-dashed rounded-lg bg-muted/30 border-border">
-            <p className="text-muted-foreground text-sm">
-              {shouldShowHiddenTasks 
-                ? 'Nenhuma tarefa encontrada. Adicione sua primeira tarefa!' 
-                : 'Nenhuma tarefa visível. Você pode habilitar tarefas ocultas nas configurações.'}
-            </p>
-          </div>
+          {filteredTasks.length === 0 && (
+            <div className="text-center py-8 border border-dashed rounded-lg bg-muted/30 border-border">
+              <p className="text-muted-foreground text-sm">
+                {shouldShowHiddenTasks 
+                  ? 'Nenhuma tarefa encontrada. Adicione sua primeira tarefa!' 
+                  : 'Nenhuma tarefa visível. Você pode habilitar tarefas ocultas nas configurações.'}
+              </p>
+            </div>
+          )}
+        </div>
+        
+        {/* Task Form Modal */}
+        {isTaskFormOpen && (
+          <TaskForm onClose={() => setIsTaskFormOpen(false)} />
         )}
-      </div>
-      
-      {/* Task Form Modal */}
-      {isTaskFormOpen && (
-        <TaskForm onClose={() => setIsTaskFormOpen(false)} />
-      )}
-    </motion.div>
+      </motion.div>
+    </PullToRefresh>
   );
 };
 

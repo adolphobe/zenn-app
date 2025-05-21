@@ -1,0 +1,44 @@
+
+/* Styles for pull-to-refresh component */
+.ptr-element {
+  position: absolute;
+  width: 100%;
+  height: auto;
+  left: 0;
+  top: 0;
+  overflow: hidden;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.ptr-element .ptr-content {
+  position: relative;
+}
+
+.ptr-element__body {
+  position: relative;
+}
+
+.ptr--dragging .ptr-element__body {
+  transition: none;
+  cursor: pointer;
+}
+
+.ptr--dragging {
+  overflow: hidden !important;
+}
+
+.ptr--refresh .ptr-element {
+  transition: transform 0.2s;
+  transform: translate3d(0, 50px, 0);
+}
+
+.ptr--release .ptr-element {
+  transition: transform 0.2s;
+  transform: translate3d(0, 50px, 0);
+}
+
+.ptr--reset .ptr-element {
+  transition: transform 0.2s;
+  transform: translate3d(0, 0, 0);
+}
