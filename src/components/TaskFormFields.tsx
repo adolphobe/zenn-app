@@ -74,7 +74,7 @@ const TaskFormFields: React.FC<TaskFormFieldsProps> = ({
           
           <div>
             <label htmlFor="idealDate" className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
-              A partir de quando você quer se ver envolvido com isso?
+              Data: (opcional)
             </label>
             <input
               type="datetime-local"
