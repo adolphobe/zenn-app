@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '@/context/AppContext';
 import { useTaskDataContext } from '@/context/TaskDataProvider'; 
@@ -15,6 +14,7 @@ import { Button } from './ui/button';
 import { toast } from '@/hooks/use-toast';
 import { AnimatePresence, motion } from 'framer-motion';
 import MobileRedirect from './MobileRedirect';
+import { ViewMode } from '@/types';
 
 const Dashboard: React.FC = () => {
   const { state } = useAppContext();
@@ -136,6 +136,9 @@ const Dashboard: React.FC = () => {
       });
     }
   };
+  
+  // Fix TypeScript typing for viewMode
+  const typedViewMode: ViewMode = viewMode;
   
   // Adicionamos o componente MobileRedirect aqui
   return (
@@ -261,7 +264,7 @@ const Dashboard: React.FC = () => {
                     task={task} 
                     isExpanded={isTaskExpanded(task.id)} 
                     onToggleExpand={toggleTaskExpanded}
-                    viewMode={viewMode}
+                    viewMode={typedViewMode}
                   />
                 </motion.div>
               ))}
