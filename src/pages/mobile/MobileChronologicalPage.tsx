@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '@/context/AppContext';
 import { useTaskDataContext } from '@/context/TaskDataProvider';
@@ -10,6 +11,7 @@ import TaskForm from '@/components/TaskForm';
 import { sortTasks, isTaskOverdue } from '@/utils';
 import { Badge } from '@/components/ui/badge';
 import MobileSortDropdown from '@/components/mobile/MobileSortDropdown';
+import { NavigationStore } from '@/utils/navigationStore';
 
 // Preload the power page component - this is static and won't change
 const preloadPower = () => import('./MobilePowerPage');
