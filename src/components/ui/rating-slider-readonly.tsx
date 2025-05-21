@@ -42,7 +42,10 @@ const RatingSliderReadOnly: React.FC<RatingSliderReadOnlyProps> = ({
   const explanationClass = `text-sm text-${colorObj.base}-600 dark:text-${colorObj.base}-400 mt-4 min-h-6`;
 
   return (
-    <div className={containerClass}>
+    <div 
+      className={containerClass}
+      style={{ pointerEvents: 'none' }} // Add this to make component non-interactive
+    >
       <div className="flex justify-between items-center mb-3">
         <h2 className={`text-base font-medium ${headerTextClass}`}>{label}</h2>
         <span className={`text-sm font-medium ${headerTextClass}`}>{value}/5</span>
