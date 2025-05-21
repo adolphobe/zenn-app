@@ -226,9 +226,9 @@ const MobileBottomNav = () => {
     { 
       customRender: () => (
         <div className="flex flex-col items-center justify-center">
-          <Avatar className="h-6 w-6 mb-1">
+          <Avatar className="h-8 w-8 mb-1">
             <AvatarImage src={currentUser?.profileImage} />
-            <AvatarFallback className="text-[10px] bg-primary/10">
+            <AvatarFallback className="text-xs bg-primary/10">
               {currentUser?.name?.substring(0, 2) || 'U'}
             </AvatarFallback>
           </Avatar>
@@ -245,7 +245,7 @@ const MobileBottomNav = () => {
   const renderDrawerItem = (item: NavigationItem) => (
     <button 
       key={item.label}
-      className="flex items-center gap-2 w-full p-2 hover:bg-muted rounded-md"
+      className="flex items-center gap-3 w-full p-3 hover:bg-muted rounded-md"
       onClick={() => {
         if (item.action) {
           item.action();
@@ -267,7 +267,7 @@ const MobileBottomNav = () => {
         }
       }}
     >
-      <item.icon size={18} />
+      <item.icon size={20} />
       <span className="text-sm">{item.label}</span>
     </button>
   );
@@ -277,9 +277,9 @@ const MobileBottomNav = () => {
       {/* Filter Drawer */}
       <Drawer open={filterDrawerOpen} onOpenChange={setFilterDrawerOpen} direction="bottom">
         <DrawerContent className="max-h-[70vh]">
-          <div className="py-2 px-3 mb-[30px]">
-            <h3 className="text-sm font-medium mb-2">Filtros</h3>
-            <div className="flex flex-col gap-1">
+          <div className="py-3 px-4 mb-[30px]">
+            <h3 className="text-sm font-medium mb-3">Filtros</h3>
+            <div className="flex flex-col gap-2">
               {filterItems.map(renderDrawerItem)}
             </div>
           </div>
@@ -289,8 +289,8 @@ const MobileBottomNav = () => {
       {/* More Drawer */}
       <Drawer open={moreDrawerOpen} onOpenChange={setMoreDrawerOpen} direction="bottom">
         <DrawerContent className="max-h-[70vh]">
-          <div className="py-2 px-3 mb-[60px]">
-            <div className="flex flex-col gap-1">
+          <div className="py-3 px-4 mb-[60px]">
+            <div className="flex flex-col gap-2">
               {moreItems.map(renderDrawerItem)}
             </div>
           </div>
@@ -299,7 +299,7 @@ const MobileBottomNav = () => {
 
       {/* Bottom Navigation Bar */}
       <div className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border md:hidden">
-        <div className="flex justify-around px-1 py-2">
+        <div className="flex justify-around px-2 py-3">
           {mainNavItems.map((item, index) => (
             <button
               key={item.label}
@@ -313,7 +313,7 @@ const MobileBottomNav = () => {
                 item.customRender()
               ) : (
                 <>
-                  <item.icon size={20} className="mb-1" />
+                  <item.icon size={22} className="mb-1" />
                   <span className="text-[10px]">{item.label}</span>
                 </>
               )}
@@ -328,7 +328,7 @@ const MobileBottomNav = () => {
   );
 };
 
-// Custom icon components with max 14px size (reduzidos de 18px)
+// Custom icon components com tamanho aumentado para 16px (eram 14px)
 const Eye = (props: any) => (
   <svg 
     xmlns="http://www.w3.org/2000/svg" 
@@ -338,8 +338,8 @@ const Eye = (props: any) => (
     strokeWidth="2" 
     strokeLinecap="round" 
     strokeLinejoin="round"
-    width="14"
-    height="14"
+    width="16"
+    height="16"
     {...props}
   >
     <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
@@ -356,8 +356,8 @@ const EyeOff = (props: any) => (
     strokeWidth="2" 
     strokeLinecap="round" 
     strokeLinejoin="round"
-    width="14"
-    height="14"
+    width="16"
+    height="16"
     {...props}
   >
     <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
@@ -376,8 +376,8 @@ const Badge = (props: any) => (
     strokeWidth="2" 
     strokeLinecap="round" 
     strokeLinejoin="round"
-    width="14"
-    height="14"
+    width="16"
+    height="16"
     {...props}
   >
     <path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z" />
@@ -393,8 +393,8 @@ const Pillar = (props: any) => (
     strokeWidth="2" 
     strokeLinecap="round" 
     strokeLinejoin="round"
-    width="14"
-    height="14"
+    width="16"
+    height="16"
     {...props}
   >
     <rect x="4" y="6" width="16" height="16" rx="2" />
@@ -403,4 +403,4 @@ const Pillar = (props: any) => (
   </svg>
 );
 
-export default MobileBottomNav;
+export default MobileBottomNa
