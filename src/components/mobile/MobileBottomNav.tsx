@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Zap, ListOrdered, Filter, History, Calendar, Moon, Sun, Settings, LogOut } from 'lucide-react';
@@ -297,7 +298,7 @@ const MobileBottomNav = () => {
         </DrawerContent>
       </Drawer>
 
-      {/* Bottom Navigation Bar - MANTIDO COMO ESTAVA */}
+      {/* Bottom Navigation Bar with enhanced active state styling */}
       <div className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border md:hidden">
         <div className="flex justify-around px-1 py-2">
           {mainNavItems.map((item, index) => (
@@ -305,7 +306,9 @@ const MobileBottomNav = () => {
               key={item.label}
               className={cn(
                 "flex flex-col items-center justify-center w-1/5 py-1 text-xs",
-                item.isActive ? "text-primary" : "text-muted-foreground"
+                item.isActive 
+                  ? "text-primary" 
+                  : "text-muted-foreground"
               )}
               onClick={item.action}
             >
@@ -313,8 +316,22 @@ const MobileBottomNav = () => {
                 item.customRender()
               ) : (
                 <>
-                  <item.icon size={20} className="mb-1" />
-                  <span className="text-[10px]">{item.label}</span>
+                  <div className={cn(
+                    "flex items-center justify-center mb-1 rounded-md w-8 h-8 transition-colors",
+                    item.isActive 
+                      ? "bg-primary/10 text-primary" 
+                      : "text-muted-foreground"
+                  )}>
+                    <item.icon size={20} />
+                  </div>
+                  <span className={cn(
+                    "text-[10px]",
+                    item.isActive 
+                      ? "font-medium text-primary" 
+                      : "text-muted-foreground"
+                  )}>
+                    {item.label}
+                  </span>
                 </>
               )}
             </button>
