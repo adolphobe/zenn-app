@@ -1,10 +1,10 @@
 
-/* Imports primeiro */
-@import url('./components/task/task-card.css');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Imports depois das diretivas do Tailwind */
+@import './components/task/task-card.css';
 
 @layer base {
   :root {

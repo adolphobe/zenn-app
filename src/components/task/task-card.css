@@ -11,9 +11,9 @@
   @apply bg-acto-critical text-acto-critical-text border-red-300;
 }
 
-.task-critical .text-gray-600,
-.task-critical .text-gray-500,
-.task-critical .text-xs {
+/* Fix for the circular dependency - instead of applying text-gray-X,
+   we directly style these elements in the context of task-critical */
+.task-critical .task-text-secondary {
   @apply text-acto-critical-text;
 }
 
@@ -21,9 +21,8 @@
   @apply bg-acto-important text-acto-important-text border-orange-300;
 }
 
-.task-important .text-gray-600,
-.task-important .text-gray-500,
-.task-important .text-xs {
+/* Using the same pattern for the other priority levels */
+.task-important .task-text-secondary {
   @apply text-acto-important-text;
 }
 
@@ -31,9 +30,7 @@
   @apply bg-acto-moderate text-acto-moderate-text border-blue-300;
 }
 
-.task-moderate .text-gray-600,
-.task-moderate .text-gray-500,
-.task-moderate .text-xs {
+.task-moderate .task-text-secondary {
   @apply text-acto-moderate-text;
 }
 
@@ -46,9 +43,7 @@
   @apply bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 border-gray-200 dark:border-gray-700;
 }
 
-.task-card[data-view-mode="chronological"] .text-gray-600,
-.task-card[data-view-mode="chronological"] .text-gray-500,
-.task-card[data-view-mode="chronological"] .text-xs {
+.task-card[data-view-mode="chronological"] .task-text-secondary {
   @apply text-gray-600 dark:text-gray-400;
 }
 
