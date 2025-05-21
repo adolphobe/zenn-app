@@ -46,6 +46,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, initialData, taskId, task,
   const isMobile = useIsMobile();
   const commentsContainerRef = useRef<HTMLDivElement | null>(null);
   const queryClient = useQueryClient();
+  const titleInputRef = useRef<HTMLInputElement>(null);
   
   // Use our comments hook to fetch and manage comments
   const { 
@@ -126,6 +127,17 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, initialData, taskId, task,
     setTimeout(scrollToBottom, 300);
   }, [refreshComments, scrollToBottom]);
 
+  // If not on mobile, focus the title input after the modal is displayed (only on desktop)
+  useEffect(() => {
+    if (!isMobile && titleInputRef.current) {
+      // Small delay to ensure modal is fully rendered
+      const timer = setTimeout(() => {
+        titleInputRef.current?.focus();
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [isMobile]);
+
   // Render appropriate form container based on mobile vs desktop
   if (isMobile) {
     // Mobile: Full-screen Sheet component for mobile
@@ -147,11 +159,13 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, initialData, taskId, task,
               type="text"
               id="title"
               name="title"
+              ref={titleInputRef}
               value={formData.title}
               onChange={handleChange}
               className="w-full p-3 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
               placeholder="O que precisa ser feito?"
               required
+              autoFocus={false} // Explicitly disable autofocus on mobile
             />
           </div>
           
@@ -269,6 +283,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, initialData, taskId, task,
                     type="text"
                     id="title"
                     name="title"
+                    ref={titleInputRef}
                     value={formData.title}
                     onChange={handleChange}
                     className="w-full p-3 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
@@ -337,6 +352,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, initialData, taskId, task,
                     type="text"
                     id="title"
                     name="title"
+                    ref={titleInputRef}
                     value={formData.title}
                     onChange={handleChange}
                     className="w-full p-3 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"

@@ -1,9 +1,15 @@
+
 import * as React from "react"
 
 import { cn } from "@/lib/utils"
 
 const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
-  ({ className, type, ...props }, ref) => {
+  ({ className, type, autoFocus, ...props }, ref) => {
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    
+    // On mobile devices, we explicitly prevent autofocus to avoid keyboard popping up
+    const shouldAutoFocus = isMobile ? false : autoFocus;
+    
     return (
       <input
         type={type}
@@ -12,6 +18,7 @@ const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
           className
         )}
         ref={ref}
+        autoFocus={shouldAutoFocus}
         {...props}
       />
     )

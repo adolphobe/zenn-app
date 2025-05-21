@@ -37,6 +37,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ task, isOpen, onClose }) 
   const { activeTab, setActiveTab } = useTabNavigation('levels');
   const isMobile = useIsMobile();
   const commentsContainerRef = useRef<HTMLDivElement | null>(null);
+  const titleInputRef = useRef<HTMLInputElement>(null);
   
   // Use our comments hook to manage comments
   const { 
@@ -140,6 +141,17 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ task, isOpen, onClose }) 
     setTimeout(scrollToBottom, 500);
   }, [refreshComments, scrollToBottom]);
 
+  // If not on mobile, focus the title input after the modal is displayed (only on desktop)
+  useEffect(() => {
+    if (!isMobile && titleInputRef.current) {
+      // Small delay to ensure modal is fully rendered
+      const timer = setTimeout(() => {
+        titleInputRef.current?.focus();
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [isMobile]);
+
   // Render the mobile version using Sheet
   if (isMobile) {
     return (
@@ -161,10 +173,12 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ task, isOpen, onClose }) 
                     type="text"
                     id="title"
                     name="title"
+                    ref={titleInputRef}
                     value={formData.title}
                     onChange={handleChange}
                     className="w-full p-3 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
                     placeholder="O que precisa ser feito?"
+                    autoFocus={false}
                     required
                   />
                 </div>
@@ -266,6 +280,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ task, isOpen, onClose }) 
                   type="text"
                   id="title"
                   name="title"
+                  ref={titleInputRef}
                   value={formData.title}
                   onChange={handleChange}
                   className="w-full p-3 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
