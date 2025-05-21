@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Task } from '@/types';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -42,7 +41,9 @@ const TaskCard: React.FC<TaskCardProps> = ({
   
   // Use the view mode from props if provided, otherwise fall back to the context value
   // This ensures that we can override the view mode when used in the chronological page
-  const viewMode = propViewMode || contextViewMode;
+  // Only use 'power' or 'chronological' (handle 'strategic' at the component level)
+  const viewMode = propViewMode || 
+    (contextViewMode === 'strategic' ? 'power' : contextViewMode);
   
   // Update titleValue when task changes
   useEffect(() => {

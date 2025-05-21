@@ -1,10 +1,9 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '@/context/AppContext';
 import { useTaskDataContext } from '@/context/TaskDataProvider';
 import { useExpandedTask } from '@/context/hooks';
 import { motion, AnimatePresence } from 'framer-motion';
-import TaskCard from '@/components/TaskCard';
+import TaskCard from '@/components/task/TaskCard';
 import { Plus, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import TaskForm from '@/components/TaskForm';
@@ -98,7 +97,7 @@ const MobilePowerPage: React.FC = () => {
   }
 
   // Ensure we always use 'power' as the viewMode for this page
-  const pageViewMode = 'power';
+  const pageViewMode = 'power' as const; // Use const assertion for literal type
 
   return (
     <motion.div 
@@ -138,7 +137,7 @@ const MobilePowerPage: React.FC = () => {
                 task={task} 
                 isExpanded={isTaskExpanded(task.id)} 
                 onToggleExpand={toggleTaskExpanded}
-                viewMode={pageViewMode} // Explicitly set viewMode to 'power'
+                viewMode={pageViewMode} // Using const assertion type
               />
             </motion.div>
           ))}

@@ -1,7 +1,7 @@
 
 import React from 'react';
 import TaskCard from './TaskCard';
-import { Task } from '@/types';
+import { Task, ViewMode } from '@/types';
 import { useAppContext } from '@/context/AppContext';
 
 interface TaskCardProps {
@@ -16,13 +16,17 @@ const TaskCardNew: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand
   const { state } = useAppContext();
   const { viewMode } = state;
   
+  // Ensure we only pass valid view modes to TaskCard
+  // Convert "strategic" to "power" as a fallback
+  const safeViewMode = viewMode === 'strategic' ? 'power' : viewMode;
+  
   return (
     <TaskCard 
       task={task}
       isExpanded={isExpanded}
       onToggleExpand={onToggleExpand}
-      // Always pass the current view mode
-      viewMode={viewMode}
+      // Pass the safe view mode
+      viewMode={safeViewMode}
     />
   );
 };

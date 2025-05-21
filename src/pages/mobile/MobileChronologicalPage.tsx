@@ -1,10 +1,9 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '@/context/AppContext';
 import { useTaskDataContext } from '@/context/TaskDataProvider';
 import { useExpandedTask } from '@/context/hooks';
 import { motion, AnimatePresence } from 'framer-motion';
-import TaskCard from '@/components/TaskCard';
+import TaskCard from '@/components/task/TaskCard';
 import { Plus, Loader2, Bell, ChevronUp, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import TaskForm from '@/components/TaskForm';
@@ -114,7 +113,7 @@ const MobileChronologicalPage: React.FC = () => {
   }
 
   // Ensure we always use 'chronological' as the viewMode for this page
-  const pageViewMode = 'chronological';
+  const pageViewMode = 'chronological' as const; // Use const assertion for literal type
 
   return (
     <div className="py-2 relative">
@@ -172,6 +171,7 @@ const MobileChronologicalPage: React.FC = () => {
                         task={task} 
                         isExpanded={isTaskExpanded(task.id)} 
                         onToggleExpand={toggleTaskExpanded}
+                        viewMode={pageViewMode} // Add viewMode prop with const assertion type
                       />
                     </motion.div>
                   ))}
@@ -199,6 +199,7 @@ const MobileChronologicalPage: React.FC = () => {
                 task={task} 
                 isExpanded={isTaskExpanded(task.id)} 
                 onToggleExpand={toggleTaskExpanded}
+                viewMode={pageViewMode} // Add viewMode prop with const assertion type
               />
             </motion.div>
           ))}
