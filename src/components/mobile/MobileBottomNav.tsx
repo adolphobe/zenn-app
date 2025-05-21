@@ -289,7 +289,7 @@ const MobileBottomNav = () => {
       {/* More Drawer - AUMENTEI O ESPAÇAMENTO AQUI */}
       <Drawer open={moreDrawerOpen} onOpenChange={setMoreDrawerOpen} direction="bottom">
         <DrawerContent className="max-h-[70vh]">
-          <div className="py-3 px-4 mb-[60px]">
+          <div className="py-3 px-4 mb-[10px]">
             <div className="flex flex-col gap-2">
               {moreItems.map(renderDrawerItem)}
             </div>
