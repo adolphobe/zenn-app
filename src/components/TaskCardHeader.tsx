@@ -46,9 +46,10 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
   viewMode,
 }) => {
   // Format date with the appropriate settings
-  // Use dateFormat from dateDisplayOptions, falling back to a default format if not provided
-  const formatString = dateDisplayOptions.dateFormat || 'dd/MM/yyyy';
-  const formattedDate = idealDate ? format(new Date(idealDate), formatString) : null;
+  const formatDate = dateDisplayOptions.dateFormat || 'dd/MM/yyyy';
+  const formatTime = 'HH:mm'; // Time format to show hours and minutes
+  const formattedDate = idealDate ? format(new Date(idealDate), formatDate) : null;
+  const formattedTime = idealDate ? format(new Date(idealDate), formatTime) : null;
   
   // Verificar se a data está vencida
   const isOverdue = idealDate ? isTaskOverdue(idealDate) : false;
@@ -119,16 +120,16 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
       </div>
 
       {/* Data Ideal (se existir) ou "SEM DATA" */}
-      <div className=" text-[12px] mt-2 flex items-center text-sm">
-  {idealDate ? (
-    <span className="task-text-secondary flex items-center">
-      {isOverdue && <Bell size={12} className="mr-1 text-[#ea384c]" />}
-      {formattedDate}
-    </span>
-  ) : (
-    <span className={noDateClassName}>Sem Data</span>
-  )}
-</div>
+      <div className="text-[12px] mt-2 flex items-center text-sm">
+        {idealDate ? (
+          <span className="task-text-secondary flex items-center">
+            {isOverdue && <Bell size={12} className="mr-1 text-[#ea384c]" />}
+            {formattedDate} {formattedTime && <span className="ml-1">às {formattedTime}</span>}
+          </span>
+        ) : (
+          <span className={noDateClassName}>Sem Data</span>
+        )}
+      </div>
     </div>
   );
 };
