@@ -6,19 +6,25 @@ import "../styles/task-score.css";
 interface TaskScoreDisplayProps {
   score: number;
   maxScore?: number;
+  animate?: boolean;
+  size?: 'sm' | 'md' | 'lg';
 }
 
 const TaskScoreDisplay: React.FC<TaskScoreDisplayProps> = ({ 
   score, 
-  maxScore = 15 
+  maxScore = 15,
+  animate = true,
+  size = 'md'
 }) => {
   const [animated, setAnimated] = useState(false);
   
   useEffect(() => {
-    setAnimated(true);
-    const timer = setTimeout(() => setAnimated(false), 1000);
-    return () => clearTimeout(timer);
-  }, [score]);
+    if (animate && score >= 11) {
+      setAnimated(true);
+      const timer = setTimeout(() => setAnimated(false), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [score, animate]);
 
   // Determine the styling based on score ranges
   const getScoreStyling = () => {
@@ -48,13 +54,19 @@ const TaskScoreDisplay: React.FC<TaskScoreDisplayProps> = ({
   const scoreClassName = getScoreStyling();
   const animationClass = (score >= 11 && animated) ? "task-score-animate" : "";
 
+  const textSize = {
+    sm: "text-base",
+    md: "text-[20px]",
+    lg: "text-3xl"
+  };
+
   return (
     <div className="task-score-container">
       <div className="task-score-header">
-        <span className={cn("task-score-title text-[20px]", scoreClassName, animationClass)}>
+        <span className={cn("task-score-title", textSize[size], scoreClassName, animationClass)}>
           Score Total:
         </span>
-        <span className={cn("task-score-value text-[20px]", scoreClassName, animationClass)}>
+        <span className={cn("task-score-value", textSize[size], scoreClassName, animationClass)}>
           {score}/{maxScore}
         </span>
       </div>
