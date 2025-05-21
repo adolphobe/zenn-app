@@ -260,7 +260,7 @@ const MobileBottomNav = () => {
       {/* Filter Drawer */}
       <Drawer open={filterDrawerOpen} onOpenChange={setFilterDrawerOpen} direction="bottom">
         <DrawerContent className="max-h-[70vh]">
-          <div className="py-2 px-3 mb-[60px]">
+          <div className="py-2 px-3 mb-[30px]">
             <h3 className="text-sm font-medium mb-2">Filtros</h3>
             <div className="flex flex-col gap-1">
               {filterItems.map(renderDrawerItem)}
