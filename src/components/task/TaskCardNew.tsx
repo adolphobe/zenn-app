@@ -18,8 +18,12 @@ const TaskCardNew: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand
   const { viewMode: contextViewMode } = state;
   
   // Use the provided viewMode prop if available, otherwise use the one from context
-  // Ensure we only pass valid view modes to TaskCard
-  const safeViewMode = propViewMode || contextViewMode;
+  // Strategic mode should fallback to power mode for task display
+  const baseViewMode = propViewMode || contextViewMode;
+  
+  // Convert strategic to power for the TaskCard component
+  const safeViewMode: 'power' | 'chronological' = 
+    baseViewMode === 'strategic' ? 'power' : baseViewMode as 'power' | 'chronological';
   
   // Debug the viewMode being passed
   console.log('TaskCardNew rendering with viewMode:', safeViewMode, 'for task:', task.id);

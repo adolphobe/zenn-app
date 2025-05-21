@@ -17,7 +17,7 @@ interface TaskCardProps {
   task: Task;
   isExpanded: boolean;
   onToggleExpand: (taskId: string) => void;
-  viewMode?: 'power' | 'chronological'; // Made optional to maintain backward compatibility
+  viewMode?: 'power' | 'chronological'; // Explicitly limiting to these two modes
 }
 
 const TaskCard: React.FC<TaskCardProps> = ({ 
