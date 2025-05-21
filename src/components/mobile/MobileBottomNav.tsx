@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Zap, ListOrdered, Filter, History, Calendar, Moon, Sun, Settings, LogOut } from 'lucide-react';
@@ -318,13 +319,14 @@ const MobileBottomNav = () => {
               )}
               onClick={item.action}
               disabled={item.isDisabled}
+              style={item.isDisabled ? { pointerEvents: 'none' } : {}}
             >
               {item.customRender ? (
                 item.customRender()
               ) : (
                 <>
                   <div className={cn(
-                    "flex items-center justify-center mb-1 rounded-md w-8 h-8 transition-colors",
+                    "flex items-center justify-center mb-1 rounded-md w-8 h-8",
                     item.isActive 
                       ? "bg-primary/10 text-primary" 
                       : item.isDisabled
