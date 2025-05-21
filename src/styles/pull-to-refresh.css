@@ -7,38 +7,32 @@
   left: 0;
   top: 0;
   overflow: hidden;
-  z-index: 10;
   pointer-events: none;
-}
-
-.ptr-element .ptr-content {
-  position: relative;
-}
-
-.ptr-element__body {
-  position: relative;
-}
-
-.ptr--dragging .ptr-element__body {
-  transition: none;
-  cursor: pointer;
-}
-
-.ptr--dragging {
-  overflow: hidden !important;
-}
-
-.ptr--refresh .ptr-element {
-  transition: transform 0.2s;
-  transform: translate3d(0, 50px, 0);
-}
-
-.ptr--release .ptr-element {
-  transition: transform 0.2s;
-  transform: translate3d(0, 50px, 0);
-}
-
-.ptr--reset .ptr-element {
-  transition: transform 0.2s;
+  z-index: 10;
   transform: translate3d(0, 0, 0);
+}
+
+.ptr-content {
+  position: relative;
+  transform: translate3d(0, 0, 0);
+}
+
+.ptr-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  height: 40px;
+  position: relative;
+}
+
+.ptr-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.ptr-pulling {
+  transition: transform 0.2s ease;
 }
