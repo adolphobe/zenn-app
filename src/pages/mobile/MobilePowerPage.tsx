@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '@/context/AppContext';
 import { useTaskDataContext } from '@/context/TaskDataProvider';
@@ -96,6 +97,9 @@ const MobilePowerPage: React.FC = () => {
     );
   }
 
+  // Ensure we always use 'power' as the viewMode for this page
+  const pageViewMode = 'power';
+
   return (
     <motion.div 
       className="py-2 relative"
@@ -133,7 +137,8 @@ const MobilePowerPage: React.FC = () => {
               <TaskCard 
                 task={task} 
                 isExpanded={isTaskExpanded(task.id)} 
-                onToggleExpand={toggleTaskExpanded} 
+                onToggleExpand={toggleTaskExpanded}
+                viewMode={pageViewMode} // Explicitly set viewMode to 'power'
               />
             </motion.div>
           ))}

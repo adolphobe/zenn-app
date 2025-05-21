@@ -113,6 +113,9 @@ const MobileChronologicalPage: React.FC = () => {
     );
   }
 
+  // Ensure we always use 'chronological' as the viewMode for this page
+  const pageViewMode = 'chronological';
+
   return (
     <div className="py-2 relative">
       {/* Cabeçalho com ordenação e botão de adicionar */}
@@ -168,7 +171,7 @@ const MobileChronologicalPage: React.FC = () => {
                         key={task.id} 
                         task={task} 
                         isExpanded={isTaskExpanded(task.id)} 
-                        onToggleExpand={toggleTaskExpanded} 
+                        onToggleExpand={toggleTaskExpanded}
                       />
                     </motion.div>
                   ))}
@@ -195,7 +198,7 @@ const MobileChronologicalPage: React.FC = () => {
               <TaskCard 
                 task={task} 
                 isExpanded={isTaskExpanded(task.id)} 
-                onToggleExpand={toggleTaskExpanded} 
+                onToggleExpand={toggleTaskExpanded}
               />
             </motion.div>
           ))}

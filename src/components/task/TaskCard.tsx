@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Task } from '@/types';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -16,9 +17,15 @@ interface TaskCardProps {
   task: Task;
   isExpanded: boolean;
   onToggleExpand: (taskId: string) => void;
+  viewMode?: 'power' | 'chronological'; // Made optional to maintain backward compatibility
 }
 
-const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand }) => {
+const TaskCard: React.FC<TaskCardProps> = ({ 
+  task, 
+  isExpanded, 
+  onToggleExpand,
+  viewMode: propViewMode // Accept viewMode as a prop
+}) => {
   
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [titleValue, setTitleValue] = useState(task.title);
@@ -27,11 +34,15 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
   const [deleteConfirmModalOpen, setDeleteConfirmModalOpen] = useState(false);
   
   const { state } = useAppContext();
-  const { showHiddenTasks, viewMode, dateDisplayOptions } = state;
+  const { showHiddenTasks, viewMode: contextViewMode, dateDisplayOptions } = state;
   const { toggleTaskHidden, updateTask } = useTaskDataContext();
   const { showToggleHiddenToast } = useTaskToasts();
   const { animationClass, isPendingVisibilityUpdate, animationState } = useTaskAnimations(task);
   const isMobile = useIsMobile();
+  
+  // Use the view mode from props if provided, otherwise fall back to the context value
+  // This ensures that we can override the view mode when used in the chronological page
+  const viewMode = propViewMode || contextViewMode;
   
   // Update titleValue when task changes
   useEffect(() => {
@@ -169,7 +180,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
         data-task-id={task.id}
         data-animation-state={animationState}
         data-pending-update={isPendingVisibilityUpdate}
-        data-view-mode={viewMode} // Adicionamos um atributo para marcar o modo de visualização
+        data-view-mode={viewMode} // Always set the data-view-mode attribute
         transition={{ 
           layout: { duration: 0.3, ease: "easeInOut" },
           opacity: { duration: 0.3 }
