@@ -51,7 +51,7 @@ const TaskDetailsHeader: React.FC<TaskDetailsHeaderProps> = ({ task }) => {
       {/* Task Title */}
       <div>
         <div className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-          Título da Tarefa
+          Título da Tarefa: {task.title}
         </div>
         <div className="text-gray-800 dark:text-gray-200">
           {task.title}
