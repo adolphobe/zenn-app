@@ -9,6 +9,7 @@ import { toast } from '@/hooks/use-toast';
 import { motion } from 'framer-motion';
 import LoginErrorToast from '@/components/auth/LoginErrorToast';
 import { fetchUserPreferences } from '@/services/preferencesService';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 // Map of error codes to messages
 const ERROR_MESSAGES = {
@@ -28,9 +29,17 @@ const Login: React.FC = () => {
   const [isJustLoggedOut, setIsJustLoggedOut] = useState(false);
   const [searchParams] = useSearchParams();
   const [loginError, setLoginError] = useState<string | null>(null);
+  const isMobile = useIsMobile();
   
-  // Get redirect path from location state or default to dashboard
-  const from = location.state?.from?.pathname || "/dashboard";
+  // Get redirect path from location state or use mobile route if on mobile device
+  const getRedirectPath = () => {
+    // If on mobile, redirect to mobile power view instead of dashboard
+    if (isMobile) {
+      return "/mobile/power";
+    }
+    // Otherwise use the stored path or default to dashboard
+    return location.state?.from?.pathname || "/dashboard";
+  };
 
   // Check for error parameter in URL
   useEffect(() => {
@@ -140,12 +149,14 @@ const Login: React.FC = () => {
       localStorage.setItem('login_success', 'true');
       
       const redirectTimer = setTimeout(() => {
-        navigate(from, { replace: true });
+        // Get correct redirect path based on device
+        const redirectPath = getRedirectPath();
+        navigate(redirectPath, { replace: true });
       }, 500);
       
       return () => clearTimeout(redirectTimer);
     }
-  }, [isAuthenticated, isLoading, from, navigate, isJustLoggedOut, localAuthCheck]);
+  }, [isAuthenticated, isLoading, navigate, isJustLoggedOut, localAuthCheck, isMobile]);
 
   // Toggle between login and signup
   const toggleSignup = () => {
@@ -237,7 +248,9 @@ const Login: React.FC = () => {
               onSwitchToSignup={toggleSignup} 
               onForgotPassword={showForgotPassword}
               onSuccess={() => {
-                navigate(from, { replace: true });
+                // Get correct redirect path based on device
+                const redirectPath = getRedirectPath();
+                navigate(redirectPath, { replace: true });
               }} 
             />
           )}

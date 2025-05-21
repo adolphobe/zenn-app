@@ -1,4 +1,3 @@
-
 import { Outlet, useLocation, Navigate } from 'react-router-dom';
 import { useAuth } from '@/context/auth';
 import { useSidebar } from '@/context/hooks';
@@ -40,9 +39,13 @@ export const PrivateRoute = () => {
     }
   }, [isLoading]);
 
-  // Mobile redirect for dashboard route
+  // Mobile redirect for dashboard route - but skip actual navigation to avoid flashing
   useEffect(() => {
     if (authChecked && !isLoading && isDashboardRoute && mobileCheck) {
+      // This is now handled by direct redirect from login page
+      // We keep this as a fallback, but it shouldn't be triggered normally
+      // Since we're redirecting from login already
+      
       // Get the user's preferred view mode from localStorage if available
       const appState = localStorage.getItem('app_state');
       const viewMode = appState ? JSON.parse(appState).viewMode : 'power';

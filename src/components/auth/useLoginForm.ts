@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useAuth } from '@/context/auth';
 import { z } from "zod";
 import { useNavigate } from 'react-router-dom';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 // Define esquema para validação de formulário
 export const loginSchema = z.object({
@@ -18,6 +19,7 @@ export function useLoginForm(onSuccess?: () => void) {
   const { login } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
