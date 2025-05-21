@@ -233,7 +233,7 @@ const MobileBottomNav = () => {
               {currentUser?.name?.substring(0, 2) || 'U'}
             </AvatarFallback>
           </Avatar>
-          <span className="text-[10px]">...</span>
+          <span className="text-[10px]">Mais opções</span>
         </div>
       ),
       label: 'Mais',
