@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '@/context/AppContext';
 import { useTaskDataContext } from '@/context/TaskDataProvider';
@@ -11,7 +12,6 @@ import { sortTasks, isTaskOverdue } from '@/utils';
 import { Badge } from '@/components/ui/badge';
 import MobileSortDropdown from '@/components/mobile/MobileSortDropdown';
 import { NavigationStore } from '@/utils/navigationStore';
-import PullToRefresh from '@/components/mobile/PullToRefresh';
 
 // Preload the power page component - this is static and won't change
 const preloadPower = () => import('./MobilePowerPage');
@@ -114,111 +114,109 @@ const MobileChronologicalPage: React.FC = () => {
   }
 
   return (
-    <PullToRefresh>
-      <div className="py-2 relative">
-        {/* Cabeçalho com ordenação e botão de adicionar */}
-        <div className="flex justify-between items-center mb-4">
-          <MobileSortDropdown />
-          
-          <Button
-            onClick={() => setIsTaskFormOpen(true)}
-            className="bg-blue-600 text-white hover:bg-blue-700 transition-colors rounded-full h-10 w-10 shadow-md flex items-center justify-center"
-            size="icon"
-          >
-            <Plus size={20} />
-          </Button>
-        </div>
+    <div className="py-2 relative">
+      {/* Cabeçalho com ordenação e botão de adicionar */}
+      <div className="flex justify-between items-center mb-4">
+        <MobileSortDropdown />
         
-        {/* Tarefas vencidas */}
-        {sortedOverdueTasks.length > 0 && (
-          <div className="border-2 border-[#ea384c]/30 rounded-lg p-3 relative mb-4 bg-[#ffafaf24] dark:bg-[#ff000024]">
-            <div className="absolute -top-2.5 left-3">
-              <Badge 
-                className="bg-[#ffe7e7] dark:bg-[#3e0515] text-[#ea384c] border-[#ea384c]/30 flex items-center gap-1 cursor-pointer hover:bg-[#ffd2d2] dark:hover:bg-[#59071e] transition-colors text-xs"
-                onClick={toggleOverdueTasks}
+        <Button
+          onClick={() => setIsTaskFormOpen(true)}
+          className="bg-blue-600 text-white hover:bg-blue-700 transition-colors rounded-full h-10 w-10 shadow-md flex items-center justify-center"
+          size="icon"
+        >
+          <Plus size={20} />
+        </Button>
+      </div>
+      
+      {/* Tarefas vencidas */}
+      {sortedOverdueTasks.length > 0 && (
+        <div className="border-2 border-[#ea384c]/30 rounded-lg p-3 relative mb-4 bg-[#ffafaf24] dark:bg-[#ff000024]">
+          <div className="absolute -top-2.5 left-3">
+            <Badge 
+              className="bg-[#ffe7e7] dark:bg-[#3e0515] text-[#ea384c] border-[#ea384c]/30 flex items-center gap-1 cursor-pointer hover:bg-[#ffd2d2] dark:hover:bg-[#59071e] transition-colors text-xs"
+              onClick={toggleOverdueTasks}
+            >
+              <Bell size={12} />
+              <span>Vencidas</span>
+              {showOverdueTasks ? 
+                <ChevronUp size={12} className="ml-1" /> : 
+                <ChevronDown size={12} className="ml-1" />
+              }
+            </Badge>
+          </div>
+          <AnimatePresence initial={false}>
+            {showOverdueTasks && (
+              <motion.div 
+                className="grid grid-cols-1 gap-3 mt-1"
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.3 }}
               >
-                <Bell size={12} />
-                <span>Vencidas</span>
-                {showOverdueTasks ? 
-                  <ChevronUp size={12} className="ml-1" /> : 
-                  <ChevronDown size={12} className="ml-1" />
-                }
-              </Badge>
-            </div>
-            <AnimatePresence initial={false}>
-              {showOverdueTasks && (
-                <motion.div 
-                  className="grid grid-cols-1 gap-3 mt-1"
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
-                  exit={{ opacity: 0, height: 0 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <AnimatePresence initial={false} mode="popLayout">
-                    {sortedOverdueTasks.map(task => (
-                      <motion.div
-                        key={`overdue-task-${task.id}-${task.hidden ? 1 : 0}-${task._optimisticUpdateTime || 0}`}
-                        initial="hidden"
-                        animate="visible"
-                        exit="exit"
-                        variants={taskVariants}
-                        layout
-                        layoutId={`task-container-${task.id}`}
-                      >
-                        <TaskCard 
-                          key={task.id} 
-                          task={task} 
-                          isExpanded={isTaskExpanded(task.id)} 
-                          onToggleExpand={toggleTaskExpanded} 
-                        />
-                      </motion.div>
-                    ))}
-                  </AnimatePresence>
-                </motion.div>
-              )}
-            </AnimatePresence>
+                <AnimatePresence initial={false} mode="popLayout">
+                  {sortedOverdueTasks.map(task => (
+                    <motion.div
+                      key={`overdue-task-${task.id}-${task.hidden ? 1 : 0}-${task._optimisticUpdateTime || 0}`}
+                      initial="hidden"
+                      animate="visible"
+                      exit="exit"
+                      variants={taskVariants}
+                      layout
+                      layoutId={`task-container-${task.id}`}
+                    >
+                      <TaskCard 
+                        key={task.id} 
+                        task={task} 
+                        isExpanded={isTaskExpanded(task.id)} 
+                        onToggleExpand={toggleTaskExpanded} 
+                      />
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      )}
+      
+      {/* Tarefas não vencidas */}
+      <div className="grid grid-cols-1 gap-3">
+        <AnimatePresence initial={false} mode="popLayout">
+          {sortedNonOverdueTasks.map(task => (
+            <motion.div
+              key={`task-${task.id}-${task.hidden ? 1 : 0}-${task._optimisticUpdateTime || 0}`}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              variants={taskVariants}
+              layout
+              layoutId={`task-container-${task.id}`}
+            >
+              <TaskCard 
+                task={task} 
+                isExpanded={isTaskExpanded(task.id)} 
+                onToggleExpand={toggleTaskExpanded} 
+              />
+            </motion.div>
+          ))}
+        </AnimatePresence>
+
+        {filteredTasks.length === 0 && (
+          <div className="text-center py-8 border border-dashed rounded-lg bg-muted/30 border-border">
+            <p className="text-muted-foreground text-sm">
+              {shouldShowHiddenTasks 
+                ? 'Nenhuma tarefa encontrada. Adicione sua primeira tarefa!' 
+                : 'Nenhuma tarefa visível. Você pode habilitar tarefas ocultas nas configurações.'}
+            </p>
           </div>
         )}
-        
-        {/* Tarefas não vencidas */}
-        <div className="grid grid-cols-1 gap-3">
-          <AnimatePresence initial={false} mode="popLayout">
-            {sortedNonOverdueTasks.map(task => (
-              <motion.div
-                key={`task-${task.id}-${task.hidden ? 1 : 0}-${task._optimisticUpdateTime || 0}`}
-                initial="hidden"
-                animate="visible"
-                exit="exit"
-                variants={taskVariants}
-                layout
-                layoutId={`task-container-${task.id}`}
-              >
-                <TaskCard 
-                  task={task} 
-                  isExpanded={isTaskExpanded(task.id)} 
-                  onToggleExpand={toggleTaskExpanded} 
-                />
-              </motion.div>
-            ))}
-          </AnimatePresence>
-
-          {filteredTasks.length === 0 && (
-            <div className="text-center py-8 border border-dashed rounded-lg bg-muted/30 border-border">
-              <p className="text-muted-foreground text-sm">
-                {shouldShowHiddenTasks 
-                  ? 'Nenhuma tarefa encontrada. Adicione sua primeira tarefa!' 
-                  : 'Nenhuma tarefa visível. Você pode habilitar tarefas ocultas nas configurações.'}
-              </p>
-            </div>
-          )}
-        </div>
-        
-        {/* Task Form Modal */}
-        {isTaskFormOpen && (
-          <TaskForm onClose={() => setIsTaskFormOpen(false)} />
-        )}
       </div>
-    </PullToRefresh>
+      
+      {/* Task Form Modal */}
+      {isTaskFormOpen && (
+        <TaskForm onClose={() => setIsTaskFormOpen(false)} />
+      )}
+    </div>
   );
 };
 
