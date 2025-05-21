@@ -1,13 +1,13 @@
 
 // This file acts as a wrapper to maintain compatibility with existing code
-import { Task } from '@/types';
+import { Task, ViewMode } from '@/types';
 import TaskCardNew from './task/TaskCardNew';
 
 interface TaskCardProps {
   task: Task;
   isExpanded: boolean;
   onToggleExpand: (taskId: string) => void;
-  viewMode?: 'power' | 'chronological'; // Added viewMode as optional prop
+  viewMode?: ViewMode; 
 }
 
 // Re-export TaskCardNew as default

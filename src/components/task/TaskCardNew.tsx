@@ -8,7 +8,6 @@ interface TaskCardProps {
   task: Task;
   isExpanded: boolean;
   onToggleExpand: (taskId: string) => void;
-  // Add viewMode as an optional prop to ensure backward compatibility
   viewMode?: ViewMode;
 }
 
@@ -20,17 +19,17 @@ const TaskCardNew: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand
   
   // Use the provided viewMode prop if available, otherwise use the one from context
   // Ensure we only pass valid view modes to TaskCard
-  // Convert "strategic" to "power" as a fallback
-  const safeViewMode = propViewMode || 
-    (contextViewMode === 'strategic' ? 'power' : contextViewMode);
+  const safeViewMode = propViewMode || contextViewMode;
+  
+  // Debug the viewMode being passed
+  console.log('TaskCardNew rendering with viewMode:', safeViewMode, 'for task:', task.id);
   
   return (
     <TaskCard 
       task={task}
       isExpanded={isExpanded}
       onToggleExpand={onToggleExpand}
-      // Pass the safe view mode
-      viewMode={safeViewMode as 'power' | 'chronological'}
+      viewMode={safeViewMode}
     />
   );
 };

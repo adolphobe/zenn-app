@@ -138,7 +138,10 @@ const Dashboard: React.FC = () => {
   };
   
   // Fix TypeScript typing for viewMode
-  const typedViewMode: ViewMode = viewMode;
+  const typedViewMode: ViewMode = viewMode as ViewMode;
+  
+  // Explicitly log the view mode for debugging
+  console.log('Current viewMode in Dashboard:', viewMode);
   
   // Adicionamos o componente MobileRedirect aqui
   return (
@@ -237,7 +240,7 @@ const Dashboard: React.FC = () => {
                               task={task} 
                               isExpanded={isTaskExpanded(task.id)} 
                               onToggleExpand={toggleTaskExpanded} 
-                              viewMode="chronological"
+                              viewMode={typedViewMode}
                             />
                           </motion.div>
                         ))}
