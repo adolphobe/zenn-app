@@ -108,7 +108,7 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
         )}
         {constructionScore !== undefined && (
           <Badge variant="outline" className="bg-opacity-80 text-xs task-text-secondary">
-            Crescimento Pessoal: {constructionScore}
+            Crescimento: {constructionScore}
           </Badge>
         )}
       </div>
