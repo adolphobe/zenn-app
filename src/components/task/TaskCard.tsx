@@ -45,8 +45,15 @@ const TaskCard: React.FC<TaskCardProps> = ({
   const viewMode = propViewMode || 
     (contextViewMode === 'strategic' ? 'power' : contextViewMode);
   
-  // Log view mode for debugging
-  console.log(`TaskCard rendering for task ${task.id} with viewMode:`, viewMode);
+  // Improved logging for debugging the display issues
+  console.log(`TaskCard rendering for task ${task.id} with:`, { 
+    title: task.title, 
+    totalScore: task.totalScore,
+    viewMode,
+    hidden: task.hidden, 
+    showHiddenTasks,
+    wasFiltered: task.hidden && !showHiddenTasks
+  });
   
   // Update titleValue when task changes
   useEffect(() => {
@@ -59,7 +66,9 @@ const TaskCard: React.FC<TaskCardProps> = ({
   // Garantir que o viewMode seja respeitado e não seja substituído
   if (viewMode === 'power') {
     // No modo potência, usamos as classes de prioridade
-    cardClass = getTaskPriorityClass(task.totalScore);
+    const priorityClass = getTaskPriorityClass(task.totalScore);
+    console.log(`Task ${task.id} priority class: ${priorityClass} based on score ${task.totalScore}`);
+    cardClass = priorityClass;
     
     // Aplicar estilo "Potência Extra" se estiver ativado e no modo potência
     if (task.is_power_extra && task.totalScore >= 14) {

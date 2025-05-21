@@ -39,27 +39,40 @@ const Dashboard: React.FC = () => {
     setShowOverdueTasks(prev => !prev);
   };
   
-  // Console log to debug filter settings
-  console.log('Dashboard render:', { 
+  // Improved console log to debug filter settings
+  console.log('Dashboard render with settings:', { 
     viewMode, 
     showHiddenTasks, 
     sortOptions: sortOptions[viewMode],
     taskCount: tasks?.length || 0,
   });
   
+  // Log all tasks for debugging
+  console.log('All tasks before filtering:', tasks.map(t => ({
+    id: t.id, 
+    title: t.title,
+    score: t.totalScore,
+    hidden: t.hidden,
+    completed: t.completed
+  })));
+  
   // Filtrar as tarefas não-completadas e visíveis conforme as configurações
   const filteredTasks = tasks.filter(task => {
-    // Log the task to debug
-    console.log('Task filtering:', { 
-      id: task.id, 
-      title: task.title, 
-      completed: task.completed, 
-      hidden: task.hidden 
-    });
-    
+    // More detailed logging for filtering decisions
     const isNotCompleted = !task.completed;
     const isVisible = showHiddenTasks || !task.hidden;
-    return isNotCompleted && isVisible;
+    const keepTask = isNotCompleted && isVisible;
+    
+    console.log(`Filtering task ${task.id} (${task.title}):`, { 
+      score: task.totalScore,
+      completed: task.completed, 
+      hidden: task.hidden,
+      showHiddenTasks,
+      keepTask,
+      reason: !keepTask ? (task.completed ? 'completed' : 'hidden') : 'displayed'
+    });
+    
+    return keepTask;
   });
   
   console.log('Filtered tasks count:', filteredTasks.length);

@@ -4,6 +4,23 @@
   @apply flex flex-col gap-2 p-4 relative rounded-lg border shadow transition-all;
 }
 
+/* Priority classes for task cards based on score */
+.task-critical {
+  @apply bg-red-50 text-red-900 border-red-300 dark:bg-red-950 dark:text-red-100 dark:border-red-800;
+}
+
+.task-important {
+  @apply bg-purple-50 text-purple-900 border-purple-300 dark:bg-purple-950 dark:text-purple-100 dark:border-purple-800;
+}
+
+.task-moderate {
+  @apply bg-amber-50 text-amber-900 border-amber-300 dark:bg-amber-950 dark:text-amber-100 dark:border-amber-800;
+}
+
+.task-light {
+  @apply bg-blue-50 text-blue-900 border-blue-200 dark:bg-blue-950 dark:text-blue-100 dark:border-blue-900;
+}
+
 /* Potência Extra animation */
 @keyframes pulseGlow {
   0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
