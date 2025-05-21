@@ -15,6 +15,21 @@ const ActoApp: React.FC = () => {
   // Determine if we're on a mobile-specific route
   const isMobileRoute = location.pathname.startsWith('/mobile/');
   
+  // Apply overscroll behavior to prevent pull-to-refresh
+  useEffect(() => {
+    if (currentIsMobile) {
+      // Apply the style in a way that ensures it's respected across the app
+      document.documentElement.style.overscrollBehavior = 'none';
+      document.body.style.overscrollBehavior = 'none';
+      
+      return () => {
+        // Cleanup when component unmounts
+        document.documentElement.style.overscrollBehavior = '';
+        document.body.style.overscrollBehavior = '';
+      };
+    }
+  }, [currentIsMobile]);
+  
   // Preload mobile components as soon as ActoApp renders
   useEffect(() => {
     // If on mobile device, preload mobile components immediately

@@ -1,4 +1,3 @@
-
 import { lazy, Suspense, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from '@/hooks/use-toast';
@@ -59,6 +58,25 @@ const queryClient = new QueryClient({
 
 // App with all providers and routes
 function App() {
+  // Disable pull-to-refresh behavior globally
+  useEffect(() => {
+    // Disable pull-to-refresh on mobile devices
+    const disablePullToRefresh = () => {
+      document.documentElement.style.overscrollBehavior = 'none';
+      document.body.style.overscrollBehavior = 'none';
+    };
+    
+    // Apply immediately
+    disablePullToRefresh();
+    
+    // Also listen for orientation changes to ensure it persists
+    window.addEventListener('orientationchange', disablePullToRefresh);
+    
+    return () => {
+      window.removeEventListener('orientationchange', disablePullToRefresh);
+    };
+  }, []);
+  
   // Preload important components on app init
   useEffect(() => {
     // Start preloading components after a short delay
