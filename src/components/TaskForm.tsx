@@ -136,6 +136,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, initialData, taskId, task,
       }, 100);
       return () => clearTimeout(timer);
     }
+    // Explicitly not focusing on mobile
   }, [isMobile]);
 
   // Render appropriate form container based on mobile vs desktop
@@ -150,7 +151,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, initialData, taskId, task,
         </SheetHeader>
 
         <div className="flex-1 overflow-y-auto p-4">
-          {/* Task title input */}
+          {/* Task title input - removed autoFocus */}
           <div className="mb-4">
             <label htmlFor="title" className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
               Título da Tarefa

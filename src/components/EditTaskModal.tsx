@@ -141,15 +141,17 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ task, isOpen, onClose }) 
     setTimeout(scrollToBottom, 500);
   }, [refreshComments, scrollToBottom]);
 
-  // If not on mobile, focus the title input after the modal is displayed (only on desktop)
+  // If not on mobile, focus the title input after the modal is displayed
+  // For mobile, we'll completely skip the autofocus to avoid the keyboard popping up
   useEffect(() => {
     if (!isMobile && titleInputRef.current) {
-      // Small delay to ensure modal is fully rendered
+      // Only focus on desktop
       const timer = setTimeout(() => {
         titleInputRef.current?.focus();
       }, 100);
       return () => clearTimeout(timer);
     }
+    // Explicitly not focusing on mobile
   }, [isMobile]);
 
   // Render the mobile version using Sheet
@@ -164,7 +166,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ task, isOpen, onClose }) 
             
             <div className="flex-1 overflow-auto">
               <div className="px-4 py-4 space-y-6">
-                {/* Task title input */}
+                {/* Task title input - removed autoFocus */}
                 <div>
                   <label htmlFor="title" className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
                     Título da Tarefa
