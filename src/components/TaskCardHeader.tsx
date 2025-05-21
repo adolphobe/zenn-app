@@ -126,7 +126,7 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
       {formattedDate}
     </span>
   ) : (
-    <span className={noDateClassName}>SEM DATA</span>
+    <span className={noDateClassName}>Sem Data</span>
   )}
 </div>
     </div>
