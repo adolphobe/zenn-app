@@ -23,6 +23,7 @@ interface TaskCardHeaderProps {
   prideScore?: number;
   constructionScore?: number;
   isPowerExtra?: boolean;
+  viewMode?: string;
 }
 
 const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
@@ -42,6 +43,7 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
   prideScore,
   constructionScore,
   isPowerExtra,
+  viewMode,
 }) => {
   // Format date with the appropriate settings
   // Use dateFormat from dateDisplayOptions, falling back to a default format if not provided
@@ -50,6 +52,11 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
   
   // Verificar se a data está vencida
   const isOverdue = idealDate ? isTaskOverdue(idealDate) : false;
+  
+  // Definir classe para o título de acordo com o modo e se está vencido
+  const titleClassName = `text-base md:text-lg font-medium cursor-pointer ${
+    viewMode === 'chronological' && isOverdue ? 'text-[#ea384c]' : ''
+  }`;
   
   return (
     <div>
@@ -67,7 +74,7 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
       ) : (
         <div className="flex justify-between items-start mb-2">
           <h3 
-            className="text-base md:text-lg font-medium cursor-pointer"
+            className={titleClassName}
             onClick={onTitleClick}
           >
             {isPowerExtra && (

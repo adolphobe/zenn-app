@@ -157,7 +157,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
   // Convert idealDate to string format if it's a Date object
   const idealDateString = task.idealDate ? 
     (typeof task.idealDate === 'string' ? task.idealDate : task.idealDate.toISOString()) 
-    : null;
+    : undefined;
 
   return (
     <>
@@ -198,6 +198,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
           prideScore={task.prideScore}
           constructionScore={task.constructionScore}
           isPowerExtra={viewMode === 'power' && task.is_power_extra && task.totalScore >= 14}
+          viewMode={viewMode}
         />
 
         <AnimatePresence initial={false}>
