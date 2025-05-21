@@ -104,24 +104,22 @@ const ColoredSlider: React.FC<ColoredSliderProps> = ({
     };
   }, [value]); // Re-attach listeners when value changes
   
-  // Generate class names for colors based on input props
-  const getColorClass = (baseClass: string) => {
-    if (baseClass === 'bg-gradient-to-r') {
-      return `${baseClass} from-${gradientFrom} to-${gradientTo}`;
-    }
-    return `${baseClass}-${color}`;
-  };
+  // Generate container class based on color
+  const containerClass = `flex flex-col w-full px-4 py-3 cursor-pointer bg-${color}-50 rounded-xl`;
+  
+  // Generate text classes based on color
+  const textClass = `text-${color}-600`;
   
   return (
     <div 
       ref={containerRef}
-      className={`flex flex-col w-full px-4 py-3 cursor-pointer ${getColorClass('bg')}-50 rounded-xl`}
+      className={containerClass}
       onMouseDown={handleMouseDown}
       onTouchStart={handleTouchStart}
     >
       <div className="flex justify-between items-center mb-3">
-        <h2 className={`text-base font-medium ${getColorClass('text')}-600`}>{label}</h2>
-        <span className={`text-sm font-medium ${getColorClass('text')}-600`}>{value}/5</span>
+        <h2 className={`text-base font-medium ${textClass}`}>{label}</h2>
+        <span className={`text-sm font-medium ${textClass}`}>{value}/5</span>
       </div>
       
       {/* Custom Track - Empty */}
@@ -130,8 +128,11 @@ const ColoredSlider: React.FC<ColoredSliderProps> = ({
         
         {/* Custom Track - Gradient - Always show at least 5% width */}
         <div 
-          className={`absolute top-1/2 transform -translate-y-1/2 h-4 rounded-full bg-gradient-to-r from-${gradientFrom} to-${gradientTo}`}
-          style={{ width: `${Math.max(5, (value - 1) * 25)}%` }}
+          style={{ 
+            width: `${Math.max(5, (value - 1) * 25)}%`,
+            background: `linear-gradient(to right, #${color === 'green' ? '68d391' : color === 'orange' ? 'fdb874' : color === 'blue' ? '60a5fa' : 'fc8181'}, #${color === 'green' ? '38a169' : color === 'orange' ? 'ed8936' : color === 'blue' ? '3182ce' : 'e53e3e'})`
+          }}
+          className="absolute top-1/2 transform -translate-y-1/2 h-4 rounded-full"
         ></div>
         
         {/* Markers */}
@@ -139,14 +140,14 @@ const ColoredSlider: React.FC<ColoredSliderProps> = ({
           {[1, 2, 3, 4, 5].map((mark) => (
             <div 
               key={mark} 
-              className={`h-1.5 w-1.5 rounded-full ${mark <= value ? `${getColorClass('bg')}-500` : 'bg-gray-200'}`}
+              className={`h-1.5 w-1.5 rounded-full ${mark <= value ? `bg-${color}-500` : 'bg-gray-200'}`}
             ></div>
           ))}
         </div>
       </div>
       
       {/* Explanatory text */}
-      <p className={`text-sm ${getColorClass('text')}-600 mt-4 min-h-6`}>
+      <p className={`text-sm ${textClass} mt-4 min-h-6`}>
         {getExplanation()}
       </p>
     </div>
