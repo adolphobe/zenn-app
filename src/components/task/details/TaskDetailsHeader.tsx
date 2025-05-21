@@ -51,9 +51,9 @@ const TaskDetailsHeader: React.FC<TaskDetailsHeaderProps> = ({ task }) => {
       {/* Task Title */}
       <div>
         <div className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-          Título da Tarefa:
+          Título da Tarefa: 
         </div>
-        <div className="ml-2 text-sm text-gray-600 dark:text-gray-400">
+        <div className="text-sm text-gray-600 dark:text-gray-400">
           {task.title}
         </div>
       </div>
@@ -62,15 +62,15 @@ const TaskDetailsHeader: React.FC<TaskDetailsHeaderProps> = ({ task }) => {
       <div className="flex flex-col mt-2 space-y-1">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:space-y-0 space-y-1">
           <div>
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Concluída em:</span>
-            <span className="ml-2 text-sm text-gray-600 dark:text-gray-400">
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Concluída em: </span>
+            <span className=" text-sm text-gray-600 dark:text-gray-400">
               {formatDate(task.completedAt)}
             </span>
           </div>
           {task.idealDate && (
             <div>
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Data da tarefa:</span>
-              <span className="ml-2 text-sm text-gray-600 dark:text-gray-400">
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Data da tarefa: </span>
+              <span className=" text-sm text-gray-600 dark:text-gray-400">
                 {formatDate(task.idealDate)}
               </span>
             </div>
