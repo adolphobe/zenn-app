@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -105,13 +104,11 @@
 
 /* Configurações de Botões */
 
-
 /* SERIA ESSE MODO DE CONFIGURAR SE FOSSE QUERER FAZER BOTAO PRO MODO DARK, ia adicionar class Dark no inicio
 .dark .btn-green {
   background-color: #00b300 !important;
 }
 */ 
-
 
 @layer components {
   /* Botão Verde */
@@ -130,8 +127,6 @@
     cursor: not-allowed !important;
   }
 
-
-
   /* Botão Vermelho Lixeira */
   .btn-red-lixeira {
   }
@@ -146,7 +141,6 @@
     opacity: 0.5 !important;
     cursor: not-allowed !important;
   }
-
 
   /* Botão Vermelho */
   .btn-red {
@@ -203,7 +197,7 @@
     opacity: 0.5 !important;
     cursor: not-allowed !important;
   }
-  
+
   /* Classes de Menu - Tema claro */
   .menu-item-active {
     color: #3265de !important;

@@ -3,7 +3,7 @@ import React from 'react';
 import { format } from 'date-fns';
 import { Eye, CalendarDays } from 'lucide-react';
 import { Badge } from './ui/badge';
-import { DateDisplayOptions } from '@/types';
+import { DateDisplayOptions } from '@/types/dates';
 
 interface TaskCardHeaderProps {
   title: string;
@@ -43,7 +43,9 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
   isPowerExtra,
 }) => {
   // Format date with the appropriate settings
-  const formattedDate = idealDate ? format(new Date(idealDate), dateDisplayOptions.format) : null;
+  // Use dateFormat from dateDisplayOptions, falling back to a default format if not provided
+  const formatString = dateDisplayOptions.dateFormat || 'dd/MM/yyyy';
+  const formattedDate = idealDate ? format(new Date(idealDate), formatString) : null;
   
   return (
     <div>
