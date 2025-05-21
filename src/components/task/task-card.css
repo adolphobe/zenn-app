@@ -41,12 +41,31 @@
   @apply bg-acto-light text-acto-light-text border-gray-300;
 }
 
+/* Garantindo que o modo cronológico não tenha estilos de cores especiais */
+.task-card[data-view-mode="chronological"] {
+  @apply bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 border-gray-200 dark:border-gray-700;
+}
+
+.task-card[data-view-mode="chronological"] .text-gray-600,
+.task-card[data-view-mode="chronological"] .text-gray-500,
+.task-card[data-view-mode="chronological"] .text-xs {
+  @apply text-gray-600 dark:text-gray-400;
+}
+
 /* Estilo para o modo de Potência Extra */
 .task-power-extra {
   @apply border-red-500 shadow-md;
   background-image: linear-gradient(to right, #ffefef, #f0f7ff, #fff5eb);
   animation: subtle-pulse 0.7s ease-in-out infinite;
   box-shadow: 0 2px 8px rgba(234, 56, 76, 0.25); /* Sombra vermelha suave */
+}
+
+/* Garantindo que mesmo no modo Potência Extra, o modo cronológico mantém seu estilo */
+.task-card[data-view-mode="chronological"].task-power-extra {
+  background-image: none;
+  animation: none;
+  box-shadow: none;
+  @apply bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 border-gray-200 dark:border-gray-700;
 }
 
 /* Indicador de ponto piscando para Potência Extra */

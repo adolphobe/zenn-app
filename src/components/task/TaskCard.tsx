@@ -40,15 +40,21 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
   }, [task.title]);
   
   // Determinar classes de estilo com base no modo e status da tarefa
-  let cardClass = viewMode === 'chronological' 
-    ? 'bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 border-gray-200 dark:border-gray-700' 
-    : getTaskPriorityClass(task.totalScore);
+  let cardClass = "";
   
-  // Aplicar estilo "Potência Extra" se estiver ativado e no modo potência
-  if (viewMode === 'power' && task.is_power_extra && task.totalScore >= 14) {
-    cardClass += ' task-power-extra';
+  // Aplicar estilos diferentes baseados no viewMode
+  if (viewMode === 'power') {
+    // No modo potência, usamos as classes de prioridade
+    cardClass = getTaskPriorityClass(task.totalScore);
+    
+    // Aplicar estilo "Potência Extra" se estiver ativado e no modo potência
+    if (task.is_power_extra && task.totalScore >= 14) {
+      cardClass += ' task-power-extra';
+    }
+  } else {
+    // No modo cronológico, usamos o estilo padrão sem cores por prioridade
+    cardClass = 'bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 border-gray-200 dark:border-gray-700';
   }
-  
   
   // Card expansion handler
   const handleCardClick = (e: React.MouseEvent) => {
@@ -159,6 +165,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpand })
         data-task-id={task.id}
         data-animation-state={animationState}
         data-pending-update={isPendingVisibilityUpdate}
+        data-view-mode={viewMode} // Adicionamos um atributo para marcar o modo de visualização
         transition={{ 
           layout: { duration: 0.3, ease: "easeInOut" },
           opacity: { duration: 0.3 }
