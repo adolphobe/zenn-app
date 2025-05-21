@@ -65,7 +65,7 @@ const TaskLevelsContent: React.FC<TaskLevelsContentProps> = ({ task, isMobile = 
       />
       
       <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg shadow-sm mt-6">
-        <div className="text-center">
+        <div className="text-center mb-5">
           <span className={`text-3xl font-bold ${scoreColorClass}`}>{task.totalScore || 0}/15</span>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{scoreLabel}</p>
         </div>
@@ -98,7 +98,7 @@ const TaskLevelsContent: React.FC<TaskLevelsContentProps> = ({ task, isMobile = 
       
       <div className="space-y-6">
         <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg shadow-sm mt-[33px]">
-          <div className="text-center">
+          <div className="text-center mb-5">
             <span className={`text-3xl font-bold ${scoreColorClass}`}>{task.totalScore || 0}/15</span>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{scoreLabel}</p>
           </div>
