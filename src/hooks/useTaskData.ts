@@ -14,6 +14,7 @@ import { useTaskStateOperations } from './task/useTaskStateOperations';
  */
 export const useTaskData = (completed: boolean = false) => {
   const { currentUser, isAuthenticated } = useAuth();
+  const queryClient = useQueryClient();
   const [operationLoading, setOperationLoading] = useState<Record<string, Record<string, boolean>>>({});
   
   // Helper to set loading state for specific task operations
@@ -32,7 +33,8 @@ export const useTaskData = (completed: boolean = false) => {
     tasks, 
     isLoading, 
     error, 
-    forceSynchronize 
+    forceSynchronize, 
+    syncStatus 
   } = useFetchTasks(completed);
   
   // Basic task operations (create, update, delete)
@@ -70,6 +72,7 @@ export const useTaskData = (completed: boolean = false) => {
     tasks: enhancedTasks,
     isLoading,
     error,
+    syncStatus,
     // Export all operations from both hooks
     ...taskOperations,
     ...taskStateOperations,
