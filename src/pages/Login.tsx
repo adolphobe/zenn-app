@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/auth';
@@ -166,7 +165,7 @@ const Login: React.FC = () => {
     setIsSignup(false);
   };
 
-  // Prevent rendering content during loading
+  // Prevent rendering content during loading or if already authenticated
   if (isLoading || localAuthCheck === null) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-blue-50 to-white">
@@ -178,16 +177,11 @@ const Login: React.FC = () => {
   // Use both authentication checks to determine if user is truly authenticated
   const actuallyAuthenticated = isAuthenticated && !isJustLoggedOut && localAuthCheck === true;
 
-  // If user is authenticated and not just logged out, show a temporary message
+  // If user is authenticated and not just logged out, show only loading spinner instead of message
   if (actuallyAuthenticated && !isJustLoggedOut) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gradient-to-b from-blue-50 to-white">
-        <div className="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 mb-4 max-w-lg">
-          <p className="font-bold">Já Autenticado</p>
-          <p>Você já está logado. Redirecionando...</p>
-        </div>
-        
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mt-4"></div>
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-blue-50 to-white">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
       </div>
     );
   }
