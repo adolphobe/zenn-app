@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Zap, ListOrdered, Filter, History, Calendar, Moon, Sun, Settings, LogOut } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -12,6 +11,11 @@ import {
   DrawerContent,
   DrawerTrigger,
 } from '@/components/ui/drawer';
+
+// Preload functions for key pages
+const preloadMobilePower = () => import('@/pages/mobile/MobilePowerPage');
+const preloadMobileChronological = () => import('@/pages/mobile/MobileChronologicalPage');
+const preloadMobileHistory = () => import('@/pages/mobile/MobileTaskHistoryPage');
 
 type NavigationItem = {
   icon: React.ElementType;
@@ -36,6 +40,19 @@ const MobileBottomNav = () => {
   
   const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
   const [moreDrawerOpen, setMoreDrawerOpen] = useState(false);
+
+  // Preload all mobile pages when bottom nav mounts
+  useEffect(() => {
+    // Start preloading with small delays to not block the main thread
+    setTimeout(() => preloadMobilePower(), 100);
+    setTimeout(() => preloadMobileChronological(), 200);
+    setTimeout(() => preloadMobileHistory(), 300);
+    
+    // Preload strategic review only if we're on a main page
+    if (location.pathname === '/mobile/power' || location.pathname === '/mobile/chronological') {
+      setTimeout(() => import('@/pages/mobile/MobileStrategicReviewPage'), 500);
+    }
+  }, []);
 
   // Enhanced navigation handlers with NavigationStore
   const handlePowerMode = () => {

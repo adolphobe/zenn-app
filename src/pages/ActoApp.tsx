@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import MobileBottomNav from '../components/mobile/MobileBottomNav';
@@ -9,6 +9,18 @@ import { useIsMobile } from '@/hooks/use-mobile';
 
 const ActoApp: React.FC = () => {
   const { isOpen: sidebarOpen, open: openSidebar, isMobile } = useSidebar();
+  
+  // Preload mobile components as soon as ActoApp renders
+  useEffect(() => {
+    if (isMobile) {
+      // Preload both pages immediately to avoid white screen transitions
+      const preloadPower = import('@/pages/mobile/MobilePowerPage');
+      const preloadChrono = import('@/pages/mobile/MobileChronologicalPage');
+      
+      // Also preload other commonly used pages
+      const preloadHistory = import('@/pages/mobile/MobileTaskHistoryPage');
+    }
+  }, [isMobile]);
   
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 flex">

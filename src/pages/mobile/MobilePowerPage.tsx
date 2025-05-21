@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '@/context/AppContext';
 import { useTaskDataContext } from '@/context/TaskDataProvider';
@@ -12,6 +11,9 @@ import { sortTasks } from '@/utils';
 import { NavigationStore } from '@/utils/navigationStore';
 import MobileSortDropdown from '@/components/mobile/MobileSortDropdown';
 
+// Preload the chronological page component - this is static and won't change
+const preloadChronological = () => import('./MobileChronologicalPage');
+
 const MobilePowerPage: React.FC = () => {
   const { state } = useAppContext();
   const { viewMode, showHiddenTasks, sortOptions } = state;
@@ -19,18 +21,13 @@ const MobilePowerPage: React.FC = () => {
   const [isTaskFormOpen, setIsTaskFormOpen] = useState(false);
   const { isTaskExpanded, toggleTaskExpanded } = useExpandedTask();
   
-  // Preload components for faster navigation
+  // Preload chronological page as soon as this component mounts
   useEffect(() => {
-    // Preload the history and strategic review pages
-    const preloadHistory = import('../mobile/MobileTaskHistoryPage').catch(() => {});
-    const preloadStrategic = import('../mobile/MobileStrategicReviewPage').catch(() => {});
+    // Start preloading instantly
+    preloadChronological();
     
-    // Record dashboard visit for optimizing return navigation
+    // Track navigation for optimization
     NavigationStore.recordDashboardVisit();
-    
-    return () => {
-      // Cleanup if needed
-    };
   }, []);
   
   // Filtragem e ordenação de tarefas - similar ao Desktop

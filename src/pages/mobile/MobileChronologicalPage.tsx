@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '@/context/AppContext';
 import { useTaskDataContext } from '@/context/TaskDataProvider';
@@ -12,12 +11,24 @@ import { sortTasks, isTaskOverdue } from '@/utils';
 import { Badge } from '@/components/ui/badge';
 import MobileSortDropdown from '@/components/mobile/MobileSortDropdown';
 
+// Preload the power page component - this is static and won't change
+const preloadPower = () => import('./MobilePowerPage');
+
 const MobileChronologicalPage: React.FC = () => {
   const { state } = useAppContext();
   const { viewMode, showHiddenTasks, sortOptions } = state;
   const { tasks, isLoading: tasksLoading } = useTaskDataContext();
   const [isTaskFormOpen, setIsTaskFormOpen] = useState(false);
   const { isTaskExpanded, toggleTaskExpanded } = useExpandedTask();
+  
+  // Preload power page as soon as this component mounts
+  useEffect(() => {
+    // Start preloading instantly
+    preloadPower();
+    
+    // Record this visit for optimizing navigation
+    NavigationStore.recordDashboardVisit();
+  }, []);
   
   // Estado para mostrar/esconder tarefas vencidas, inicializado do localStorage
   const [showOverdueTasks, setShowOverdueTasks] = useState(() => {
