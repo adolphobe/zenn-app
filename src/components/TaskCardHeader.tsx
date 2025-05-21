@@ -113,15 +113,17 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
         )}
       </div>
 
-      {/* Data Ideal (se existir) */}
-      {idealDate && (
-        <div className="mt-2 flex items-center task-text-secondary text-sm">
-          {isOverdue ? (
-            <Bell size={14} className="mr-1 text-[#ea384c]" /> 
-          ) : null}
-          {formattedDate}
-        </div>
-      )}
+      {/* Data Ideal (se existir) ou "SEM DATA" */}
+      <div className="mt-2 flex items-center task-text-secondary text-sm">
+        {idealDate ? (
+          <>
+            {isOverdue && <Bell size={14} className="mr-1 text-[#ea384c]" />}
+            {formattedDate}
+          </>
+        ) : (
+          <span className="text-gray-500 dark:text-gray-400">SEM DATA</span>
+        )}
+      </div>
     </div>
   );
 };
