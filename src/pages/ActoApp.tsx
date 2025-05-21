@@ -17,7 +17,7 @@ const ActoApp: React.FC = () => {
       
       <main 
         className={cn(
-          "transition-all duration-300 p-4 md:p-6 lg:p-8 flex-grow pb-16 md:pb-8",
+          "transition-all duration-300 p-4 md:p-6 lg:p-8 flex-grow pb-26 md:pb-8",
           sidebarOpen 
             ? isMobile ? "ml-0" : "md:ml-64" 
             : isMobile ? "ml-0" : "md:ml-20",
