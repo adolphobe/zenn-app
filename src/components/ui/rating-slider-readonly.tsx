@@ -57,7 +57,7 @@ const RatingSliderReadOnly: React.FC<RatingSliderReadOnlyProps> = ({
           className={`absolute top-1/2 transform -translate-y-1/2 h-4 rounded-full`}
           style={{ 
             width: `${Math.max(5, (value - 1) * 25)}%`,
-            background: `linear-gradient(to right, #${color === 'green' ? '68d391' : color === 'orange' ? 'fdb874' : color === 'blue' ? '60a5fa' : 'fc8181'}, #${color === 'green' ? '38a169' : color === 'orange' ? 'ed8936' : color === 'blue' ? '3182ce' : 'e53e3e'})`
+            background: `linear-gradient(to right, #${color === 'green' ? '68d391' : color === 'orange' ? 'fdb874' : color === 'red' ? 'fc8181' : '60a5fa'}, #${color === 'green' ? '38a169' : color === 'orange' ? 'ed8936' : color === 'red' ? 'e53e3e' : '3182ce'})`
           }}
         ></div>
         

@@ -5,7 +5,7 @@ import { PillarDataType } from '../types';
 
 // Colors for the pillars
 const COLORS = {
-  consequence: '#3B82F6', // Azul
+  consequence: '#ef5350', // Vermelho - alterado de azul para vermelho
   pride: '#F97316',       // Laranja
   construction: '#10B981' // Verde
 };
