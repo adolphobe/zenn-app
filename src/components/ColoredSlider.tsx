@@ -130,7 +130,7 @@ const ColoredSlider: React.FC<ColoredSliderProps> = ({
         
         {/* Custom Track - Gradient - Always show at least 5% width */}
         <div 
-          className={`absolute top-1/2 transform -translate-y-1/2 h-4 rounded-full ${getColorClass('bg-gradient-to-r')}`}
+          className={`absolute top-1/2 transform -translate-y-1/2 h-4 rounded-full bg-gradient-to-r from-${gradientFrom} to-${gradientTo}`}
           style={{ width: `${Math.max(5, (value - 1) * 25)}%` }}
         ></div>
         
